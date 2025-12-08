@@ -1,17 +1,12 @@
 package com.example.MuzPayroll.entity;
 
 import java.time.LocalDateTime;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "authorization_tbl")
 public class Authorization {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long authId;
@@ -20,7 +15,7 @@ public class Authorization {
     private Long mstId;
 
     @ManyToOne
-    @JoinColumn(name = "userCode", nullable = false)
+    @JoinColumn(name = "user_code", referencedColumnName = "userCode", nullable = false)
     private UserMst userMst;
 
     @Column(nullable = false)
@@ -28,6 +23,9 @@ public class Authorization {
 
     @Column(nullable = false)
     private boolean verified;
+
+    @Column(nullable = false)
+    private Integer userAttempts = 0;
 
     public Long getAuthId() {
         return authId;
@@ -67,5 +65,13 @@ public class Authorization {
 
     public void setVerified(boolean verified) {
         this.verified = verified;
+    }
+
+    public Integer getUserAttempts() {
+        return userAttempts;
+    }
+
+    public void setUserAttempts(Integer userAttempts) {
+        this.userAttempts = userAttempts;
     }
 }
