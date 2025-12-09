@@ -14,9 +14,10 @@ header.header {
     width: 100%;
     z-index: 100;
     display: flex;
+    border-bottom: 1px solid #c7c4c4ff;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 .logo {
  /* font-family: "Roboto", sans-serif; */
@@ -33,9 +34,9 @@ header.header {
     display: inline-block;
     padding-right: 10px;
     height: 100%;
-    padding: 12px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding: 14px;
+    padding-top: 17px;
+    padding-bottom: 17px;
     transition: all 0.3s ease;
      
 }
@@ -152,23 +153,23 @@ header.header {
 }
 .dashboard {
         padding: 10px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 17px;
+    padding-bottom: 17px;
     transition: all 0.3s ease;
 }
 .dashboard:hover {
     background-color:rgba(219, 219, 219, 0.726);
 }
 .user-profile {
-   background-color: rgba(219, 219, 219, 0.726);
+    background-color: rgba(219, 219, 219, 0.726);
     padding: 10px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 17px;
+    padding-bottom: 17px;
 }
 .settings {
-    padding: 12px;
-    padding-top: 13px;
-    padding-bottom: 13px;
+    padding: 14px;
+    padding-top: 18px;
+    padding-bottom: 18px;
 }
 .settings:hover {
     background-color:rgba(192, 190, 190, 0.73);
