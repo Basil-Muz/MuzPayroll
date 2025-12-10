@@ -1,0 +1,79 @@
+.location-form {
+  background: #ffffff;
+  width: 79rem;
+  margin-left: -3rem;
+  padding-top: 1px;
+  z-index: 0;
+  height: 1120px;
+}
+
+.generalinfo {
+  width: 95%;
+}
+.docinfo {
+  width: 95%;
+}
+
+.button-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 20px;
+  margin-left: 20px;
+  height: 55px;
+  width: 97%;
+  border-bottom: 2px solid #ada9a9;
+  transition: border-color 0.3s ease;
+}
+.button-toggle.general-active {
+  border-bottom-color: rgb(36, 48, 221);
+}
+
+.button-toggle.doc-active {
+  border-bottom-color: rgb(35, 180, 15); 
+}
+.doc {
+  left: 220px;
+  position: absolute;
+  width: 200px;
+  border-radius: 0px;
+  height: 55px;
+  border: none;
+}
+.general {
+  left: 20px;
+  /* position: absolute; */
+  width: 200px;
+  border-radius: 0px;
+  height: 55px;
+  border: none;
+}
+button.active-green {
+  background: rgb(35, 180, 15);
+  color: white;
+}
+button.active-blue {
+  background: rgb(36, 48, 221);
+  color: white;
+}
+button.inactive {
+  background-color: gainsboro;
+  color: #000000;
+}
+button.inactive:hover {
+  background-color: rgb(202, 200, 200);
+}
+.button-toggle.border-green {
+  border-bottom-color: rgb(35, 180, 15);
+}
+
+.button-toggle.border-blue {
+  border-bottom-color: rgb(36, 48, 221);
+}
+.form-tab {
+  display: none;
+}
+
+.form-tab.visible {
+  display: block;
+}
