@@ -35,7 +35,7 @@ header.header {
     padding-right: 10px;
     height: 100%;
     padding: 14px;
-    padding-top: 17px;
+    padding-top: 19px;
     padding-bottom: 17px;
     transition: all 0.3s ease;
      
@@ -91,7 +91,7 @@ header.header {
 }
 .notification .msgs {
     position: absolute;
-    top: 6px;
+    top: 11px;
     background-color: #188bd8;
     color: white;
     right: 10.4rem;
@@ -115,7 +115,7 @@ header.header {
 }
 /* When dashboard is hidden */
 .notification.no-dashboard .msgs {
-    right: 0.4rem; /* same as dashboard */
+    right: 0.5rem; /* same as dashboard */
 }
 /* @keyframes ring {
   0% { transform: rotate(0deg); }
@@ -162,7 +162,7 @@ header.header {
 }
 .user-profile {
     background-color: rgba(219, 219, 219, 0.726);
-    padding: 10px;
+    padding: 12px;
     padding-top: 17px;
     padding-bottom: 17px;
 }
