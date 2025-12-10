@@ -52,12 +52,12 @@ const Companyform = forwardRef((props, ref) => {
           General Info
         </button>
 
-        <button
+        {/* <button
           className={`doc ${showdiv === "docinfo" ? "active-green" : "inactive"}`}
           onClick={() => toggleDiv("docinfo")}
         >
           Documents Info
-        </button>
+        </button> */}
       </div>
 
       <div className="form-tabs-container">

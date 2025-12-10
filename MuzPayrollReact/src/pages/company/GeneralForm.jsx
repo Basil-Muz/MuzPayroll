@@ -13,12 +13,18 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
+import { IoClose } from "react-icons/io5";
 
 const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   let page = "company";
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
+  const [imageUpload, setImageUpload] = useState(false);
+  const [file, setFile] = useState(null);
+const [error, setError] = useState("");
+
+
   const codeInputRef = useRef(null);
   const calendarRef = useRef(null);
 
@@ -43,6 +49,18 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   const districts = selectedState
     ? City.getCitiesOfState(selectedCountry, selectedState)
     : [];
+
+    const handleFileChange = (e) => {
+  setFile(e.target.files[0]);
+};
+const handleSelect = () => {
+  // store selected file (optional – remove if you don't need it)
+  formik.setFieldValue("companyImage", file);
+
+  // close popup
+  setImageUpload(false);
+};
+
 
   useEffect(() => {
     const today = new Date();
@@ -160,6 +178,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       designation: "",
       employerNumber: "",
       employerEmail: "",
+      companyImage: null,
     },
     validationSchema: Yup.object({
       code: Yup.string()
@@ -358,13 +377,89 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                         : ""
                     }
                   />
-                  
-
                   <div className="active-date-icon">
                     <FaRegCalendarAlt />
                   </div>
                 </div>
               </div>
+
+<button
+  type="button"
+  className="imageupload"
+  onClick={() => setImageUpload(true)}
+>
+  Image Upload
+</button>
+
+{imageUpload && (
+  <div className="popup-overlay">
+    <div className="popup-box">
+
+      <div className="imagehead">
+        <h3 className="upload">Image Upload</h3>
+        <button className="close-btn" onClick={() => setImageUpload(false)}>
+          <IoClose />
+        </button>
+      </div>
+              <label htmlFor="File" className="fancy-label">
+                Upload File
+              </label>
+      {/* FILE INPUT */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          setFile(e.target.files[0]);
+          setError(""); // clear previous error
+        }}
+      />
+
+      {/* SHOW SELECTED FILE */}
+      {file && (
+        <p className="file-selected">Selected: {file.name}</p>
+      )}
+
+      {/* ERROR MESSAGE */}
+      {error && (
+        <p style={{ color: "red", marginTop: "5px" }}>{error}</p>
+      )}
+
+      <p className="dimension-text">
+        Image dimension must be <b>490 × 350 px</b>
+      </p>
+
+      {/* SELECT BUTTON WITH VALIDATION */}
+      <button
+        className="select-btn"
+        onClick={() => {
+          if (!file) {
+            setError("Please upload an image.");
+            return;
+          }
+
+          const img = new Image();
+          img.src = URL.createObjectURL(file);
+
+          img.onload = () => {
+            if (img.width !== 490 || img.height !== 350) {
+              setError("Image must be exactly 490 × 350 pixels.");
+              return;
+            }
+
+            // Valid image -> set file into formik
+            formik.setFieldValue("companyImage", file);
+
+            setImageUpload(false);
+          };
+        }}
+      >
+        Select and Close
+      </button>
+
+    </div>
+  </div>
+)}
+
 
             </div>
             <div className="address">
