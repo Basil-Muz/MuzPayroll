@@ -15,6 +15,7 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 
 const GeneralForm = forwardRef(({ onFormChange }, ref) => {
+  let page = "company";
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
@@ -28,12 +29,8 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   const [isDateLocked, setIsDateLocked] = useState(false);
   const [authorization, setAuthorization] = useState("Active");
   const [todayDate, setTodayDate] = useState("");
-  let page = "location";
 
-  const companyId = 2;
-  const defaultBranchId = 22;
-  const [companyList, setCompanyList] = useState([]);
-  const [branchList, setBranchList] = useState([]);
+
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
@@ -81,7 +78,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     }
   };
   useEffect(() => {
-    if (page === "location") {
+    if (page === "company") {
       setAddressEditable(true);
       setContactInfoEditable(true);
       setemployerEditable(true);
@@ -142,13 +139,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
 
   const formik = useFormik({
     initialValues: {
-      companyEntity: { id: "" },
-      branchEntity: { id: "" },
       code: "",
       name: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
-      esiRegion: "",
       address: "",
       address1: "",
       address2: "",
@@ -168,8 +162,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       employerEmail: "",
     },
     validationSchema: Yup.object({
-      company: Yup.string().required("Company is required"),
-      branch: Yup.string().required("Branch is required"),
       code: Yup.string()
         .required("Code is required")
         .test(
@@ -217,11 +209,9 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
         const formattedValues = {
           ...values,
           activeDate: values.activeDate.split("T")[0], // Only date
-          companyEntity: { id: values.company }, // 👈 nested objects
-          branchEntity: { id: values.branch },
         };
 
-        const response = await fetch("http://localhost:8087/saveLocation", {
+        const response = await fetch("http://localhost:8087/saveCompany", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formattedValues),
@@ -231,56 +221,21 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           throw new Error("Network response was not ok");
         }
 
-        alert("Location saved successfully!");
+        alert("Company saved successfully!");
         resetForm();
       } catch (error) {
         console.error("Error:", error);
-        alert("Failed to save location");
+        alert("Failed to save Company");
       }
     },
   });
-  useEffect(() => {
-    onFormChange?.(formik.dirty, formik.isValid);
-  }, [formik.dirty, formik.isValid]);
-  const loadCompanyAndBranches = async () => {
-    try {
-      const companyResponse = await axios.get(
-        `http://localhost:8087/companies/${companyId}`,
-      );
-      const company = companyResponse.data;
-      setCompanyList([company]);
-      formik.setFieldValue("company", company.id);
+  
 
-      const branchResponse = await axios.get(
-        `http://localhost:8087/${companyId}/branches`,
-      );
-      const branches = branchResponse.data || [];
-      setBranchList(branches);
-
-      const selectedBranch = formik.values.branch;
-
-      if (!selectedBranch) {
-        if (defaultBranchId) {
-          formik.setFieldValue("branch", defaultBranchId);
-        }
-      } else {
-        formik.setFieldValue("branch", selectedBranch);
-      }
-    } catch (error) {
-      console.error("Failed to load company or branches:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadCompanyAndBranches();
-  }, [companyId, defaultBranchId]);
 
   const cancelForm = () => {
     formik.resetForm({
       values: {
         ...formik.initialValues,
-        company: formik.values.company,
-        branch: defaultBranchId,
       },
     });
     setStartDate(null);
@@ -292,9 +247,9 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   };
 
   useImperativeHandle(ref, () => ({
-    refresh: async () => {
-      await loadCompanyAndBranches();
-    },
+    // refresh: async () => {
+    //   await loadCompanyAndBranches();
+    // },
     resetForm: async () => {
       cancelForm();
     },
@@ -317,57 +272,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
               <div className="headertext">
                 <h4>General Info</h4>
               </div>
-
-              <label htmlFor="company" className="fancy-label">
-                Company
-              </label>
-
-              <select
-                id="company"
-                name="company"
-                value={formik.values.company}
-                disabled
-              >
-                {companyList.map((company) => (
-                  <option key={company.id} value={company.id}>
-                    {company.companyName}
-                  </option>
-                ))}
-              </select>
-
-              {formik.touched.company && formik.errors.company ? (
-                <div className="error">{formik.errors.company}</div>
-              ) : null}
-
-              <label htmlFor="branch" className="fancy-label">
-                Branch
-              </label>
-              <select
-                id="branch"
-                name="branch"
-                value={formik.values.branch}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={
-                  formik.touched.branch && formik.errors.branch
-                    ? "input-error"
-                    : ""
-                }
-                disabled={!startDate}
-              >
-                <option value="">Select a branch</option>{" "}
-                {/* optional placeholder */}
-                {branchList.map((branch) => (
-                  <option key={branch.id} value={branch.id}>
-                    {branch.branchName}
-                  </option>
-                ))}
-              </select>
-
-              {formik.touched.branch && formik.errors.branch && (
-                <div className="error">{formik.errors.branch}</div>
-              )}
-
+            
               <label htmlFor="code" className="fancy-label">
                 Code
               </label>
@@ -453,6 +358,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                         : ""
                     }
                   />
+                  
 
                   <div className="active-date-icon">
                     <FaRegCalendarAlt />
@@ -470,7 +376,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                     type="checkbox"
                     checked={addressEditable}
                     onChange={handleAddressEditToggle}
-                    disabled={!startDate || page === "location"}
+                    disabled={!startDate || page === "Company"}
                   />
                   <span>Edit</span>
                 </label>
@@ -722,7 +628,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                     type="checkbox"
                     checked={contactInfoEditable}
                     onChange={handlecontactInfoEditable}
-                    disabled={!startDate || page === "location"}
+                    disabled={!startDate || page === "Company"}
                   />
                   <span>Edit</span>
                 </label>
@@ -799,7 +705,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                     type="checkbox"
                     checked={employerEditable}
                     onChange={handleemployerEditable}
-                    disabled={!startDate || page === "location"}
+                    disabled={!startDate || page === "company"}
                   />
                   <span>Edit</span>
                 </label>
