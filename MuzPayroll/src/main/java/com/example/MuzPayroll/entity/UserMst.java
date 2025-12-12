@@ -10,7 +10,7 @@ public class UserMst {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private Long userCode;
+    private String userCode;
 
     @Column(nullable = false, length = 100)
     private String userName;
@@ -35,11 +35,11 @@ public class UserMst {
         this.id = id;
     }
 
-    public Long getUserCode() {
+    public String getUserCode() {
         return userCode;
     }
 
-    public void setUserCode(Long userCode) {
+    public void setUserCode(String userCode) {
         this.userCode = userCode;
     }
 

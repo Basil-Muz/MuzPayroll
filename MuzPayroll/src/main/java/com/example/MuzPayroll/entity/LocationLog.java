@@ -11,11 +11,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class LocationMst {
+public class LocationLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "AuthID", nullable = false)
+    private Authorization authorization;
 
     @ManyToOne
     @JoinColumn(name = "CompanyID", nullable = false)
@@ -98,6 +102,14 @@ public class LocationMst {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
     }
 
     public CompanyMst getCompanyEntity() {

@@ -15,11 +15,12 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 
 const GeneralForm = forwardRef(({ onFormChange }, ref) => {
-    let page = "location";
+  let page = "location";
 
   const companyId = 1;
-  const defaultBranchId = 11;
-  
+  const defaultBranchId = 1;
+  const user_code = 1001;
+
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
@@ -76,6 +77,9 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   const handleDateChange = (date) => {
     if (!dateLocked) {
       setStartDate(date);
+
+      formik.setFieldValue("withaffectdate", date.toISOString().split("T")[0]);
+
       setShowCalendar(false);
       setInputsUnlocked(true);
       setIsDateLocked(true);
@@ -147,7 +151,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       companyEntity: { id: "" },
       branchEntity: { id: "" },
       code: "",
-      name: "",
+      location: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
       esiRegion: "",
@@ -168,6 +172,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       designation: "",
       employerNumber: "",
       employerEmail: "",
+      withaffectdate: "",
+      authorizationStatus: "0",
+      user_code: user_code,
+      authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
       company: Yup.string().required("Company is required"),
@@ -179,7 +187,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           "Code must contain only numbers and symbols, no alphabets or spaces",
           (value) => /^[0-9\W_]+$/.test(value || ""),
         ),
-      name: Yup.string().required("Name is required"),
+      location: Yup.string().required("Location Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
       esiRegion: Yup.string().required("ESI Region is required"),
@@ -391,23 +399,25 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.code}</div>
               ) : null}
 
-              <label htmlFor="Name" className="fancy-label">
+              <label htmlFor="?Location" className="fancy-label">
                 Name
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
+                id="location"
+                name="location"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
-                value={formik.values.name}
+                value={formik.values.location}
                 className={
-                  formik.touched.name && formik.errors.name ? "input-error" : ""
+                  formik.touched.location && formik.errors.location
+                    ? "input-error"
+                    : ""
                 }
               />
-              {formik.touched.name && formik.errors.name ? (
-                <div className="error">{formik.errors.name}</div>
+              {formik.touched.location && formik.errors.location ? (
+                <div className="error">{formik.errors.location}</div>
               ) : null}
 
               <label htmlFor="shortName" className="fancy-label">
@@ -910,9 +920,22 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
+            <div className="form-buttons">
+              <button
+                type="submit"
+                className="submit-btn"
+                onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
+              >
+                Submit
+              </button>
+              <button type="button" className="cancel-btn" onClick={cancelForm}>
+                Cancel
+              </button>
+            </div>
           </div>
         </form>
       </div>
+
       <div className="secform">
         <div className="authorization">
           <label htmlFor="Authorization" className="authorization-label">
@@ -922,12 +945,17 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           <div className="authorization-input-group">
             <select
               id="authorization"
-              value={authorization}
-              onChange={(e) => setAuthorization(e.target.value)}
+              value={formik.values.authorizationStatus}
+              onChange={(e) => {
+                const today = new Date().toISOString().split("T")[0];
+
+                formik.setFieldValue("authorizationStatus", e.target.value);
+                formik.setFieldValue("authorizationDate", today);
+              }}
               className="authorization-dropdown"
             >
-              <option value="entry">ENTRY:</option>
-              <option value="verified">VERIFIED:</option>
+              <option value="0">ENTRY</option>
+              <option value="1">VERIFIED</option>
             </select>
           </div>
         </div>
@@ -947,10 +975,19 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
             {/* Date input field */}
             <div className="date">
               <div className="left-box">1</div>
+
               <div className="icondate">
                 <input
                   type="text"
-                  value={startDate ? startDate.toLocaleDateString("en-GB") : ""}
+                  id="withaffectdate"
+                  name="withaffectdate"
+                  value={
+                    formik.values.withaffectdate
+                      ? new Date(
+                          formik.values.withaffectdate,
+                        ).toLocaleDateString("en-GB")
+                      : ""
+                  }
                   readOnly
                 />
 

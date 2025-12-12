@@ -11,34 +11,31 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class LocationMst {
+public class BranchLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "CompanyID", nullable = false)
-    private CompanyMst companyEntity;
+    @JoinColumn(name = "AuthID", nullable = false)
+    private Authorization authorization;
 
     @ManyToOne
-    @JoinColumn(name = "BranchID", nullable = false)
-    private BranchMst branchEntity;
+    @JoinColumn(name = "CompanyID", nullable = false)
+    private CompanyMst companyEntity;
 
     @Column(nullable = false)
     private String code;
 
     @Column(nullable = false)
-    private String location;
+    private String branch;
 
     @Column(nullable = false)
     private String shortName;
 
     @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
-
-    @Column(nullable = false)
-    private String esiRegion;
 
     @Column(nullable = false)
     private String address;
@@ -100,20 +97,20 @@ public class LocationMst {
         this.id = id;
     }
 
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
+
     public CompanyMst getCompanyEntity() {
         return companyEntity;
     }
 
     public void setCompanyEntity(CompanyMst companyEntity) {
         this.companyEntity = companyEntity;
-    }
-
-    public BranchMst getBranchEntity() {
-        return branchEntity;
-    }
-
-    public void setBranchEntity(BranchMst branchEntity) {
-        this.branchEntity = branchEntity;
     }
 
     public String getCode() {
@@ -124,12 +121,12 @@ public class LocationMst {
         this.code = code;
     }
 
-    public String getLocation() {
-        return location;
+    public String getBranch() {
+        return branch;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setBranch(String branch) {
+        this.branch = branch;
     }
 
     public String getShortName() {
@@ -146,14 +143,6 @@ public class LocationMst {
 
     public void setActiveDate(LocalDate activeDate) {
         this.activeDate = activeDate;
-    }
-
-    public String getEsiRegion() {
-        return esiRegion;
-    }
-
-    public void setEsiRegion(String esiRegion) {
-        this.esiRegion = esiRegion;
     }
 
     public String getAddress() {

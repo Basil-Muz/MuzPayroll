@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import "../Branch/GeneralForm.css"
+import "../Branch/GeneralForm.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaRegCalendarAlt } from "react-icons/fa";
@@ -15,9 +15,10 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 
 const GeneralForm = forwardRef(({ onFormChange }, ref) => {
-    let page = "branch";
+  let page = "branch";
   const companyId = 1;
-  
+  const user_code = 1001;
+
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
@@ -31,7 +32,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   const [isDateLocked, setIsDateLocked] = useState(false);
   const [authorization, setAuthorization] = useState("Active");
   const [todayDate, setTodayDate] = useState("");
-
 
   const [companyList, setCompanyList] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState("");
@@ -73,6 +73,9 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   const handleDateChange = (date) => {
     if (!dateLocked) {
       setStartDate(date);
+
+      formik.setFieldValue("withaffectdate", date.toISOString().split("T")[0]);
+
       setShowCalendar(false);
       setInputsUnlocked(true);
       setIsDateLocked(true);
@@ -145,8 +148,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       code: "",
       branch: "",
       shortName: "",
-      activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
-      address: "",
+      activeDate: new Date().toISOString().split("T")[0], 
       address1: "",
       address2: "",
       country: "",
@@ -163,6 +165,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       designation: "",
       employerNumber: "",
       employerEmail: "",
+      withaffectdate: "",
+      authorizationStatus: "0",
+      user_code: user_code,
+      authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
       company: Yup.string().required("Company is required"),
@@ -173,7 +179,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           "Code must contain only numbers and symbols, no alphabets or spaces",
           (value) => /^[0-9\W_]+$/.test(value || ""),
         ),
-      branch: Yup.string().required("Name is required"),
+      branch: Yup.string().required("Branch Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
       address: Yup.string().required("Address is required"),
@@ -212,8 +218,8 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       try {
         const formattedValues = {
           ...values,
-          activeDate: values.activeDate.split("T")[0], 
-          companyEntity: { id: values.company }, 
+          activeDate: values.activeDate.split("T")[0],
+          companyEntity: { id: values.company },
         };
 
         const response = await fetch("http://localhost:8087/saveBranch", {
@@ -245,9 +251,8 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       const company = companyResponse.data;
       setCompanyList([company]);
       formik.setFieldValue("company", company.id);
-
     } catch (error) {
-      console.error("Failed to load company or branches:", error);
+      console.error("Failed to load company:", error);
     }
   };
 
@@ -338,23 +343,25 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.code}</div>
               ) : null}
 
-              <label htmlFor="Name" className="fancy-label">
+              <label htmlFor="Branch" className="fancy-label">
                 Name
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
+                id="branch"
+                name="branch"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
-                value={formik.values.name}
+                value={formik.values.branch}
                 className={
-                  formik.touched.name && formik.errors.name ? "input-error" : ""
+                  formik.touched.branch && formik.errors.branch
+                    ? "input-error"
+                    : ""
                 }
               />
-              {formik.touched.name && formik.errors.name ? (
-                <div className="error">{formik.errors.name}</div>
+              {formik.touched.branch && formik.errors.branch ? (
+                <div className="error">{formik.errors.branch}</div>
               ) : null}
 
               <label htmlFor="shortName" className="fancy-label">
@@ -409,8 +416,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                   </div>
                 </div>
               </div>
-
-              
             </div>
             <div className="address">
               <div className="headertext">
@@ -838,9 +843,23 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
+
+            <div className="form-buttons">
+              <button
+                type="submit"
+                className="submit-btn"
+                onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
+              >
+                Submit
+              </button>
+              <button type="button" className="cancel-btn" onClick={cancelForm}>
+                Cancel
+              </button>
+            </div>
           </div>
         </form>
       </div>
+
       <div className="secform">
         <div className="authorization">
           <label htmlFor="Authorization" className="authorization-label">
@@ -850,12 +869,17 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           <div className="authorization-input-group">
             <select
               id="authorization"
-              value={authorization}
-              onChange={(e) => setAuthorization(e.target.value)}
+              value={formik.values.authorizationStatus}
+              onChange={(e) => {
+                const today = new Date().toISOString().split("T")[0];
+
+                formik.setFieldValue("authorizationStatus", e.target.value);
+                formik.setFieldValue("authorizationDate", today);
+              }}
               className="authorization-dropdown"
             >
-              <option value="entry">ENTRY:</option>
-              <option value="verified">VERIFIED:</option>
+              <option value="0">ENTRY</option>
+              <option value="1">VERIFIED</option>
             </select>
           </div>
         </div>
@@ -875,10 +899,19 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
             {/* Date input field */}
             <div className="date">
               <div className="left-box">1</div>
+
               <div className="icondate">
                 <input
                   type="text"
-                  value={startDate ? startDate.toLocaleDateString("en-GB") : ""}
+                  id="withaffectdate"
+                  name="withaffectdate"
+                  value={
+                    formik.values.withaffectdate
+                      ? new Date(
+                          formik.values.withaffectdate,
+                        ).toLocaleDateString("en-GB")
+                      : ""
+                  }
                   readOnly
                 />
 

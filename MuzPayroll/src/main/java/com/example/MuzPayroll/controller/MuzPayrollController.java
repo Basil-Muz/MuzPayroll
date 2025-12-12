@@ -1,6 +1,7 @@
 package com.example.MuzPayroll.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,18 +37,18 @@ public class MuzPayrollController {
     private UserRepository userRepository;
 
     @PostMapping("/saveCompany")
-    public ResponseEntity<String> saveCompany(@RequestBody CompanyMst company) {
-        return muzpayrollService.saveCompany(company);
+    public ResponseEntity<String> saveCompany(@RequestBody Map<String, Object> data) {
+        return muzpayrollService.saveCompany(data);
     }
 
     @PostMapping("/saveBranch")
-    public ResponseEntity<String> saveBranch(@RequestBody BranchMst branch) {
-        return muzpayrollService.save(branch);
+    public ResponseEntity<String> saveBranch(@RequestBody Map<String, Object> data) {
+        return muzpayrollService.saveBranch(data);
     }
 
     @PostMapping("/saveLocation")
-    public ResponseEntity<String> saveLocation(@RequestBody LocationMst location) {
-        return muzpayrollService.save(location);
+    public ResponseEntity<String> saveLocation(@RequestBody Map<String, Object> data) {
+        return muzpayrollService.saveLocation(data);
     }
 
     @GetMapping("/companies/{id}")
