@@ -1,6 +1,5 @@
 package com.example.MuzPayroll.entity;
 
-import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,13 +18,26 @@ public class Authorization {
     private UserMst userMst;
 
     @Column(nullable = false)
-    private LocalDateTime authorizationDate;
+    private String authorizationDate;
+
+    public String getAuthorizationDate() {
+        return authorizationDate;
+    }
+
+    public void setAuthorizationDate(String authorizationDate) {
+        this.authorizationDate = authorizationDate;
+    }
 
     @Column(nullable = false)
-    private boolean verified;
+    private String authorizationStatus;
 
-    @Column(nullable = false)
-    private Integer userAttempts = 0;
+    public String getAuthorizationStatus() {
+        return authorizationStatus;
+    }
+
+    public void setAuthorizationStatus(String authorizationStatus) {
+        this.authorizationStatus = authorizationStatus;
+    }
 
     public Long getAuthId() {
         return authId;
@@ -51,27 +63,4 @@ public class Authorization {
         this.userMst = userMst;
     }
 
-    public LocalDateTime getAuthorizationDate() {
-        return authorizationDate;
-    }
-
-    public void setAuthorizationDate(LocalDateTime authorizationDate) {
-        this.authorizationDate = authorizationDate;
-    }
-
-    public boolean isVerified() {
-        return verified;
-    }
-
-    public void setVerified(boolean verified) {
-        this.verified = verified;
-    }
-
-    public Integer getUserAttempts() {
-        return userAttempts;
-    }
-
-    public void setUserAttempts(Integer userAttempts) {
-        this.userAttempts = userAttempts;
-    }
 }

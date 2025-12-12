@@ -4,13 +4,13 @@ import React, {
   useRef,
   useState,
 } from "react";
-import "../company/Companyform.css";
-import GeneralForm from "../company/GeneralForm.jsx";
-import DocumentsInfo from "../company/DocumentsInfo.jsx";
-import Header from "../../components/Header/Header.jsx";  
+import "../Location/LocationForm.css";
+import GeneralForm from "../Location/GeneralForm.jsx";  
+import DocumentsInfo from "../Location/DocumentsInfo.jsx";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton.jsx";
 
-const Companyform = forwardRef((props, ref) => {
+
+const LocationForm = forwardRef((props, ref) => {
   const generalFormRef = useRef();
   const documentsInfoRef = useRef();
 
@@ -43,7 +43,7 @@ const Companyform = forwardRef((props, ref) => {
   };
 
   return (
-    <div className="company-form">
+    <div className="location-form">
       <div
         className={`button-toggle ${showdiv === "generalinfo" ? "general-active" : showdiv === "docinfo" ? "doc-active" : ""}`}
       >
@@ -54,16 +54,15 @@ const Companyform = forwardRef((props, ref) => {
           General Info
         </button>
 
-        {/* <button
+        <button
           className={`doc ${showdiv === "docinfo" ? "active-green" : "inactive"}`}
           onClick={() => toggleDiv("docinfo")}
         >
           Documents Info
-        </button> */}
+        </button>
       </div>
 
       <div className="form-tabs-container">
-        {/* <Header /> */}
         <div
           className={`form-tab ${showdiv === "generalinfo" ? "visible" : "hidden"}`}
         >
@@ -81,4 +80,4 @@ const Companyform = forwardRef((props, ref) => {
   );
 });
 
-export default Companyform;
+export default LocationForm;

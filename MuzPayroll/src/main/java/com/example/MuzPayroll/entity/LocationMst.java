@@ -7,41 +7,29 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
-public class CompanyEntity {
+public class LocationMst {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String company;
+    @ManyToOne
+    @JoinColumn(name = "CompanyID", nullable = false)
+    private CompanyMst companyEntity;
 
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    @Column(nullable = false)
-    private String branch;
-
-    public String getBranch() {
-        return branch;
-    }
-
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
+    @ManyToOne
+    @JoinColumn(name = "BranchID", nullable = false)
+    private BranchMst branchEntity;
 
     @Column(nullable = false)
     private String code;
 
     @Column(nullable = false)
-    private String name;
+    private String location;
 
     @Column(nullable = false)
     private String shortName;
@@ -109,6 +97,22 @@ public class CompanyEntity {
         this.id = id;
     }
 
+    public CompanyMst getCompanyEntity() {
+        return companyEntity;
+    }
+
+    public void setCompanyEntity(CompanyMst companyEntity) {
+        this.companyEntity = companyEntity;
+    }
+
+    public BranchMst getBranchEntity() {
+        return branchEntity;
+    }
+
+    public void setBranchEntity(BranchMst branchEntity) {
+        this.branchEntity = branchEntity;
+    }
+
     public String getCode() {
         return code;
     }
@@ -117,12 +121,12 @@ public class CompanyEntity {
         this.code = code;
     }
 
-    public String getName() {
-        return name;
+    public String getLocation() {
+        return location;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getShortName() {

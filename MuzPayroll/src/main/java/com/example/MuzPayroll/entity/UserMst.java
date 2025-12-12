@@ -25,7 +25,7 @@ public class UserMst {
     private String phoneNumber;
 
     @Column(nullable = false)
-    private Integer userAttempt = 0; 
+    private Integer userAttempt = 0;
 
     public Long getId() {
         return id;
@@ -82,4 +82,5 @@ public class UserMst {
     public void setUserAttempt(Integer userAttempt) {
         this.userAttempt = userAttempt;
     }
+
 }

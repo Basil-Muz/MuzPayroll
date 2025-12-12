@@ -7,24 +7,20 @@ import React, {
 } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import "./GeneralForm.css";
+import "../Branch/GeneralForm.css"
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
-import { IoClose } from "react-icons/io5";
 
 const GeneralForm = forwardRef(({ onFormChange }, ref) => {
-  let page = "company";
-  const user_code =1;
+    let page = "branch";
+  const companyId = 1;
+  
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
-  const [imageUpload, setImageUpload] = useState(false);
-  const [file, setFile] = useState(null);
-const [error, setError] = useState("");
-
   const codeInputRef = useRef(null);
   const calendarRef = useRef(null);
 
@@ -35,13 +31,12 @@ const [error, setError] = useState("");
   const [isDateLocked, setIsDateLocked] = useState(false);
   const [authorization, setAuthorization] = useState("Active");
   const [todayDate, setTodayDate] = useState("");
-  
 
 
+  const [companyList, setCompanyList] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedBranch, setSelectedBranch] = useState("");
 
   const countries = Country.getAllCountries();
   const states = selectedCountry
@@ -50,18 +45,6 @@ const [error, setError] = useState("");
   const districts = selectedState
     ? City.getCitiesOfState(selectedCountry, selectedState)
     : [];
-
-    const handleFileChange = (e) => {
-  setFile(e.target.files[0]);
-};
-const handleSelect = () => {
-  // store selected file (optional – remove if you don't need it)
-  formik.setFieldValue("companyImage", file);
-
-  // close popup
-  setImageUpload(false);
-};
-
 
   useEffect(() => {
     const today = new Date();
@@ -90,12 +73,6 @@ const handleSelect = () => {
   const handleDateChange = (date) => {
     if (!dateLocked) {
       setStartDate(date);
-
-          formik.setFieldValue(
-      "withaffectdate",
-      date.toISOString().split("T")[0]
-    );
-
       setShowCalendar(false);
       setInputsUnlocked(true);
       setIsDateLocked(true);
@@ -103,7 +80,7 @@ const handleSelect = () => {
     }
   };
   useEffect(() => {
-    if (page === "company") {
+    if (page === "branch") {
       setAddressEditable(true);
       setContactInfoEditable(true);
       setemployerEditable(true);
@@ -164,8 +141,9 @@ const handleSelect = () => {
 
   const formik = useFormik({
     initialValues: {
+      companyEntity: { id: "" },
       code: "",
-      company: "",
+      branch: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
       address: "",
@@ -185,13 +163,9 @@ const handleSelect = () => {
       designation: "",
       employerNumber: "",
       employerEmail: "",
-      companyImage: null,
-      withaffectdate:"",
-      authorizationStatus: "entry",
-      user_code:user_code,
-  authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
+      company: Yup.string().required("Company is required"),
       code: Yup.string()
         .required("Code is required")
         .test(
@@ -199,7 +173,7 @@ const handleSelect = () => {
           "Code must contain only numbers and symbols, no alphabets or spaces",
           (value) => /^[0-9\W_]+$/.test(value || ""),
         ),
-      company: Yup.string().required("Company Name is required"),
+      branch: Yup.string().required("Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
       address: Yup.string().required("Address is required"),
@@ -234,14 +208,15 @@ const handleSelect = () => {
         .email("Invalid email format")
         .required("Employer Email is required"),
     }),
-onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values, { resetForm }) => {
       try {
         const formattedValues = {
           ...values,
           activeDate: values.activeDate.split("T")[0], 
+          companyEntity: { id: values.company }, 
         };
 
-        const response = await fetch("http://localhost:8087/saveCompany", {
+        const response = await fetch("http://localhost:8087/saveBranch", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formattedValues),
@@ -251,22 +226,40 @@ onSubmit: async (values, { resetForm }) => {
           throw new Error("Network response was not ok");
         }
 
-        alert("Company saved successfully!");
+        alert("Branch saved successfully!");
         resetForm();
       } catch (error) {
         console.error("Error:", error);
-        alert("Failed to save Company");
+        alert("Failed to save Branch");
       }
     },
-
   });
-  
+  useEffect(() => {
+    onFormChange?.(formik.dirty, formik.isValid);
+  }, [formik.dirty, formik.isValid]);
+  const loadCompanyAndBranches = async () => {
+    try {
+      const companyResponse = await axios.get(
+        `http://localhost:8087/companies/${companyId}`,
+      );
+      const company = companyResponse.data;
+      setCompanyList([company]);
+      formik.setFieldValue("company", company.id);
 
+    } catch (error) {
+      console.error("Failed to load company or branches:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadCompanyAndBranches();
+  }, [companyId]);
 
   const cancelForm = () => {
     formik.resetForm({
       values: {
         ...formik.initialValues,
+        company: formik.values.company,
       },
     });
     setStartDate(null);
@@ -278,9 +271,9 @@ onSubmit: async (values, { resetForm }) => {
   };
 
   useImperativeHandle(ref, () => ({
-    // refresh: async () => {
-    //   await loadCompanyAndBranches();
-    // },
+    refresh: async () => {
+      await loadCompanyAndBranches();
+    },
     resetForm: async () => {
       cancelForm();
     },
@@ -297,13 +290,34 @@ onSubmit: async (values, { resetForm }) => {
   return (
     <div className="gen">
       <div className="form">
-        <form onSubmit={formik.handleSubmit} className="Companyform">
+        <form onSubmit={formik.handleSubmit} className="branchform">
           <div className="screenleft">
             <div className="genaralform">
               <div className="headertext">
                 <h4>General Info</h4>
               </div>
-            
+
+              <label htmlFor="company" className="fancy-label">
+                Company
+              </label>
+
+              <select
+                id="company"
+                name="company"
+                value={formik.values.company}
+                disabled
+              >
+                {companyList.map((company) => (
+                  <option key={company.id} value={company.id}>
+                    {company.company}
+                  </option>
+                ))}
+              </select>
+
+              {formik.touched.company && formik.errors.company ? (
+                <div className="error">{formik.errors.company}</div>
+              ) : null}
+
               <label htmlFor="code" className="fancy-label">
                 Code
               </label>
@@ -324,23 +338,23 @@ onSubmit: async (values, { resetForm }) => {
                 <div className="error">{formik.errors.code}</div>
               ) : null}
 
-              <label htmlFor="company" className="fancy-label">
+              <label htmlFor="Name" className="fancy-label">
                 Name
               </label>
               <input
                 type="text"
-                id="company"
-                name="company"
+                id="name"
+                name="name"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
-                value={formik.values.company}
+                value={formik.values.name}
                 className={
-                  formik.touched.company && formik.errors.company ? "input-error" : ""
+                  formik.touched.name && formik.errors.name ? "input-error" : ""
                 }
               />
-              {formik.touched.company && formik.errors.company ? (
-                <div className="error">{formik.errors.company}</div>
+              {formik.touched.name && formik.errors.name ? (
+                <div className="error">{formik.errors.name}</div>
               ) : null}
 
               <label htmlFor="shortName" className="fancy-label">
@@ -389,90 +403,14 @@ onSubmit: async (values, { resetForm }) => {
                         : ""
                     }
                   />
+
                   <div className="active-date-icon">
                     <FaRegCalendarAlt />
                   </div>
                 </div>
               </div>
 
-<button
-  type="button"
-  className="imageupload"
-  onClick={() => setImageUpload(true)}
->
-  Image Upload
-</button>
-
-{imageUpload && (
-  <div className="popup-overlay">
-    <div className="popup-box">
-
-      <div className="imagehead">
-        <h3 className="upload">Image Upload</h3>
-        <button className="close-btn" onClick={() => setImageUpload(false)}>
-          <IoClose />
-        </button>
-      </div>
-              <label htmlFor="File" className="fancy-label">
-                Upload File
-              </label>
-      {/* FILE INPUT */}
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          setFile(e.target.files[0]);
-          setError(""); // clear previous error
-        }}
-      />
-
-      {/* SHOW SELECTED FILE */}
-      {file && (
-        <p className="file-selected">Selected: {file.name}</p>
-      )}
-
-      {/* ERROR MESSAGE */}
-      {error && (
-        <p style={{ color: "red", marginTop: "5px" }}>{error}</p>
-      )}
-
-      <p className="dimension-text">
-        Image dimension must be <b>490 × 350 px</b>
-      </p>
-
-      {/* SELECT BUTTON WITH VALIDATION */}
-      <button
-        className="select-btn"
-        onClick={() => {
-          if (!file) {
-            setError("Please upload an image.");
-            return;
-          }
-
-          const img = new Image();
-          img.src = URL.createObjectURL(file);
-
-          img.onload = () => {
-            // if (img.width !== 490 || img.height !== 350) {
-            //   setError("Image must be exactly 490 × 350 pixels.");
-            //   return;
-            // }
-
-            // Valid image -> set file into formik
-            formik.setFieldValue("companyImage", file);
-
-            setImageUpload(false);
-          };
-        }}
-      >
-        Select and Close
-      </button>
-
-    </div>
-  </div>
-)}
-
-
+              
             </div>
             <div className="address">
               <div className="headertext">
@@ -483,7 +421,7 @@ onSubmit: async (values, { resetForm }) => {
                     type="checkbox"
                     checked={addressEditable}
                     onChange={handleAddressEditToggle}
-                    disabled={!startDate || page === "Company"}
+                    disabled={!startDate || page === "branch"}
                   />
                   <span>Edit</span>
                 </label>
@@ -735,7 +673,7 @@ onSubmit: async (values, { resetForm }) => {
                     type="checkbox"
                     checked={contactInfoEditable}
                     onChange={handlecontactInfoEditable}
-                    disabled={!startDate || page === "Company"}
+                    disabled={!startDate || page === "branch"}
                   />
                   <span>Edit</span>
                 </label>
@@ -812,7 +750,7 @@ onSubmit: async (values, { resetForm }) => {
                     type="checkbox"
                     checked={employerEditable}
                     onChange={handleemployerEditable}
-                    disabled={!startDate || page === "company"}
+                    disabled={!startDate || page === "branch"}
                   />
                   <span>Edit</span>
                 </label>
@@ -901,24 +839,6 @@ onSubmit: async (values, { resetForm }) => {
               ) : null}
             </div>
           </div>
-
-          <div className="form-buttons">
-  <button
-    type="submit"
-    className="submit-btn"
-    onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
-  >
-    Submit
-  </button>
-  <button
-    type="button"
-    className="cancel-btn"
-    onClick={cancelForm}
-  >
-    Cancel
-  </button>
-</div>
-
         </form>
       </div>
       <div className="secform">
@@ -928,58 +848,46 @@ onSubmit: async (values, { resetForm }) => {
           </label>
 
           <div className="authorization-input-group">
-<select
-  id="authorization"
-  value={formik.values.authorizationStatus}
-  onChange={(e) => {
-    const today = new Date().toISOString().split("T")[0];
-
-    formik.setFieldValue("authorizationStatus", e.target.value);
-    formik.setFieldValue("authorizationDate", today);
-  }}
-  className="authorization-dropdown"
->
-  <option value="entry">ENTRY</option>
-  <option value="verified">VERIFIED</option>
-</select>
-
+            <select
+              id="authorization"
+              value={authorization}
+              onChange={(e) => setAuthorization(e.target.value)}
+              className="authorization-dropdown"
+            >
+              <option value="entry">ENTRY:</option>
+              <option value="verified">VERIFIED:</option>
+            </select>
           </div>
         </div>
         <div className="newbutton">
-<div className="calender">
-  {!isDateLocked && (
-    <div className="datepicker" ref={calendarRef}>
-      <DatePicker
-        selected={startDate}
-        onChange={handleDateChange}
-        inline
-        autoFocus
-      />
-    </div>
-  )}
+          <div className="calender">
+            {!isDateLocked && (
+              <div className="datepicker" ref={calendarRef}>
+                <DatePicker
+                  selected={startDate}
+                  onChange={handleDateChange}
+                  inline
+                  autoFocus
+                />
+              </div>
+            )}
 
-  {/* Date input field */}
-  <div className="date">
-    <div className="left-box">1</div>
+            {/* Date input field */}
+            <div className="date">
+              <div className="left-box">1</div>
+              <div className="icondate">
+                <input
+                  type="text"
+                  value={startDate ? startDate.toLocaleDateString("en-GB") : ""}
+                  readOnly
+                />
 
-    <div className="icondate">
-      <input
-        type="text"
-        id="withaffectdate" 
-        name="withaffectdate"  
-value={formik.values.withaffectdate ? 
-        new Date(formik.values.withaffectdate).toLocaleDateString("en-GB") 
-        : ""}
-        readOnly
-      />
-
-      <FaRegCalendarAlt
-        style={{ color: "#28a745", fontSize: "19px" }}
-      />
-    </div>
-  </div>
-</div>
-
+                <FaRegCalendarAlt
+                  style={{ color: "#28a745", fontSize: "19px" }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
