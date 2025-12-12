@@ -1,0 +1,33 @@
+.to-top-btn {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  border-radius: 50%;
+  background: #fafafaff;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  outline: none;
+  height: 48px;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: all 0.35s ease;
+  border:1px solid #a7a7a7ff;
+  /* box-shadow: 0 4px 12px rgba(0,0,0,0.25); */
+
+  z-index: 2000;
+}
+
+.to-top-btn:hover {
+  border:1px solid #a7a7a7ff;
+}
+
+.to-top-btn.show {
+  opacity: 1;
+  outline: none;
+  transform: translateY(0);
+  pointer-events: auto;
+}

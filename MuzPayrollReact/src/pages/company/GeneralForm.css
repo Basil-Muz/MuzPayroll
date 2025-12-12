@@ -1,0 +1,295 @@
+.fancy-label {
+  font-size: 16px;
+  margin-bottom: 5px;
+  display: block;
+  color: black;
+}
+
+/* This will make only the first letter red */
+.fancy-label::first-letter {
+  color: red;
+  font-weight: bold;
+}
+.Companyform {
+  display: flex;
+  padding-top: 9rem;
+  padding-left: 3rem;
+  padding-bottom: 2rem;
+  text-align: left;
+}
+.screenleft {
+  display: flex;
+  width: 65%;
+  margin-top: -7rem;
+  margin-left: -28px;
+  gap: 15px;
+}
+.screenright {
+  display: flex;
+  flex-direction: column;
+  width: 28%;
+  gap: 25px;
+  margin-top: -7rem;
+  margin-left: 14px;
+}
+.genaralform {
+  width: 50%;
+  border: 1px solid #ada9a9;
+  padding-left: 15px;
+  padding-top: 15px;
+}
+.address {
+  width: 50%;
+  border: 1px solid #ada9a9;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-bottom: 40px;
+}
+.ContactInfo {
+  width: 120%;
+  border: 1px solid #ada9a9;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-bottom: 25px;
+}
+.EmployerInfo {
+  width: 120%;
+  border: 1px solid #ada9a9;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-bottom: 90px;
+}
+
+.Companyform input {
+  width: 95%;
+  padding: 5px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.location {
+  display: flex;
+}
+.headertext {
+  background-color: rgb(85, 150, 235);
+  color: white;
+  width: 386px;
+  margin-left: -15px;
+  margin-top: -15px;
+  height: 35px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.headertext2 {
+  background-color: rgb(85, 150, 235);
+  color: white;
+  width: 423px;
+  margin-left: -15px;
+  margin-top: -15px;
+  height: 35px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+h4 {
+  margin-top: 0px;
+  margin-left: 17px;
+  padding-top: 5px;
+}
+.edit {
+  margin-right: 3rem;
+  padding-top: 5px;
+  margin-top: 0px;
+}
+.edit-checkbox {
+  display: flex;
+  align-items: normal;
+  gap: 6px;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  margin-right: 20px;
+  padding-top: 6px;
+}
+
+.edit-checkbox input[type="checkbox"] {
+  accent-color: green;
+  width: 16px;
+  height: 16px;
+}
+input.inputdate {
+  border: none;
+  outline: none;
+}
+
+.icondate {
+  height: 30px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  margin-left: 5px;
+}
+.calender {
+  display: inline-block;
+  /* bottom: 100%;
+  margin-bottom: 10px; */
+  /* z-index: 1000;
+  position: relative;
+    left: 36px;
+    top: -215px; */
+}
+.newbutton {
+  margin-left: -63rem;
+  margin-top: 1rem;
+  position: relative;
+}
+.date {
+  width: 170px;
+  display: flex;
+  align-items: center;
+  font-family: sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  overflow: hidden;
+  background-color: #28a745;
+  height: 60px;
+}
+
+.date .left-box {
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid white;
+  height: 60px;
+}
+
+.date input {
+  border: none;
+  font-size: 14px;
+  width: 85px;
+  outline: none;
+  background: none;
+  margin-left: 4px;
+}
+
+/* Optional: Disable second input styling */
+.disabled-input {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.active-date-wrapper {
+  display: flex;
+  flex-direction: column;
+  font-family: sans-serif;
+  margin-bottom: 20px;
+}
+
+.active-date-label {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.active-date-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  overflow: hidden;
+  width: 95%;
+  height: 29px;
+}
+
+.active-date-input input {
+  display: flex;
+  align-items: center;
+  border: none;
+  outline: none;
+  border-radius: 0px;
+  overflow: hidden;
+  width: 327px;
+  height: 28px;
+  margin-top: 11px;
+}
+
+.active-date-icon {
+  background-color: #28a745;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left:0px;
+}
+
+.active-date-icon svg {
+  color: white;
+  width: 15px;
+  height: 15px;
+}
+
+.active-date-error {
+  border: 1px solid red !important;
+}
+
+.active-date-msg {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.authorization {
+  display: flex;
+  left: -72.8rem;
+  bottom: -56rem;
+  gap: 30px;
+  height: 30px;
+}
+
+select#authorization {
+  width: 320px;
+  height: 30px;
+  outline: none;
+}
+/* Basic dropdown styling */
+select {
+  width: 95%; /* full width */
+  border: 1px solid #ccc; /* border color */
+  border-radius: 0px; /* rounded corners */
+  background-color: #fff; /* background */
+  font-size: 14px; /* font size */
+  color: #333; /* text color */
+  cursor: pointer; /* pointer cursor */
+  height: 28px;
+}
+
+.gen {
+  display: flex;
+  flex-direction: column;
+  height: 950px;
+}
+.secform {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+.datepicker {
+  position: absolute;
+  bottom: 80px;
+  left: 64rem;
+}
+.error {
+    color: red;
+}
