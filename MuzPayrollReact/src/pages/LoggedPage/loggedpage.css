@@ -1,0 +1,94 @@
+
+
+.logo-homesection {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 40px 50px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  gap: 40px;
+ }
+
+/* 🔹 Left Section (Heading + Logo) */
+.left-section {
+  flex: 1;
+}
+
+/* Home heading */
+.home-heading {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+/* Logo below heading */
+.home-logo {
+  width: 250px;
+  opacity:0.9;   /* faded effect */
+  margin-top: 10px;
+  user-select: none;
+  
+}
+
+/* 🔹 Right Section */
+.logged-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Login Box */
+.logged-box {
+  width: 800px;
+  height: 325px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Login Credentials Heading */
+.logged-heading {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Label + Input rows */
+.logged-details {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.logged-details label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.logged-details input {
+  padding: 5px;
+  border: 1px solid #d0d0d0;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+}
+
+/* Buttons */
+.logged-btn {
+  padding: 8px 25px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  margin-right: 10px;
+  margin-top: 15px;
+  background: #4b79ff;
+  color: #fff;
+  font-size: 14px;
+}
+
