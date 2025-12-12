@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
+import { MdOutlineCancel } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { HiMiniSwatch } from "react-icons/hi2";
@@ -106,6 +107,7 @@ export default function HomePage() {
         <div className="side-dashboard">
             <HiMiniSwatch size={20} color="black"/>
         </div>
+        <MdOutlineMenu />
         <div className="side-menu">
           {/* fake icons using simple blocks – replace with react-icons if you like */}
           {[1, 2, 3, 4, 5, 6, 7].map((i) => (
@@ -131,7 +133,13 @@ export default function HomePage() {
 
         {/* CONTENT */}
         <main className="content">
+          <div className="main-header">
           <h1 className="page-title">Sitemap</h1>
+          <div className="main-cancel">
+            <MdOutlineCancel />
+            </div>
+          </div>
+          
 
           <div className="sitemap-card">
             {sitemapData.map((section) => (

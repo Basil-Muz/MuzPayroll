@@ -1,0 +1,57 @@
+.theme-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 30px;
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+    border: none;
+  transition: 0.25s;
+  font-size: 13px;
+}
+
+/* .theme-toggle:hover {
+  background: var(--btn-hover);
+} */
+
+/* .toggle-indicator {
+  width: 32px;
+  height: 16px;
+  border-radius: 16px;
+  background: var(--toggle-bg);
+  position: relative;
+  margin-left: 6px;
+  transition: 0.3s;
+}
+
+.toggle-indicator::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: var(--toggle-ball);
+  border-radius: 50%;
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  transition: 0.3s;
+}
+
+.toggle-indicator.dark::after {
+  transform: translateX(16px);
+} */
+/* ICON ROTATION */
+.toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotate {
+  transform: rotate(180deg);
+}
