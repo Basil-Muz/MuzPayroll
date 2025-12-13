@@ -5,16 +5,16 @@ import MasterPage from "./pages/Masters/MasterPage.jsx";
 import Companyform from "./pages/company/Companyform";
 import GeneralForm from "./pages/company/GeneralForm";
 import DocumentsInfo from "./pages/company/DocumentsInfo";
-
+import LoginPage from "./pages/LoginPage/loginpage.jsx";
 
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<LoginPage />} />
       <Route path="/masters" element={<MasterPage />} />
       <Route path="/company" element={<Companyform />} />
       <Route path="/generalform" element={<GeneralForm />} />
       <Route path="/documentsinfo" element={<DocumentsInfo />} />
-
     </Routes>
   );
 }

@@ -26,9 +26,10 @@ a {
 
 body {
   margin: 0;
-  display: flex;
+  /* display: flex; */
   place-items: center;
   min-width: 320px;
+  background-color:#e9e9e9ff;
   min-height: 100vh;
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import { MdOutlineCancel } from "react-icons/md";
@@ -10,8 +10,9 @@ import { MdOutlineMenu } from "react-icons/md";
 import { ImStack } from "react-icons/im";
 import "./Master.css";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
+import Sidebar from "../../components/SideBar/Sidebar";
 export default function HomePage() {
-    const [open, setOpen] = useState(false);    //sidebar state
+    // const [open, setOpen] = useState(false);    //sidebar state
 
     const sitemapData = [
   {
@@ -77,47 +78,15 @@ export default function HomePage() {
   },
    
 ];
-
+// cancle operation and return to home
+const handleCancel = () => {
+  window.location.href = "/home";
+}
   return <>
   <Header />
    <div className="app-shell">
       {/* LEFT SIDEBAR */}
-      <aside className="side-nav">
-        
-        <div className="side-header">
-            <div className="section-name">
-           <div 
-  className="icon-transition"
-   onClick={() => setOpen(!open)}
-  style={{
-    transform: open ? "rotate(90deg)" : "rotate(0deg)",
-  }}
->
-  {open ? (
-    <RxCross2 size={21} className="icon"/>
-  ) : (
-    <MdOutlineMenu size={21} className="icon"/>
-  )}
-</div>
-
-            </div>
-          <div className="avatar-circle">A</div>
-          <div className="avatar-name">ADMIN</div>
-        </div>
-        <div className="side-dashboard">
-            <HiMiniSwatch size={20} color="black"/>
-        </div>
-        <MdOutlineMenu />
-        <div className="side-menu">
-          {/* fake icons using simple blocks – replace with react-icons if you like */}
-          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-            <div key={i} className="side-icon-row">
-              <ImStack  size={20} color="black"/> 
-              <IoIosArrowForward size={13} color="#279fb8"/>
-            </div>
-          ))}
-        </div>
-      </aside>
+     <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} />
 
       {/* MAIN AREA */}
       <div className="main-area">
@@ -136,7 +105,7 @@ export default function HomePage() {
           <div className="main-header">
           <h1 className="page-title">Sitemap</h1>
           <div className="main-cancel">
-            <MdOutlineCancel />
+            <MdOutlineCancel size={20} onClick={handleCancel}/>
             </div>
           </div>
           
@@ -158,7 +127,8 @@ export default function HomePage() {
                 {section.rows.map((row, idx) => (
                   <div className="tile-row" key={idx}>
                     {row.map((tile) => (
-                      <a href={tile.link} className="tile-card" key={tile.title}><IoMdSettings  size={21} color="#1daa4a"/>
+                      <a href={tile.link} className="tile-card" key={tile.title}>
+                        <IoMdSettings  size={21} color="#a51daa"/>
                         {/* <div className="tile-icon"></div> */}
                         <div className="tile-text">
                           <div className="tile-title">{tile.title}</div>

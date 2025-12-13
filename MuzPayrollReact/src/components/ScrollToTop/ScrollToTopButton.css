@@ -1,14 +1,14 @@
 .to-top-btn {
   position: fixed;
   bottom: 26px;
-  right: 26px;
+  right: 31px;
   border-radius: 50%;
   background: #fafafaff;
   display: flex;
   align-items: center;
   padding: 0 10px;
   outline: none;
-  height: 48px;
+  height: 42px;
   justify-content: center;
   cursor: pointer;
   opacity: 0;
