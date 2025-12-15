@@ -75,7 +75,7 @@ const menuItems = [
     },
 ];
 
-export default function Sidebar({ initialOpen = true, onNavigate = () => {} }) {
+export default function Sidebar({ initialOpen = true, onNavigate = () => {},toggleMenu}) {
   const [open, setOpen] = useState(initialOpen);
   const [active, setActive] = useState("payroll");
 
@@ -176,8 +176,8 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {} }) {
           </div>
         </div>
       </div>
-
-      <nav
+{toggleMenu &&
+      (<nav
         className="sidebar-nav"
         aria-label="Main navigation"
         onMouseLeave={() => scheduleCloseSubmenu()}
@@ -295,7 +295,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {} }) {
             </div>
             );
         })}
-        </nav>
+        </nav>)}
 
     
     </aside>

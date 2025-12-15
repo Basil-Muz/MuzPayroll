@@ -1,72 +1,84 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginpage.css";
-import muzLogo from "../../assets/muzlogo.jpg";
+import muzLogo from "../../assets/muzlogo_transparent.png";
 
 function LoginPage() {
   const navigate = useNavigate();
 
   const [userCode, setUserCode] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
 
-  // Auto-append @muziris
+  const [userCodeError, setUserCodeError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  // Handle typing: Allow only letters + numbers
   const handleUserCodeChange = (e) => {
-    let value = e.target.value.trim();
+    const value = e.target.value;
+    const cleaned = value.replace("@muziris", "");
 
-    // endsWith is correct (not endwith)
-    if (!value.endsWith("@muziris")) {
-      value = value.replace("@muziris", "");
-      value = value + "@muziris";
+    if (/^[A-Za-z0-9]*$/.test(cleaned)) {
+      setUserCode(value);
+      setUserCodeError("");
+    } else {
+      setUserCodeError("User code must contain letters or numbers only.");
     }
+  };
 
-    setUserCode(value);
+  // On blur add "@muziris"
+  const handleUserCodeBlur = () => {
+    let value = userCode.trim().replace("@muziris", "");
+    if (value) setUserCode(value + "@muziris");
   };
 
   const handleLogin = async () => {
-    setErrorMsg("");
+    setUserCodeError("");
+    setPasswordError("");
 
-    if (!userCode.trim() || !password.trim()) {
-      setErrorMsg(
-        "invalid (user code) or (password) or you might have exceeded continuous 3 attempts."
-      );
-      return;
+    let isValid = true;
+
+    if (!userCode.trim()) {
+      setUserCodeError("User code is required.");
+      isValid = false;
     }
+    if (!password.trim()) {
+      setPasswordError("Password is required.");
+      isValid = false;
+    }
+    if (!isValid) return;
 
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
+      const response = await fetch("http://localhost:8087/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_code: userCode, password: password }),
+        body: JSON.stringify({ userCode: userCode, password }),
+        
       });
 
       const data = await response.json();
+      console.log("LOGIN RESPONSE FROM BACKEND:", data);
 
-      // Login failed
+
       if (!data.success) {
-        if (data.user_attempt >= 3) {
-          setErrorMsg(
-            "invalid (user code) or (password) or you might have exceeded continuous 3 attempts."
-          );
-
-          // Redirect to change password
-          setTimeout(() => {
-            navigate("/change-password", {
-              state: { userCode: userCode },
-            });
-          }, 1500);
-        } else {
-          setErrorMsg(
-            "invalid (user code) or (password) or you might have exceeded continuous 3 attempts."
-          );
-        }
+        setPasswordError(data.message || "Invalid login.");
         return;
       }
 
-      // Login success — go to home
+      // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
+      const loginData = {
+        companyId: data.companyId,
+        branchId: data.branchId,
+        locationId: data.locationId,
+
+        companyList: data.companyList,
+        branchList: data.branchList,
+        locationList: data.locationList
+      };
+
+      localStorage.setItem("loginData", JSON.stringify(loginData));
       navigate("/home");
     } catch (error) {
-      setErrorMsg("Server error. Please try again later.");
+      setPasswordError("Server error.");
       console.error("Login error:", error);
     }
   };
@@ -80,21 +92,42 @@ function LoginPage() {
         </div>
 
         <div className="form-group">
-          <label>User Code</label>
-          <input type="text" value={userCode} onChange={handleUserCodeChange} autoFocus/>
 
+          {/* User Code */}
+          <label>User Code</label>
+          <input
+            type="text"
+            value={userCode}
+            onChange={handleUserCodeChange}
+            onBlur={handleUserCodeBlur}
+            autoFocus
+          />
+          {userCodeError && <p className="error-msg">{userCodeError}</p>}
+
+          {/* Password */}
           <label>Password</label>
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setPasswordError("");
+            }}
           />
+          {passwordError && <p className="error-msg">{passwordError}</p>}
 
-          {errorMsg && <p className="error-msg">{errorMsg}</p>}
-
+          {/* Login Button */}
           <button className="login-btn" onClick={handleLogin}>
             LOGIN
           </button>
+
+          {/* Forgot Password */}
+          <p
+            className="forgot-link"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot Password?
+          </p>
         </div>
       </div>
     </div>

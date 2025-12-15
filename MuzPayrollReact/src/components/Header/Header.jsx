@@ -165,7 +165,9 @@ const handlerprofileLeave = () => {
             onMouseLeave={handlerprofileLeave}
             >
             <ImUser size={21} style={{ color: '#1092e9'}}/>
+
             {shouldProfileRender && profileOpen && (
+
                     <div className="profile-dropdown">
                         <a href="/forgotPassword">Change Password</a>
                         <a href="/logout">Logout</a>

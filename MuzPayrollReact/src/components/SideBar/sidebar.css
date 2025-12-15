@@ -144,7 +144,7 @@ button.collapse-btn.cross {
 
 /* active */
 .nav-item.active {
-    background: linear-gradient(90deg, rgba(235, 37, 225, 0.18);, rgba(201, 58, 237, 0.03));
+    background: linear-gradient(90deg, rgba(235, 37, 225, 0.18), rgba(201, 58, 237, 0.03));
     color: var(--accent);
     box-shadow: inset 0 0 0 1px rgba(229, 37, 235, 0.18);;
 }
