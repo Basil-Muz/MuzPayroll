@@ -82,7 +82,7 @@ const handleCancel = () => {
   <Header />
    <div className="app-shell">
       {/* LEFT SIDEBAR */}
-     <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} />
+     <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>
 
       {/* MAIN AREA */}
       <div className="main-area">

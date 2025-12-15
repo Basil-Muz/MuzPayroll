@@ -7,6 +7,7 @@ import DocumentsInfo from "./pages/company/DocumentsInfo"
 import MasterPage from "./pages/Masters/MasterPage";
 import LoggedPage from "./pages/LoggedPage/loggedpage";
 import LoginPage from "./pages/LoginPage/loginpage";
+import Companyform from "./pages/company/Companyform";
 
 function App() {
   return (

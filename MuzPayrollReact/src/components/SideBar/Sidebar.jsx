@@ -7,9 +7,11 @@ import { IoIosArrowForward } from "react-icons/io";
 
 import "./sidebar.css";
 import {  } from "axios";
+// import { href } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <HiMiniSwatch size={18} />, badge: 0 },
+    { id: "dashboard", label: "Dashboard", icon: <HiMiniSwatch size={18} />, link:"/dashboard" },
     {
     id: "employee",
     label: "Employee",
@@ -79,6 +81,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
   const [open, setOpen] = useState(initialOpen);
   const [active, setActive] = useState("payroll");
 
+    const navigate = useNavigate();//navigate function for dashboard link
   // submenu state
   const [openSubmenu, setOpenSubmenu] = useState(null); // id of menu item with submenu
   const [submenuStyle, setSubmenuStyle] = useState({ top: 0, left: "calc(100% + 8px)" });
@@ -136,26 +139,25 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
   return (
     <aside
       ref={sidebarRef}
-      className={`sidebar ${open ? "expanded" : "collapsed"}`}
+      className={`sidebar ${open ? "collapsed" : "expanded"}`}
       aria-expanded={open}
     >
         <button
-          className={`collapse-btn ${open ? "cross" : "menu"}`}
+          className={`collapse-btn ${open ? "menu" : "cross"}`}
           onClick={() => setOpen((v) => !v)}
-          aria-pressed={!open}
-          aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
+          aria-pressed={open}
+          aria-label={open ?  "Collapse sidebar": "Expand sidebar" }
         >
           <div className={`icon-transition ${open ? "rotated" : "rotated-back"}`}>
             {open ? (
-              <RxCross2 size={20} className="toggle-icon" />
-            ) : (
               <MdOutlineMenu size={20} className="toggle-icon" />
+            ) : (
+                <RxCross2 size={20} className="toggle-icon" />
             )}
           </div>
         </button>
       <div className="sidebar-top">
         
-
         <div
           className="brand"
           role="link"
@@ -164,7 +166,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
         >
           <div className="user">
             <div className="user-avatar">R</div>
-            {open && (
+            {!open && (
               <div className="user-meta">
                 <div className="user-name">Rahul Admin</div>
                 <div className="user-role">Payroll Manager</div>
@@ -198,9 +200,14 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
             >
               <button
                 className={`nav-item ${active === item.id ? "active" : ""}`}
-                onClick={() => handleNav(item)}
+                onClick={() => {
+                    if (item.id=="dashboard"){ {
+                        navigate("/dashboard");
+                    }
+                    handleNav(item)}}}
                 title={!open ? item.label : undefined} /* tooltip when collapsed */
                 aria-current={active === item.id ? "page" : undefined}
+              
               >
                 <div className="nav-icon">{item.icon}</div>
 
@@ -224,7 +231,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                   className= "submenu enter"
                   style={{
                     position: "absolute",
-                    left: open ? `calc(280px + 10px)` : `calc(87px + 10px)`, // adjust when collapsed
+                    left: open ? `calc(87px + 10px)` : `calc(280px + 10px)`, // adjust when collapsed
                     top: submenuStyle.top,
                     minWidth: 300,
                     borderRadius: 8,
