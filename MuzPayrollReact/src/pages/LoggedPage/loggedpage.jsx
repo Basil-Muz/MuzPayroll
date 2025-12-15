@@ -4,6 +4,8 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import "./loggedpage.css";
 import muzLogo from "../../assets/muzlogo_transparent.png";
+import Sidebar from "../../components/SideBar/Sidebar";
+
 
 function LoggedPage() {
   const navigate = useNavigate();
@@ -13,6 +15,12 @@ function LoggedPage() {
 
   // NEW: controls Change Credentials button
   const [changeDisabled, setChangeDisabled] = useState(false);
+
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+
 
   // Selected values
   const [companyId, setCompanyId] = useState("");
@@ -44,21 +52,37 @@ function LoggedPage() {
   }, []);
 
   // OK → lock fields + disable change button
-  const handleOk = () => {
-    setFieldsLocked(true);
-    setChangeDisabled(true);
-  };
+const handleOk = () => {
+  setFieldsLocked(true);
+  setChangeDisabled(true);
+  setShowSidebar(true);   // sidebar feature enabled
+  setSidebarOpen(false); // CLOSED initially
+};
+
+
 
   // Change Credentials → unlock fields
   const handleChangeCredentials = () => {
     setFieldsLocked(false);
   };
 
+    // 👉 ADD THESE TWO FUNCTIONS HERE
+//   const toggleSidebar = () => {
+//     setSidebarOpen((prev) => !prev);
+//   };
+
+//   const closeSidebar = () => {
+//     setSidebarOpen(false);
+//   };
+
   return (
     <>
       <Header />
-
+     
+<div className="main-section">
+    <Sidebar toggleMenu={sidebarOpen}/>
       <div className="logo-homesection">
+       
         <div className="left-section">
           <img src={muzLogo} alt="logo" className="home-logo" />
         </div>
@@ -128,6 +152,8 @@ function LoggedPage() {
           </div>
         </div>
       </div>
+</div>
+
 
       <Footer />
     </>

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState,useRef } from "react";
 import { Link } from "react-router-dom";
 import "./Header.css";
 import { IoMdSettings } from "react-icons/io";
 import {useLocation} from "react-router-dom";
 import { IoNotificationsSharp } from "react-icons/io5"; // Example from Ionicons
 import { BiSolidCollection } from "react-icons/bi";
+import { RxCross2 } from "react-icons/rx";
 // import { FaUserTie } from "react-icons/fa6";
 import { ImUser } from "react-icons/im";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
@@ -14,26 +15,76 @@ const Header = () => {
 //   const toggleMenu = () => {
 //     setIsMenuOpen(!isMenuOpen);
 //   };
+
 const [notOpen, setNotOpen] = useState(false);
 const location = useLocation();
-const [profileOpen, setProfileOpen] = useState(true);
-// notification-dropdown array
-// type MessageState = {
-//   msg: string;
-//   status: boolean;
-// };
-// const [error, setError] = useState<{msg: string,
-//   status: boolean}>({
-//   msg: "",
-//   status: false,
-// });
-// setError({ msg: "Something went wrong", status: true });
-// setError(prev => ({ ...prev, msg: "New message" }));
+const [dashOpen, setDashOpen] = useState(false);
+const [profileOpen, setProfileOpen] = useState(false);
+const notifTimer = useRef(null);
+const dashTimer = useRef(null);
+const profileTimer = useRef(null);
+
 const [notifications, setNotifications] = useState([
-  // { id: 1, msg: "New user registered", status: true },
+  { id: 1, msg: "New user registered", status: true },
   // { id: 2, msg: "Server overloaded", status: false },
   // { id: 3, msg: "New order received", status: true },
 ]);
+
+const [dashNotifications, setDashNotifications] = useState([
+//   { id: 1, msg: "New user registered", status: true },
+  { id: 2, msg: "Server overloaded", status: false },
+  // { id: 3, msg: "New order received", status: true },
+]);
+const removeNotification = (id) => {
+  setNotifications(prev =>
+    prev.filter(notification => notification.id !== id)
+  );
+};
+const removeDashNotification = (id) => {
+  setDashNotifications(prev =>
+    prev.filter(notification => notification.id !== id)
+  );
+};
+
+
+const handleNotifEnter = () => {
+  clearTimeout(notifTimer.current);
+  setDashOpen(false); // Close dashboard dropdown if open
+  setNotOpen(true);
+};
+
+const handleNotifLeave = () => {
+  notifTimer.current = setTimeout(() => {
+    setNotOpen(false);
+  }, 300); // delay before hiding
+};
+
+const handleDashEnter = () => {
+    clearTimeout(dashTimer.current);
+    setNotOpen(false); // Close notification dropdown if open
+    setDashOpen(true);
+};
+
+const handleDashLeave = () => {
+    dashTimer.current = setTimeout(() => {
+    setDashOpen(false);
+  }, 300); // delay before hiding
+};
+
+const handlerprofileEnter = () => {
+    clearTimeout(profileTimer.current);
+    setProfileOpen(true);
+};
+
+const handlerprofileLeave = () => {
+    profileTimer.current = setTimeout(() => {
+
+    setProfileOpen(false);
+  }, 300); // delay before hiding
+    //
+};
+
+// Notification addition/removal example:
 
 // setNotifications(prev => [
 //   ...prev,
@@ -49,28 +100,42 @@ const [notifications, setNotifications] = useState([
 // setNotifications([]);
 
 const currentPath = location.pathname;
-const [dashOpen, setDashOpen] = useState(false);
+
     return (
     <header className="header">
         <div className="logo">Cloud Stack Solutions</div>
         <div className="header-right">
-            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`} onMouseEnter={() => setNotOpen(!notOpen)} onMouseLeave={() => setNotOpen(!notOpen)}>
-                <IoNotificationsSharp size={19} color="#161414e6"/>
+            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`}  onMouseEnter={handleNotifEnter}
+  onMouseLeave={handleNotifLeave}>
+                <IoNotificationsSharp size={19} />
                 <div className="msgs">{notifications.length}</div>
                 {notOpen && (
       <div className="notification-dropdown">
-        <p style={{color:'black'}}>No new notifications</p>
+            {notifications.length > 0 ? (
+        notifications.map((notification) => (
+            <p className="error-msg" key={notification.id} style={{color:'black'}}>{notification.msg} <RxCross2 size={20} color="red" onClick={() => removeNotification(notification.id)}/></p>
+            ))
+        ) : (
+        <p className="no-msg">no notifications</p>
+        )}
       </div>
               )}
             </div>
         <div>
-            {currentPath!=="/masters/"&& currentPath!=="/home/" &&
-            <div className="dashboard" onMouseEnter={() => setDashOpen(!dashOpen)} onMouseLeave={() => setDashOpen(!dashOpen)}>
-                <BiSolidCollection size={19} color="#161414e6"/>
-                <div className="msgs">0</div>
+            {currentPath!=="/masters"&& currentPath!=="/home" &&
+            <div className="dashboard" onMouseEnter={handleDashEnter}
+    onMouseLeave={handleDashLeave}>
+                <BiSolidCollection size={19} />
+                <div className="msgs">{dashNotifications.length}</div>
                 {dashOpen && (
                     <div className="notification-dropdown">
-                        <p>No new notifications1111</p>
+                        {dashNotifications.length > 0 ? (
+                        dashNotifications.map((notification) => (
+                            <p className="error-msg" key={notification.id} style={{color:'black'}}>{notification.msg} <RxCross2 size={20} color="red" onClick={() => removeDashNotification(notification.id)}/></p>
+                        ))
+                    ) : (   
+                        <p className="no-msg">no notifications</p>
+                    )}
                     </div>
                 )} 
             </div>}
@@ -79,18 +144,23 @@ const [dashOpen, setDashOpen] = useState(false);
             <span className="location">Kochi_Kakkanad</span>
             <span className="date">12/09/2025</span>
             </div>
-        <div className="user-profile" onMouseEnter={() => setProfileOpen(!profileOpen)} onMouseLeave={() => setProfileOpen(!profileOpen)}>
+        <div 
+            className="user-profile" 
+            onMouseEnter={handlerprofileEnter} 
+            onMouseLeave={handlerprofileLeave}
+            >
             <ImUser size={21} style={{ color: '#1092e9'}}/>
-            {profileOpen && (
+            {(currentPath==="/masters" || currentPath==="/home" ) && profileOpen && (
                     <div className="profile-dropdown">
-                        <p>Change Password</p>
-                        <p>Logout</p>
+                        <a href="/forgotPassword">Change Password</a>
+                        <a href="/logout">Logout</a>
                     </div>
                 )} 
         </div>
-       {currentPath==="/masters/" && <div className="settings">
+       {/* {currentPath=="/masters/" && 
+       <div className="settings">
             <IoMdSettings size={19} color="#161414e6"/>
-        </div>}
+        </div>} */}
         {/* <ThemeToggle /> */}
         </div>
         
