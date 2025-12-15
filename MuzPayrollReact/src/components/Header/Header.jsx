@@ -152,7 +152,7 @@ const currentPath = location.pathname;
             <ImUser size={21} style={{ color: '#1092e9'}}/>
             {(currentPath==="/masters" || currentPath==="/home" ) && profileOpen && (
                     <div className="profile-dropdown">
-                        <a href="/forgotPassword">Change Password</a>
+                        <a href="/changePassword">Change Password</a>
                         <a href="/logout">Logout</a>
                     </div>
                 )} 
@@ -161,6 +161,7 @@ const currentPath = location.pathname;
        <div className="settings">
             <IoMdSettings size={19} color="#161414e6"/>
         </div>} */}
+
         {/* <ThemeToggle /> */}
         </div>
         

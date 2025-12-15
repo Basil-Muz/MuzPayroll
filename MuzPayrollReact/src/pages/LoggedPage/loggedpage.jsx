@@ -56,7 +56,7 @@ const handleOk = () => {
   setFieldsLocked(true);
   setChangeDisabled(true);
   setShowSidebar(true);   // sidebar feature enabled
-  setSidebarOpen(false); // CLOSED initially
+  setSidebarOpen(true); // CLOSED initially
 };
 
 
