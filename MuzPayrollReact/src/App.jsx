@@ -17,17 +17,25 @@ import LocationDocumentsInfo from "./pages/Location/DocumentsInfo.jsx";
 import LoginPage from "./pages/LoginPage/loginpage.jsx";
 import LoggedPage from "./pages/LoggedPage/loggedpage.jsx";
 
+import ChangePassword from "./pages/changepassword/changepassword.jsx";
+import Logout from "./components/logout/logout.jsx";
+import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
+import Settings from "./pages/Settings/Settings.jsx";
 
 function App() {
   return (
     <Routes>
+      {/* <Route path="/" element={<Page />} /> */}
       <Route path="/" element={<LoginPage />} />
       <Route path="/home" element={<LoggedPage />} />
-
-      <Route path="/masters" element={<MasterPage />} />
       <Route path="/company" element={<Companyform />} />
       <Route path="/generalform" element={<GeneralForm />} />
       <Route path="/documentsinfo" element={<DocumentsInfo />} />
+      <Route path="/masters" element={<MasterPage />} />
+      <Route path="/changepassword" element={<ChangePassword />} />
+      <Route path="/logout" element={<Logout />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/settings" element={<Settings />} />
 
       <Route path="/branch" element={<BranchForm />} />
       <Route path="/generalform" element={<BranchGeneralForm />} />

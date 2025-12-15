@@ -1,5 +1,4 @@
 package com.example.MuzPayroll.entity;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -27,6 +26,21 @@ public class UserMst {
     @Column(nullable = false)
     private Integer userAttempt = 0;
 
+    @ManyToOne
+    @JoinColumn(name = "CompanyID", nullable = false)
+    private CompanyMst companyEntity;
+
+
+    @ManyToOne
+    @JoinColumn(name = "BranchID", nullable = false)
+    private BranchMst branchEntity;
+
+
+    @ManyToOne
+    @JoinColumn(name = "LocationID", nullable = false)
+    private LocationMst  locationEntity;
+
+    
     public Long getId() {
         return id;
     }
@@ -82,5 +96,31 @@ public class UserMst {
     public void setUserAttempt(Integer userAttempt) {
         this.userAttempt = userAttempt;
     }
+    public CompanyMst getCompanyEntity() {
+        return companyEntity;
+    }
 
+    public void setCompanyEntity(CompanyMst companyEntity) {
+        this.companyEntity = companyEntity;
+    }
+
+
+    public BranchMst getBranchEntity() {
+        return branchEntity;
+    }
+
+    public void setBranchEntity(BranchMst branchEntity) {
+        this.branchEntity = branchEntity;
+    }
+
+
+    public LocationMst getLocationEntity() {
+        return locationEntity;
+    }
+
+    public void setLocationEntity(LocationMst locationEntity) {
+         this.locationEntity = locationEntity;
+    }
+
+  
 }

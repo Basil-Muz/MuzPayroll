@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { IoMdRocket } from "react-icons/io";
+import { FaArrowUp } from "react-icons/fa";
 import "./ScrollToTopButton.css";
 
 const ScrollToTopButton = ({ showAfter = 120 }) => {
@@ -28,7 +28,7 @@ const ScrollToTopButton = ({ showAfter = 120 }) => {
       onClick={scrollToTop}
       aria-label="Scroll to top"
     >
-      <IoMdRocket size={23} color="#f11b1b" />
+      <FaArrowUp size={20} style={{color:'#c71e9d'}} />
     </button>
   );
 };
