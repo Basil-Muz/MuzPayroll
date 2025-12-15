@@ -24,6 +24,10 @@ const notifTimer = useRef(null);
 const dashTimer = useRef(null);
 const profileTimer = useRef(null);
 
+const date=new Date().toLocaleDateString();
+
+const company_location=localStorage.getItem("company_location")||"Kochi_Kakkanad";
+
 const [notifications, setNotifications] = useState([
   { id: 1, msg: "New user registered", status: true },
   // { id: 2, msg: "Server overloaded", status: false },
@@ -35,6 +39,17 @@ const [dashNotifications, setDashNotifications] = useState([
   { id: 2, msg: "Server overloaded", status: false },
   // { id: 3, msg: "New order received", status: true },
 ]);
+
+//path check for dashboard rendering
+const currentPath = location.pathname;
+const blockedPaths = ["/masters", "/home", "/settings"];
+const shouldRender = !blockedPaths.includes(currentPath);
+//path check for profile-dropdown rendering
+
+const blockedProfilePaths = ["/masters", "/home", "/settings"];
+const shouldProfileRender = blockedProfilePaths.includes(currentPath);
+
+// Notification removal functions
 const removeNotification = (id) => {
   setNotifications(prev =>
     prev.filter(notification => notification.id !== id)
@@ -99,7 +114,7 @@ const handlerprofileLeave = () => {
 // };
 // setNotifications([]);
 
-const currentPath = location.pathname;
+
 
     return (
     <header className="header">
@@ -122,7 +137,7 @@ const currentPath = location.pathname;
               )}
             </div>
         <div>
-            {currentPath!=="/masters"&& currentPath!=="/home" &&
+            {shouldRender &&
             <div className="dashboard" onMouseEnter={handleDashEnter}
     onMouseLeave={handleDashLeave}>
                 <BiSolidCollection size={19} />
@@ -141,8 +156,8 @@ const currentPath = location.pathname;
             </div>}
         </div>
             <div className="location-date">
-            <span className="location">Kochi_Kakkanad</span>
-            <span className="date">12/09/2025</span>
+            <span className="location">{company_location}</span>
+            <span className="date">{date}</span>
             </div>
         <div 
             className="user-profile" 
@@ -150,7 +165,7 @@ const currentPath = location.pathname;
             onMouseLeave={handlerprofileLeave}
             >
             <ImUser size={21} style={{ color: '#1092e9'}}/>
-            {(currentPath==="/masters" || currentPath==="/home/" ) && profileOpen && (
+            {shouldProfileRender && profileOpen && (
                     <div className="profile-dropdown">
                         <a href="/forgotPassword">Change Password</a>
                         <a href="/logout">Logout</a>

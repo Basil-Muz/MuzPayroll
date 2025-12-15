@@ -15,62 +15,62 @@ const menuItems = [
     label: "Employee",
     icon: <ImStack size={18} />,
     children: [
-        { id: "employee.employee", label: "Employee" },
-        { id: "employee.employeeList", label: "Employee List" },
-        { id: "employee.employeeUpload", label: "Employee Upload" },
-        { id: "employee.employeeAttrAlloc", label: "Employee Attribute Allocation" },
-        { id: "employee.employeeBulkVerification", label: "Employee Bulk Verification" },
+        { id: "employee.employee", label: "Employee" ,link:"/employee"},
+        { id: "employee.employeeList", label: "Employee List",link:"/employee/employee-list" },
+        { id: "employee.employeeUpload", label: "Employee Upload",link:"/employee/employee-upload" },
+        { id: "employee.employeeAttrAlloc", label: "Employee Attribute Allocation",link:"/employee/employee-attribute-allocation" },
+        { id: "employee.employeeBulkVerification", label: "Employee Bulk Verification", link:"/employee/employee-bulk-verification" },
     ],
     },
     { id: "attendance", label: "Attendance and Leave", icon: <ImStack size={18} />,
     children: [
-    { id: "attendance.masterRoll", label: "Master Roll" },
-    { id: "attendance.VeringWeeklyAllocation", label: "Vering Weekly Allocation" },
+    { id: "attendance.masterRoll", label: "Master Roll", link:"/attendance/master-roll" },
+    { id: "attendance.VeringWeeklyAllocation", label: "Vering Weekly Allocation",link:"/attendance/vering-weekly-allocation" },
     // varing shift allocation,Leave Allocation/Deallocation,Leave enchangment,Leave year end process,
-    { id: "attendance.varingShiftAllocation", label: "Varing Shift Allocation" },
-    { id: "attendance.leaveAllocationDeallocation", label: "Leave Allocation/Deallocation" },
-    { id: "attendance.leaveEnchangment", label: "Leave Enchangment" },
-    { id: "attendance.leaveYearEndProcess", label: "Leave Year End Process" },
+    { id: "attendance.varingShiftAllocation", label: "Varing Shift Allocation",link:"/attendance/varing-shift-allocation" },
+    { id: "attendance.leaveAllocationDeallocation", label: "Leave Allocation/Deallocation",link:"/attendance/leave-allocation-deallocation" },
+    { id: "attendance.leaveEnchangment", label: "Leave Enchangment",link:"/attendance/leave-enchangment" },
+    { id: "attendance.leaveYearEndProcess", label: "Leave Year End Process",link:"/attendance/leave-year-end-process"  },
     ], 
     },
     { id: "advance", label: "Advance Management", icon: <ImStack size={18} />,  
     children: [
         // advance Issue,advance recovery update
-        { id: "advance.advanceIssue", label: "Advance Issue" },
-        { id: "advance.advanceRecoveryUpdate", label: "Advance Recovery Update" },
+        { id: "advance.advanceIssue", label: "Advance Issue" ,link:"/advance/advance-issue"},
+        { id: "advance.advanceRecoveryUpdate", label: "Advance Recovery Update" ,link:"/advance/advance-recovery-update" },
         ]},
     { id: "other", label: "Other Transaction", icon: <ImStack size={18} />,  
 //   Monthly allowance and deduction,Employee reminder Register, Employee final settilement,Tasklist
     children: [
-        { id: "other.monthlyAllowanceDeduction", label: "Monthly Allowance and Deduction" },
-        { id: "other.employeeReminderRegister", label: "Employee Reminder Register" },
-        { id: "other.employeeFinalSettlement", label: "Employee Final Settlement" },
+        { id: "other.monthlyAllowanceDeduction", label: "Monthly Allowance and Deduction" ,link:"/other/monthly-allowance-deduction"},
+        { id: "other.employeeReminderRegister", label: "Employee Reminder Register" ,link:"/other/employee-reminder-register" },
+        { id: "other.employeeFinalSettlement", label: "Employee Final Settlement" ,link:"/other/employee-final-settlement" },
         { id: "other.tasklist", label: "Tasklist" },
         ]
         },
     { id: "process", label: "Process", icon: <ImStack size={18} />,  
 // payroll process,Payroll process verification,bonus process,gratiuty process
     children: [
-        { id: "process.payrollProcess", label: "Payroll Process" },
-        { id: "process.payrollProcessVerification", label: "Payroll Process Verification" },
-        { id: "process.bonusProcess", label: "Bonus Process" },
-        { id: "process.gratiutyProcess", label: "Gratiuty Process" },
+        { id: "process.payrollProcess", label: "Payroll Process", link:"/process/payroll-process"  },
+        { id: "process.payrollProcessVerification", label: "Payroll Process Verification",link:"/process/payroll-process-verification"  },
+        { id: "process.bonusProcess", label: "Bonus Process",link:"/process/bonus-process"  },
+        { id: "process.gratiutyProcess", label: "Gratiuty Process",link:"/process/gratiuty-process"  },
         ]
 },
     { id: "Statutary", label: "Statutary Complients", icon: <ImStack size={18} />,
     children: [
     // complients letter,letter,report
-        { id: "Statutary.complientsLetter", label: "Complients Letter" },
-        { id: "Statutary.letter", label: "Letter" },
-        { id: "Statutary.report", label: "Report" },
+        { id: "Statutary.complientsLetter", label: "Complients Letter" ,link:"/statutary/complients-letter" },
+        { id: "Statutary.letter", label: "Letter" ,link:"/statutary/letter"  },
+        { id: "Statutary.report", label: "Report",link:"/statutary/report"  },
         ]   
     },
     { id: "system", label: "System Management", icon: <ImStack size={18} />,
     children: [
     //    masters,Settings,database backup
-        { id: "system.masters", label: "Masters" },
-        { id: "system.settings", label: "Settings" },
-        { id: "system.databaseBackup", label: "Database Backup" },
+        { id: "system.masters", label: "Masters" ,link:"/masters"  },
+        { id: "system.settings", label: "Settings" ,link:"/system/settings"  },
+        { id: "system.databaseBackup", label: "Database Backup",link:"/system/database-backup"  },
         ]   
     },
 ];
@@ -221,14 +221,14 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {} }) {
               {/* floating submenu (render when openSubmenu == item.id) */}
               {hasChildren && openSubmenu === item.id && (
                 <div
-                  className="submenu"
+                  className= "submenu enter"
                   style={{
                     position: "absolute",
                     left: open ? `calc(280px + 10px)` : `calc(87px + 10px)`, // adjust when collapsed
                     top: submenuStyle.top,
                     minWidth: 300,
                     borderRadius: 8,
-                    zIndex: 120,
+                    zIndex: 10,
                     transition: "left 0.2s ease",
                   }}
                   onMouseEnter={() => {
@@ -285,7 +285,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {} }) {
                             >
                             ✱
                         </span>
-                        <span style={{ flex: 1 ,color:'black'}}>{child.label}</span>
+                        <a href={child.link} style={{ flex: 1 ,color:'black'}}>{child.label}</a>
                         <span style={{ color: "#b594b8", fontSize: 12 }}>&gt;</span>
                         </button>
                     ))}

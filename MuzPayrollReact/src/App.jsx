@@ -6,6 +6,7 @@ import Companyform from "./pages/company/Companyform";
 import GeneralForm from "./pages/company/GeneralForm";
 import DocumentsInfo from "./pages/company/DocumentsInfo";
 import LoginPage from "./pages/LoginPage/loginpage.jsx";
+import Settings from "./pages/Settings/Settings.jsx";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/company" element={<Companyform />} />
       <Route path="/generalform" element={<GeneralForm />} />
       <Route path="/documentsinfo" element={<DocumentsInfo />} />
+      <Route path="/settings" element={<Settings/>} />
     </Routes>
   );
 }
