@@ -1,0 +1,172 @@
+.employee-form-container {
+  max-width: 800px;
+  /* margin: 20px auto; */
+    padding: 50px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.error-badge {
+    background: red;
+    color: white;
+    padding: 1px 6px;
+    border-radius: 50%;
+    position: fixed;
+    font-size: 13px;
+    top: 1.4rem;
+    font-weight: bold;
+    right: 1.9rem;
+    z-index: 100;
+}
+
+
+.form-tabs {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.form-tabs button {
+  padding: 8px 16px;
+  background: #e0e0e0;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.form-tabs .active {
+  background: #2196f3;
+  color: white;
+}
+
+.employee-form {
+  margin-top: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.form-actions {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.form-actions button {
+    background: rgb(5, 146, 5);
+    color: white;
+    position: fixed;
+    top: 10.01rem;
+    outline: none;
+    right: -66px;
+    padding: 10px 15px;
+    padding-right: 1rem;
+    border: none;
+    display:flex;
+    /* width: 10%; */
+    border-radius: 0px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    height: 2.7rem;
+}
+
+.form-actions button:hover {
+    background: rgba(5, 129, 5, 0.856);
+     padding-right: 7rem;
+    /* width: 15%; */
+     /* animation: moveLeft 5s linear; */
+}
+
+.form-actions button[type="reset"] {
+    background: rgba(219, 11, 11, 0.925);
+    top: 15.6rem;
+}
+.form-actions button[type="new"] {
+    background: rgb(245, 210, 12);
+    padding-right: 1rem;
+    right: -6rem;
+    top: 24.06rem;
+}
+.form-actions button[type="search"] {
+    background: rgba(224, 194, 27, 0.925);
+    
+        top: 12.8rem;
+}
+.form-actions button[type="delete"] {
+    background: rgba(224, 194, 27, 0.925);
+    
+    top: 18.42rem;
+}
+.form-actions button[type="print"] {
+    background: rgba(224, 194, 27, 0.925);
+    top: 21.22rem;
+}
+.form-actions button[type="new"]:hover {
+    background: rgb(230, 197, 14);
+     padding-right: 7rem;
+    /* width: 15%; */
+     /* animation: moveLeft 5s linear; */
+}
+.form-actions button:disabled {
+    background: rgb(204, 204, 204);
+       padding-right: 1rem;  
+    cursor: not-allowed;
+}
+ @keyframes moveLeft {
+      0% {
+        right: -100px;
+      }
+      100% {
+        right: 100%;
+      }
+    }
+.red{
+    color: red;
+}
+.save{
+    margin-left: 30px;
+}
+.cancel{
+    margin-left: 16.7px;
+}
+.new{
+    margin-left: 24px;
+}
+.search{
+    margin-left: 17px;
+}
+.delete{
+    margin-left: 18px;
+}
+.print{
+    margin-left: 31px;
+}

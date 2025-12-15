@@ -24,6 +24,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   const [imageUpload, setImageUpload] = useState(false);
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
 
   const codeInputRef = useRef(null);
   const calendarRef = useRef(null);
@@ -70,6 +71,35 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       setShowCalendar(true);
     }
   }, []);
+
+  const resetToInitialState = () => {
+    // Formik reset
+    formik.resetForm();
+
+    // 🔒 Lock everything again
+    setStartDate(null);
+    setIsDateLocked(false);
+    setDateLocked(false);
+    setInputsUnlocked(false);
+
+    // 📅 Show calendar again
+    setShowCalendar(true);
+
+    // 🖼 Clear image
+    setFile(null);
+    setError("");
+    formik.setFieldValue("companyImage", null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    // Close popup
+    setImageUpload(false);
+
+    // Focus back to calendar
+    focusWithTimeout(calendarRef);
+  };
 
   const focusWithTimeout = (ref, delay = 100) => {
     setTimeout(() => {
@@ -230,15 +260,23 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
-        const formattedValues = {
-          ...values,
-          activeDate: values.activeDate.split("T")[0],
-        };
+        const formData = new FormData();
+
+        // Append all normal fields
+        Object.keys(values).forEach((key) => {
+          if (key !== "companyImage") {
+            formData.append(key, values[key]);
+          }
+        });
+
+        // Append image file
+        if (values.companyImage) {
+          formData.append("companyImage", values.companyImage);
+        }
 
         const response = await fetch("http://localhost:8087/saveCompany", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formattedValues),
+          body: formData, // ❗ NO Content-Type header
         });
 
         if (!response.ok) {
@@ -246,7 +284,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
         }
 
         alert("Company saved successfully!");
-        resetForm();
+        resetToInitialState();
       } catch (error) {
         console.error("Error:", error);
         alert("Failed to save Company");
@@ -255,16 +293,22 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   });
 
   const cancelForm = () => {
-    formik.resetForm({
-      values: {
-        ...formik.initialValues,
-      },
-    });
+    formik.resetForm();
     setStartDate(null);
     setDateLocked(false);
     setIsDateLocked(false);
     setInputsUnlocked(false);
     setAuthorization("entry");
+
+    // ✅ Clear image
+    setFile(null);
+    setError("");
+    formik.setFieldValue("companyImage", null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
     focusWithTimeout(calendarRef);
   };
 
@@ -413,11 +457,12 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                     </label>
                     {/* FILE INPUT */}
                     <input
+                      ref={fileInputRef}
                       type="file"
                       accept="image/*"
                       onChange={(e) => {
                         setFile(e.target.files[0]);
-                        setError(""); // clear previous error
+                        setError("");
                       }}
                     />
 
@@ -437,6 +482,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
 
                     {/* SELECT BUTTON WITH VALIDATION */}
                     <button
+                      type="button" // 👈 VERY IMPORTANT
                       className="select-btn"
                       onClick={() => {
                         if (!file) {
@@ -448,15 +494,16 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                         img.src = URL.createObjectURL(file);
 
                         img.onload = () => {
+                          // Optional dimension check
                           // if (img.width !== 490 || img.height !== 350) {
                           //   setError("Image must be exactly 490 × 350 pixels.");
                           //   return;
                           // }
 
-                          // Valid image -> set file into formik
+                          // Store locally (Formik state only)
                           formik.setFieldValue("companyImage", file);
 
-                          setImageUpload(false);
+                          setImageUpload(false); // close popup
                         };
                       }}
                     >
@@ -539,7 +586,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 name="country"
                 onChange={(e) => {
                   formik.handleChange(e);
-                  // Reset dependent states if needed
                   setSelectedCountry(e.target.value);
                   setSelectedState("");
                   setSelectedDistrict("");
@@ -574,10 +620,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 name="state"
                 value={formik.values.state}
                 onChange={(e) => {
-                  formik.handleChange(e); // update Formik state value
-                  setSelectedState(e.target.value); // update local state if you use it
-                  setSelectedDistrict(""); // reset district when state changes
-                  formik.setFieldValue("district", ""); // also reset district in Formik
+                  formik.handleChange(e);
+                  setSelectedState(e.target.value);
+                  setSelectedDistrict("");
+                  formik.setFieldValue("district", "");
                 }}
                 onBlur={formik.handleBlur}
                 disabled={!addressEditable || !startDate || !selectedCountry}
@@ -892,19 +938,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
-          </div>
-
-          <div className="form-buttons">
-            <button
-              type="submit"
-              className="submit-btn"
-              onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
-            >
-              Submit
-            </button>
-            <button type="button" className="cancel-btn" onClick={cancelForm}>
-              Cancel
-            </button>
           </div>
         </form>
       </div>

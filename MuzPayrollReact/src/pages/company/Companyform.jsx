@@ -7,21 +7,21 @@ import React, {
 import "../company/Companyform.css";
 import GeneralForm from "../company/GeneralForm.jsx";
 import DocumentsInfo from "../company/DocumentsInfo.jsx";
-import Header from "../../components/Header/Header.jsx";  
+import Header from "../../components/Header/Header.jsx";
+import ManinButtons from "../../components/MainButtons/MainButtons.jsx";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton.jsx";
 
 const Companyform = forwardRef((props, ref) => {
   const generalFormRef = useRef();
   const documentsInfoRef = useRef();
 
-    const [isDirty, setIsDirty] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
   const handleFormChange = (dirty, valid) => {
     setIsDirty(dirty);
     setIsValid(valid);
   };
-
 
   useImperativeHandle(ref, () => ({
     resetForms() {
@@ -44,6 +44,9 @@ const Companyform = forwardRef((props, ref) => {
 
   return (
     <div className="company-form">
+      <div className="pagename">
+        <h2>Company</h2>
+      </div>
       <div
         className={`button-toggle ${showdiv === "generalinfo" ? "general-active" : showdiv === "docinfo" ? "doc-active" : ""}`}
       >
@@ -54,16 +57,16 @@ const Companyform = forwardRef((props, ref) => {
           General Info
         </button>
 
-        {/* <button
+        <button
           className={`doc ${showdiv === "docinfo" ? "active-green" : "inactive"}`}
           onClick={() => toggleDiv("docinfo")}
         >
           Documents Info
-        </button> */}
+        </button>
       </div>
 
       <div className="form-tabs-container">
-        {/* <Header /> */}
+        <Header />
         <div
           className={`form-tab ${showdiv === "generalinfo" ? "visible" : "hidden"}`}
         >
@@ -76,7 +79,8 @@ const Companyform = forwardRef((props, ref) => {
           <DocumentsInfo ref={documentsInfoRef} />
         </div>
       </div>
-      < ScrollToTopButton />
+      <ManinButtons />
+      <ScrollToTopButton />
     </div>
   );
 });

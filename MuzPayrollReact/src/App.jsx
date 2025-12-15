@@ -17,11 +17,13 @@ import LocationDocumentsInfo from "./pages/Location/DocumentsInfo.jsx";
 import LoginPage from "./pages/LoginPage/loginpage.jsx";
 import LoggedPage from "./pages/LoggedPage/loggedpage.jsx";
 
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route path="/home" element={<LoggedPage />} />
+
       <Route path="/masters" element={<MasterPage />} />
       <Route path="/company" element={<Companyform />} />
       <Route path="/generalform" element={<GeneralForm />} />

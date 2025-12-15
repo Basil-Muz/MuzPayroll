@@ -16,9 +16,9 @@ import axios from "axios";
 
 const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   let page = "branch";
-  const companyId = 1;
+  const companyId = 28;
   const user_code = 1001;
-
+  const [initialCompanyId, setInitialCompanyId] = useState("");
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
@@ -46,6 +46,20 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     ? City.getCitiesOfState(selectedCountry, selectedState)
     : [];
 
+  const loadCompanyAndBranches = async () => {
+    try {
+      const companyResponse = await axios.get(
+        `http://localhost:8087/companies/${companyId}`,
+      );
+      const company = companyResponse.data;
+
+      setCompanyList([company]);
+      setInitialCompanyId(company.id); // ✅ store it
+    } catch (error) {
+      console.error("Failed to load company:", error);
+    }
+  };
+
   useEffect(() => {
     const today = new Date();
     const formatted = today.toLocaleDateString("en-GB"); // e.g., 15/09/2025
@@ -57,17 +71,49 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     }
   }, []);
 
-  const focusWithTimeout = (ref, delay = 100) => {
+  const focusAndScrollToTop = (ref, delay = 100) => {
     setTimeout(() => {
-      if (ref?.current) {
-        if (typeof ref.current.scrollIntoView === "function") {
-          ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-        if (typeof ref.current.focus === "function") {
-          ref.current.focus();
-        }
+      if (!ref?.current) return;
+
+      // 1️⃣ Focus first
+      if (typeof ref.current.focus === "function") {
+        ref.current.focus({ preventScroll: true });
       }
+
+      // 2️⃣ Then scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }, delay);
+  };
+
+  const resetToInitialState = () => {
+    formik.resetForm({
+      values: {
+        ...formik.initialValues,
+        company: initialCompanyId,
+      },
+    });
+
+    setStartDate(null);
+    setShowCalendar(true);
+    setInputsUnlocked(false);
+    setIsDateLocked(false);
+    setDateLocked(false);
+
+    setAddressEditable(true);
+    setContactInfoEditable(true);
+    setemployerEditable(true);
+
+    // ✅ Focus calendar AFTER render
+    setTimeout(() => {
+      calendarRef.current?.focus();
+      calendarRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
   };
 
   const handleDateChange = (date) => {
@@ -79,7 +125,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       setShowCalendar(false);
       setInputsUnlocked(true);
       setIsDateLocked(true);
-      focusWithTimeout(codeInputRef);
+      focusAndScrollToTop(codeInputRef);
     }
   };
   useEffect(() => {
@@ -100,6 +146,12 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       btn?.focus();
     });
   }, []);
+
+  useEffect(() => {
+    if (companyList.length && initialCompanyId) {
+      formik.setFieldValue("company", initialCompanyId, false);
+    }
+  }, [companyList, initialCompanyId]);
 
   const handleAddressEditToggle = () => {
     if (addressEditable) {
@@ -143,12 +195,14 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   };
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      companyEntity: { id: "" },
+      company: initialCompanyId,
       code: "",
       branch: "",
       shortName: "",
-      activeDate: new Date().toISOString().split("T")[0], 
+      activeDate: new Date().toISOString().split("T")[0],
+      address: "",
       address1: "",
       address2: "",
       country: "",
@@ -233,28 +287,13 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
         }
 
         alert("Branch saved successfully!");
-        resetForm();
+        resetToInitialState();
       } catch (error) {
         console.error("Error:", error);
         alert("Failed to save Branch");
       }
     },
   });
-  useEffect(() => {
-    onFormChange?.(formik.dirty, formik.isValid);
-  }, [formik.dirty, formik.isValid]);
-  const loadCompanyAndBranches = async () => {
-    try {
-      const companyResponse = await axios.get(
-        `http://localhost:8087/companies/${companyId}`,
-      );
-      const company = companyResponse.data;
-      setCompanyList([company]);
-      formik.setFieldValue("company", company.id);
-    } catch (error) {
-      console.error("Failed to load company:", error);
-    }
-  };
 
   useEffect(() => {
     loadCompanyAndBranches();
@@ -272,7 +311,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     setIsDateLocked(false);
     setInputsUnlocked(false);
     setAuthorization("entry");
-    focusWithTimeout(calendarRef);
+    focusAndScrollToTop(calendarRef);
   };
 
   useImperativeHandle(ref, () => ({
@@ -309,8 +348,9 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
               <select
                 id="company"
                 name="company"
-                value={formik.values.company}
+                value={formik.values.company || ""}
                 disabled
+                onChange={formik.handleChange}
               >
                 {companyList.map((company) => (
                   <option key={company.id} value={company.id}>
@@ -843,19 +883,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
-
-            <div className="form-buttons">
-              <button
-                type="submit"
-                className="submit-btn"
-                onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
-              >
-                Submit
-              </button>
-              <button type="button" className="cancel-btn" onClick={cancelForm}>
-                Cancel
-              </button>
-            </div>
           </div>
         </form>
       </div>
@@ -886,7 +913,11 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
         <div className="newbutton">
           <div className="calender">
             {!isDateLocked && (
-              <div className="datepicker" ref={calendarRef}>
+              <div
+                className="datepicker"
+                ref={calendarRef}
+                tabIndex={-1} // ✅ makes it focusable
+              >
                 <DatePicker
                   selected={startDate}
                   onChange={handleDateChange}

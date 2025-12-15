@@ -1,3 +1,10 @@
+
+#root{
+    max-width: 1349px;
+    /* margin: 0 auto; */
+    /* padding: 2rem; */
+    text-align: center;
+}
 /* overall layout */
 .app-shell {
     display: flex;
@@ -239,3 +246,17 @@
 .tile-row:has(.tile-card:nth-child(1):nth-last-child(1)) {
     grid-template-columns: 1fr;
 } */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.main-cancel {
+    padding: 7px;
+    display: flex;
+    width: 36px;
+    background-color: #c52b2bff;
+    flex-wrap: nowrap;
+    color: azure;
+    justify-content: center;
+}

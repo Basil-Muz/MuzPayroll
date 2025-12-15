@@ -89,7 +89,7 @@
 .headertext2 {
   background-color: rgb(85, 150, 235);
   color: white;
-  width: 423px;
+  width: 424px;
   margin-left: -15px;
   margin-top: -15px;
   height: 35px;
@@ -231,7 +231,7 @@ input.inputdate {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-left:0px;
+  margin-left: 0px;
 }
 
 .active-date-icon svg {
@@ -289,7 +289,9 @@ select {
   position: absolute;
   bottom: 80px;
   left: 64rem;
+  margin-left: 4rem;
+  margin-bottom: -23px;
 }
 .error {
-    color: red;
+  color: red;
 }

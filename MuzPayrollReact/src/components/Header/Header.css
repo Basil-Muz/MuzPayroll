@@ -10,7 +10,7 @@ header.header {
     top: 0;
     background-color: white;
     left: 0;
-    min-height: 8%;
+    min-height: 10%;
     width: 100%;
     z-index: 100;
     display: flex;
@@ -20,23 +20,26 @@ header.header {
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 .logo {
- /* font-family: "Roboto", sans-serif; */
+    /* font-family: "Roboto", sans-serif; */
     font-optical-sizing: auto;
     font-style: normal;
     font-size: 17px;
     color: #C71E64;
+    height: 26px;
+    padding: 0;
     margin-left: 20px;
     font-weight: bold;
     width: auto;
 }
+
 .notification {
     position: relative;
     display: inline-block;
     padding-right: 10px;
-    height: 100%;
+    /* height: 100%; */
     padding: 14px;
-    padding-top: 19px;
-    padding-bottom: 17px;
+    padding-top: 21px;
+    padding-bottom: 18px;
     transition: all 0.3s ease;
      
 }
@@ -46,21 +49,25 @@ header.header {
 
 .notification .notification-dropdown {
     position: absolute;
-    top: 100%;
+    top: 103%;
     right: 0;
     width: 234px;
     height: 207px;
     /* justify-content: center;
     align-items: center; */
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.14); /* transparent white */
     border: 1px solid #ddd;
+    backdrop-filter: blur(6px); /* optional: smooth glass effect */
     /* border-radius: 6px; */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 12px;
+    border-radius: 12px;
     overflow-y: auto;
     overflow-x: hidden;/*scrolling*/
     z-index: 1000;
-    display: block; /* Hidden by default */
+    display: flex; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
     transition: all 0.3s ease;
 }
 
@@ -94,7 +101,7 @@ header.header {
     top: 11px;
     background-color: #188bd8;
     color: white;
-    right: 10.4rem;
+    right: 0.5rem;
     width: 13px;
     display:flex;
     justify-content: center;
@@ -133,28 +140,35 @@ header.header {
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
+    padding: 0;
+    height: 60px;
     padding-right: 3rem;
 }
 .location-date {
     display: flex;
     flex-direction: column;
-    align-items: self-end;
+    height: 38px;
     font-size: 13px;
     padding: 9px 12px 8px 12px;
 }
 .location {
     color: #188bd8;
+    display: flex;
+    justify-content: center;
 }
-.location-date .date{
+.location-date .date {
     color: black;
     margin-top: -3px;
     font-size: 12px;
-
+    background: none;
+    border: 0;
+    display: block;
+    width: 114px;
 }
 .dashboard {
         padding: 10px;
-    padding-top: 17px;
-    padding-bottom: 17px;
+    padding-top: 18px;
+    padding-bottom: 18px;
     transition: all 0.3s ease;
 }
 .dashboard:hover {
@@ -163,14 +177,34 @@ header.header {
 .user-profile {
     background-color: rgba(219, 219, 219, 0.726);
     padding: 12px;
-    padding-top: 17px;
-    padding-bottom: 17px;
+    padding-top: 19px;
+    padding-bottom: 18px;
 }
 .settings {
     padding: 14px;
-    padding-top: 18px;
-    padding-bottom: 18px;
+    padding-top: 20px;
+    padding-bottom: 19px;
 }
 .settings:hover {
     background-color:rgba(192, 190, 190, 0.73);
+}
+.profile-dropdown {
+    position: fixed;
+    top: 4.2rem;
+    right: 6rem;
+    font-size: smaller;
+    height: 75px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 160px;
+    border-radius: 12px;
+    background-color: rgba(192, 190, 190, 0.73);
+}
+.profile-dropdown p {
+background-color: transparent;
+    border: none;
+    margin: 10px;
+    width: 100%;
+    cursor: pointer;
 }

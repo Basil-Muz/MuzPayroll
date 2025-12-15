@@ -20,6 +20,8 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   const companyId = 1;
   const defaultBranchId = 1;
   const user_code = 1001;
+  const [initialCompanyId, setInitialCompanyId] = useState("");
+  const [initialBranchId, setInitialBranchId] = useState("");
 
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
@@ -61,16 +63,45 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     }
   }, []);
 
-  const focusWithTimeout = (ref, delay = 100) => {
-    setTimeout(() => {
-      if (ref?.current) {
-        if (typeof ref.current.scrollIntoView === "function") {
-          ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-        if (typeof ref.current.focus === "function") {
-          ref.current.focus();
-        }
+  const loadCompanyAndBranches = async () => {
+    try {
+      const companyResponse = await axios.get(
+        `http://localhost:8087/companies/${companyId}`,
+      );
+
+      const company = companyResponse.data;
+      setCompanyList([company]);
+      setInitialCompanyId(company.id);
+
+      const branchResponse = await axios.get(
+        `http://localhost:8087/${companyId}/branches`,
+      );
+
+      const branches = branchResponse.data;
+      setBranchList(branches);
+
+      if (branches.length > 0) {
+        setInitialBranchId(branches[0].id);
       }
+    } catch (error) {
+      console.error("Failed to load company or branches:", error);
+    }
+  };
+
+  const focusAndScrollToTop = (ref, delay = 100) => {
+    setTimeout(() => {
+      if (!ref?.current) return;
+
+      // 1️⃣ Focus first
+      if (typeof ref.current.focus === "function") {
+        ref.current.focus({ preventScroll: true });
+      }
+
+      // 2️⃣ Then scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }, delay);
   };
 
@@ -83,7 +114,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       setShowCalendar(false);
       setInputsUnlocked(true);
       setIsDateLocked(true);
-      focusWithTimeout(codeInputRef);
+      focusAndScrollToTop(codeInputRef);
     }
   };
   useEffect(() => {
@@ -147,9 +178,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   };
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      companyEntity: { id: "" },
-      branchEntity: { id: "" },
+      company: initialCompanyId,
+      branch: initialBranchId,
       code: "",
       location: "",
       shortName: "",
@@ -243,63 +275,48 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
         }
 
         alert("Location saved successfully!");
-        resetForm();
+        resetToInitialState();
       } catch (error) {
         console.error("Error:", error);
         alert("Failed to save location");
       }
     },
   });
-  useEffect(() => {
-    onFormChange?.(formik.dirty, formik.isValid);
-  }, [formik.dirty, formik.isValid]);
-  const loadCompanyAndBranches = async () => {
-    try {
-      const companyResponse = await axios.get(
-        `http://localhost:8087/companies/${companyId}`,
-      );
-      const company = companyResponse.data;
-      setCompanyList([company]);
-      formik.setFieldValue("company", company.id);
-
-      const branchResponse = await axios.get(
-        `http://localhost:8087/${companyId}/branches`,
-      );
-      const branches = branchResponse.data || [];
-      setBranchList(branches);
-
-      const selectedBranch = formik.values.branch;
-
-      if (!selectedBranch) {
-        if (defaultBranchId) {
-          formik.setFieldValue("branch", defaultBranchId);
-        }
-      } else {
-        formik.setFieldValue("branch", selectedBranch);
-      }
-    } catch (error) {
-      console.error("Failed to load company or branches:", error);
-    }
-  };
 
   useEffect(() => {
     loadCompanyAndBranches();
   }, [companyId, defaultBranchId]);
 
   const cancelForm = () => {
-    formik.resetForm({
-      values: {
-        ...formik.initialValues,
-        company: formik.values.company,
-        branch: defaultBranchId,
-      },
-    });
+    formik.resetForm();
     setStartDate(null);
     setDateLocked(false);
     setIsDateLocked(false);
     setInputsUnlocked(false);
     setAuthorization("entry");
-    focusWithTimeout(calendarRef);
+    focusAndScrollToTop(calendarRef);
+  };
+
+  const resetToInitialState = () => {
+    formik.resetForm({
+      values: {
+        ...formik.initialValues,
+        company: initialCompanyId,
+        branch: initialBranchId,
+      },
+    });
+
+    setStartDate(null);
+    setShowCalendar(true);
+    setInputsUnlocked(false);
+    setIsDateLocked(false);
+    setDateLocked(false);
+
+    setAddressEditable(true);
+    setContactInfoEditable(true);
+    setemployerEditable(true);
+
+    focusAndScrollToTop(calendarRef);
   };
 
   useImperativeHandle(ref, () => ({
@@ -919,18 +936,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
               {formik.touched.employerEmail && formik.errors.employerEmail ? (
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
-            </div>
-            <div className="form-buttons">
-              <button
-                type="submit"
-                className="submit-btn"
-                onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
-              >
-                Submit
-              </button>
-              <button type="button" className="cancel-btn" onClick={cancelForm}>
-                Cancel
-              </button>
             </div>
           </div>
         </form>
