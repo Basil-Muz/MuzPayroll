@@ -7,70 +7,72 @@ import { IoIosArrowForward } from "react-icons/io";
 
 import "./sidebar.css";
 import {  } from "axios";
+// import { href } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <HiMiniSwatch size={18} />, badge: 0 },
+    { id: "dashboard", label: "Dashboard", icon: <HiMiniSwatch size={18} />, link:"/dashboard" },
     {
     id: "employee",
     label: "Employee",
     icon: <ImStack size={18} />,
     children: [
-        { id: "employee.employee", label: "Employee" },
-        { id: "employee.employeeList", label: "Employee List" },
-        { id: "employee.employeeUpload", label: "Employee Upload" },
-        { id: "employee.employeeAttrAlloc", label: "Employee Attribute Allocation" },
-        { id: "employee.employeeBulkVerification", label: "Employee Bulk Verification" },
+        { id: "employee.employee", label: "Employee" ,link:"/employee"},
+        { id: "employee.employeeList", label: "Employee List",link:"/employee/employee-list" },
+        { id: "employee.employeeUpload", label: "Employee Upload",link:"/employee/employee-upload" },
+        { id: "employee.employeeAttrAlloc", label: "Employee Attribute Allocation",link:"/employee/employee-attribute-allocation" },
+        { id: "employee.employeeBulkVerification", label: "Employee Bulk Verification", link:"/employee/employee-bulk-verification" },
     ],
     },
     { id: "attendance", label: "Attendance and Leave", icon: <ImStack size={18} />,
     children: [
-    { id: "attendance.masterRoll", label: "Master Roll" },
-    { id: "attendance.VeringWeeklyAllocation", label: "Vering Weekly Allocation" },
+    { id: "attendance.masterRoll", label: "Master Roll", link:"/attendance/master-roll" },
+    { id: "attendance.VeringWeeklyAllocation", label: "Vering Weekly Allocation",link:"/attendance/vering-weekly-allocation" },
     // varing shift allocation,Leave Allocation/Deallocation,Leave enchangment,Leave year end process,
-    { id: "attendance.varingShiftAllocation", label: "Varing Shift Allocation" },
-    { id: "attendance.leaveAllocationDeallocation", label: "Leave Allocation/Deallocation" },
-    { id: "attendance.leaveEnchangment", label: "Leave Enchangment" },
-    { id: "attendance.leaveYearEndProcess", label: "Leave Year End Process" },
+    { id: "attendance.varingShiftAllocation", label: "Varing Shift Allocation",link:"/attendance/varing-shift-allocation" },
+    { id: "attendance.leaveAllocationDeallocation", label: "Leave Allocation/Deallocation",link:"/attendance/leave-allocation-deallocation" },
+    { id: "attendance.leaveEnchangment", label: "Leave Enchangment",link:"/attendance/leave-enchangment" },
+    { id: "attendance.leaveYearEndProcess", label: "Leave Year End Process",link:"/attendance/leave-year-end-process"  },
     ], 
     },
     { id: "advance", label: "Advance Management", icon: <ImStack size={18} />,  
     children: [
         // advance Issue,advance recovery update
-        { id: "advance.advanceIssue", label: "Advance Issue" },
-        { id: "advance.advanceRecoveryUpdate", label: "Advance Recovery Update" },
+        { id: "advance.advanceIssue", label: "Advance Issue" ,link:"/advance/advance-issue"},
+        { id: "advance.advanceRecoveryUpdate", label: "Advance Recovery Update" ,link:"/advance/advance-recovery-update" },
         ]},
     { id: "other", label: "Other Transaction", icon: <ImStack size={18} />,  
 //   Monthly allowance and deduction,Employee reminder Register, Employee final settilement,Tasklist
     children: [
-        { id: "other.monthlyAllowanceDeduction", label: "Monthly Allowance and Deduction" },
-        { id: "other.employeeReminderRegister", label: "Employee Reminder Register" },
-        { id: "other.employeeFinalSettlement", label: "Employee Final Settlement" },
+        { id: "other.monthlyAllowanceDeduction", label: "Monthly Allowance and Deduction" ,link:"/other/monthly-allowance-deduction"},
+        { id: "other.employeeReminderRegister", label: "Employee Reminder Register" ,link:"/other/employee-reminder-register" },
+        { id: "other.employeeFinalSettlement", label: "Employee Final Settlement" ,link:"/other/employee-final-settlement" },
         { id: "other.tasklist", label: "Tasklist" },
         ]
         },
     { id: "process", label: "Process", icon: <ImStack size={18} />,  
 // payroll process,Payroll process verification,bonus process,gratiuty process
     children: [
-        { id: "process.payrollProcess", label: "Payroll Process" },
-        { id: "process.payrollProcessVerification", label: "Payroll Process Verification" },
-        { id: "process.bonusProcess", label: "Bonus Process" },
-        { id: "process.gratiutyProcess", label: "Gratiuty Process" },
+        { id: "process.payrollProcess", label: "Payroll Process", link:"/process/payroll-process"  },
+        { id: "process.payrollProcessVerification", label: "Payroll Process Verification",link:"/process/payroll-process-verification"  },
+        { id: "process.bonusProcess", label: "Bonus Process",link:"/process/bonus-process"  },
+        { id: "process.gratiutyProcess", label: "Gratiuty Process",link:"/process/gratiuty-process"  },
         ]
 },
     { id: "Statutary", label: "Statutary Complients", icon: <ImStack size={18} />,
     children: [
     // complients letter,letter,report
-        { id: "Statutary.complientsLetter", label: "Complients Letter" },
-        { id: "Statutary.letter", label: "Letter" },
-        { id: "Statutary.report", label: "Report" },
+        { id: "Statutary.complientsLetter", label: "Complients Letter" ,link:"/statutary/complients-letter" },
+        { id: "Statutary.letter", label: "Letter" ,link:"/statutary/letter"  },
+        { id: "Statutary.report", label: "Report",link:"/statutary/report"  },
         ]   
     },
     { id: "system", label: "System Management", icon: <ImStack size={18} />,
     children: [
     //    masters,Settings,database backup
-        { id: "system.masters", label: "Masters" },
-        { id: "system.settings", label: "Settings" },
-        { id: "system.databaseBackup", label: "Database Backup" },
+        { id: "system.masters", label: "Masters" ,link:"/masters"  },
+        { id: "system.settings", label: "Settings" ,link:"/system/settings"  },
+        { id: "system.databaseBackup", label: "Database Backup",link:"/system/database-backup"  },
         ]   
     },
 ];
@@ -79,6 +81,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
   const [open, setOpen] = useState(initialOpen);
   const [active, setActive] = useState("payroll");
 
+    const navigate = useNavigate();//navigate function for dashboard link
   // submenu state
   const [openSubmenu, setOpenSubmenu] = useState(null); // id of menu item with submenu
   const [submenuStyle, setSubmenuStyle] = useState({ top: 0, left: "calc(100% + 8px)" });
@@ -136,26 +139,25 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
   return (
     <aside
       ref={sidebarRef}
-      className={`sidebar ${open ? "expanded" : "collapsed"}`}
+      className={`sidebar ${open ? "collapsed" : "expanded"}`}
       aria-expanded={open}
     >
         <button
-          className={`collapse-btn ${open ? "cross" : "menu"}`}
+          className={`collapse-btn ${open ? "menu" : "cross"}`}
           onClick={() => setOpen((v) => !v)}
-          aria-pressed={!open}
-          aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
+          aria-pressed={open}
+          aria-label={open ?  "Collapse sidebar": "Expand sidebar" }
         >
           <div className={`icon-transition ${open ? "rotated" : "rotated-back"}`}>
             {open ? (
-              <RxCross2 size={20} className="toggle-icon" />
-            ) : (
               <MdOutlineMenu size={20} className="toggle-icon" />
+            ) : (
+                <RxCross2 size={20} className="toggle-icon" />
             )}
           </div>
         </button>
       <div className="sidebar-top">
         
-
         <div
           className="brand"
           role="link"
@@ -164,7 +166,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
         >
           <div className="user">
             <div className="user-avatar">R</div>
-            {open && (
+            {!open && (
               <div className="user-meta">
                 <div className="user-name">Rahul Admin</div>
                 <div className="user-role">Payroll Manager</div>
@@ -198,9 +200,14 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
             >
               <button
                 className={`nav-item ${active === item.id ? "active" : ""}`}
-                onClick={() => handleNav(item)}
+                onClick={() => {
+                    if (item.id=="dashboard"){ {
+                        navigate("/dashboard");
+                    }
+                    handleNav(item)}}}
                 title={!open ? item.label : undefined} /* tooltip when collapsed */
                 aria-current={active === item.id ? "page" : undefined}
+              
               >
                 <div className="nav-icon">{item.icon}</div>
 
@@ -221,14 +228,14 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
               {/* floating submenu (render when openSubmenu == item.id) */}
               {hasChildren && openSubmenu === item.id && (
                 <div
-                  className="submenu"
+                  className= "submenu enter"
                   style={{
                     position: "absolute",
-                    left: open ? `calc(280px + 10px)` : `calc(87px + 10px)`, // adjust when collapsed
+                    left: open ? `calc(87px + 10px)` : `calc(280px + 10px)`, // adjust when collapsed
                     top: submenuStyle.top,
                     minWidth: 300,
                     borderRadius: 8,
-                    zIndex: 120,
+                    zIndex: 10,
                     transition: "left 0.2s ease",
                   }}
                   onMouseEnter={() => {
@@ -285,7 +292,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                             >
                             ✱
                         </span>
-                        <span style={{ flex: 1 ,color:'black'}}>{child.label}</span>
+                        <a href={child.link} style={{ flex: 1 ,color:'black'}}>{child.label}</a>
                         <span style={{ color: "#b594b8", fontSize: 12 }}>&gt;</span>
                         </button>
                     ))}

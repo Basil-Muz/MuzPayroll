@@ -1,7 +1,7 @@
 import "./App.css";
 import React from "react";
 import { Router, Routes, Route } from "react-router-dom";
-import Companyform from "./pages/company/Companyform";
+import Settings from "./pages/Settings/Settings.jsx";
 import GeneralForm  from "./pages/company/GeneralForm";
 import DocumentsInfo from "./pages/company/DocumentsInfo"
 import MasterPage from "./pages/Masters/MasterPage";
@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage/loginpage";
 import ChangePassword from "./pages/changepassword/changepassword";
 import Logout from "./components/logout/logout";
 import ForgotPassword from "./pages/forgotpassword/forgotpassword";
+import Companyform from "./pages/company/Companyform";
 
 function App() {
   return (
@@ -24,10 +25,9 @@ function App() {
         <Route path="/changepassword" element={<ChangePassword/>} /> 
         <Route path="/logout" element={< Logout/>} /> 
         <Route path="/forgot-password" element={<ForgotPassword />} />
-
+         <Route path="/settings" element={<Settings/>} />
 
       </Routes>
-
 
   );
 }
