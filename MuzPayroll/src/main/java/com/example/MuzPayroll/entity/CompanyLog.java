@@ -43,7 +43,7 @@ public class CompanyLog {
         this.authorization = authorization;
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String code;
 
     @Column(nullable = false)

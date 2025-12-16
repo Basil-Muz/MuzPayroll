@@ -14,9 +14,9 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
 
-const GeneralForm = forwardRef(({ onFormChange }, ref) => {
+const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   let page = "branch";
-  const companyId = 28;
+  const companyId = 2;
   const user_code = 1001;
   const [initialCompanyId, setInitialCompanyId] = useState("");
   const [employerEditable, setemployerEditable] = useState(false);
@@ -270,6 +270,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
+        onBackendError(""); // clear previous backend error
         const formattedValues = {
           ...values,
           activeDate: values.activeDate.split("T")[0],
@@ -282,15 +283,24 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           body: JSON.stringify(formattedValues),
         });
 
+        // 👇 READ BACKEND MESSAGE
+        const message = await response.text();
+
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          // Field-level error (unique code)
+          if (message.toLowerCase().includes("code")) {
+            formik.setFieldError("code", message);
+          } else {
+            onBackendError(message);
+          }
+          return;
         }
 
         alert("Branch saved successfully!");
         resetToInitialState();
       } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to save Branch");
+        console.error(error);
+        onBackendError("Something went wrong. Please try again.");
       }
     },
   });
@@ -371,7 +381,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 id="code"
                 name="code"
                 ref={codeInputRef}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  onBackendError(""); // 👈 clear backend error
+                  formik.handleChange(e);
+                }}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
                 value={formik.values.code}
@@ -882,6 +895,16 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
               {formik.touched.employerEmail && formik.errors.employerEmail ? (
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
+            </div>
+
+            <div className="form-buttons">
+              <button type="submit" className="submit-btn">
+                Submit
+              </button>
+
+              <button type="button" className="cancel-btn" onClick={cancelForm}>
+                Cancel
+              </button>
             </div>
           </div>
         </form>

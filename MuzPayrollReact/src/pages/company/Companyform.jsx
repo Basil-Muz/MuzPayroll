@@ -18,6 +18,8 @@ const Companyform = forwardRef((props, ref) => {
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
+  const [headerError, setHeaderError] = useState("");
+
   const handleFormChange = (dirty, valid) => {
     setIsDirty(dirty);
     setIsValid(valid);
@@ -66,11 +68,11 @@ const Companyform = forwardRef((props, ref) => {
       </div>
 
       <div className="form-tabs-container">
-        <Header />
+        <Header backendError={headerError} />
         <div
           className={`form-tab ${showdiv === "generalinfo" ? "visible" : "hidden"}`}
         >
-          <GeneralForm ref={generalFormRef} />
+          <GeneralForm ref={generalFormRef} onBackendError={setHeaderError} />
         </div>
 
         <div

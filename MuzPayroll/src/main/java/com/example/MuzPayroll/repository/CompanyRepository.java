@@ -9,5 +9,4 @@ import com.example.MuzPayroll.entity.CompanyMst;
 public interface CompanyRepository extends JpaRepository<CompanyMst, Long> {
 
     boolean existsByCode(String code);
-
 }

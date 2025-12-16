@@ -29,7 +29,7 @@ public class CompanyMst {
         this.company = company;
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String code;
 
     @Column(nullable = false)

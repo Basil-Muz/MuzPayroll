@@ -15,7 +15,7 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
 
-const GeneralForm = forwardRef(({ onFormChange }, ref) => {
+const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   let page = "company";
   const user_code = 1001;
   const [employerEditable, setemployerEditable] = useState(false);
@@ -50,17 +50,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     ? City.getCitiesOfState(selectedCountry, selectedState)
     : [];
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-  const handleSelect = () => {
-    // store selected file (optional – remove if you don't need it)
-    formik.setFieldValue("companyImage", file);
-
-    // close popup
-    setImageUpload(false);
-  };
-
   useEffect(() => {
     const today = new Date();
     const formatted = today.toLocaleDateString("en-GB"); // e.g., 15/09/2025
@@ -71,6 +60,17 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       setShowCalendar(true);
     }
   }, []);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+  const handleSelect = () => {
+    // store selected file (optional – remove if you don't need it)
+    formik.setFieldValue("companyImage", file);
+
+    // close popup
+    setImageUpload(false);
+  };
 
   const resetToInitialState = () => {
     // Formik reset
@@ -257,38 +257,51 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       employerEmail: Yup.string()
         .email("Invalid email format")
         .required("Employer Email is required"),
+      withaffectdate: Yup.string().required("with affect date is required"),
     }),
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       try {
+        onBackendError(""); // clear previous backend error
+
         const formData = new FormData();
 
-        // Append all normal fields
+        // Append all fields except image
         Object.keys(values).forEach((key) => {
           if (key !== "companyImage") {
             formData.append(key, values[key]);
           }
         });
 
-        // Append image file
+        // Append image if exists
         if (values.companyImage) {
           formData.append("companyImage", values.companyImage);
         }
 
         const response = await fetch("http://localhost:8087/saveCompany", {
           method: "POST",
-          body: formData, // ❗ NO Content-Type header
+          body: formData,
         });
 
+        // 👇 READ BACKEND MESSAGE
+        const message = await response.text();
+
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          // Field-level error (unique code)
+          if (message.toLowerCase().includes("code")) {
+            formik.setFieldError("code", message);
+          } else {
+            onBackendError(message);
+          }
+          return;
         }
 
+        // ✅ SUCCESS
         alert("Company saved successfully!");
         resetToInitialState();
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to save Company");
-      }
+        } catch (error) {
+          console.error(error);
+          onBackendError("Something went wrong. Please try again.");
+        }
     },
   });
 
@@ -347,7 +360,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 id="code"
                 name="code"
                 ref={codeInputRef}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  onBackendError(""); // 👈 clear backend error
+                  formik.handleChange(e);
+                }}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
                 value={formik.values.code}
@@ -938,6 +954,19 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
+          </div>
+
+          <div className="form-buttons">
+            <button
+              type="submit"
+              className="submit-btn"
+              onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
+            >
+              Submit
+            </button>
+            <button type="button" className="cancel-btn" onClick={cancelForm}>
+              Cancel
+            </button>
           </div>
         </form>
       </div>

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -69,52 +70,85 @@ public class CompanyService {
                 imagePath = UPLOAD_DIR + fileName;
             }
 
-            // ----------------- Required Field Checks -----------------
+            /* ================= REQUIRED AUTH FIELDS ================= */
             if (data.get("authorizationDate") == null ||
                     data.get("authorizationStatus") == null ||
                     data.get("user_code") == null) {
 
-                return ResponseEntity.badRequest().body("Missing authorization data");
+                return ResponseEntity
+                        .badRequest()
+                        .body("Missing authorization data");
             }
 
-            // ----------------- Save Company -----------------
+            /* ================= UNIQUE CODE VALIDATION ================= */
+            String companyCode = data.get("code");
+
+            if (companyCode == null || companyCode.trim().isEmpty()) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("Company code is required");
+            }
+
+            if (companyRepository.existsByCode(companyCode)) {
+                return ResponseEntity
+                        .status(409) // CONFLICT
+                        .body("Company code already exists: " + companyCode);
+            }
+
+            /* ================= SAVE COMPANY ================= */
             CompanyMst company = objectMapper.convertValue(data, CompanyMst.class);
 
-            // Save image path
             company.setCompanyImage(imagePath);
 
             CompanyMst savedCompany = companyRepository.save(company);
 
-            // ----------------- Save Authorization -----------------
+            /* ================= SAVE AUTHORIZATION ================= */
             Authorization auth = new Authorization();
             auth.setMstId(savedCompany.getId());
-            auth.setAuthorizationDate(LocalDate.parse(data.get("authorizationDate")));
+            auth.setAuthorizationDate(
+                    LocalDate.parse(data.get("authorizationDate")));
 
-            int statusInt = Integer.parseInt(data.get("authorizationStatus"));
-            if (statusInt != 0 && statusInt != 1) {
-                return ResponseEntity.badRequest().body("authorizationStatus must be 0 or 1");
+            int status = Integer.parseInt(data.get("authorizationStatus"));
+
+            if (status != 0 && status != 1) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("authorizationStatus must be 0 or 1");
             }
 
-            auth.setAuthorizationStatus(statusInt == 1);
+            auth.setAuthorizationStatus(status == 1);
 
             UserMst user = userRepository.findByUserCode(data.get("user_code"));
+
             if (user == null) {
-                return ResponseEntity.badRequest().body("Invalid user_code");
+                return ResponseEntity
+                        .badRequest()
+                        .body("Invalid user_code");
             }
 
             auth.setUserMst(user);
             Authorization savedAuth = authorizationRepository.save(auth);
 
-            // ----------------- Save Company Log -----------------
+            /* ================= SAVE COMPANY LOG ================= */
             CompanyLog log = objectMapper.convertValue(data, CompanyLog.class);
+
             log.setAuthorization(savedAuth);
             companyLogRepository.save(log);
 
             return ResponseEntity.ok("Company saved successfully!");
 
-        } catch (Exception e) {
+        }
+        /* ================= DB UNIQUE SAFETY ================= */
+        catch (DataIntegrityViolationException e) {
+            return ResponseEntity
+                    .status(409)
+                    .body("Company code already exists");
+        }
+        /* ================= GENERAL ERROR ================= */
+        catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500)
+            return ResponseEntity
+                    .status(500)
                     .body("Error saving company: " + e.getMessage());
         }
     }
