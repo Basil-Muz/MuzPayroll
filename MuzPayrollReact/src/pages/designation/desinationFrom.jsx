@@ -5,6 +5,7 @@ import { FaSave} from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md";
 import { IoNotificationsSharp } from "react-icons/io5";
 import axios from 'axios';
+import { RxCross2 } from "react-icons/rx";
 import Loading from '../../components/Loading/Loading';
 function DesignationForm({ toggleForm,data }) {
 
@@ -21,8 +22,9 @@ function DesignationForm({ toggleForm,data }) {
     const [errors, setErrors] = useState({});
     const [notOpen, setNotOpen] = useState(false);
 
-     const codeInputRef = useRef(null);
+    const codeInputRef = useRef(null);
 
+    const notifTimer = useRef(null);
 const [form, setForm] = useState({
     code: "",
     name: "",
@@ -43,11 +45,11 @@ const [form, setForm] = useState({
     }
   }, [flag]);
 
-  useEffect(() => {
-     axios.get("http://localhost:9082/getAllSalaryHead")
-        .then((res) => setSalaryHead(res.data))
-        .catch(console.error);
-}, []);
+//   useEffect(() => {
+//      axios.get("http://localhost:9082/getAllSalaryHead")
+//         .then((res) => setSalaryHead(res.data))
+//         .catch(console.error);
+// }, []);
 
     useEffect(() => {
   if (data) {
@@ -66,6 +68,17 @@ const [form, setForm] = useState({
   }
    
 }, [data]);
+
+  const handleNotifEnter = () => {
+  clearTimeout(notifTimer.current);
+  setNotOpen(true);
+};
+
+const handleNotifLeave = () => {
+  notifTimer.current = setTimeout(() => {
+    setNotOpen(false);
+  }, 300); // delay before hiding
+};
 
   const handleMouseDown = (e) => {
     dragging.current = true;
@@ -150,43 +163,43 @@ const handleMouseUp = () => {
     //     form.status=data.status;
     //     form.date=data.date;
     // }
-    if (validate(form)) {
-       if(data){
-      if (data) {
-    try {
-        const response =axios.put(`http://localhost:9082/updateAdvanceType/${data.id}`, {
-            code: form.code,
-            name: form.name,
-            date: form.date,
-            shortName: form.shortName,
-            recoveryHead: form.recoveryHead,
-            description: form.description,
-            activeDate: form.activeDate,
-            status: form.status,
-        });
-        console.log(response.data);
-    } catch (error) {
-        console.error("Error updating advance type:", error);
-    }
-        alert(`Form Updation successfully!`);
-       }
-    }else{
-      axios.post('http://localhost:9082/saveAdvanceType',{
-        code: form.code,
-        name: form.name,
-        date: form.date,
-        shortName: form.shortName,
-        recoveryHead: form.recoveryHead,
-        description: form.description,
-        activeDate: form.activeDate,
-        status: form.status , // Or just boolean true/false
-});
+//     if (validate(form)) {
+//        if(data){
+//       if (data) {
+//     try {
+//         const response =axios.put(`http://localhost:9082/updateAdvanceType/${data.id}`, {
+//             code: form.code,
+//             name: form.name,
+//             date: form.date,
+//             shortName: form.shortName,
+//             recoveryHead: form.recoveryHead,
+//             description: form.description,
+//             activeDate: form.activeDate,
+//             status: form.status,
+//         });
+//         console.log(response.data);
+//     } catch (error) {
+//         console.error("Error updating advance type:", error);
+//     }
+//         alert(`Form Updation successfully!`);
+//        }
+//     }else{
+//       axios.post('http://localhost:9082/saveAdvanceType',{
+//         code: form.code,
+//         name: form.name,
+//         date: form.date,
+//         shortName: form.shortName,
+//         recoveryHead: form.recoveryHead,
+//         description: form.description,
+//         activeDate: form.activeDate,
+//         status: form.status , // Or just boolean true/false
+// });
       
-      alert("Form insertion successfully!");
-}
-      // Handle submit
-      toggleForm();
-    }
+//       alert("Form insertion successfully!");
+// }
+//       // Handle submit
+//       toggleForm();
+//     }
     
   };
 
@@ -242,12 +255,20 @@ const handleMouseUp = () => {
         </div> */}
     <div className="h3">Designation</div>
     <div className="header-icons">
-       <div className="notifications" onMouseEnter={() => setNotOpen(!notOpen)} onMouseLeave={() => setNotOpen(!notOpen)}>
+       <div className="notifications" 
+        onMouseEnter={handleNotifEnter}
+        onMouseLeave={handleNotifLeave}>
                 <IoNotificationsSharp size={19} style={{cursor:'pointer'}}/>
                 {(notifications.length!=0)&&<div className="error-msgs">{notifications.length}</div>}
                 {notOpen && (
       <div className="notifications-dropdown">
-        <p>No new notifications</p>
+       {notifications.length > 0 ? (
+               notifications.map((notification) => (
+                   <p className="error-msg" key={notification.id} style={{color:'black'}}>{notification.msg} <RxCross2 size={20} color="red" onClick={() => removeNotification(notification.id)}/></p>
+                   ))
+               ) : (
+               <p className="no-msg">no notifications</p>
+               )}
       </div>
               )}
             </div>

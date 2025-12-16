@@ -44,14 +44,14 @@ const Designation = () => {
         useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (searchData.trim()) {
-                axios.get(`http://localhost:9082/searchAdvanceType?data=${searchData}`)
-                .then((res) => setAdvanceTypes(res.data))
-                .catch(console.error);
+                // axios.get(`http://localhost:9082/searchAdvanceType?data=${searchData}`)
+                // .then((res) => setAdvanceTypes(res.data))
+                // .catch(console.error);
             }else {
       // If searchData is empty, get all advance types
-        axios.get("http://localhost:9082/viewAdvanceType")
-        .then((res) => setAdvanceTypes(res.data))
-        .catch(console.error);
+        // axios.get("http://localhost:9082/viewAdvanceType")
+        // .then((res) => setAdvanceTypes(res.data))
+        // .catch(console.error);
     }
         }, 200); // debounce delay
  return () => clearTimeout(delayDebounceFn);
@@ -67,9 +67,9 @@ useEffect(() => {
             return () => clearTimeout(timer); // clean up on unmount
             }
             else{
-              axios.get("http://localhost:9082/viewAdvanceType")
-        .then((res) => setAdvanceTypes(res.data))
-        .catch(console.error);
+        //       axios.get("http://localhost:9082/viewAdvanceType")
+        // .then((res) => setAdvanceTypes(res.data))
+        // .catch(console.error);
     }
             
           }, [showForm]);

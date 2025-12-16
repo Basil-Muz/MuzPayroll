@@ -1,4 +1,4 @@
-/* AdvanceTypeForm.css */
+/* DesignationForm.css */
 
 .modal-designation-form {
   position: fixed;
@@ -51,7 +51,7 @@
     justify-content: flex-start;
     height: 45px;
     font: 400 15px sans-serif;
-    background: rgba(188, 165, 189, 0.75);;
+    background: rgba(218, 190, 219, 0.75);
     padding-left: 26.2px;
     padding-right: 26.2px;
     margin: -10px -15px 0 -15px;
@@ -135,7 +135,7 @@ margin-top: 5px;
     z-index: 1000;
     display: flex; /* Hidden by default */
     justify-content: center;
-    align-items: center;
+    /* align-items: center; */
     transition: all 0.3s ease;
     /* justify-content: center;
     align-items: center; */
@@ -154,9 +154,13 @@ margin-top: 5px;
     width: 11px;
     font-size: 11px;
     border-radius: 8px;
+    align-items: center;
     justify-content: center;
 }
 
+.header-icons .no-msgs {
+   align-self: center;
+}
 /* .label-section {
     display: flex;
     flex-direction: column;

@@ -120,8 +120,9 @@ const handlerprofileLeave = () => {
     <header className="header">
         <div className="logo"><img src="../../../public/muziris-png.ico" alt="" width="120px" height="69px "/></div>
         <div className="header-right">
-            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`}  onMouseEnter={handleNotifEnter}
-  onMouseLeave={handleNotifLeave}>
+            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`} 
+            onMouseEnter={handleNotifEnter}
+            onMouseLeave={handleNotifLeave}>
                 <IoNotificationsSharp size={19} />
 
                 {(notifications.length!=0)&&<div className="msgs">{notifications.length}</div>}
