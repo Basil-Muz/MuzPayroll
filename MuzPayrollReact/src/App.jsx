@@ -21,6 +21,7 @@ import ChangePassword from "./pages/changepassword/changepassword.jsx";
 import Logout from "./components/logout/logout.jsx";
 import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
+import Designation from "./pages/designation/designation.jsx";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
       <Route path="/location" element={<LocationForm />} />
       <Route path="/generalform" element={<LocationGeneralForm />} />
       <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
+      <Route path="/designation" element={<Designation/>} />
     </Routes>
   );
 }

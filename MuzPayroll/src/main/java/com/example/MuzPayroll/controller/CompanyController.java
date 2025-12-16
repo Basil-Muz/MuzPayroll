@@ -33,7 +33,7 @@ public class CompanyController {
     // return companyService.saveCompany(data);
     // }
 
-    @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    	@PostMapping(value = "/saveCompany", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveCompany(
             @RequestParam Map<String, String> data,
             @RequestParam(value = "companyImage", required = false) MultipartFile companyImage) {

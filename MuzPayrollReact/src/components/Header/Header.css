@@ -27,6 +27,7 @@ header.header {
     color: #C71E64;
     height: 26px;
     padding: 0;
+    margin-top: -39px;
     margin-left: 20px;
     font-weight: bold;
     width: auto;
@@ -287,10 +288,11 @@ background-color: rgba(219, 37, 235, 0.06);
 .error-msg{
     display: flex;
     justify-content: space-around;
-   background: #FEE2E2;                 /* soft error red */
+    background: #FEE2E2;                 /* soft error red */
     border: 1px solid #FCA5A5;           /* warm red border */
     color: #B91C1C;   
     display: flex;
+    margin-top:0;
     align-items: center;
     height:  2.2rem;
     width: -webkit-fill-available;
