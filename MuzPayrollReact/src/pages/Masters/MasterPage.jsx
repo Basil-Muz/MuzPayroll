@@ -48,20 +48,20 @@ export default function HomePage() {
     subtitle: "Payroll",
     rows: [
       [
-        { title: "Designation", subtitle: "Designation",link:"/payroll/designation" },
-        { title: "Department", subtitle: "Department",link:"/payroll/department" },
-        { title: "Job Grade", subtitle: "Job Grade",link:"/payroll/job-grade" },
-        {title:"Govt. Job Grade", subtitle:"Govt. Job Grade",link:"/payroll/govt-job-grade" },
-        {title:"Employee Type", subtitle:"Employee Type",link:"/payroll/employee-type" },
-        {title:"Attendance and Leave", subtitle:"Attendance and Leave",link:"/payroll/attendance-and-leave" },
-        {title:"Salary Head", subtitle:"Salary Head", link:"/payroll/salary-head" },
-        {title:"Advance Type", subtitle:"Advance Type", link:"/payroll/advance-type" },
-        {title:"Reports and Letters", subtitle:"Reports and Letters", link:"/payroll/reports-and-letters" },
-        {title:"DA Centre", subtitle:"DA Centre", link:"/payroll/da-centre" },
-        {title:"Reminder Item", subtitle:"Reminder Item", link:"/payroll/reminder-item" },
-        {title:"Employee Attribute", subtitle:"Employee Attribute", link:"/payroll/employee-attribute" },
-        {title:"Employee Attribute Value", subtitle:"Employee Attribute Value", link:"/payroll/employee-attribute-value" },
-        {title:"Work Type", subtitle:"Work Type", link:"/payroll/work-type" },
+        { title: "Designation", subtitle: "Designation",link:"/designation" },
+        { title: "Department", subtitle: "Department",link:"/department" },
+        { title: "Job Grade", subtitle: "Job Grade",link:"/job-grade" },
+        {title:"Govt. Job Grade", subtitle:"Govt. Job Grade",link:"/govt-job-grade" },
+        {title:"Employee Type", subtitle:"Employee Type",link:"/employee-type" },
+        {title:"Attendance and Leave", subtitle:"Attendance and Leave",link:"/attendance-and-leave" },
+        {title:"Salary Head", subtitle:"Salary Head", link:"/salary-head" },
+        {title:"Advance Type", subtitle:"Advance Type", link:"/advance-type" },
+        {title:"Reports and Letters", subtitle:"Reports and Letters", link:"/reports-and-letters" },
+        {title:"DA Centre", subtitle:"DA Centre", link:"/da-centre" },
+        {title:"Reminder Item", subtitle:"Reminder Item", link:"/reminder-item" },
+        {title:"Employee Attribute", subtitle:"Employee Attribute", link:"/employee-attribute" },
+        {title:"Employee Attribute Value", subtitle:"Employee Attribute Value", link:"/employee-attribute-value" },
+        {title:"Work Type", subtitle:"Work Type", link:"/work-type" },
 
       ],
        ],
@@ -86,7 +86,7 @@ const handleCancel = () => {
   <Header />
    <div className="app-shell">
       {/* LEFT SIDEBAR */}
-     <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} />
+     <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>
 
       {/* MAIN AREA */}
       <div className="main-area">

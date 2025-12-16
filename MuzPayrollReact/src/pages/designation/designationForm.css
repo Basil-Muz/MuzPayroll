@@ -1,0 +1,256 @@
+/* AdvanceTypeForm.css */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: black;
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 10px 15px;
+    position: absolute;
+    top: 7%;
+    left: 26%;
+    width: 581px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    border-radius: 4px;
+    animation: slideInDown 0.4s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* .main-model-content {
+   display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 10px;
+} */
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 45px;
+    font: 400 15px sans-serif;
+    background: lightgray;
+    padding-left: 26.2px;
+    padding-right: 26.2px;
+    margin: -10px -15px 0 -15px;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 4px;
+}
+
+
+ .main-model-content {
+  display: flex;
+  flex-direction: column;
+  padding-top: 15px;
+  font-size: 14px;
+  /* gap: 11px; */
+}
+
+.header-icons {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-right: 16px;
+    height: 5px;
+    align-items: center;
+}
+
+.close {
+    font-size: 24px;
+    color: rgba(219, 11, 11, 0.925);
+    transition: all 0.3s ease;
+    padding-left: 9px;
+    padding-right: 9px;
+}
+.close:hover {
+    cursor: pointer;
+    background-color: rgb(180, 180, 180);
+}
+
+.header-icons  svg {
+padding: 6px 18px 0 10px;
+height: 20px;
+margin-top: 5px;
+}
+
+
+.header-icons .notifications {
+    /* position: relative;
+    display: inline-block;
+    padding-right: 10px;
+    height: 100%; */
+    /* padding: 18px; */
+    display: inline-block;
+    transition: all 0.5s ease-in-out;
+     
+}
+.header-icons .notifications:hover {
+    background-color:rgb(180, 180, 180);
+}
+
+
+.notifications-dropdown{
+    position: absolute;
+    bottom: 40%;
+    right: 70px;
+    width: 234px;
+    height: 207px;
+    /* justify-content: center;
+    align-items: center; */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    /* border-radius: 6px; */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+    z-index: 1000;
+    display: block; /* Hidden by default */
+    transition: all 0.3s ease;
+}
+.header-icons .err-msgs {
+    position: relative;
+    top: -30px;
+    background-color: #188bd8;
+    color: white;
+    display: flex;
+    right: -1.6rem;
+    width: 11px;
+    font-size: 11px;
+    border-radius: 8px;
+    justify-content: center;
+}
+
+/* .label-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 15px;
+} */
+.form-row {
+     display: flex;
+     /* grid-template-columns: 150px 1fr; */
+    align-items: center;
+    justify-content: space-between;
+}
+
+.full-content {
+    padding-bottom: 15px;
+}
+
+.input {
+    width: 381px;
+    padding-right: 0.7rem;
+    border: none;
+    border-radius: 0;
+    outline: none;
+}
+
+label {
+  display: block;
+padding-left: 0.7rem;
+}
+
+label.active-date {
+    margin-top: -11px;
+}
+
+label span.required {
+    color: rgba(219, 11, 11, 0.925);
+    font-weight: bold;
+  /* margin-right: 5px; */
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    /* margin-top: 4px; */
+    border: 1px solid #ccc;
+    /* border-radius: 4px;*/
+    outline: none;
+    
+}
+
+textarea {
+  resize: horizontal;
+  min-height: 33px;
+}
+
+input[type="date"] {
+    /* margin-top: -5px; */
+    margin-bottom: 0.9rem;
+}
+
+/* .active-date{
+    margin-top: -5px; 
+} */
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.save-btn {
+    background-color: rgba(5, 129, 5, 0.856);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 0px;
+    cursor: pointer;
+    outline: none;
+}
+
+.save-btn:hover {
+    background-color: rgb(5, 146, 5);
+    outline: none;
+    border: none;
+}
+.save-btn:disabled {
+    background-color: rgb(156, 216, 87);
+    cursor: not-allowed;
+}
+
+.cancel-btn {
+  background-color: rgba(219, 11, 11, 0.925);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 0px;
+  cursor: pointer;
+  outline: none;
+}
+.error {
+    color: rgba(219, 11, 11, 0.925);
+    padding-top: 13px;
+    font-size: 13px;
+    margin-top: -8px;
+    margin-bottom: -8px;
+}
+.cancel-btn:disabled {
+    background-color: rgba(212, 69, 69, 0.925);
+    cursor: not-allowed;
+}

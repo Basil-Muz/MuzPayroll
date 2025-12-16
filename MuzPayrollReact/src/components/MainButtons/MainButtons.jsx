@@ -1,5 +1,5 @@
 // import React, { useState } from 'react';
-import '../style//ManinButtons.css'; // optional: external CSS
+import './MainButtons.css'; // optional: external CSS
 import { FaSave } from 'react-icons/fa';
 import { MdOutlineCancel } from "react-icons/md";
 import { MdAddCard } from "react-icons/md";

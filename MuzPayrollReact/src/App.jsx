@@ -11,6 +11,7 @@ import ChangePassword from "./pages/changepassword/changepassword";
 import Logout from "./components/logout/logout";
 import ForgotPassword from "./pages/forgotpassword/forgotpassword";
 import Companyform from "./pages/company/Companyform";
+import Designation from "./pages/designation/designation.jsx";
 
 function App() {
   return (
@@ -25,8 +26,8 @@ function App() {
         <Route path="/changepassword" element={<ChangePassword/>} /> 
         <Route path="/logout" element={< Logout/>} /> 
         <Route path="/forgot-password" element={<ForgotPassword />} />
-         <Route path="/settings" element={<Settings/>} />
-
+        <Route path="/settings" element={<Settings/>} />
+        <Route path="/designation" element={<Designation/>} />
       </Routes>
 
   );

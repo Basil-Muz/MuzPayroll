@@ -1,0 +1,47 @@
+.search-container {
+    transition: all 0.5s ease-in-out;
+}
+
+.heading {
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-size: 17px;
+    font-weight: bold;
+    display: flex;
+    padding: 0.5rem 0 0.5rem 0.5rem;
+    border-bottom: 1px dotted black;
+}
+.search-form {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    padding: 0.5rem 0 0.5rem 0.5rem;
+    font-size: 14.6px;
+    color:black
+}
+button.search-button {
+    width: 307px;
+    background-color: #0d8ee4;
+    color: white;
+    border-radius: 0;
+    margin-top: 0.5rem;
+    border: none;
+}
+button.search-button:hover {
+    background-color: #0b79c1;
+    cursor: pointer;
+    
+}
+input#activeInactive {
+    width: 20px;
+    height: 20px;
+    margin-left: 33px;
+}
+.search-items {
+    display: flex;
+    align-items: center;
+}
+input[type="checkbox"]:checked {
+  accent-color: green; /* Changes checkmark color */
+}
