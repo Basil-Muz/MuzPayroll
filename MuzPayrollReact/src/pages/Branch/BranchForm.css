@@ -1,8 +1,9 @@
 .branch-form {
   background: #ffffff;
   width: 79rem;
-  margin-left: -3rem;
+  margin-left: 18px;
   padding-top: 1px;
+  margin-top: 7rem;
   z-index: 0;
   height: 1120px;
 }
@@ -30,7 +31,7 @@
 }
 
 .button-toggle.doc-active {
-  border-bottom-color: rgb(35, 180, 15); 
+  border-bottom-color: rgb(35, 180, 15);
 }
 .doc {
   left: 220px;
@@ -43,7 +44,7 @@
 .general {
   left: 20px;
   /* position: absolute; */
-  width: 200px;
+  width: 182px;
   border-radius: 0px;
   height: 55px;
   border: none;
@@ -76,4 +77,11 @@ button.inactive:hover {
 
 .form-tab.visible {
   display: block;
+}
+.pagename {
+  display: flex;
+  text-align: left;
+  position: relative;
+  top: -60px;
+  margin-bottom: -5rem;
 }

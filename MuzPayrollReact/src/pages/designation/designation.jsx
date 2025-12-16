@@ -92,7 +92,7 @@ useEffect(() => {
     <Header />
     <div className="advance-type-page">
     <div className="header-section">
-        <h2>Advance Type</h2>
+        <h2>Designation</h2>
         <div className="view-icons">
             <div className="icons">
             <BsGrid3X3GapFill size={24}

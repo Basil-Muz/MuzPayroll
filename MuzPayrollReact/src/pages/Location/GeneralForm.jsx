@@ -15,11 +15,14 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 
 const GeneralForm = forwardRef(({ onFormChange }, ref) => {
-    let page = "location";
+  let page = "location";
 
   const companyId = 1;
-  const defaultBranchId = 11;
-  
+  const defaultBranchId = 1;
+  const user_code = 1001;
+  const [initialCompanyId, setInitialCompanyId] = useState("");
+  const [initialBranchId, setInitialBranchId] = useState("");
+
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
@@ -60,26 +63,58 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     }
   }, []);
 
-  const focusWithTimeout = (ref, delay = 100) => {
-    setTimeout(() => {
-      if (ref?.current) {
-        if (typeof ref.current.scrollIntoView === "function") {
-          ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-        if (typeof ref.current.focus === "function") {
-          ref.current.focus();
-        }
+  const loadCompanyAndBranches = async () => {
+    try {
+      const companyResponse = await axios.get(
+        `http://localhost:8087/companies/${companyId}`,
+      );
+
+      const company = companyResponse.data;
+      setCompanyList([company]);
+      setInitialCompanyId(company.id);
+
+      const branchResponse = await axios.get(
+        `http://localhost:8087/${companyId}/branches`,
+      );
+
+      const branches = branchResponse.data;
+      setBranchList(branches);
+
+      if (branches.length > 0) {
+        setInitialBranchId(branches[0].id);
       }
+    } catch (error) {
+      console.error("Failed to load company or branches:", error);
+    }
+  };
+
+  const focusAndScrollToTop = (ref, delay = 100) => {
+    setTimeout(() => {
+      if (!ref?.current) return;
+
+      // 1️⃣ Focus first
+      if (typeof ref.current.focus === "function") {
+        ref.current.focus({ preventScroll: true });
+      }
+
+      // 2️⃣ Then scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }, delay);
   };
 
   const handleDateChange = (date) => {
     if (!dateLocked) {
       setStartDate(date);
+
+      formik.setFieldValue("withaffectdate", date.toISOString().split("T")[0]);
+
       setShowCalendar(false);
       setInputsUnlocked(true);
       setIsDateLocked(true);
-      focusWithTimeout(codeInputRef);
+      focusAndScrollToTop(codeInputRef);
     }
   };
   useEffect(() => {
@@ -143,11 +178,12 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   };
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      companyEntity: { id: "" },
-      branchEntity: { id: "" },
+      company: initialCompanyId,
+      branch: initialBranchId,
       code: "",
-      name: "",
+      location: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
       esiRegion: "",
@@ -168,6 +204,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       designation: "",
       employerNumber: "",
       employerEmail: "",
+      withaffectdate: "",
+      authorizationStatus: "0",
+      user_code: user_code,
+      authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
       company: Yup.string().required("Company is required"),
@@ -179,7 +219,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           "Code must contain only numbers and symbols, no alphabets or spaces",
           (value) => /^[0-9\W_]+$/.test(value || ""),
         ),
-      name: Yup.string().required("Name is required"),
+      location: Yup.string().required("Location Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
       esiRegion: Yup.string().required("ESI Region is required"),
@@ -235,63 +275,48 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
         }
 
         alert("Location saved successfully!");
-        resetForm();
+        resetToInitialState();
       } catch (error) {
         console.error("Error:", error);
         alert("Failed to save location");
       }
     },
   });
-  useEffect(() => {
-    onFormChange?.(formik.dirty, formik.isValid);
-  }, [formik.dirty, formik.isValid]);
-  const loadCompanyAndBranches = async () => {
-    try {
-      const companyResponse = await axios.get(
-        `http://localhost:8087/companies/${companyId}`,
-      );
-      const company = companyResponse.data;
-      setCompanyList([company]);
-      formik.setFieldValue("company", company.id);
-
-      const branchResponse = await axios.get(
-        `http://localhost:8087/${companyId}/branches`,
-      );
-      const branches = branchResponse.data || [];
-      setBranchList(branches);
-
-      const selectedBranch = formik.values.branch;
-
-      if (!selectedBranch) {
-        if (defaultBranchId) {
-          formik.setFieldValue("branch", defaultBranchId);
-        }
-      } else {
-        formik.setFieldValue("branch", selectedBranch);
-      }
-    } catch (error) {
-      console.error("Failed to load company or branches:", error);
-    }
-  };
 
   useEffect(() => {
     loadCompanyAndBranches();
   }, [companyId, defaultBranchId]);
 
   const cancelForm = () => {
-    formik.resetForm({
-      values: {
-        ...formik.initialValues,
-        company: formik.values.company,
-        branch: defaultBranchId,
-      },
-    });
+    formik.resetForm();
     setStartDate(null);
     setDateLocked(false);
     setIsDateLocked(false);
     setInputsUnlocked(false);
     setAuthorization("entry");
-    focusWithTimeout(calendarRef);
+    focusAndScrollToTop(calendarRef);
+  };
+
+  const resetToInitialState = () => {
+    formik.resetForm({
+      values: {
+        ...formik.initialValues,
+        company: initialCompanyId,
+        branch: initialBranchId,
+      },
+    });
+
+    setStartDate(null);
+    setShowCalendar(true);
+    setInputsUnlocked(false);
+    setIsDateLocked(false);
+    setDateLocked(false);
+
+    setAddressEditable(true);
+    setContactInfoEditable(true);
+    setemployerEditable(true);
+
+    focusAndScrollToTop(calendarRef);
   };
 
   useImperativeHandle(ref, () => ({
@@ -391,23 +416,25 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.code}</div>
               ) : null}
 
-              <label htmlFor="Name" className="fancy-label">
+              <label htmlFor="?Location" className="fancy-label">
                 Name
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
+                id="location"
+                name="location"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
-                value={formik.values.name}
+                value={formik.values.location}
                 className={
-                  formik.touched.name && formik.errors.name ? "input-error" : ""
+                  formik.touched.location && formik.errors.location
+                    ? "input-error"
+                    : ""
                 }
               />
-              {formik.touched.name && formik.errors.name ? (
-                <div className="error">{formik.errors.name}</div>
+              {formik.touched.location && formik.errors.location ? (
+                <div className="error">{formik.errors.location}</div>
               ) : null}
 
               <label htmlFor="shortName" className="fancy-label">
@@ -913,6 +940,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           </div>
         </form>
       </div>
+
       <div className="secform">
         <div className="authorization">
           <label htmlFor="Authorization" className="authorization-label">
@@ -922,12 +950,17 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           <div className="authorization-input-group">
             <select
               id="authorization"
-              value={authorization}
-              onChange={(e) => setAuthorization(e.target.value)}
+              value={formik.values.authorizationStatus}
+              onChange={(e) => {
+                const today = new Date().toISOString().split("T")[0];
+
+                formik.setFieldValue("authorizationStatus", e.target.value);
+                formik.setFieldValue("authorizationDate", today);
+              }}
               className="authorization-dropdown"
             >
-              <option value="entry">ENTRY:</option>
-              <option value="verified">VERIFIED:</option>
+              <option value="0">ENTRY</option>
+              <option value="1">VERIFIED</option>
             </select>
           </div>
         </div>
@@ -947,10 +980,19 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
             {/* Date input field */}
             <div className="date">
               <div className="left-box">1</div>
+
               <div className="icondate">
                 <input
                   type="text"
-                  value={startDate ? startDate.toLocaleDateString("en-GB") : ""}
+                  id="withaffectdate"
+                  name="withaffectdate"
+                  value={
+                    formik.values.withaffectdate
+                      ? new Date(
+                          formik.values.withaffectdate,
+                        ).toLocaleDateString("en-GB")
+                      : ""
+                  }
                   readOnly
                 />
 

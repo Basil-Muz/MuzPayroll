@@ -89,7 +89,7 @@
 .headertext2 {
   background-color: rgb(85, 150, 235);
   color: white;
-  width: 429px;
+  width: 424px;
   margin-left: -15px;
   margin-top: -15px;
   height: 35px;
@@ -99,7 +99,7 @@
   margin-bottom: 15px;
 }
 
-h4 {
+.Companyform h4 {
   margin-top: 0px;
   margin-left: 17px;
   padding-top: 5px;
@@ -125,7 +125,7 @@ h4 {
   width: 16px;
   height: 16px;
 }
-input.inputdate {
+.Companyform input.inputdate {
   border: none;
   outline: none;
 }
@@ -231,7 +231,7 @@ input.inputdate {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-left:0px;
+  margin-left: 0px;
 }
 
 .active-date-icon svg {
@@ -258,13 +258,13 @@ input.inputdate {
   height: 30px;
 }
 
-select#authorization {
+.Companyform select#authorization {
   width: 320px;
   height: 30px;
   outline: none;
 }
 /* Basic dropdown styling */
-select {
+.Companyform select {
   width: 95%; /* full width */
   border: 1px solid #ccc; /* border color */
   border-radius: 0px; /* rounded corners */
@@ -289,9 +289,11 @@ select {
   position: absolute;
   bottom: 80px;
   left: 64rem;
+  margin-left: 4rem;
+  margin-bottom: -23px;
 }
 .error {
-    color: red;
+  color: red;
 }
 
 .popup-overlay {
@@ -338,23 +340,22 @@ select {
   cursor: pointer;
 }
 
-.imageupload:hover{
-    color: #ffffff;
-    background-color: #007bff;
-
+.imageupload:hover {
+  color: #ffffff;
+  background-color: #007bff;
 }
 
 .imagehead {
-background: aliceblue;
-    position: relative;
-    margin-top: -20px;
-    width: 525px;
-    border-radius: 10px;
-    left: -20px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding-left: 15px;
+  background: aliceblue;
+  position: relative;
+  margin-top: -20px;
+  width: 525px;
+  border-radius: 10px;
+  left: -20px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-left: 15px;
 }
 
 .select-btn {
@@ -372,7 +373,6 @@ background: aliceblue;
 .select-btn:hover {
   background: #089908;
 }
-
 
 @keyframes popupFade {
   from {

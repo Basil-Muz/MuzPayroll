@@ -2,6 +2,8 @@ package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,25 +13,38 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class LocationMst {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CompanyLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "CompanyID", nullable = false)
-    private CompanyMst companyEntity;
+    @Column(nullable = false)
+    private String company;
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
 
     @ManyToOne
-    @JoinColumn(name = "BranchID", nullable = false)
-    private BranchMst branchEntity;
+    @JoinColumn(name = "AuthID", nullable = false)
+    private Authorization authorization;
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
 
     @Column(nullable = false)
     private String code;
-
-    @Column(nullable = false)
-    private String location;
 
     @Column(nullable = false)
     private String shortName;
@@ -37,8 +52,8 @@ public class LocationMst {
     @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
 
-    @Column(nullable = false)
-    private String esiRegion;
+    @Column(nullable = true)
+    private String companyImage;
 
     @Column(nullable = false)
     private String address;
@@ -59,7 +74,7 @@ public class LocationMst {
     private String place;
 
     @Column(nullable = false)
-    private Integer pincode;
+    private String pincode;
 
     @Column(nullable = false)
     private String latitude;
@@ -68,10 +83,10 @@ public class LocationMst {
     private String longitude;
 
     @Column(nullable = false)
-    private Long landlineNumber;
+    private String landlineNumber;
 
     @Column(nullable = false)
-    private Long mobileNumber;
+    private String mobileNumber;
 
     @Column(nullable = false)
     private String email;
@@ -83,7 +98,7 @@ public class LocationMst {
     private String designation;
 
     @Column(nullable = false)
-    private Long employerNumber;
+    private String employerNumber;
 
     @Column(nullable = false)
     private String employerEmail;
@@ -100,36 +115,12 @@ public class LocationMst {
         this.id = id;
     }
 
-    public CompanyMst getCompanyEntity() {
-        return companyEntity;
-    }
-
-    public void setCompanyEntity(CompanyMst companyEntity) {
-        this.companyEntity = companyEntity;
-    }
-
-    public BranchMst getBranchEntity() {
-        return branchEntity;
-    }
-
-    public void setBranchEntity(BranchMst branchEntity) {
-        this.branchEntity = branchEntity;
-    }
-
     public String getCode() {
         return code;
     }
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public String getShortName() {
@@ -148,12 +139,12 @@ public class LocationMst {
         this.activeDate = activeDate;
     }
 
-    public String getEsiRegion() {
-        return esiRegion;
+    public String getCompanyImage() {
+        return companyImage;
     }
 
-    public void setEsiRegion(String esiRegion) {
-        this.esiRegion = esiRegion;
+    public void setCompanyImage(String companyImage) {
+        this.companyImage = companyImage;
     }
 
     public String getAddress() {
@@ -212,11 +203,11 @@ public class LocationMst {
         this.place = place;
     }
 
-    public Integer getPincode() {
+    public String getPincode() {
         return pincode;
     }
 
-    public void setPincode(Integer pincode) {
+    public void setPincode(String pincode) {
         this.pincode = pincode;
     }
 
@@ -236,19 +227,19 @@ public class LocationMst {
         this.longitude = longitude;
     }
 
-    public Long getLandlineNumber() {
+    public String getLandlineNumber() {
         return landlineNumber;
     }
 
-    public void setLandlineNumber(Long landlineNumber) {
+    public void setLandlineNumber(String landlineNumber) {
         this.landlineNumber = landlineNumber;
     }
 
-    public Long getMobileNumber() {
+    public String getMobileNumber() {
         return mobileNumber;
     }
 
-    public void setMobileNumber(Long mobileNumber) {
+    public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
 
@@ -276,11 +267,11 @@ public class LocationMst {
         this.designation = designation;
     }
 
-    public Long getEmployerNumber() {
+    public String getEmployerNumber() {
         return employerNumber;
     }
 
-    public void setEmployerNumber(Long employerNumber) {
+    public void setEmployerNumber(String employerNumber) {
         this.employerNumber = employerNumber;
     }
 

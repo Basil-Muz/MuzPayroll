@@ -29,8 +29,7 @@ public class UserMstService {
         resp.setSuccess(false);
 
         UserMst user = userRepo.findByUserCode(
-            Long.parseLong(request.getUserCode().replace("@muziris", ""))
-        );
+                request.getUserCode().replace("@muziris", ""));
 
         if (user == null || !user.getPassword().equals(request.getPassword())) {
             resp.setMessage("Invalid login");

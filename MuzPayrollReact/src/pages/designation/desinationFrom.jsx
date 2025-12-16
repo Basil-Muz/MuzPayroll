@@ -7,10 +7,66 @@ import { IoNotificationsSharp } from "react-icons/io5";
 import axios from 'axios';
 import Loading from '../../components/Loading/Loading';
 function DesignationForm({ toggleForm,data }) {
+
     const [position, setPosition] = useState({ x: 355, y: 43 });
     const dragging = useRef(false);
     const offset = useRef({ x: 0, y: 0 });
     const [flag, setFlag] = useState(false); // new state for flag from parent
+    const [notifications, setNotifications] = useState([
+  { id: 1, msg: "Payroll processed successfully", status: true },
+  // { id: 2, msg: "New policy update available", status: false },
+  // { id: 3, msg: "System maintenance scheduled", status: true },
+    ]);
+
+    const [errors, setErrors] = useState({});
+    const [notOpen, setNotOpen] = useState(false);
+
+     const codeInputRef = useRef(null);
+
+const [form, setForm] = useState({
+    code: "",
+    name: "",
+    shortName: "",
+    recoveryHead: "",
+    description: "",
+    activeDate: new Date().toISOString().split('T')[0], // sets today's date
+    status: 'ENTRY',
+    date: new Date().toISOString().split('T')[0],
+  });
+    // const [isOpenForm, setIsOpenForm] = useState(true);
+    const [isVarified, setIsVarified] = useState(false);
+    const [salaryHeads, setSalaryHead] = useState([]);
+    
+      useEffect(() => {
+    if (flag===false && form.status) {
+      codeInputRef.current.focus();
+    }
+  }, [flag]);
+
+  useEffect(() => {
+     axios.get("http://localhost:9082/getAllSalaryHead")
+        .then((res) => setSalaryHead(res.data))
+        .catch(console.error);
+}, []);
+
+    useEffect(() => {
+  if (data) {
+    setForm(() => ({
+        code: data.code,
+        shortName: data.shortName,
+        name: data.name,
+        recoveryHead: data.recoveryHead,
+        description: data.description,
+        activeDate: data.activeDate,
+        status: data.status,
+        date: data.date,
+      // ... any other fields
+    }));
+    setIsVarified(data.status === "VERIFIED");
+  }
+   
+}, [data]);
+
   const handleMouseDown = (e) => {
     dragging.current = true;
     offset.current = {
@@ -30,54 +86,7 @@ function DesignationForm({ toggleForm,data }) {
 const handleMouseUp = () => {
     dragging.current = false;
   };
-   
- const codeInputRef = useRef(null);
 
-  useEffect(() => {
-    if (flag===false && form.status) {
-      codeInputRef.current.focus();
-    }
-  }, [flag]);
-
-   const [form, setForm] = useState({
-    code: "",
-    name: "",
-    shortName: "",
-    recoveryHead: "",
-    description: "",
-    activeDate: new Date().toISOString().split('T')[0], // sets today's date
-    status: 'ENTRY',
-    date: new Date().toISOString().split('T')[0],
-  });
-    // const [isOpenForm, setIsOpenForm] = useState(true);
-    const [isVarified, setIsVarified] = useState(false);
-    const [salaryHeads, setSalaryHead] = useState([]);
-    useEffect(() => {
-     axios.get("http://localhost:9082/getAllSalaryHead")
-        .then((res) => setSalaryHead(res.data))
-        .catch(console.error);
-}, []);
-    useEffect(() => {
-  if (data) {
-    setForm(() => ({
-        code: data.code,
-        shortName: data.shortName,
-        name: data.name,
-        recoveryHead: data.recoveryHead,
-        description: data.description,
-        activeDate: data.activeDate,
-        status: data.status,
-        date: data.date,
-      // ... any other fields
-    }));
-    setIsVarified(data.status === "VERIFIED");
-  }
-   
-}, [data]);
-
-    const [errors, setErrors] = useState({});
-    const [notOpen, setNotOpen] = useState(false);
-    
     const validateEach = (name,value) => {
     const newErrors = {};
     if(value.trim() === "") {
@@ -201,8 +210,14 @@ const handleMouseUp = () => {
     }
   };
 
+  const removeNotification = (id) => {
+  setNotifications(prev =>
+    prev.filter(notification => notification.id !== id)
+  );
+};
+
   return (
-<div className="modal"> 
+<div className="modal-designation-form"> 
     <div className="modal-content"
    
        style={{
@@ -225,11 +240,11 @@ const handleMouseUp = () => {
       <Search/>
         
         </div> */}
-    <div className="h3">Advance Type</div>
+    <div className="h3">Designation</div>
     <div className="header-icons">
        <div className="notifications" onMouseEnter={() => setNotOpen(!notOpen)} onMouseLeave={() => setNotOpen(!notOpen)}>
-                <IoNotificationsSharp size={24} style={{cursor:'pointer'}}/>
-                <div className="err-msgs">0</div>
+                <IoNotificationsSharp size={19} style={{cursor:'pointer'}}/>
+                {(notifications.length!=0)&&<div className="error-msgs">{notifications.length}</div>}
                 {notOpen && (
       <div className="notifications-dropdown">
         <p>No new notifications</p>
