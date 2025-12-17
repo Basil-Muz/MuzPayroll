@@ -13,6 +13,7 @@ import DesignationForm from "./desinationFrom";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import Loading from "../../components/Loading/Loading";
 import Header from "../../components/Header/Header";
+import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 const Designation = () => {
 
     const [advanceTypes, setAdvanceTypes] = useState([]);
@@ -24,6 +25,16 @@ const Designation = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [loading, setLoading] = useState(true);
     const [flag, setFlag] = useState(false); // new state for flag from child
+    const [headerError, setHeaderError] = useState([]);
+
+    // const isNewRecord = !designationId;  //Is this form creating a new record, or editing an existing one?
+
+    // const hasDeletePermission = user.permissions.includes("DESIGNATION_DELETE");   //Is this user allowed to delete this record?
+
+    // const isViewMode = mode === "VIEW";   //Is the form in view-only mode?
+
+    // const isSubmitted = designationData?.status === "SUBMITTED"; //Has the designation been submitted/finalized?
+
 // useEffect(() => {
 //   if (!searchData.trim()) { // Only fetch all if search is empty
 //     axios.get("http://localhost:9082/viewAdvanceType")
@@ -31,6 +42,33 @@ const Designation = () => {
 //       .catch(console.error);
 //   }
 // }, []);
+
+
+  const handleSave = () => {
+    console.log("Save clicked");
+    // API call / form submit logic
+  };
+
+  const handleSearch = () => {
+    console.log("Search clicked");
+  };
+
+  const handleClear = () => {
+    console.log("Clear clicked");
+  };
+
+  const handleDelete = () => {
+    console.log("Delete clicked");
+  };
+
+  const handlePrint = () => {
+    console.log("Print clicked");
+  };
+
+  const handleNewPage = () => {
+    console.log("New page clicked");
+  };
+
     const handleFlagChange = (newFlag) => {
     setFlag(newFlag);  // update parent state
       setTimeout(() => {
@@ -89,7 +127,7 @@ useEffect(() => {
 
   return (
     <>
-    <Header />
+    <Header backendError={headerError}/>
     <div className="advance-type-page">
     <div className="header-section">
         <h2>Designation</h2>
@@ -145,7 +183,34 @@ useEffect(() => {
           </div>
         ))}
       </div>
-          <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/>
+          {/* <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/> */}
+         <FloatingActionBar
+  actions={{
+    save: {
+      onClick: handleSave,
+
+      // disabled: isViewMode || isSubmitted
+    },
+    search: {
+      onClick: handleSearch
+    },
+    clear: {
+      onClick: handleClear
+    },
+    delete: {
+      onClick: handleDelete,
+      // disabled: !hasDeletePermission
+    },
+    print: {
+      onClick: handlePrint,
+      // disabled: isNewRecord
+    },
+    new: {
+      onClick: handleNewPage
+    }
+  }}
+/>
+
            {showForm && selectedItem && loading && <Loading />}
       {showForm && !loading && selectedItem && (
         <DesignationForm data={selectedItem} toggleForm={toggleForm} />

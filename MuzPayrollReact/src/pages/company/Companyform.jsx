@@ -18,6 +18,8 @@ const Companyform = forwardRef((props, ref) => {
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
+  const [headerError, setHeaderError] = useState([]);
+
   const handleFormChange = (dirty, valid) => {
     setIsDirty(dirty);
     setIsValid(valid);
@@ -44,8 +46,11 @@ const Companyform = forwardRef((props, ref) => {
 
   return (
     <div className="company-form">
+      <Header backendError={headerError} />
       <div className="pagename">
         <h2>Company</h2>
+        {/* {headerError.length > 0 && (<div className="error-count">{headerError.length}</div>)} */}
+      
       </div>
       <div
         className={`button-toggle ${showdiv === "generalinfo" ? "general-active" : showdiv === "docinfo" ? "doc-active" : ""}`}
@@ -66,11 +71,11 @@ const Companyform = forwardRef((props, ref) => {
       </div>
 
       <div className="form-tabs-container">
-        <Header />
+        
         <div
           className={`form-tab ${showdiv === "generalinfo" ? "visible" : "hidden"}`}
         >
-          <GeneralForm ref={generalFormRef} />
+          <GeneralForm ref={generalFormRef} onBackendError={setHeaderError} />
         </div>
 
         <div

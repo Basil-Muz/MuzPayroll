@@ -25,7 +25,7 @@ public class LocationMst {
     @JoinColumn(name = "BranchID", nullable = false)
     private BranchMst branchEntity;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String code;
 
     @Column(nullable = false)

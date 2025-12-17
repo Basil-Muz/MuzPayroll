@@ -25,7 +25,7 @@ public class BranchLog {
     @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String code;
 
     @Column(nullable = false)

@@ -60,7 +60,7 @@ header.header {
 /* Hover effect (same glow as sidebar items) */
 .notification:hover {
    background-color: rgba(219, 37, 235, 0.06); /* soft blue hue */
-    color: #111827;
+    color: #251127ff;
 }
 
 /* Notification badge (same style as dashboard badge) */
@@ -107,7 +107,9 @@ header.header {
     overflow-x: hidden;/*scrolling*/
     z-index: 1000;
     display: flex; /* Hidden by default */
-    justify-content: center;
+    /* justify-content: center; */
+    flex-direction: column;
+    align-items: center; 
     transition: all 0.3s ease;
 }
 
@@ -136,7 +138,7 @@ header.header {
 /* Hover behavior */
 .dashboard:hover {
     background-color: rgba(219, 37, 235, 0.06); /* soft blue hue */
-    color: #111827;
+    color: #251127ff;
 }
 
 /* Shared badge design */
@@ -165,6 +167,7 @@ header.header {
     height: 207px;
     /* justify-content: center;
     align-items: center; */
+    align-items: center; 
 
     background: rgba(255, 255, 255, 0.85); /* clearer, modern */
     backdrop-filter: blur(10px);           /* stronger blur = premium */
@@ -175,7 +178,8 @@ header.header {
     border-radius: 12px;
     z-index: 1000;
     display: flex; /* Hidden by default */
-     justify-content: center;
+    /* justify-content: center; */
+    flex-direction: column;
     transition: all 0.3s ease;
 }
 
@@ -292,15 +296,15 @@ background-color: rgba(219, 37, 235, 0.06);
     border: 1px solid #FCA5A5;           /* warm red border */
     color: #B91C1C;   
     display: flex;
-    margin-top:0;
+    margin:0;
+    padding:4px;
     align-items: center;
     height:  2.2rem;
     width: -webkit-fill-available;
     border-radius: inherit;
+  
 }
 .no-msg{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin:auto;// center both axis
     color: #161414bd; 
 }

@@ -1,0 +1,115 @@
+.floating-action-bar {
+  position: fixed;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+}
+
+/* Base button */
+.fab-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--brand-border);
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.fab-btn:hover {
+  background: rgba(210, 24, 216, 0.12);
+  color: var(--primary-hover);
+  transform: translateY(-2px);
+  /* box-shadow: 0 8px 20px rgba(0,0,0,0.14); */
+}
+
+/* PRIMARY — Save */
+.fab-btn.primary {
+  background: linear-gradient(
+    135deg,
+    var(--brand),
+    #b017b5
+  );
+  color: #fff;
+  border: none;
+}
+
+.fab-btn.primary:hover {
+  /* box-shadow: 0 10px 28px rgba(210, 24, 216, 0.45); */
+}
+
+/* ACCENT — New Page */
+.fab-btn.accent {
+  background: rgba(210, 24, 216, 0.12);
+  color: var(--brand);
+}
+
+.fab-btn.accent:hover {
+  background: rgba(210, 24, 216, 0.22);
+}
+
+/* DANGER — Delete (brand-consistent, not harsh red) */
+.fab-btn.danger {
+  background: rgba(210, 24, 216, 0.08);
+  color: var(--brand);
+  border: 1px dashed var(--brand-border);
+}
+
+.fab-btn.danger:hover {
+  background: rgba(210, 24, 216, 0.18);
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  right: 60px;
+  background: var(--primary-hover);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(4px);
+  transition: all 0.2s ease;
+}
+
+.fab-btn:hover .tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Disabled (very important for payroll UX) */
+.fab-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.fab-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.3);
+}
+.fab-btn:disabled:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  box-shadow: none;
+  transform: none;
+}

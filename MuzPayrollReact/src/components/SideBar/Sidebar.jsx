@@ -71,8 +71,8 @@ const menuItems = [
     children: [
     //    masters,Settings,database backup
         { id: "system.masters", label: "Masters" ,link:"/masters"  },
-        { id: "system.settings", label: "Settings" ,link:"/system/settings"  },
-        { id: "system.databaseBackup", label: "Database Backup",link:"/system/database-backup"  },
+        { id: "system.settings", label: "Settings" ,link:"/settings"  },
+        { id: "system.databaseBackup", label: "Database Backup",link:"/database-backup"  },
         ]   
     },
 ];

@@ -272,7 +272,7 @@ const handleMouseUp = () => {
       </div>
               )}
             </div>
-        <div onClick={toggleForm} className="close">x</div>
+        <div onClick={toggleForm} className="close"><RxCross2 size={18}/></div>
     </div>
     </div>
     <div className="main-model-content">

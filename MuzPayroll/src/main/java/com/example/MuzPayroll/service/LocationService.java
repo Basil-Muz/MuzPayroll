@@ -43,6 +43,7 @@ public class LocationService {
             // Convert JSON → LocationMst
             LocationMst location = objectMapper.convertValue(data, LocationMst.class);
 
+            
             // Save Location
             LocationMst savedLocation = locationRepository.save(location);
 
