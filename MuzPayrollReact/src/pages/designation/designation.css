@@ -39,7 +39,7 @@ h2 {
 
 .code {
     font-size: 14px;
-    color: #0066cc;
+    color: #a300ccff;
 }
 
 .check-icon {
@@ -55,13 +55,13 @@ h2 {
 
 .card-title {
   font-size: 14px;
-  color: #0066cc;
+  color: #cc00bbff;
   display: flex;
   margin-bottom: 5px;
 }
 
 .card-shortname {
-  color: #444;
+  color: #444444ff;
   display: flex;
   font-size: 14px;
   margin-bottom: 5px;

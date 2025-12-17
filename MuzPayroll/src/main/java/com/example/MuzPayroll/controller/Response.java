@@ -2,7 +2,7 @@ package com.example.MuzPayroll.controller;
 
 public class Response<T> {
 
-    private boolean success;
+    private boolean success = false; // 🔴 default false
     private String message;
     private T data;
 
@@ -15,18 +15,42 @@ public class Response<T> {
         this.data = data;
     }
 
-    public static <T> Response<T> success(T data, String message) {
-        return new Response<>(true, message, data);
+    /* ================= FACTORY METHODS ================= */
+
+    // Use ONLY at FINAL step
+    public static <T> Response<T> finalSuccess(T data) {
+        return new Response<>(true, null, data);
+    }
+
+    // Validation / intermediate step success (no UI impact)
+    public static <T> Response<T> pass() {
+        return new Response<>(true, null, null);
     }
 
     public static <T> Response<T> error(String message) {
         return new Response<>(false, message, null);
     }
 
-    // getters & setters
+    /* ================= HELPERS ================= */
+
     public boolean isSuccess() {
         return success;
     }
+
+    public void markSuccess() {
+        this.success = true;
+    }
+
+    public void markFailure(String message) {
+        this.success = false;
+        this.message = message;
+    }
+
+    public static <T> Response<T> success(T data) {
+        return new Response<>(true, null, data);
+    }
+
+    /* ================= GETTERS / SETTERS ================= */
 
     public void setSuccess(boolean success) {
         this.success = success;

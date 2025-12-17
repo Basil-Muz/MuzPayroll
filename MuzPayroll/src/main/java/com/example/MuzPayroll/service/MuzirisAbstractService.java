@@ -31,39 +31,46 @@ public abstract class MuzirisAbstractService<D, E> {
     // ================== FINAL SAVE METHOD ==================
     public final Response<D> save(D dto) {
 
-        // Entity validation
+        // 1. Entity validation
         Response<Boolean> r1 = entityValidate(dto);
-        if (!r1.isSuccess())
+        if (!r1.isSuccess()) {
             return Response.error(r1.getMessage());
+        }
 
-        // Business validation
+        // 2. Business validation
         Response<Boolean> r2 = businessValidate(dto);
-        if (!r2.isSuccess())
+        if (!r2.isSuccess()) {
             return Response.error(r2.getMessage());
+        }
 
-        // Generate serial/code
+        // 3. Generate serial/code
         Response<String> r3 = generateSerialNo(dto);
-        if (!r3.isSuccess())
+        if (!r3.isSuccess()) {
             return Response.error(r3.getMessage());
+        }
 
-        // Populate entity
+        // 4. Populate entity
         Response<E> r4 = entityPopulate(dto);
-        if (!r4.isSuccess())
+        if (!r4.isSuccess()) {
             return Response.error(r4.getMessage());
+        }
 
         E entity = r4.getData();
 
-        // Generate PK
+        // 5. Generate PK
         Response<Object> r5 = generatePK(dto);
-        if (!r5.isSuccess())
+        if (!r5.isSuccess()) {
             return Response.error(r5.getMessage());
+        }
 
-        // Save entity in service (all DB tables)
+        // 6. Save entity
         E savedEntity = saveEntityInService(entity, dto);
 
-        // Convert saved entity back to DTO
+        // 7. Convert entity to DTO
         D savedDto = entityToDto(savedEntity);
 
-        return Response.success(savedDto, "Saved successfully");
+        return Response.success(savedDto);
+
     }
+
 }

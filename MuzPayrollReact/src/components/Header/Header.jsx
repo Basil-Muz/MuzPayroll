@@ -1,4 +1,4 @@
-import { useState,useRef } from "react";
+import { useState,useRef,useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Header.css";
 import { IoMdSettings } from "react-icons/io";
@@ -28,11 +28,7 @@ const date=new Date().toLocaleDateString();
 
 const company_location=localStorage.getItem("company_location")||"Kochi_Kakkanad";
 
-const [notifications, setNotifications] = useState(backendError || [
-  // { id: 1, msg: "Payroll processed successfully", status: true },
-  // { id: 2, msg: "New policy update available", status: false },
-  // { id: 3, msg: "System maintenance scheduled", status: true },
-]);
+const [notifications, setNotifications] = useState([]);
 
 const [dashNotifications, setDashNotifications] = useState([
 //   { id: 1, msg: "New user registered", status: true },
@@ -49,6 +45,14 @@ const shouldRender = !blockedPaths.includes(currentPath);
 const blockedProfilePaths = ["/masters", "/home", "/settings"];
 const shouldProfileRender = blockedProfilePaths.includes(currentPath);
 
+useEffect(() => {
+  setNotifications(backendError || []);
+}, [backendError]);
+  useEffect(() => {
+    if (backendError.length > 0) {
+      setNotOpen(true);
+    }
+  }, [backendError.length]);
 // Notification removal functions
 const removeNotification = (id) => {
   setNotifications(prev =>
@@ -120,8 +124,9 @@ const handlerprofileLeave = () => {
     <header className="header">
         <div className="logo"><img src="../../../public/muziris-png.ico" alt="" width="120px" height="69px "/></div>
         <div className="header-right">
-            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`}  onMouseEnter={handleNotifEnter}
-  onMouseLeave={handleNotifLeave}>
+            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`} 
+            onMouseEnter={handleNotifEnter}
+            onMouseLeave={handleNotifLeave}>
                 <IoNotificationsSharp size={19} />
 
                 {(notifications.length!=0)&&<div className="msgs">{notifications.length}</div>}

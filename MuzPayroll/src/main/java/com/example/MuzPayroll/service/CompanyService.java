@@ -106,7 +106,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         if (isEmpty(dto.getUserCode()))
             return Response.error("User code is required");
 
-        return Response.success(true, "Validation passed");
+        return Response.success(true);
+
     }
 
     // =================== 2️⃣ BUSINESS VALIDATION ===================
@@ -116,20 +117,20 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         if (user == null)
             return Response.error("Invalid user code");
 
-        return Response.success(true, "Business validation passed");
+        return Response.success(true);
     }
 
     // =================== 3️⃣ ENTITY POPULATE ===================
     @Override
     public Response<CompanyMst> entityPopulate(CompanyDTO dto) {
         CompanyMst company = dtoToEntity(dto);
-        return Response.success(company, "Entity populated");
+        return Response.success(company);
     }
 
     // =================== 4️⃣ GENERATE PK ===================
     @Override
     public Response<Object> generatePK(CompanyDTO dto) {
-        return Response.success(true, "PK generation not required");
+        return Response.success(true);
     }
 
     // =================== 5️⃣ GENERATE SERIAL NO ===================
@@ -151,7 +152,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             String code = prefix + String.format("%02d", nextNumber);
             dto.setCode(code);
 
-            return Response.success(code, "Serial number generated");
+            return Response.success(code);
         } catch (Exception e) {
             return Response.error("Failed to generate serial number");
         }

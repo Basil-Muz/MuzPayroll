@@ -15,6 +15,7 @@
   padding-top: 9rem;
   padding-left: 3rem;
   padding-bottom: 2rem;
+    color: black;
   text-align: left;
 }
 .screenleft {
@@ -63,6 +64,7 @@
 .Companyform input {
   width: 95%;
   padding: 5px;
+  color: black;
   margin-bottom: 12px;
   border: 1px solid #ccc;
   border-radius: 0px;

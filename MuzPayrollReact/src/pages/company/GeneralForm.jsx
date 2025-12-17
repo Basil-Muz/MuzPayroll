@@ -188,7 +188,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
 
   const formik = useFormik({
     initialValues: {
-      code: "",
+      // code: "",
       company: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
@@ -216,13 +216,13 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
-      code: Yup.string()
-        .required("Code is required")
-        .test(
-          "only-numbers-symbols",
-          "Code must contain only numbers and symbols, no alphabets or spaces",
-          (value) => /^[0-9\W_]+$/.test(value || ""),
-        ),
+      // code: Yup.string()
+      //   .required("Code is required")
+      //   .test(
+      //     "only-numbers-symbols",
+      //     "Code must contain only numbers and symbols, no alphabets or spaces",
+      //     (value) => /^[0-9\W_]+$/.test(value || ""),
+      //   ),
       company: Yup.string().required("Company Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
@@ -261,7 +261,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
     }),
     onSubmit: async (values) => {
       try {
-        onBackendError(""); // clear previous backend error
+        onBackendError([]); // clear previous backend error
 
         const formData = new FormData();
 
@@ -289,8 +289,13 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
           // Field-level error (unique code)
           if (message.toLowerCase().includes("code")) {
             formik.setFieldError("code", message);
-          } else {
-            onBackendError(message);
+            onBackendError(prev => [
+              ...(Array.isArray(prev) ? prev : []),//when prev is not array or null
+                  { id: Date.now(), msg: message , status: false },
+            ]); // show in header
+  // } else {
+            
+
           }
           return;
         }
@@ -300,7 +305,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
         resetToInitialState();
         } catch (error) {
           console.error(error);
-          onBackendError("Something went wrong. Please try again.");
+          onBackendError(["Something went wrong. Please try again."]);
         }
     },
   });
@@ -351,7 +356,10 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               <div className="headertext">
                 <h4>General Info</h4>
               </div>
-
+              {/* {onBackendError.length > 0 && (
+                <div className="backend-errors">
+                  {onBackendError.length}
+                </div>)} */}
               <label htmlFor="code" className="fancy-label">
                 Code
               </label>
@@ -361,12 +369,13 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
                 name="code"
                 ref={codeInputRef}
                 onChange={(e) => {
-                  onBackendError(""); // 👈 clear backend error
+                  onBackendError([]); // 👈 clear backend error
                   formik.handleChange(e);
                 }}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
                 value={formik.values.code}
+                disabled
                 className={
                   formik.touched.code && formik.errors.code ? "input-error" : ""
                 }
