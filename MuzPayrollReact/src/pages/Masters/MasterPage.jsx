@@ -83,7 +83,7 @@ const handleCancel = () => {
   window.location.href = "/home";
 }
   return <>
-  <Header />
+  <Header backendError={[]}/>
    <div className="app-shell">
       {/* LEFT SIDEBAR */}
      <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>

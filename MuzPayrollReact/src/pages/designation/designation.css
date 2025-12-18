@@ -1,11 +1,10 @@
 .advance-type-page {
-  padding-top: 65px;
-  padding-left: 12px;
+  padding: 65px 0 21px 12px;
   font-family: sans-serif;
   background-color: #f2f2f2;
 }
 
-h2 {
+.advance-type-page h2 {
   margin-bottom: 20px;
   color: #333;
   font-family: "Roboto", sans-serif;
@@ -13,7 +12,7 @@ h2 {
   font-weight: 400;
 }
 
-.card-grid {
+/* .card-grid {
     display: flex;
     flex-wrap: wrap;
     column-gap: 27px;
@@ -25,24 +24,158 @@ h2 {
     border-left: 2.6px solid green;
     padding: 6px 9px;
     width: 273px;
-  /* border-radius: 6px; */
+
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+} */
+
+.card-grid.tile{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(298px, 3fr));
+  gap: 18px;
+  margin-right: 6rem;
 }
 
-.card-header {
+
+.card-grid.list{
+display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    flex-direction: column;
+  gap: 16px;
+  margin-right: 6rem;
+}
+
+.advance-card {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    #ffffff,
+    var(--glass-bg)
+  );
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--border-light);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+/* subtle brand accent */
+/* .advance-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    var(--brand),
+    rgba(210, 24, 216, 0.4)
+  );
+  border-radius: 4px;
+} */
+
+.advance-card:hover {
+  transform: translateY(-4px);
+  /* box-shadow: 0 16px 34px rgba(0,0,0,0.14); */
+  border-color: var(--brand-border);
+}
+
+
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.view-toggle {
+  display: flex;
+  /* background: var(--glass-bg); */
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+
+/* .card-header {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
   justify-content: space-between;
-}
+} */
 
-.code {
+/* .code {
     font-size: 14px;
-    color: #a300ccff;
+    color: #cc00ccff;
+} */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
-.check-icon {
+.advance-type-page .code {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--brand);
+  letter-spacing: 0.3px;
+}
+
+.advance-type-page .status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.advance-type-page .check-icon {
+  color: var(--brand);
+  font-size: 14px;
+}
+
+.advance-type-page .card-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.advance-type-page .card-shortname {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.advance-type-page .card-description {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+/* .check-icon {
   color: green;
   font-size: 14px;
       padding-right: 3px;
@@ -71,7 +204,8 @@ h2 {
   font-size: 14px;
   display: flex;
   color: #555;
-}
+} */
+
 .header-section {
     display: flex;
     justify-content: space-between;
@@ -83,9 +217,40 @@ h2 {
     flex-direction: row;
 }
 
-/*Search box*/
 .search-box {
-position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  width: 210px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(210, 24, 216, 0.12);
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13.5px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.search-box svg {
+  color: var(--text-muted);
+}
+
+
+/*Search box*/
+/* .search-box {
+    position: relative;
     width: 187px;
     height: 31px;
     background: white;
@@ -98,10 +263,10 @@ position: relative;
     margin-left: 21px ;
     padding: 0px 12px;
     /* box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); */
-    transition: all 0.7s ease;
-}
+    /* transition: all 0.7s ease;
+} */
 
-
+/* 
 .search-box:focus-within {
       border-radius: 17px;
     width: 250px;
@@ -112,11 +277,11 @@ position: relative;
   outline: none;
   font-size: 14px;
   background: transparent;
-  padding-right: 30px; /* space for the icon */
+  padding-right: 30px; 
   color: #333;
-}
+} */
 
-.search-icon {
+/* .search-icon {
     position: absolute;
     right: 6px;
     top: 3px;
@@ -127,19 +292,51 @@ position: relative;
   color: #999;
   font-size: 13.5px;
   font-style: italic;
-  opacity: 1; /* makes sure it's fully visible */
-}
-.icons{
+  opacity: 1; } */
+
+/* .icons{
     transition: all 0.3s ease;
     border-top: 2px solid transparent;
     padding: 12px;
 }
 .icons:hover {
-    color: #188bd8;
+    color: #251127ff;
     background-color: white;
-    border-top: 2px solid #188bd8;
+    border-top: 2px solid #e525ebff;
     transform: translateY(-4px);
 }
+.icons.active {
+    border-top: 2px solid #e525ebff;
+    color: #251127ff;
+    background-color: white;
+    transform: translateY(-4px);
+} */
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(210, 24, 216, 0.1);
+  color: var(--primary-hover);
+}
+
+.icon-btn.active {
+  background: rgba(210, 24, 216, 0.16);
+  color: var(--brand);
+}
+
+
 @keyframes search-div {
   from {
     transform: translateX(100%);

@@ -172,9 +172,9 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                 <div className="user-role">Payroll Manager</div>
               </div>
             )}
-            <button className="user-action" aria-label="User actions">
+            {!open && ( <button className="user-action" aria-label="User actions">
               <IoIosArrowForward size={14} />
-            </button>
+            </button>)}
           </div>
         </div>
       </div>

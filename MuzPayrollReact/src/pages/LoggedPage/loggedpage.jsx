@@ -77,7 +77,7 @@ const handleOk = () => {
 
   return (
     <>
-      <Header />
+      <Header backendError={[]}/>
      
 <div className="main-section">
     <Sidebar toggleMenu={sidebarOpen}/>

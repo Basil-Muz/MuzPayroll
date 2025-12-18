@@ -6,10 +6,10 @@
   --primary-light: #eadcf3;
   /* --primary-hover: rgba(219, 37, 235, 0.06); */
 
- --brand-success: #d218d8ff;               /* same color */
+ --brand-success: #d218d8ff;    /* same color */
   --brand-success-bg: rgba(210, 24, 216, 0.08);
 
-  --brand-danger: #d218d8ff;                /* same color */
+  --brand-danger: #d218d8ff;    /* same color */
   --brand-danger-bg: rgba(210, 24, 216, 0.12);
 
   --text-dark: #2f2f2f;
@@ -118,13 +118,13 @@
 }
 
 .modal-designation-form .close {
-    font-size: 24px;
+    font-size: 21px;
     color: rgba(212, 11, 219, 0.93);
     transition: all 0.3s ease;
-    padding: 0 7px;
+    padding: 0 5px;
     border-radius: 50%;
-    border:1px solid rgba(212, 37, 235, 0.24);
-     cursor: default;
+    border: 1px solid rgba(212, 37, 235, 0.24);
+    cursor: default;
 }
 .modal-designation-form .close:hover {
     background-color: none;
