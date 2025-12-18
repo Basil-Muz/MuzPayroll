@@ -2,6 +2,7 @@
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import { MdOutlineCancel } from "react-icons/md";
+import React, { useState } from "react";
 import { IoMdSettings } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { HiMiniSwatch } from "react-icons/hi2";
@@ -13,7 +14,7 @@ import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 import Sidebar from "../../components/SideBar/Sidebar";
 export default function HomePage() {
     // const [open, setOpen] = useState(false);    //sidebar state
-
+    const [backendError, setBackendError] = useState([]);
     const sitemapData = [
   {
     title: "System Management/Masters",
@@ -83,7 +84,7 @@ const handleCancel = () => {
   window.location.href = "/home";
 }
   return <>
-  <Header />
+  <Header backendError={backendError} />
    <div className="app-shell">
       {/* LEFT SIDEBAR */}
      <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>

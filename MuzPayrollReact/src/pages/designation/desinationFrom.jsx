@@ -14,7 +14,7 @@ function DesignationForm({ toggleForm,data }) {
     const offset = useRef({ x: 0, y: 0 });
     const [flag, setFlag] = useState(false); // new state for flag from parent
     const [notifications, setNotifications] = useState([
-  { id: 1, msg: "Payroll processed successfully", status: true },
+  // { id: 1, msg: "Payroll processed successfully", status: true },
   // { id: 2, msg: "New policy update available", status: false },
   // { id: 3, msg: "System maintenance scheduled", status: true },
     ]);
@@ -272,7 +272,7 @@ const handleMouseUp = () => {
       </div>
               )}
             </div>
-        <div onClick={toggleForm} className="close"><RxCross2 size={18}/></div>
+        <div onClick={toggleForm} className="close"><RxCross2 size={15}/></div>
     </div>
     </div>
     <div className="main-model-content">

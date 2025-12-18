@@ -27,6 +27,7 @@ const renderBtn = (config, label, icon, variant = "") => {
   return (
     <button
       className={`fab-btn ${variant}`}
+      title={label}
       onClick={config.onClick}
       disabled={config.disabled}
     >

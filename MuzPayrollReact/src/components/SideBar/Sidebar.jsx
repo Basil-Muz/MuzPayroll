@@ -10,6 +10,7 @@ import {  } from "axios";
 // import { href } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+
 const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: <HiMiniSwatch size={18} />, link:"/dashboard" },
     {
@@ -77,65 +78,63 @@ const menuItems = [
     },
 ];
 
-export default function Sidebar({ initialOpen = true, onNavigate = () => {},toggleMenu}) {
-  const [open, setOpen] = useState(initialOpen);
-  const [active, setActive] = useState("payroll");
-
-    const navigate = useNavigate();//navigate function for dashboard link
-  // submenu state
-  const [openSubmenu, setOpenSubmenu] = useState(null); // id of menu item with submenu
-  const [submenuStyle, setSubmenuStyle] = useState({ top: 0, left: "calc(100% + 8px)" });
+export default function Sidebar({ forceOpen }) {
+  const navigate = useNavigate();
   const sidebarRef = useRef(null);
   const closeTimer = useRef(null);
 
+  const [open, setOpen] = useState(true);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [submenuStyle, setSubmenuStyle] = useState({ top: 0 });
+  const [sidebarEnabled, setSidebarEnabled] = useState(false);
+  const [active, setActive] = useState(localStorage.getItem("activeMenu") || "");
+
+  const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
+  const userName = loginData.userName || "";
+
+  /* 🔁 Sync sidebar enable */
+  useEffect(() => {
+  if (typeof forceOpen === "boolean") {
+    setSidebarEnabled(forceOpen);
+    return;
+  }
+
+  const stored = localStorage.getItem("loginData");
+  if (stored) {
+    const data = JSON.parse(stored);
+    setSidebarEnabled(data.sidebarOpen === true);
+  }
+}, [forceOpen]);
+  /* 🔹 Menu handlers */
   const handleNav = (item) => {
     setActive(item.id);
-    onNavigate(item.id);
+    localStorage.setItem("activeMenu", item.id);
+    if (item.link) navigate(item.link);
   };
 
   const handleSubNav = (child) => {
-    // you can customize navigation for subitems (route, open page, etc)
     setActive(child.id);
-    onNavigate(child.id);
-    // close submenu if desired
+    localStorage.setItem("activeMenu", child.id);
+    navigate(child.link);
     setOpenSubmenu(null);
   };
 
-  // open submenu next to the hovered item; compute top relative to sidebar
   const openSubmenuFor = (e, item) => {
     if (!sidebarRef.current) return;
-    // clear any pending close timer
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
+    if (closeTimer.current) clearTimeout(closeTimer.current);
 
     const sidebarRect = sidebarRef.current.getBoundingClientRect();
     const itemRect = e.currentTarget.getBoundingClientRect();
-    const topLocal = itemRect.top - sidebarRect.top; // position relative to sidebar top
 
-    setSubmenuStyle({
-      top: Math.max(8, topLocal) + "px", // small top padding, prevent negative
-      left: `calc(${sidebarRect.width}px + 12px)`, // left relative calculation (fine fallback)
-    });
+    setSubmenuStyle({ top: itemRect.top - sidebarRect.top });
     setOpenSubmenu(item.id);
   };
 
   const scheduleCloseSubmenu = () => {
-    // add small delay to make hover movement smoother
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => {
-      setOpenSubmenu(null);
-      closeTimer.current = null;
-    }, 180);
+    closeTimer.current = setTimeout(() => setOpenSubmenu(null), 200);
   };
-
-  useEffect(() => {
-    return () => {
-      if (closeTimer.current) clearTimeout(closeTimer.current);
-    };
-  }, []);
-
+  
   return (
     <aside
       ref={sidebarRef}
@@ -165,20 +164,22 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
           onClick={() => handleNav({ id: "dashboard" })}
         >
           <div className="user">
-            <div className="user-avatar">R</div>
+            <div className="user-avatar">
+               {userName ? userName.charAt(0).toUpperCase() : "U"}
+            </div>
             {!open && (
               <div className="user-meta">
-                <div className="user-name">Rahul Admin</div>
-                <div className="user-role">Payroll Manager</div>
+                <div className="user-name">{userName}</div>
+               
               </div>
             )}
-            <button className="user-action" aria-label="User actions">
+            {!open && ( <button className="user-action" aria-label="User actions">
               <IoIosArrowForward size={14} />
-            </button>
+            </button>)}
           </div>
         </div>
       </div>
-{toggleMenu &&
+{sidebarEnabled &&
       (<nav
         className="sidebar-nav"
         aria-label="Main navigation"
@@ -200,11 +201,11 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
             >
               <button
                 className={`nav-item ${active === item.id ? "active" : ""}`}
-                onClick={() => {
-                    if (item.id=="dashboard"){ {
-                        navigate("/dashboard");
-                    }
-                    handleNav(item)}}}
+             onClick={() => {
+              if (item.link) {
+                navigate(item.link);}
+                handleNav(item);
+              }}
                 title={!open ? item.label : undefined} /* tooltip when collapsed */
                 aria-current={active === item.id ? "page" : undefined}
               
@@ -265,7 +266,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                     {item.children.map((child) => (
                       <button
                         key={child.id}
-                        onClick={() => handleSubNav(child)}
+                        onClick={() => navigate(child.link)}
                         className="submenu-item"
                         style={{
                             display: "flex",
@@ -292,7 +293,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                             >
                             ✱
                         </span>
-                        <a href={child.link} style={{ flex: 1 ,color:'black'}}>{child.label}</a>
+                          <span style={{ flex: 1, color: "black" }}>{child.label}</span>
                         <span style={{ color: "#b594b8", fontSize: 12 }}>&gt;</span>
                         </button>
                     ))}

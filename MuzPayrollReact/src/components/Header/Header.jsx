@@ -26,7 +26,8 @@ const profileTimer = useRef(null);
 
 const date=new Date().toLocaleDateString();
 
-const company_location=localStorage.getItem("company_location")||"Kochi_Kakkanad";
+const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
+const locationName = loginData.locationName || "";
 
 const [notifications, setNotifications] = useState([]);
 
@@ -164,7 +165,7 @@ const handlerprofileLeave = () => {
             </div>}
         </div>
             <div className="location-date">
-            <span className="location">{company_location}</span>
+            <span className="location">{locationName}</span>
             <span className="date">{date}</span>
             </div>
         <div 
