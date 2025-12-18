@@ -16,7 +16,48 @@ import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 const Designation = () => {
 
-    const [advanceTypes, setAdvanceTypes] = useState([]);
+    const [advanceTypes, setAdvanceTypes] = useState([ {
+    code: "ADV001",
+    activeDate: "2024-01-15",
+    name: "Travel Advance",
+    shortName: "Travel",
+    description: "Advance provided to employees for official travel expenses."
+  },
+  {
+    code: "ADV002",
+    activeDate: "2024-02-01",
+    name: "Medical Advance",
+    shortName: "Medical",
+    description: "Advance issued to cover medical emergencies or planned treatments."
+  },
+  {
+    code: "ADV003",
+    activeDate: "2024-03-10",
+    name: "Salary Advance",
+    shortName: "Salary",
+    description: "Short-term advance against monthly salary for urgent needs."
+  },
+  {
+    code: "ADV004",
+    activeDate: "2024-04-05",
+    name: "Project Advance",
+    shortName: "Project",
+    description: "Funds released in advance for project-related operational costs."
+  },
+  {
+    code: "ADV005",
+    activeDate: "2024-05-20",
+    name: "Education Advance",
+    shortName: "Education",
+    description: "Advance to support employee education or certification programs."
+  },
+{
+    code: "ADV004",
+    activeDate: "2024-04-05",
+    name: "Project Advance",
+    shortName: "Project",
+    description: "Funds released in advance for project-related operational costs."
+  }]);
     const [boxView, setBoxView] = useState(true);
     const [listView, setListView] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
@@ -42,6 +83,8 @@ const Designation = () => {
 //       .catch(console.error);
 //   }
 // }, []);
+
+
 
 
   const handleSave = () => {
@@ -115,11 +158,12 @@ useEffect(() => {
  if (showForm) {
        setSelectedItem(null);
   }}
-    const containerStyle = boxView
-  ? { display: 'flex', flexDirection: 'row' }
-  : listView
-    ? { display: 'flex', flexDirection: 'column' }
-    : {};
+  //   const containerStyle = boxView
+  // ? { display: 'flex', flexDirection: 'row' }
+  // : listView
+  //   ? { display: 'flex', flexDirection: 'column' }
+  //   : {}
+  
     const hanbleSearchChange = (item) => {
         setSelectedItem(item);
         toggleForm();
@@ -130,86 +174,118 @@ useEffect(() => {
     <Header backendError={headerError}/>
     <div className="advance-type-page">
     <div className="header-section">
-        <h2>Designation</h2>
-        <div className="view-icons">
-            <div className="icons">
-            <BsGrid3X3GapFill size={24}
-            color="#161414e6"
-            onClick={() => {setBoxView(!boxView); setListView(false);}}
-            title="Tile View"
-            style={boxView ? { color: '#188bd8' } : undefined}
-            />
-            </div>
-            <div className="icons">
-            <FaListUl size={24}
-            color="#161414e6"
-            title="List View" 
-            onClick={() => {setListView(true); setBoxView(false);}}
-             style={listView ?  { color: '#188bd8' }:undefined }
-            />
-            </div>
-            <div className="icons">
-            <FaRegObjectGroup title="Grouping" size={24} color="#161414e6" onClick={() => {setShowSearch(!showSearch)}}/>
-            </div>
-            
-        <div className="search-box">
-            <input type="text" name="search" onChange={handleSearchChange} value={searchData} placeholder="Search here ..." />
-            <div className="search-icon">
-                <IoIosSearch size={22} style={{ marginLeft: '21px' }}  /></div>
-        </div>
-        </div>
+  <h2 className="page-title">Designation</h2>
+
+  <div className="header-actions">
+    <div className="view-toggle">
+      <button
+        className={`icon-btn ${boxView ? "active" : ""}`}
+        title="Tile View"
+        onClick={() => { setBoxView(true); setListView(false); }}
+      >
+        <BsGrid3X3GapFill size={18} />
+      </button>
+
+      <button
+        className={`icon-btn ${listView ? "active" : ""}`}
+        title="List View"
+        onClick={() => { setListView(true); setBoxView(false); }}
+      >
+        <FaListUl size={18} />
+      </button>
+
+      <button
+        className={`icon-btn ${showSearch ? "active" : ""}`}
+        title="Grouping"
+        onClick={() => setShowSearch(!showSearch)}
+      >
+        <FaRegObjectGroup size={18} />
+      </button>
+    </div>
+
+    <div className="search-box">
+      <IoIosSearch size={18} />
+      <input
+        type="text"
+        placeholder="Search designation…"
+        value={searchData}
+        onChange={handleSearchChange}
+      />
+    </div>
+  </div>
+
+
     </div>
     <div className={`slide-container ${showSearch ? 'show' : 'hide'}`}>
         
       <Search/>
         
         </div>
-      <div className="card-grid"
-      style={containerStyle}
-      >
-        {advanceTypes.map((item) => (
-          <div className="advance-card" 
-          style={ listView ? { width: '96%', marginRight: '20px'} : undefined}
-          key={item.code}>
-            <div className="card-header">
-              <span className="code" style={{cursor:'pointer'}} onClick={() =>{hanbleSearchChange(item)}}>{item.code}</span>
-              <div>
-              <span className="check-icon"><TiTick /></span>
-              <span className="date">{item.activeDate}</span></div>
-            </div>
-            <div className="card-title" style={{cursor:'pointer'}} onClick={() =>{hanbleSearchChange(item)}}>{item.name}</div>
-            <div className="card-shortname">{item.shortName}</div>
-            <div className="card-description">{item.description}</div>
-          </div>
-        ))}
+<div className={`card-grid ${listView ? 'list' : 'tile'}`}>
+  {advanceTypes.map((item) => (
+    <div className="advance-card" key={item.code}>
+
+      <div className="card-header">
+        <span
+          className="code"
+          onClick={() => hanbleSearchChange(item)}
+        >
+          {item.code}
+        </span>
+
+        <div className="status">
+          <TiTick className="check-icon" />
+          <span className="date">{item.activeDate}</span>
+        </div>
       </div>
+
+      <div
+        className="card-title"
+        onClick={() => hanbleSearchChange(item)}
+      >
+        {item.name}
+      </div>
+
+      <div className="card-shortname">{item.shortName}</div>
+
+      <div className="card-description">
+        {item.description}
+      </div>
+    </div>
+  ))}
+</div>
+
           {/* <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/> */}
          <FloatingActionBar
   actions={{
     save: {
       onClick: handleSave,
-
+      disabled:true,
       // disabled: isViewMode || isSubmitted
     },
     search: {
-      onClick: handleSearch
+      onClick: handleSearch,
+      disabled:true,
     },
     clear: {
-      onClick: handleClear
+      onClick: handleClear,
+      // disabled:true,
+
     },
     delete: {
       onClick: handleDelete,
       // disabled: !hasDeletePermission
+      disabled: true,
     },
     print: {
       onClick: handlePrint,
       // disabled: isNewRecord
+      disabled: true,
     },
     new: {
-      onClick: handleNewPage
+      onClick: toggleForm,  //to toggle the designation form
     }
-  }}
-/>
+  }}/>
 
            {showForm && selectedItem && loading && <Loading />}
       {showForm && !loading && selectedItem && (

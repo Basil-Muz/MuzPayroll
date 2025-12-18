@@ -2,6 +2,7 @@
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import { MdOutlineCancel } from "react-icons/md";
+import React, { useState } from "react";
 import { IoMdSettings } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import { HiMiniSwatch } from "react-icons/hi2";

@@ -173,9 +173,9 @@ export default function Sidebar({ forceOpen }) {
                
               </div>
             )}
-            <button className="user-action" aria-label="User actions">
+            {!open && ( <button className="user-action" aria-label="User actions">
               <IoIosArrowForward size={14} />
-            </button>
+            </button>)}
           </div>
         </div>
       </div>

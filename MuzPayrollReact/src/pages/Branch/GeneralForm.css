@@ -151,7 +151,7 @@
   margin-top: 1rem;
   position: relative;
 }
-.date {
+.branchform  .date {
   width: 170px;
   display: flex;
   align-items: center;
