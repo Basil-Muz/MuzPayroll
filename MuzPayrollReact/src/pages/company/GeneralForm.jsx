@@ -15,15 +15,16 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
 
-const GeneralForm = forwardRef(({ onFormChange }, ref) => {
+const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   let page = "company";
-  const user_code =1;
+  const user_code = 1001;
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
   const [imageUpload, setImageUpload] = useState(false);
   const [file, setFile] = useState(null);
-const [error, setError] = useState("");
+  const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
 
   const codeInputRef = useRef(null);
   const calendarRef = useRef(null);
@@ -35,8 +36,6 @@ const [error, setError] = useState("");
   const [isDateLocked, setIsDateLocked] = useState(false);
   const [authorization, setAuthorization] = useState("Active");
   const [todayDate, setTodayDate] = useState("");
-  
-
 
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
@@ -51,18 +50,6 @@ const [error, setError] = useState("");
     ? City.getCitiesOfState(selectedCountry, selectedState)
     : [];
 
-    const handleFileChange = (e) => {
-  setFile(e.target.files[0]);
-};
-const handleSelect = () => {
-  // store selected file (optional – remove if you don't need it)
-  formik.setFieldValue("companyImage", file);
-
-  // close popup
-  setImageUpload(false);
-};
-
-
   useEffect(() => {
     const today = new Date();
     const formatted = today.toLocaleDateString("en-GB"); // e.g., 15/09/2025
@@ -73,6 +60,46 @@ const handleSelect = () => {
       setShowCalendar(true);
     }
   }, []);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+  const handleSelect = () => {
+    // store selected file (optional – remove if you don't need it)
+    formik.setFieldValue("companyImage", file);
+
+    // close popup
+    setImageUpload(false);
+  };
+
+  const resetToInitialState = () => {
+    // Formik reset
+    formik.resetForm();
+
+    // 🔒 Lock everything again
+    setStartDate(null);
+    setIsDateLocked(false);
+    setDateLocked(false);
+    setInputsUnlocked(false);
+
+    // 📅 Show calendar again
+    setShowCalendar(true);
+
+    // 🖼 Clear image
+    setFile(null);
+    setError("");
+    formik.setFieldValue("companyImage", null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    // Close popup
+    setImageUpload(false);
+
+    // Focus back to calendar
+    focusWithTimeout(calendarRef);
+  };
 
   const focusWithTimeout = (ref, delay = 100) => {
     setTimeout(() => {
@@ -91,10 +118,7 @@ const handleSelect = () => {
     if (!dateLocked) {
       setStartDate(date);
 
-          formik.setFieldValue(
-      "withaffectdate",
-      date.toISOString().split("T")[0]
-    );
+      formik.setFieldValue("withaffectdate", date.toISOString().split("T")[0]);
 
       setShowCalendar(false);
       setInputsUnlocked(true);
@@ -186,10 +210,10 @@ const handleSelect = () => {
       employerNumber: "",
       employerEmail: "",
       companyImage: null,
-      withaffectdate:"",
-      authorizationStatus: "entry",
-      user_code:user_code,
-  authorizationDate: new Date().toISOString().split("T")[0],
+      withaffectdate: "",
+      authorizationStatus: "0",
+      user_code: user_code,
+      authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
       code: Yup.string()
@@ -233,47 +257,76 @@ const handleSelect = () => {
       employerEmail: Yup.string()
         .email("Invalid email format")
         .required("Employer Email is required"),
+      withaffectdate: Yup.string().required("with affect date is required"),
     }),
-onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       try {
-        const formattedValues = {
-          ...values,
-          activeDate: values.activeDate.split("T")[0], 
-        };
+        onBackendError([]); // clear previous backend error
+
+        const formData = new FormData();
+
+        // Append all fields except image
+        Object.keys(values).forEach((key) => {
+          if (key !== "companyImage") {
+            formData.append(key, values[key]);
+          }
+        });
+
+        // Append image if exists
+        if (values.companyImage) {
+          formData.append("companyImage", values.companyImage);
+        }
 
         const response = await fetch("http://localhost:8087/saveCompany", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formattedValues),
+          body: formData,
         });
 
+        // 👇 READ BACKEND MESSAGE
+        const message = await response.text();
+
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          // Field-level error (unique code)
+          if (message.toLowerCase().includes("code")) {
+            formik.setFieldError("code", message);
+            onBackendError(prev => [
+              ...(Array.isArray(prev) ? prev : []),//when prev is not array or null
+                  { id: Date.now(), msg: message , status: false },
+            ]); // show in header
+  // } else {
+            
+
+          }
+          return;
         }
 
+        // ✅ SUCCESS
         alert("Company saved successfully!");
-        resetForm();
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to save Company");
-      }
+        resetToInitialState();
+        } catch (error) {
+          console.error(error);
+          onBackendError(["Something went wrong. Please try again."]);
+        }
     },
-
   });
-  
-
 
   const cancelForm = () => {
-    formik.resetForm({
-      values: {
-        ...formik.initialValues,
-      },
-    });
+    formik.resetForm();
     setStartDate(null);
     setDateLocked(false);
     setIsDateLocked(false);
     setInputsUnlocked(false);
     setAuthorization("entry");
+
+    // ✅ Clear image
+    setFile(null);
+    setError("");
+    formik.setFieldValue("companyImage", null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
     focusWithTimeout(calendarRef);
   };
 
@@ -303,7 +356,10 @@ onSubmit: async (values, { resetForm }) => {
               <div className="headertext">
                 <h4>General Info</h4>
               </div>
-            
+              {/* {onBackendError.length > 0 && (
+                <div className="backend-errors">
+                  {onBackendError.length}
+                </div>)} */}
               <label htmlFor="code" className="fancy-label">
                 Code
               </label>
@@ -312,7 +368,10 @@ onSubmit: async (values, { resetForm }) => {
                 id="code"
                 name="code"
                 ref={codeInputRef}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  onBackendError([]); // 👈 clear backend error
+                  formik.handleChange(e);
+                }}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
                 value={formik.values.code}
@@ -336,7 +395,9 @@ onSubmit: async (values, { resetForm }) => {
                 disabled={!startDate}
                 value={formik.values.company}
                 className={
-                  formik.touched.company && formik.errors.company ? "input-error" : ""
+                  formik.touched.company && formik.errors.company
+                    ? "input-error"
+                    : ""
                 }
               />
               {formik.touched.company && formik.errors.company ? (
@@ -395,84 +456,86 @@ onSubmit: async (values, { resetForm }) => {
                 </div>
               </div>
 
-<button
-  type="button"
-  className="imageupload"
-  onClick={() => setImageUpload(true)}
->
-  Image Upload
-</button>
+              <button
+                type="button"
+                className="imageupload"
+                onClick={() => setImageUpload(true)}
+              >
+                Image Upload
+              </button>
 
-{imageUpload && (
-  <div className="popup-overlay">
-    <div className="popup-box">
+              {imageUpload && (
+                <div className="popup-overlay">
+                  <div className="popup-box">
+                    <div className="imagehead">
+                      <h3 className="upload">Image Upload</h3>
+                      <button
+                        className="close-btn"
+                        onClick={() => setImageUpload(false)}
+                      >
+                        <IoClose />
+                      </button>
+                    </div>
+                    <label htmlFor="File" className="fancy-label">
+                      Upload File
+                    </label>
+                    {/* FILE INPUT */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        setFile(e.target.files[0]);
+                        setError("");
+                      }}
+                    />
 
-      <div className="imagehead">
-        <h3 className="upload">Image Upload</h3>
-        <button className="close-btn" onClick={() => setImageUpload(false)}>
-          <IoClose />
-        </button>
-      </div>
-              <label htmlFor="File" className="fancy-label">
-                Upload File
-              </label>
-      {/* FILE INPUT */}
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          setFile(e.target.files[0]);
-          setError(""); // clear previous error
-        }}
-      />
+                    {/* SHOW SELECTED FILE */}
+                    {file && (
+                      <p className="file-selected">Selected: {file.name}</p>
+                    )}
 
-      {/* SHOW SELECTED FILE */}
-      {file && (
-        <p className="file-selected">Selected: {file.name}</p>
-      )}
+                    {/* ERROR MESSAGE */}
+                    {error && (
+                      <p style={{ color: "red", marginTop: "5px" }}>{error}</p>
+                    )}
 
-      {/* ERROR MESSAGE */}
-      {error && (
-        <p style={{ color: "red", marginTop: "5px" }}>{error}</p>
-      )}
+                    <p className="dimension-text">
+                      Image dimension must be <b>490 × 350 px</b>
+                    </p>
 
-      <p className="dimension-text">
-        Image dimension must be <b>490 × 350 px</b>
-      </p>
+                    {/* SELECT BUTTON WITH VALIDATION */}
+                    <button
+                      type="button" // 👈 VERY IMPORTANT
+                      className="select-btn"
+                      onClick={() => {
+                        if (!file) {
+                          setError("Please upload an image.");
+                          return;
+                        }
 
-      {/* SELECT BUTTON WITH VALIDATION */}
-      <button
-        className="select-btn"
-        onClick={() => {
-          if (!file) {
-            setError("Please upload an image.");
-            return;
-          }
+                        const img = new Image();
+                        img.src = URL.createObjectURL(file);
 
-          const img = new Image();
-          img.src = URL.createObjectURL(file);
+                        img.onload = () => {
+                          // Optional dimension check
+                          // if (img.width !== 490 || img.height !== 350) {
+                          //   setError("Image must be exactly 490 × 350 pixels.");
+                          //   return;
+                          // }
 
-          img.onload = () => {
-            // if (img.width !== 490 || img.height !== 350) {
-            //   setError("Image must be exactly 490 × 350 pixels.");
-            //   return;
-            // }
+                          // Store locally (Formik state only)
+                          formik.setFieldValue("companyImage", file);
 
-            // Valid image -> set file into formik
-            formik.setFieldValue("companyImage", file);
-
-            setImageUpload(false);
-          };
-        }}
-      >
-        Select and Close
-      </button>
-
-    </div>
-  </div>
-)}
-
-
+                          setImageUpload(false); // close popup
+                        };
+                      }}
+                    >
+                      Select and Close
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="address">
               <div className="headertext">
@@ -483,7 +546,7 @@ onSubmit: async (values, { resetForm }) => {
                     type="checkbox"
                     checked={addressEditable}
                     onChange={handleAddressEditToggle}
-                    disabled={!startDate || page === "Company"}
+                    disabled={!startDate || page === "company"}
                   />
                   <span>Edit</span>
                 </label>
@@ -547,7 +610,6 @@ onSubmit: async (values, { resetForm }) => {
                 name="country"
                 onChange={(e) => {
                   formik.handleChange(e);
-                  // Reset dependent states if needed
                   setSelectedCountry(e.target.value);
                   setSelectedState("");
                   setSelectedDistrict("");
@@ -582,10 +644,10 @@ onSubmit: async (values, { resetForm }) => {
                 name="state"
                 value={formik.values.state}
                 onChange={(e) => {
-                  formik.handleChange(e); // update Formik state value
-                  setSelectedState(e.target.value); // update local state if you use it
-                  setSelectedDistrict(""); // reset district when state changes
-                  formik.setFieldValue("district", ""); // also reset district in Formik
+                  formik.handleChange(e);
+                  setSelectedState(e.target.value);
+                  setSelectedDistrict("");
+                  formik.setFieldValue("district", "");
                 }}
                 onBlur={formik.handleBlur}
                 disabled={!addressEditable || !startDate || !selectedCountry}
@@ -735,7 +797,7 @@ onSubmit: async (values, { resetForm }) => {
                     type="checkbox"
                     checked={contactInfoEditable}
                     onChange={handlecontactInfoEditable}
-                    disabled={!startDate || page === "Company"}
+                    disabled={!startDate || page === "company"}
                   />
                   <span>Edit</span>
                 </label>
@@ -903,24 +965,20 @@ onSubmit: async (values, { resetForm }) => {
           </div>
 
           <div className="form-buttons">
-  <button
-    type="submit"
-    className="submit-btn"
-    onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
-  >
-    Submit
-  </button>
-  <button
-    type="button"
-    className="cancel-btn"
-    onClick={cancelForm}
-  >
-    Cancel
-  </button>
-</div>
-
+            <button
+              type="submit"
+              className="submit-btn"
+              onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
+            >
+              Submit
+            </button>
+            <button type="button" className="cancel-btn" onClick={cancelForm}>
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
+
       <div className="secform">
         <div className="authorization">
           <label htmlFor="Authorization" className="authorization-label">
@@ -928,58 +986,60 @@ onSubmit: async (values, { resetForm }) => {
           </label>
 
           <div className="authorization-input-group">
-<select
-  id="authorization"
-  value={formik.values.authorizationStatus}
-  onChange={(e) => {
-    const today = new Date().toISOString().split("T")[0];
+            <select
+              id="authorization"
+              value={formik.values.authorizationStatus}
+              onChange={(e) => {
+                const today = new Date().toISOString().split("T")[0];
 
-    formik.setFieldValue("authorizationStatus", e.target.value);
-    formik.setFieldValue("authorizationDate", today);
-  }}
-  className="authorization-dropdown"
->
-  <option value="entry">ENTRY</option>
-  <option value="verified">VERIFIED</option>
-</select>
-
+                formik.setFieldValue("authorizationStatus", e.target.value);
+                formik.setFieldValue("authorizationDate", today);
+              }}
+              className="authorization-dropdown"
+            >
+              <option value="0">ENTRY</option>
+              <option value="1">VERIFIED</option>
+            </select>
           </div>
         </div>
         <div className="newbutton">
-<div className="calender">
-  {!isDateLocked && (
-    <div className="datepicker" ref={calendarRef}>
-      <DatePicker
-        selected={startDate}
-        onChange={handleDateChange}
-        inline
-        autoFocus
-      />
-    </div>
-  )}
+          <div className="calender">
+            {!isDateLocked && (
+              <div className="datepicker" ref={calendarRef}>
+                <DatePicker
+                  selected={startDate}
+                  onChange={handleDateChange}
+                  inline
+                  autoFocus
+                />
+              </div>
+            )}
 
-  {/* Date input field */}
-  <div className="date">
-    <div className="left-box">1</div>
+            {/* Date input field */}
+            <div className="date">
+              <div className="left-box">1</div>
 
-    <div className="icondate">
-      <input
-        type="text"
-        id="withaffectdate" 
-        name="withaffectdate"  
-value={formik.values.withaffectdate ? 
-        new Date(formik.values.withaffectdate).toLocaleDateString("en-GB") 
-        : ""}
-        readOnly
-      />
+              <div className="icondate">
+                <input
+                  type="text"
+                  id="withaffectdate"
+                  name="withaffectdate"
+                  value={
+                    formik.values.withaffectdate
+                      ? new Date(
+                          formik.values.withaffectdate,
+                        ).toLocaleDateString("en-GB")
+                      : ""
+                  }
+                  readOnly
+                />
 
-      <FaRegCalendarAlt
-        style={{ color: "#28a745", fontSize: "19px" }}
-      />
-    </div>
-  </div>
-</div>
-
+                <FaRegCalendarAlt
+                  style={{ color: "#28a745", fontSize: "19px" }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

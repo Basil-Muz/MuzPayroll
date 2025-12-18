@@ -17,7 +17,7 @@
   border-right: 1px solid var(--sidebar-border);
   transition: width 250ms ease, box-shadow 220ms ease;
   box-shadow: none;
-  padding-top: 4rem;
+  padding-top: 1.8rem;
   overflow: hidden;
   z-index: 50;
 }

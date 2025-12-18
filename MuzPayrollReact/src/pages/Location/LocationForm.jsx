@@ -5,23 +5,24 @@ import React, {
   useState,
 } from "react";
 import "../Location/LocationForm.css";
-import GeneralForm from "../Location/GeneralForm.jsx";  
+import GeneralForm from "../Location/GeneralForm.jsx";
 import DocumentsInfo from "../Location/DocumentsInfo.jsx";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton.jsx";
-
+import Header from "../../components/Header/Header.jsx";
+import ManinButtons from "../../components/MainButtons/MainButtons.jsx";
 
 const LocationForm = forwardRef((props, ref) => {
   const generalFormRef = useRef();
   const documentsInfoRef = useRef();
 
-    const [isDirty, setIsDirty] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const [headerError, setHeaderError] = useState("");
 
   const handleFormChange = (dirty, valid) => {
     setIsDirty(dirty);
     setIsValid(valid);
   };
-
 
   useImperativeHandle(ref, () => ({
     resetForms() {
@@ -44,6 +45,9 @@ const LocationForm = forwardRef((props, ref) => {
 
   return (
     <div className="location-form">
+      <div className="pagename">
+        <h2>Location</h2>
+      </div>
       <div
         className={`button-toggle ${showdiv === "generalinfo" ? "general-active" : showdiv === "docinfo" ? "doc-active" : ""}`}
       >
@@ -63,10 +67,12 @@ const LocationForm = forwardRef((props, ref) => {
       </div>
 
       <div className="form-tabs-container">
+        <Header backendError={headerError} />
+
         <div
           className={`form-tab ${showdiv === "generalinfo" ? "visible" : "hidden"}`}
         >
-          <GeneralForm ref={generalFormRef} />
+          <GeneralForm ref={generalFormRef} onBackendError={setHeaderError} />
         </div>
 
         <div
@@ -75,7 +81,9 @@ const LocationForm = forwardRef((props, ref) => {
           <DocumentsInfo ref={documentsInfoRef} />
         </div>
       </div>
-      < ScrollToTopButton />
+      <ManinButtons />
+
+      <ScrollToTopButton />
     </div>
   );
 });

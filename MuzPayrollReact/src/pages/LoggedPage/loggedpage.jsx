@@ -30,7 +30,7 @@ function LoggedPage() {
   const [companyList, setCompanyList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
-
+ const [backendError, setBackendError] = useState([]);
   // Load from localStorage
   useEffect(() => {
   const stored = localStorage.getItem("loginData");
@@ -143,7 +143,7 @@ function LoggedPage() {
 
   return (
     <>
-      <Header />
+      <Header backendError={backendError} />
       <div className="main-section">
         <Sidebar forceOpen={sidebarOpen} />
 

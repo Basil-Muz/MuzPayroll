@@ -1,4 +1,4 @@
-import { useState,useRef } from "react";
+import { useState,useRef,useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Header.css";
 import { IoMdSettings } from "react-icons/io";
@@ -9,7 +9,7 @@ import { RxCross2 } from "react-icons/rx";
 // import { FaUserTie } from "react-icons/fa6";
 import { ImUser } from "react-icons/im";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
-const Header = () => {
+const Header = ({backendError}) => {
 //   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
 //   const toggleMenu = () => {
@@ -29,15 +29,11 @@ const date=new Date().toLocaleDateString();
 const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
 const locationName = loginData.locationName || "";
 
-const [notifications, setNotifications] = useState([
-  { id: 1, msg: "New user registered", status: true },
-  // { id: 2, msg: "Server overloaded", status: false },
-  // { id: 3, msg: "New order received", status: true },
-]);
+const [notifications, setNotifications] = useState([]);
 
 const [dashNotifications, setDashNotifications] = useState([
 //   { id: 1, msg: "New user registered", status: true },
-  { id: 2, msg: "Server overloaded", status: false },
+//   { id: 2, msg: "Server overloaded", status: false },
   // { id: 3, msg: "New order received", status: true },
 ]);
 
@@ -50,6 +46,14 @@ const shouldRender = !blockedPaths.includes(currentPath);
 const blockedProfilePaths = ["/masters", "/home", "/settings"];
 const shouldProfileRender = blockedProfilePaths.includes(currentPath);
 
+useEffect(() => {
+  setNotifications(backendError || []);
+}, [backendError]);
+  useEffect(() => {
+    if (backendError.length > 0) {
+      setNotOpen(true);
+    }
+  }, [backendError.length]);
 // Notification removal functions
 const removeNotification = (id) => {
   setNotifications(prev =>
@@ -119,12 +123,14 @@ const handlerprofileLeave = () => {
 
     return (
     <header className="header">
-        <div className="logo">Cloud Stack Solutions</div>
+        <div className="logo"><img src="../../../public/muziris-png.ico" alt="" width="120px" height="69px "/></div>
         <div className="header-right">
-            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`}  onMouseEnter={handleNotifEnter}
-  onMouseLeave={handleNotifLeave}>
+            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`} 
+            onMouseEnter={handleNotifEnter}
+            onMouseLeave={handleNotifLeave}>
                 <IoNotificationsSharp size={19} />
-                <div className="msgs">{notifications.length}</div>
+
+                {(notifications.length!=0)&&<div className="msgs">{notifications.length}</div>}
                 {notOpen && (
       <div className="notification-dropdown">
             {notifications.length > 0 ? (
@@ -142,7 +148,9 @@ const handlerprofileLeave = () => {
             <div className="dashboard" onMouseEnter={handleDashEnter}
     onMouseLeave={handleDashLeave}>
                 <BiSolidCollection size={19} />
+                {dashNotifications.length!=0 &&
                 <div className="msgs">{dashNotifications.length}</div>
+                }
                 {dashOpen && (
                     <div className="notification-dropdown">
                         {dashNotifications.length > 0 ? (

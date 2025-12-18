@@ -8,18 +8,21 @@ import "../Branch/BranchForm.css";
 import GeneralForm from "../Branch/GeneralForm.jsx";
 import DocumentsInfo from "../Branch/DocumentsInfo.jsx";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton.jsx";
+import Header from "../../components/Header/Header.jsx";
+import ManinButtons from "../../components/MainButtons/MainButtons.jsx";
 const BranchForm = forwardRef((props, ref) => {
   const generalFormRef = useRef();
   const documentsInfoRef = useRef();
 
-    const [isDirty, setIsDirty] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(false);
+
+  const [headerError, setHeaderError] = useState("");
 
   const handleFormChange = (dirty, valid) => {
     setIsDirty(dirty);
     setIsValid(valid);
   };
-
 
   useImperativeHandle(ref, () => ({
     resetForms() {
@@ -42,6 +45,9 @@ const BranchForm = forwardRef((props, ref) => {
 
   return (
     <div className="branch-form">
+      <div className="pagename">
+        <h2>Branch</h2>
+      </div>
       <div
         className={`button-toggle ${showdiv === "generalinfo" ? "general-active" : showdiv === "docinfo" ? "doc-active" : ""}`}
       >
@@ -61,10 +67,12 @@ const BranchForm = forwardRef((props, ref) => {
       </div>
 
       <div className="form-tabs-container">
+        <Header backendError={headerError} />
+
         <div
           className={`form-tab ${showdiv === "generalinfo" ? "visible" : "hidden"}`}
         >
-          <GeneralForm ref={generalFormRef} />
+          <GeneralForm ref={generalFormRef} onBackendError={setHeaderError} />
         </div>
 
         <div
@@ -73,7 +81,9 @@ const BranchForm = forwardRef((props, ref) => {
           <DocumentsInfo ref={documentsInfoRef} />
         </div>
       </div>
-      < ScrollToTopButton />
+      <ManinButtons />
+
+      <ScrollToTopButton />
     </div>
   );
 });

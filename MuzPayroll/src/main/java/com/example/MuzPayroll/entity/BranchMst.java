@@ -20,7 +20,7 @@ public class BranchMst {
     @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String code;
 
     @Column(nullable = false)
@@ -79,6 +79,9 @@ public class BranchMst {
 
     @Column(nullable = false)
     private String employerEmail;
+
+    @Column(nullable = false)
+    private LocalDate withaffectdate;
 
     // Getters and setters
     public Long getId() {
@@ -263,5 +266,13 @@ public class BranchMst {
 
     public void setEmployerEmail(String employerEmail) {
         this.employerEmail = employerEmail;
+    }
+
+    public LocalDate getWithaffectdate() {
+        return withaffectdate;
+    }
+
+    public void setWithaffectdate(LocalDate withaffectdate) {
+        this.withaffectdate = withaffectdate;
     }
 }

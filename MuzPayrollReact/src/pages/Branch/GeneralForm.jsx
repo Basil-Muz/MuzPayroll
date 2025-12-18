@@ -7,17 +7,18 @@ import React, {
 } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import "../Branch/GeneralForm.css"
+import "../Branch/GeneralForm.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
 
-const GeneralForm = forwardRef(({ onFormChange }, ref) => {
-    let page = "branch";
-  const companyId = 1;
-  
+const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
+  let page = "branch";
+  const companyId = 2;
+  const user_code = 1001;
+  const [initialCompanyId, setInitialCompanyId] = useState("");
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
@@ -32,7 +33,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   const [authorization, setAuthorization] = useState("Active");
   const [todayDate, setTodayDate] = useState("");
 
-
   const [companyList, setCompanyList] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
@@ -46,6 +46,20 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     ? City.getCitiesOfState(selectedCountry, selectedState)
     : [];
 
+  const loadCompanyAndBranches = async () => {
+    try {
+      const companyResponse = await axios.get(
+        `http://localhost:8087/companies/${companyId}`,
+      );
+      const company = companyResponse.data;
+
+      setCompanyList([company]);
+      setInitialCompanyId(company.id); // ✅ store it
+    } catch (error) {
+      console.error("Failed to load company:", error);
+    }
+  };
+
   useEffect(() => {
     const today = new Date();
     const formatted = today.toLocaleDateString("en-GB"); // e.g., 15/09/2025
@@ -57,26 +71,61 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     }
   }, []);
 
-  const focusWithTimeout = (ref, delay = 100) => {
+  const focusAndScrollToTop = (ref, delay = 100) => {
     setTimeout(() => {
-      if (ref?.current) {
-        if (typeof ref.current.scrollIntoView === "function") {
-          ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-        if (typeof ref.current.focus === "function") {
-          ref.current.focus();
-        }
+      if (!ref?.current) return;
+
+      // 1️⃣ Focus first
+      if (typeof ref.current.focus === "function") {
+        ref.current.focus({ preventScroll: true });
       }
+
+      // 2️⃣ Then scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }, delay);
+  };
+
+  const resetToInitialState = () => {
+    formik.resetForm({
+      values: {
+        ...formik.initialValues,
+        company: initialCompanyId,
+      },
+    });
+
+    setStartDate(null);
+    setShowCalendar(true);
+    setInputsUnlocked(false);
+    setIsDateLocked(false);
+    setDateLocked(false);
+
+    setAddressEditable(true);
+    setContactInfoEditable(true);
+    setemployerEditable(true);
+
+    // ✅ Focus calendar AFTER render
+    setTimeout(() => {
+      calendarRef.current?.focus();
+      calendarRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
   };
 
   const handleDateChange = (date) => {
     if (!dateLocked) {
       setStartDate(date);
+
+      formik.setFieldValue("withaffectdate", date.toISOString().split("T")[0]);
+
       setShowCalendar(false);
       setInputsUnlocked(true);
       setIsDateLocked(true);
-      focusWithTimeout(codeInputRef);
+      focusAndScrollToTop(codeInputRef);
     }
   };
   useEffect(() => {
@@ -97,6 +146,12 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       btn?.focus();
     });
   }, []);
+
+  useEffect(() => {
+    if (companyList.length && initialCompanyId) {
+      formik.setFieldValue("company", initialCompanyId, false);
+    }
+  }, [companyList, initialCompanyId]);
 
   const handleAddressEditToggle = () => {
     if (addressEditable) {
@@ -140,12 +195,13 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
   };
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      companyEntity: { id: "" },
+      company: initialCompanyId,
       code: "",
       branch: "",
       shortName: "",
-      activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
+      activeDate: new Date().toISOString().split("T")[0],
       address: "",
       address1: "",
       address2: "",
@@ -163,6 +219,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
       designation: "",
       employerNumber: "",
       employerEmail: "",
+      withaffectdate: "",
+      authorizationStatus: "0",
+      user_code: user_code,
+      authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
       company: Yup.string().required("Company is required"),
@@ -173,7 +233,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           "Code must contain only numbers and symbols, no alphabets or spaces",
           (value) => /^[0-9\W_]+$/.test(value || ""),
         ),
-      branch: Yup.string().required("Name is required"),
+      branch: Yup.string().required("Branch Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
       address: Yup.string().required("Address is required"),
@@ -210,10 +270,11 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
+        onBackendError(""); // clear previous backend error
         const formattedValues = {
           ...values,
-          activeDate: values.activeDate.split("T")[0], 
-          companyEntity: { id: values.company }, 
+          activeDate: values.activeDate.split("T")[0],
+          companyEntity: { id: values.company },
         };
 
         const response = await fetch("http://localhost:8087/saveBranch", {
@@ -222,34 +283,27 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           body: JSON.stringify(formattedValues),
         });
 
+        // 👇 READ BACKEND MESSAGE
+        const message = await response.text();
+
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          // Field-level error (unique code)
+          if (message.toLowerCase().includes("code")) {
+            formik.setFieldError("code", message);
+          } else {
+            onBackendError(message);
+          }
+          return;
         }
 
         alert("Branch saved successfully!");
-        resetForm();
+        resetToInitialState();
       } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to save Branch");
+        console.error(error);
+        onBackendError("Something went wrong. Please try again.");
       }
     },
   });
-  useEffect(() => {
-    onFormChange?.(formik.dirty, formik.isValid);
-  }, [formik.dirty, formik.isValid]);
-  const loadCompanyAndBranches = async () => {
-    try {
-      const companyResponse = await axios.get(
-        `http://localhost:8087/companies/${companyId}`,
-      );
-      const company = companyResponse.data;
-      setCompanyList([company]);
-      formik.setFieldValue("company", company.id);
-
-    } catch (error) {
-      console.error("Failed to load company or branches:", error);
-    }
-  };
 
   useEffect(() => {
     loadCompanyAndBranches();
@@ -267,7 +321,7 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
     setIsDateLocked(false);
     setInputsUnlocked(false);
     setAuthorization("entry");
-    focusWithTimeout(calendarRef);
+    focusAndScrollToTop(calendarRef);
   };
 
   useImperativeHandle(ref, () => ({
@@ -304,8 +358,9 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
               <select
                 id="company"
                 name="company"
-                value={formik.values.company}
+                value={formik.values.company || ""}
                 disabled
+                onChange={formik.handleChange}
               >
                 {companyList.map((company) => (
                   <option key={company.id} value={company.id}>
@@ -326,7 +381,10 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 id="code"
                 name="code"
                 ref={codeInputRef}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  onBackendError(""); // 👈 clear backend error
+                  formik.handleChange(e);
+                }}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
                 value={formik.values.code}
@@ -338,23 +396,25 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.code}</div>
               ) : null}
 
-              <label htmlFor="Name" className="fancy-label">
+              <label htmlFor="Branch" className="fancy-label">
                 Name
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
+                id="branch"
+                name="branch"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
-                value={formik.values.name}
+                value={formik.values.branch}
                 className={
-                  formik.touched.name && formik.errors.name ? "input-error" : ""
+                  formik.touched.branch && formik.errors.branch
+                    ? "input-error"
+                    : ""
                 }
               />
-              {formik.touched.name && formik.errors.name ? (
-                <div className="error">{formik.errors.name}</div>
+              {formik.touched.branch && formik.errors.branch ? (
+                <div className="error">{formik.errors.branch}</div>
               ) : null}
 
               <label htmlFor="shortName" className="fancy-label">
@@ -409,8 +469,6 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                   </div>
                 </div>
               </div>
-
-              
             </div>
             <div className="address">
               <div className="headertext">
@@ -838,9 +896,20 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
+
+            <div className="form-buttons">
+              <button type="submit" className="submit-btn">
+                Submit
+              </button>
+
+              <button type="button" className="cancel-btn" onClick={cancelForm}>
+                Cancel
+              </button>
+            </div>
           </div>
         </form>
       </div>
+
       <div className="secform">
         <div className="authorization">
           <label htmlFor="Authorization" className="authorization-label">
@@ -850,19 +919,28 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
           <div className="authorization-input-group">
             <select
               id="authorization"
-              value={authorization}
-              onChange={(e) => setAuthorization(e.target.value)}
+              value={formik.values.authorizationStatus}
+              onChange={(e) => {
+                const today = new Date().toISOString().split("T")[0];
+
+                formik.setFieldValue("authorizationStatus", e.target.value);
+                formik.setFieldValue("authorizationDate", today);
+              }}
               className="authorization-dropdown"
             >
-              <option value="entry">ENTRY:</option>
-              <option value="verified">VERIFIED:</option>
+              <option value="0">ENTRY</option>
+              <option value="1">VERIFIED</option>
             </select>
           </div>
         </div>
         <div className="newbutton">
           <div className="calender">
             {!isDateLocked && (
-              <div className="datepicker" ref={calendarRef}>
+              <div
+                className="datepicker"
+                ref={calendarRef}
+                tabIndex={-1} // ✅ makes it focusable
+              >
                 <DatePicker
                   selected={startDate}
                   onChange={handleDateChange}
@@ -875,10 +953,19 @@ const GeneralForm = forwardRef(({ onFormChange }, ref) => {
             {/* Date input field */}
             <div className="date">
               <div className="left-box">1</div>
+
               <div className="icondate">
                 <input
                   type="text"
-                  value={startDate ? startDate.toLocaleDateString("en-GB") : ""}
+                  id="withaffectdate"
+                  name="withaffectdate"
+                  value={
+                    formik.values.withaffectdate
+                      ? new Date(
+                          formik.values.withaffectdate,
+                        ).toLocaleDateString("en-GB")
+                      : ""
+                  }
                   readOnly
                 />
 
