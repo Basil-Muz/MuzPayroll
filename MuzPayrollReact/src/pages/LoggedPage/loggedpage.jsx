@@ -6,155 +6,243 @@ import "./loggedpage.css";
 import muzLogo from "../../assets/muzlogo_transparent.png";
 import Sidebar from "../../components/SideBar/Sidebar";
 
-
 function LoggedPage() {
   const navigate = useNavigate();
 
-  // TRUE = fields disabled
+  //  Fields lock
   const [fieldsLocked, setFieldsLocked] = useState(true);
 
-  // NEW: controls Change Credentials button
-  const [changeDisabled, setChangeDisabled] = useState(false);
-
-  const [showSidebar, setShowSidebar] = useState(false);
-
+  // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  //  Button states (ONLY ONE TRUE)
+  const [okEnabled, setOkEnabled] = useState(true);
+  const [changeEnabled, setChangeEnabled] = useState(false);
 
-
-  // Selected values
+  // Dropdown values
   const [companyId, setCompanyId] = useState("");
   const [branchId, setBranchId] = useState("");
   const [locationId, setLocationId] = useState("");
   const [finYear, setFinYear] = useState("");
 
-  // Dropdown lists
+
+  //  Dropdown lists
   const [companyList, setCompanyList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
-  const [finYearList, setFinYearList] = useState([]);
 
+  // Load from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("loginData");
-    if (!stored) return;
+  const stored = localStorage.getItem("loginData");
 
-    const data = JSON.parse(stored);
+  if (!stored) {
+    navigate("/login");
+    return;
+  }
 
-    setCompanyId(data.companyId);
-    setBranchId(data.branchId);
-    setLocationId(data.locationId);
-    setFinYear(data.finYearId);
+  const data = JSON.parse(stored);
 
-    setCompanyList(data.companyList || []);
-    setBranchList(data.branchList || []);
-    setLocationList(data.locationList || []);
-    setFinYearList(data.finYearList || []);
-  }, []);
+  setCompanyId(Number(data.companyId));
+  setBranchId(Number(data.branchId));
+  setLocationId(Number(data.locationId));
+  setFinYear(data.finYear || "");
 
-  // OK → lock fields + disable change button
-const handleOk = () => {
+  setSidebarOpen(data.sidebarOpen === true);
+
+  // Restore UI state
+  setFieldsLocked(data.fieldsLocked ?? true);
+  setOkEnabled(data.okEnabled ?? true);
+  setChangeEnabled(data.changeEnabled ?? false);
+
+  fetchContextData(
+    data.companyId,
+    data.branchId,
+    data.locationId,
+    data.userCode
+  );
+}, [navigate]);
+
+
+  // Fetch dropdown data
+  const fetchContextData = async (companyId, branchId, locationId, userCode ) => {
+    try {
+      const res = await fetch(
+     `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`
+      );
+      const data = await res.json();
+      
+
+      setCompanyList(data.companyList || []);
+      setBranchList(data.branchList || []);
+      setLocationList(data.locationList || []);
+
+
+      const stored = JSON.parse(localStorage.getItem("loginData"));
+
+    localStorage.setItem(
+      "loginData",
+      JSON.stringify({
+        ...stored,
+        userName: data.userName,
+        locationName: data.locationName,
+      })
+    );
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ✅ OK BUTTON
+  const handleOk = () => {
+  const stored = JSON.parse(localStorage.getItem("loginData"));
+
+  localStorage.setItem(
+    "loginData",
+    JSON.stringify({
+      ...stored,
+      companyId,
+      branchId,
+      locationId,
+      finYear,
+      sidebarOpen: true,
+      fieldsLocked: true,
+      okEnabled: false,
+      changeEnabled: true,
+    })
+  );
+
+  setSidebarOpen(true);
+
   setFieldsLocked(true);
-  setChangeDisabled(true);
-  setShowSidebar(true);   // sidebar feature enabled
-  setSidebarOpen(true); // CLOSED initially
+  setSidebarOpen(true);
+  setOkEnabled(false);
+  setChangeEnabled(true);
 };
 
 
+  // 🔁 CHANGE CREDENTIALS
+ const handleChangeCredentials = () => {
+  const stored = JSON.parse(localStorage.getItem("loginData"));
 
-  // Change Credentials → unlock fields
-  const handleChangeCredentials = () => {
-    setFieldsLocked(false);
-  };
+  localStorage.setItem(
+    "loginData",
+    JSON.stringify({
+      ...stored,
+      fieldsLocked: false,
+      okEnabled: true,
+      changeEnabled: false,
+    })
+  );
 
-    // 👉 ADD THESE TWO FUNCTIONS HERE
-//   const toggleSidebar = () => {
-//     setSidebarOpen((prev) => !prev);
-//   };
+  setFieldsLocked(false);
+  setOkEnabled(true);
+  setChangeEnabled(false);
+};
 
-//   const closeSidebar = () => {
-//     setSidebarOpen(false);
-//   };
 
   return (
     <>
       <Header />
-     
-<div className="main-section">
-    <Sidebar toggleMenu={sidebarOpen}/>
-      <div className="logo-homesection">
-       
-        <div className="left-section">
-          <img src={muzLogo} alt="logo" className="home-logo" />
-        </div>
+      <div className="main-section">
+        <Sidebar forceOpen={sidebarOpen} />
 
-        <div className="logged-container">
-          <div className="logged-box">
-            <h2 className="logged-heading">Login Credentials</h2>
+        <div className="logo-homesection">
+          <div className="left-section">
+            <img src={muzLogo} alt="logo" className="home-logo" />
+          </div>
 
-            <div className="logged-details">
-              <label>Company</label>
-              <select value={companyId} disabled={fieldsLocked} onChange={(e) => setCompanyId(e.target.value)}>
-                <option value="">Select Company</option>
-                {companyList.map((c) => (
-                  <option key={c.id} value={c.id}>{c.company}</option>
-                ))}
-              </select>
-            </div>
+          <div className="logged-container">
+            <div className="logged-box">
+              <h2 className="logged-heading">Login Credentials</h2>
 
-            <div className="logged-details">
-              <label>Login Date</label>
-              <input type="date" disabled value={new Date().toISOString().split("T")[0]} style={{ width: "524px" }} />
-            </div>
+              <div className="logged-details">
+                <label>Company</label>
+                <select value={companyId} disabled>
+                  <option value="">Select Company</option>
+                  {companyList.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.company}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="logged-details">
-              <label>FinYear</label>
-              <select value={finYear} disabled={fieldsLocked} onChange={(e) => setFinYear(e.target.value)}>
+              <div className="logged-details">
+                <label>Login Date</label>
+                <input
+                  type="date"
+                  disabled
+                  value={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+
+              <div className="logged-details">
+                <label>Branch</label>
+                <select
+                  value={branchId}
+                  disabled={fieldsLocked}
+                  onChange={(e) => setBranchId(e.target.value)}
+                >
+                  <option value="">Select Branch</option>
+                  {branchList.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.branch}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="logged-details">
+                <label>FinYear</label>
+              <select value={finYear} disabled={fieldsLocked}
+              onChange={(e) => setFinYear(e.target.value)}>
                 <option value="">Select Year</option>
                 <option value="2023-2024">2023 - 2024</option>
                 <option value="2024-2025">2024 - 2025</option>
                 <option value="2025-2026">2025 - 2026</option>
                 <option value="2026-2027">2026 - 2027</option>
               </select>
-            </div>
 
-            <div className="logged-details">
-              <label>Branch</label>
-              <select value={branchId} disabled={fieldsLocked} onChange={(e) => setBranchId(e.target.value)}>
-                <option value="">Select Branch</option>
-                {branchList.map((b) => (
-                  <option key={b.id} value={b.id}>{b.branch}</option>
-                ))}
-              </select>
-            </div>
+              </div>
 
-            <div className="logged-details">
-              <label>Location</label>
-              <select value={locationId} disabled={fieldsLocked} onChange={(e) => setLocationId(e.target.value)}>
-                <option value="">Select Location</option>
-                {locationList.map((l) => (
-                  <option key={l.id} value={l.id}>{l.location}</option>
-                ))}
-              </select>
-            </div>
+              <div className="logged-details">
+                <label>Location</label>
+                <select
+                  value={locationId}
+                  disabled={fieldsLocked}
+                  onChange={(e) => setLocationId(e.target.value)}
+                >
+                  <option value="">Select Location</option>
+                  {locationList.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.location}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div style={{ textAlign: "center", marginTop: "2px" }}>
-              <button className="logged-btn" onClick={handleOk}>OK</button>
+              <div style={{ textAlign: "center" }}>
+                <button
+                  className="logged-btn"
+                  onClick={handleOk}
+                  disabled={!okEnabled}
+                >
+                  OK
+                </button>
 
-              <button
-                className="logged-btn"
-                onClick={handleChangeCredentials}
-                disabled={changeDisabled}
-                style={{ opacity: changeDisabled ? 0.5 : 1, cursor: changeDisabled ? "not-allowed" : "pointer" }}
-              >
-                Change Credentials
-              </button>
+                <button
+                  className="logged-btn"
+                  onClick={handleChangeCredentials}
+                  disabled={!changeEnabled}
+                >
+                  Change Credentials
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-</div>
-
-
       <Footer />
     </>
   );

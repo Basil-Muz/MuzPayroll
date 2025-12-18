@@ -88,6 +88,10 @@
   width: 100%;
 }
 
+.logged-details input[type="date"] {
+  width: 524px;
+}
+
 /* ---------- BUTTONS ---------- */
 .logged-btn {
   padding: 8px 20px;
@@ -132,6 +136,13 @@
 .sidebar-wrapper.open {
   left: 0;                  /* slide in */
 }
+/* ---------- DISABLED BUTTON FIX ---------- */
+.logged-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 
 /* ---------- SIDEBAR TOGGLE BUTTON ---------- */
 

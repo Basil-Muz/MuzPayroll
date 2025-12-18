@@ -66,13 +66,11 @@ function LoginPage() {
 
       // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
       const loginData = {
+        userCode: userCode,  
         companyId: data.companyId,
         branchId: data.branchId,
         locationId: data.locationId,
-
-        companyList: data.companyList,
-        branchList: data.branchList,
-        locationList: data.locationList
+      
       };
 
       localStorage.setItem("loginData", JSON.stringify(loginData));

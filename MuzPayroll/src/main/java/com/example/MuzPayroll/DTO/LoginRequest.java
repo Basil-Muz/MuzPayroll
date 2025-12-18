@@ -4,12 +4,11 @@ public class LoginRequest {
     private String userCode;
     private String password;
 
-    public LoginRequest() {}
+    private Long companyId;
+    private Long branchId;
+    private Long locationId;
 
-    public LoginRequest(String userCode, String password) {
-        this.userCode = userCode;
-        this.password = password;
-    }
+    // getters & setters
 
     public String getUserCode() {
         return userCode;
@@ -24,4 +23,25 @@ public class LoginRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-}
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
+    }
+
+    public Long getBranchId() {
+        return branchId;
+    }
+    public void setBranchId(Long branchId) {
+        this.branchId = branchId;
+    }
+
+    public Long getLocationId() {
+        return locationId;
+    }
+    public void setLocationId(Long locationId) {
+        this.locationId = locationId;
+    }
+}           

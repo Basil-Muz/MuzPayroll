@@ -1,18 +1,23 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./changepassword.css";
 
 function ChangePassword() {
+  const navigate = useNavigate();
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
+    // 🔹 Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
       setError("All fields are required");
       return;
@@ -23,14 +28,40 @@ function ChangePassword() {
       return;
     }
 
-    // 🔹 API CALL WILL GO HERE LATER
-    // For now, simulate success
-    setSuccess("Password changed successfully");
+    try {
+      const loginData = JSON.parse(localStorage.getItem("loginData"));
 
-    // Clear fields
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+      if (!loginData || !loginData.userCode) {
+        setError("User not logged in. Please login again.");
+        return;
+      }
+
+      const payload = {
+        userCode: loginData.userCode,
+        currentPassword,
+        newPassword
+      };
+
+      const response = await axios.post(
+        "http://localhost:8087/change-password",
+        payload
+      );
+
+      setSuccess(response.data.message || "Password changed successfully");
+
+      // 🔐 Force logout after password change
+      localStorage.clear();
+
+      // 🔁 Redirect to login after 2 seconds
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Failed to change password"
+      );
+    }
   };
 
   return (
