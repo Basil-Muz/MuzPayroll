@@ -1,15 +1,17 @@
 package com.example.MuzPayroll.service;
 
+import com.example.MuzPayroll.DTO.CompanyDTO;
 import com.example.MuzPayroll.controller.Response;
+import com.example.MuzPayroll.entity.CompanyMst;
 
 public abstract class MuzirisAbstractService<D, E> {
 
-    // 1️⃣ Validations
+    // Validations
     public abstract Response<Boolean> entityValidate(D dto);
 
     public abstract Response<Boolean> businessValidate(D dto);
 
-    // 2️⃣ Populate entity from DTO
+    // Populate entity from DTO
     public abstract Response<E> entityPopulate(D dto);
 
     // 3️⃣ Generate PK if needed
@@ -28,49 +30,56 @@ public abstract class MuzirisAbstractService<D, E> {
     // related tables)
     protected abstract E saveEntityInService(E entity, D dto);
 
-    // ================== FINAL SAVE METHOD ==================
     public final Response<D> save(D dto) {
+        System.out.println("=== SAVE METHOD STARTED ===");
 
         // 1. Entity validation
         Response<Boolean> r1 = entityValidate(dto);
+        System.out.println("Entity Validation: success=" + r1.isSuccess() + ", message=" + r1.getMessage());
         if (!r1.isSuccess()) {
             return Response.error(r1.getMessage());
         }
 
         // 2. Business validation
         Response<Boolean> r2 = businessValidate(dto);
+        System.out.println("Business Validation: success=" + r2.isSuccess() + ", message=" + r2.getMessage());
         if (!r2.isSuccess()) {
             return Response.error(r2.getMessage());
         }
 
         // 3. Generate serial/code
+        System.out.println("Before generateSerialNo, DTO code: " + ((CompanyDTO) dto).getCode());
         Response<String> r3 = generateSerialNo(dto);
+        System.out.println("Generate Serial: success=" + r3.isSuccess() + ", message=" + r3.getMessage());
+        System.out.println("Generated code: " + r3.getData());
+        System.out.println("After generateSerialNo, DTO code: " + ((CompanyDTO) dto).getCode());
         if (!r3.isSuccess()) {
             return Response.error(r3.getMessage());
         }
 
         // 4. Populate entity
         Response<E> r4 = entityPopulate(dto);
+        System.out.println("Entity Populate: success=" + r4.isSuccess() + ", message=" + r4.getMessage());
         if (!r4.isSuccess()) {
             return Response.error(r4.getMessage());
         }
 
         E entity = r4.getData();
+        System.out.println("Entity created, entity code: " + ((CompanyMst) entity).getCode());
 
-        // 5. Generate PK
-        Response<Object> r5 = generatePK(dto);
-        if (!r5.isSuccess()) {
-            return Response.error(r5.getMessage());
+        // Generate PK
+        Response<Object> pkResult = generatePK(dto);
+        if (!pkResult.isSuccess()) {
+            return Response.error("PK generation failed: " + pkResult.getMessage());
         }
 
-        // 6. Save entity
+        // Save entity
         E savedEntity = saveEntityInService(entity, dto);
 
-        // 7. Convert entity to DTO
+        // Convert to DTO
         D savedDto = entityToDto(savedEntity);
 
         return Response.success(savedDto);
-
     }
 
 }
