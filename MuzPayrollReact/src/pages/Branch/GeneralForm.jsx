@@ -49,7 +49,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   const loadCompanyAndBranches = async () => {
     try {
       const companyResponse = await axios.get(
-        `http://localhost:8087/companies/${companyId}`,
+        `http://localhost:8087/company/${companyId}`,
       );
       const company = companyResponse.data;
 

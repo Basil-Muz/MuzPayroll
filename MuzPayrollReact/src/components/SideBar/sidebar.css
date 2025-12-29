@@ -74,6 +74,29 @@
 }
 /* .collapse-btn:hover { outline: 2px solid rgba(235, 37, 225, 0.18); } */
 
+.collapse-btn1 {
+    background: transparent;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    right: 29px;
+    bottom: 29px;
+    width: 51px;
+    z-index: 100;
+    height: 46px;
+    /* padding-left: 9px; */
+    outline: none;
+    border:solid 1px var(--brand-border);
+    border-radius: 50%;
+    cursor: pointer;
+    background: var(--primary-light);
+    backdrop-filter: blur(12px);
+    /* box-shadow: 0 4px 12px rgba(0,0,0,0.12); */
+    transition: all 0.25s ease;
+}
+
 .sidebar .buttons {
     display: flex;
     justify-content: center;
@@ -254,7 +277,7 @@
 .user-meta {
     display: flex;
     flex-direction: column;
-     transition: opacity 300ms ease, transform 300ms ease;
+    transition: opacity 300ms ease, transform 300ms ease;
 }
 
 .user-meta.hide {
@@ -366,53 +389,43 @@
 
 /* RESPONSIVE: on narrow screens collapse automatically */
 @media (max-width: 900px) {
-
   .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 100;
-    background: var(--sidebar-bg);
-    transition: transform 0.3s ease;
+    width: 72px;
   }
 
-  /* CLOSED state */
+  /* .sidebar.expanded,
   .sidebar.collapsed {
-    transform: translateX(-100%);
-    width: 280px;
-  }
+    width: 72px;
+  } */
 
-  /* OPEN state */
-  .sidebar.expanded {
-    transform: translateX(0);
-    width: 280px;
-    min-width: 280px;
+  .nav-item{
+    justify-content: center;  
   }
-
-  /* Always show labels when open */
-  .sidebar.expanded .nav-label,
-  .sidebar.expanded .brand-text,
-  .sidebar.expanded .user-meta {
-    display: flex;
-  }
-
-  /* Hide tooltips on mobile */
-  .sidebar .tooltip {
+  .nav-label {
     display: none;
   }
-  .sidebar .user-meta {
+  .user-name{
     display: none;
   }
+  .user-role{
+    display: none;
+  }
+  .nav-chevron {
+    display: none;
+  }
+  .user-action{
+    display: none;
+  }
+  /* .nav-chevron{
+    display: none;
+  } */
 }
 
 @media (max-width: 768px) {
   .sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
     height: 100vh;
-    width: 280px;
+    width: 79px;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     z-index: 100;
@@ -425,10 +438,12 @@
   .sidebar.mobile-closed {
     transform: translateX(-100%);
   }
-
+.collapse-btn {
+    display: none;
+  }
   /* show labels on mobile */
   .nav-label {
-    display: flex !important;
+    display: none ;
   }
 
   /* hide tooltips */
@@ -437,3 +452,11 @@
   }
 }
 
+@meadia (max-width: 600px) {
+  .sidebar {
+    width: 240px;
+  }
+  .nav-label {
+   display: none;
+  }
+}

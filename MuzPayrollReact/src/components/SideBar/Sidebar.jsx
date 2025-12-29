@@ -12,6 +12,7 @@ import useIsTab from "../../hook/useIsTab";
 // import { href } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+
 const menuItems = [
     { id: "dashboard", title:"Dashboard", label: "Dashboard", icon: <HiMiniSwatch size={18} />, link:"/dashboard"},
     {
@@ -79,58 +80,81 @@ const menuItems = [
     },
 ];
 
-export default function Sidebar({ initialOpen = true, onNavigate = () => {},toggleMenu}) {
-  const [open, setOpen] = useState(initialOpen);
-  const [active, setActive] = useState("payroll");
-
-    const navigate = useNavigate();//navigate function for dashboard link
-  // submenu state
-  const [openSubmenu, setOpenSubmenu] = useState(null); // id of menu item with submenu
-  const [submenuStyle, setSubmenuStyle] = useState({ top: 0, left: "calc(100% + 8px)" });
+export default function Sidebar({ forceOpen }) {
+  const navigate = useNavigate();
   const sidebarRef = useRef(null);
   const closeTimer = useRef(null);
+
   const isMobile = useIsMobile();//for mobile check
   const isTab = useIsTab();//for tab check
+  const [open, setOpen] = useState(true);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [submenuStyle, setSubmenuStyle] = useState({ top: 0 });
+  const [sidebarEnabled, setSidebarEnabled] = useState(false);
+  const [active, setActive] = useState(localStorage.getItem("activeMenu") || "");
+
+  const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
+  const userName = loginData.userName || "";
+
+  const sidebarClass = isMobile
+  ? open ? "mobile-open" : "mobile-closed"
+  : open ? "expanded" : "collapsed";
+
+  /* 🔁 Sync sidebar enable */
+  useEffect(() => {
+  if (typeof forceOpen === "boolean") {
+    setSidebarEnabled(forceOpen);
+    return;
+  }
+
+  const stored = localStorage.getItem("loginData");
+  if (stored) {
+    const data = JSON.parse(stored);
+    setSidebarEnabled(data.sidebarOpen === true);
+  }
+}, [forceOpen]);
+  /* 🔹 Menu handlers */
   const handleNav = (item) => {
     setActive(item.id);
-    onNavigate(item.id);
+    localStorage.setItem("activeMenu", item.id);
+    if (item.link) navigate(item.link);
   };
 
   const handleSubNav = (child) => {
-    // you can customize navigation for subitems (route, open page, etc)
     setActive(child.id);
-    onNavigate(child.id);
-    // close submenu if desired
+    localStorage.setItem("activeMenu", child.id);
+    navigate(child.link);
     setOpenSubmenu(null);
   };
 
-  // open submenu next to the hovered item; compute top relative to sidebar
   const openSubmenuFor = (e, item) => {
     if (!sidebarRef.current) return;
+
     // clear any pending close timer
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
     }
+
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+
+
     const sidebarRect = sidebarRef.current.getBoundingClientRect();
     const itemRect = e.currentTarget.getBoundingClientRect();
-    const topLocal = itemRect.top - sidebarRect.top; // position relative to sidebar top
+    const topLocal = itemRect.top - sidebarRect.top;
 
     
     setSubmenuStyle({
       top: Math.max(5, topLocal-5) + "px", // small top padding, prevent negative
       left: `calc(${sidebarRect.width}px + 12px)`, // left relative calculation (fine fallback)
     });
+
     setOpenSubmenu(item.id);
   };
 
   const scheduleCloseSubmenu = () => {
-    // add small delay to make hover movement smoother
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => {
-      setOpenSubmenu(null);
-      closeTimer.current = null;
-    }, 180);
+    closeTimer.current = setTimeout(() => setOpenSubmenu(null), 200);
   };
 
   useEffect(() => {
@@ -142,23 +166,24 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
     console.log("sidebarRect.left:", open);
     console.log("itemRect.left:", isTab);
     console.log("efwegfreg:", isTab || isMobile && open);
+
   return (
+    <>
     <aside
   ref={sidebarRef}
-  className={`sidebar ${open ? "collapsed" : "expanded"
-  }`}
+  className={`sidebar ${sidebarClass}`}
 >
       <div className="buttons"
-      style={{justifyContent:open ?"center":"flex-end"}}
+      style={{justifyContent:!open ?"center":"flex-end"}}
       >
         <button
-          className={`collapse-btn ${open ? "menu" : "cross"}`}
+          className={`collapse-btn ${!open ? "menu" : "cross"}`}
           onClick={() => setOpen((v) => !v)}
           aria-pressed={open}
-          aria-label={open ?  "Collapse sidebar": "Expand sidebar" }
+          aria-label={!open ?  "Collapse sidebar": "Expand sidebar" }
         >
-          <div className={`icon-transition ${open ? "rotated" : "rotated-back"}`}>
-            {open ? (
+          <div className={`icon-transition ${!open ? "rotated" : "rotated-back"}`}>
+            {!open ? (
               <MdOutlineMenu size={20} className="toggle-icon" />
             ) : (
                 <RxCross2 size={20} className="toggle-icon" />
@@ -169,7 +194,10 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
         
 
       <div className={`sidebar-top ${!open ? "brand-expanded" : "brand-collapsed"}`}
-      style={{justifyContent: open? "center":"normal" ,}}
+     style={{
+  justifyContent: !open && !isMobile ? "center" : "flex-start",
+}}
+
       >
         <div
           className="brand"
@@ -178,20 +206,23 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
           onClick={() => handleNav({ id: "dashboard" })}
         >
           <div className="user">
-            <div className="user-avatar">R{open}</div>
+            <div className="user-avatar">
+               {userName ? userName.charAt(0).toUpperCase() : "U"}
+            </div>
             
-              <div className={`user-meta ${open ? "hide" : "show"}`}>
-                <div className="user-name">Rahul Admin</div>
-                <div className="user-role">Payroll Manager</div>
+              <div className={`user-meta ${!open ? "hide" : "show"}`}>
+                <div className="user-name">{userName}</div>
+               
+
               </div>
            
-            {!open && ( <button className="user-action" aria-label="User actions">
+            {open && ( <button className="user-action" aria-label="User actions">
               <IoIosArrowForward size={14} />
             </button>)}
           </div>
         </div>
       </div>
-{toggleMenu &&
+{sidebarEnabled &&
       (<nav
         className="sidebar-nav"
         aria-label="Main navigation"
@@ -213,12 +244,14 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
             >
               <button
                 className={`nav-item ${active === item.id ? "active" : ""}`}
-                onClick={() => {
-                    if (item.id=="dashboard"){ {
-                        navigate("/dashboard");
-                    }
-                    handleNav(item)}}}
-                title={open ? item.label : undefined} /* tooltip when collapsed */
+
+             onClick={() => {
+              if (item.link) {
+                navigate(item.link);}
+                handleNav(item);
+              }}
+                title={!open ? item.label : undefined} /* tooltip when collapsed */
+
                 aria-current={active === item.id ? "page" : undefined}
               
               >
@@ -279,7 +312,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                     {item.children.map((child) => (
                       <button
                         key={child.id}
-                        onClick={() => handleSubNav(child)}
+                        onClick={() => navigate(child.link)}
                         className="submenu-item"
                         style={{
                             display: "flex",
@@ -306,7 +339,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                             >
                             <VscActivateBreakpoints size={16} />
                         </span>
-                        <a href={child.link} style={{ flex: 1 ,color:'black'}}>{child.label}</a>
+                          <span style={{ flex: 1, color: "black" }}>{child.label}</span>
                         <span style={{ color: "#b594b8", fontSize: 12 }}>&gt;</span>
                         </button>
                     ))}
@@ -318,12 +351,21 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
         })}
         </nav>)}
 
-    { isTab || isMobile && open && (
+  
+    </aside>
+      { open && isMobile && (
           <div
           className="sidebar-backdrop"
-          onClick={() => setOpen(false)}
-          />
+          onClick={() => setOpen(prev => !prev)}
+          />)}
+        {isMobile && (
+          <button
+   className="collapse-btn1"
+  onClick={() => setOpen(prev => !prev)}
+  style={{color:"black"}}
+><MdOutlineMenu size={20} className="toggle-icon" /></button>
         )}
-    </aside>
+        
+    </>
   );
 }

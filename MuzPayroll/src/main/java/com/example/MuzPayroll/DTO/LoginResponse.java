@@ -14,6 +14,9 @@ public class LoginResponse {
     private Long branchId;
     private Long locationId;
 
+    private String userName;
+    private String locationName;
+
     private List<CompanyMst> companyList;
     private List<BranchMst> branchList;
     private List<LocationMst> locationList;
@@ -52,25 +55,42 @@ public class LoginResponse {
     public void setLocationId(Long locationId) {
         this.locationId = locationId;
     }
+     public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
 
     public List<CompanyMst> getCompanyList() {
-        return companyList;
-    }
-    public void setCompanyList(List<CompanyMst> companyList) {
-        this.companyList = companyList;
-    }
+    return companyList;
+}
+public void setCompanyList(List<CompanyMst> companyList) {
+    this.companyList = companyList;
+}
 
-    public List<BranchMst> getBranchList() {
-        return branchList;
-    }
-    public void setBranchList(List<BranchMst> branchList) {
-        this.branchList = branchList;
-    }
+public List<BranchMst> getBranchList() {
+    return branchList;
+}
+public void setBranchList(List<BranchMst> branchList) {
+    this.branchList = branchList;
+}
 
-    public List<LocationMst> getLocationList() {
-        return locationList;
-    }
-    public void setLocationList(List<LocationMst> locationList) {
-        this.locationList = locationList;
-    }
+public List<LocationMst> getLocationList() {
+    return locationList;
+}
+public void setLocationList(List<LocationMst> locationList) {
+    this.locationList = locationList;
+}
+
+
+
 }

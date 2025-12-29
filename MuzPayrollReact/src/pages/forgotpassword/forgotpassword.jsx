@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import "./forgotpassword.css";
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -8,6 +8,7 @@ function ForgotPassword() {
   const [userCode, setUserCode] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     setMessage("");
@@ -19,11 +20,21 @@ function ForgotPassword() {
     }
 
     try {
+      setLoading(true);
+
       const response = await fetch("http://localhost:8087/forgot-password", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userCode }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userCode: userCode.trim(),
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Server error");
+      }
 
       const data = await response.json();
 
@@ -33,8 +44,11 @@ function ForgotPassword() {
       }
 
       setMessage("Password has been sent to your registered email.");
+      setUserCode("");
     } catch (err) {
       setError("Server error. Try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,6 +60,7 @@ function ForgotPassword() {
         <label>User Code</label>
         <input
           type="text"
+          placeholder="Enter your user code"
           value={userCode}
           onChange={(e) => setUserCode(e.target.value)}
         />
@@ -53,7 +68,9 @@ function ForgotPassword() {
         {error && <p className="error-msg">{error}</p>}
         {message && <p className="success-msg">{message}</p>}
 
-        <button onClick={handleSubmit}>SEND PASSWORD</button>
+        <button onClick={handleSubmit} disabled={loading}>
+          {loading ? "SENDING..." : "SEND PASSWORD"}
+        </button>
 
         <p className="back-link" onClick={() => navigate("/")}>
           Back to Login
