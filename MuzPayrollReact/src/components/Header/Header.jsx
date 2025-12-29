@@ -122,7 +122,7 @@ const handlerprofileLeave = () => {
 
     return (
     <header className="header">
-        <div className="logo"><img src="../../../public/muziris-png.ico" alt="" width="120px" height="69px "/></div>
+        <div className="logo"><img src="/muziris-png.ico" alt="" width="106px" height="55px "/></div>
         <div className="header-right">
             <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`} 
             onMouseEnter={handleNotifEnter}
@@ -154,7 +154,10 @@ const handlerprofileLeave = () => {
                     <div className="notification-dropdown">
                         {dashNotifications.length > 0 ? (
                         dashNotifications.map((notification) => (
-                            <p className="error-msg" key={notification.id} style={{color:'black'}}>{notification.msg} <RxCross2 size={20} color="red" onClick={() => removeDashNotification(notification.id)}/></p>
+                            <p className="error-msg" key={notification.id} style={{color:'black'}}>
+                              {notification.msg} 
+                              <RxCross2 size={20} color="red" 
+                              onClick={() => removeDashNotification(notification.id)}/></p>
                         ))
                     ) : (   
                         <p className="no-msg">no notifications</p>
@@ -172,7 +175,7 @@ const handlerprofileLeave = () => {
             onMouseEnter={handlerprofileEnter} 
             onMouseLeave={handlerprofileLeave}
             >
-            <ImUser size={21} style={{ color: '#1092e9'}}/>
+            <ImUser size={21} style={{ color: '#d218d8ff'}}/>
 
             {shouldProfileRender && profileOpen && (
 

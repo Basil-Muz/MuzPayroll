@@ -1,8 +1,8 @@
 #root {
-    max-width: 1351px;
+  width: 100%;
   /* margin: 0 auto; */
   /* padding: 2rem; */
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }

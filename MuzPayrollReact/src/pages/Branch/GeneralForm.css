@@ -17,19 +17,19 @@
   padding-bottom: 2rem;
   text-align: left;
 }
-.screenleft {
+.branchform .screenleft {
   display: flex;
   width: 65%;
-  margin-top: -7rem;
+  /* margin-top: -7rem; */
   margin-left: -28px;
   gap: 15px;
 }
-.screenright {
+.branchform .screenright {
   display: flex;
   flex-direction: column;
   width: 28%;
   gap: 25px;
-  margin-top: -7rem;
+  /* margin-top: -7rem; */
   margin-left: 14px;
 }
 .genaralform {
@@ -38,6 +38,13 @@
   padding-left: 15px;
   padding-top: 15px;
 }
+
+.branchform .secform {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
 .address {
   width: 50%;
   border: 1px solid #ada9a9;
@@ -280,11 +287,7 @@
   flex-direction: column;
   height: 950px;
 }
-.secform {
-  display: flex;
-  flex-direction: column;
-  margin-left: 20px;
-}
+
 .datepicker {
   position: absolute;
   bottom: 80px;

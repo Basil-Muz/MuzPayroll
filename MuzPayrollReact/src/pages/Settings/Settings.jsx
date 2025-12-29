@@ -79,13 +79,13 @@ const handleCancel = () => {
   window.location.href = "/home";
 }
   return <>
-  <Header />
-   <div className="app-shell">
+  <Header backendError={[]}/>
+   <div className="settigs-app-shell ">
       {/* LEFT SIDEBAR */}
      <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>
 
       {/* MAIN AREA */}
-      <div className="main-area">
+      <div className="settigs-main-area">
         {/* TOP BAR */}
         {/* <header className="top-bar">
           <div className="top-left" />

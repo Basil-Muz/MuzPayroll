@@ -4,14 +4,16 @@ import { MdOutlineMenu } from "react-icons/md";
 import { HiMiniSwatch } from "react-icons/hi2";
 import { ImStack } from "react-icons/im";
 import { IoIosArrowForward } from "react-icons/io";
-
+import { VscActivateBreakpoints } from "react-icons/vsc";
 import "./sidebar.css";
 import {  } from "axios";
+import useIsMobile from "../../hook/useIsMobile";
+import useIsTab from "../../hook/useIsTab";
 // import { href } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <HiMiniSwatch size={18} />, link:"/dashboard" },
+    { id: "dashboard", title:"Dashboard", label: "Dashboard", icon: <HiMiniSwatch size={18} />, link:"/dashboard"},
     {
     id: "employee",
     label: "Employee",
@@ -87,6 +89,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
   const [submenuStyle, setSubmenuStyle] = useState({ top: 0, left: "calc(100% + 8px)" });
   const sidebarRef = useRef(null);
   const closeTimer = useRef(null);
+  const isMobile = useIsMobile();//for mobile check
 
   const handleNav = (item) => {
     setActive(item.id);
@@ -109,13 +112,15 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
     }
-
     const sidebarRect = sidebarRef.current.getBoundingClientRect();
     const itemRect = e.currentTarget.getBoundingClientRect();
     const topLocal = itemRect.top - sidebarRect.top; // position relative to sidebar top
-
+    console.log("topLocal:", sidebarRect.width);
+    console.log("sidebarRect.left:", sidebarRect);
+    console.log("itemRect.left:", submenuStyle.left);
+    
     setSubmenuStyle({
-      top: Math.max(8, topLocal) + "px", // small top padding, prevent negative
+      top: Math.max(5, topLocal-5) + "px", // small top padding, prevent negative
       left: `calc(${sidebarRect.width}px + 12px)`, // left relative calculation (fine fallback)
     });
     setOpenSubmenu(item.id);
@@ -138,10 +143,13 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
 
   return (
     <aside
-      ref={sidebarRef}
-      className={`sidebar ${open ? "collapsed" : "expanded"}`}
-      aria-expanded={open}
-    >
+  ref={sidebarRef}
+  className={`sidebar ${open ? "collapsed" : "expanded"
+  }`}
+>
+      <div className="buttons"
+      style={{justifyContent:open ?"center":"flex-end"}}
+      >
         <button
           className={`collapse-btn ${open ? "menu" : "cross"}`}
           onClick={() => setOpen((v) => !v)}
@@ -156,8 +164,17 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
             )}
           </div>
         </button>
-      <div className="sidebar-top">
-        
+        </div>
+        {isMobile && open && (
+          <div
+          className="sidebar-backdrop"
+          onClick={() => setOpen(false)}
+          />
+        )}
+
+      <div className={`sidebar-top ${!open ? "brand-expanded" : "brand-collapsed"}`}
+      style={{justifyContent: open? "center":"normal" ,}}
+      >
         <div
           className="brand"
           role="link"
@@ -165,13 +182,13 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
           onClick={() => handleNav({ id: "dashboard" })}
         >
           <div className="user">
-            <div className="user-avatar">R</div>
-            {!open && (
-              <div className="user-meta">
+            <div className="user-avatar">R{open}</div>
+            
+              <div className={`user-meta ${open ? "hide" : "show"}`}>
                 <div className="user-name">Rahul Admin</div>
                 <div className="user-role">Payroll Manager</div>
               </div>
-            )}
+           
             {!open && ( <button className="user-action" aria-label="User actions">
               <IoIosArrowForward size={14} />
             </button>)}
@@ -205,7 +222,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                         navigate("/dashboard");
                     }
                     handleNav(item)}}}
-                title={!open ? item.label : undefined} /* tooltip when collapsed */
+                title={open ? item.label : undefined} /* tooltip when collapsed */
                 aria-current={active === item.id ? "page" : undefined}
               
               >
@@ -221,7 +238,8 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                   <IoIosArrowForward size={14} />
                 </div>
 
-                {/* tooltip (visible only when collapsed) */}
+                {/* 
+                 (visible only when collapsed) */}
                 <span className="tooltip">{item.label}</span>
               </button>
 
@@ -231,11 +249,11 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                   className= "submenu enter"
                   style={{
                     position: "absolute",
-                    left: open ? `calc(87px + 10px)` : `calc(280px + 10px)`, // adjust when collapsed
+                    left: submenuStyle.left, // adjust when collapsed
                     top: submenuStyle.top,
                     minWidth: 300,
                     borderRadius: 8,
-                    zIndex: 10,
+                    zIndex: 100,
                     transition: "left 0.2s ease",
                   }}
                   onMouseEnter={() => {
@@ -250,7 +268,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                   {/* header blue strip */}
                   <div
                     style={{
-                      background: "#c71ebeff",
+                      background: "#d218d8ff",
                       borderRadius: "8px 8px 0 0",
                       color: "#fff",
                       padding: "10px 12px",
@@ -290,7 +308,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
                                 color: "#9d16a9",
                             }}
                             >
-                            ✱
+                            <VscActivateBreakpoints size={16} />
                         </span>
                         <a href={child.link} style={{ flex: 1 ,color:'black'}}>{child.label}</a>
                         <span style={{ color: "#b594b8", fontSize: 12 }}>&gt;</span>

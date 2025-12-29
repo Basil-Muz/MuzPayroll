@@ -6,15 +6,14 @@
     /* justify-content: center; */
     padding: 0;
     flex:1;
-    margin-top: 57px;//space for header
+    margin-top: 66px;//space for header
     width: 100%;
     /* height: 34rem; */
     align-content: center;
 }
 
 .logo-homesection {
-    display: flex
-;
+    display: flex;
     justify-content: center;
     align-items: center;
     flex: 1;//fill the reamain height   
