@@ -90,7 +90,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
   const sidebarRef = useRef(null);
   const closeTimer = useRef(null);
   const isMobile = useIsMobile();//for mobile check
-
+  const isTab = useIsTab();//for tab check
   const handleNav = (item) => {
     setActive(item.id);
     onNavigate(item.id);
@@ -115,9 +115,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
     const sidebarRect = sidebarRef.current.getBoundingClientRect();
     const itemRect = e.currentTarget.getBoundingClientRect();
     const topLocal = itemRect.top - sidebarRect.top; // position relative to sidebar top
-    console.log("topLocal:", sidebarRect.width);
-    console.log("sidebarRect.left:", sidebarRect);
-    console.log("itemRect.left:", submenuStyle.left);
+
     
     setSubmenuStyle({
       top: Math.max(5, topLocal-5) + "px", // small top padding, prevent negative
@@ -140,7 +138,10 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
       if (closeTimer.current) clearTimeout(closeTimer.current);
     };
   }, []);
-
+    console.log("topLocal:", isMobile);
+    console.log("sidebarRect.left:", open);
+    console.log("itemRect.left:", isTab);
+    console.log("efwegfreg:", isTab || isMobile && open);
   return (
     <aside
   ref={sidebarRef}
@@ -165,12 +166,7 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
           </div>
         </button>
         </div>
-        {isMobile && open && (
-          <div
-          className="sidebar-backdrop"
-          onClick={() => setOpen(false)}
-          />
-        )}
+        
 
       <div className={`sidebar-top ${!open ? "brand-expanded" : "brand-collapsed"}`}
       style={{justifyContent: open? "center":"normal" ,}}
@@ -322,7 +318,12 @@ export default function Sidebar({ initialOpen = true, onNavigate = () => {},togg
         })}
         </nav>)}
 
-    
+    { isTab || isMobile && open && (
+          <div
+          className="sidebar-backdrop"
+          onClick={() => setOpen(false)}
+          />
+        )}
     </aside>
   );
 }
