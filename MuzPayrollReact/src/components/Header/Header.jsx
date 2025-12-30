@@ -76,7 +76,7 @@ const handleNotifEnter = () => {
 const handleNotifLeave = () => {
   notifTimer.current = setTimeout(() => {
     setNotOpen(false);
-  }, 300); // delay before hiding
+  }, 200); // delay before hiding
 };
 
 const handleDashEnter = () => {
@@ -88,7 +88,7 @@ const handleDashEnter = () => {
 const handleDashLeave = () => {
     dashTimer.current = setTimeout(() => {
     setDashOpen(false);
-  }, 300); // delay before hiding
+  }, 200); // delay before hiding
 };
 
 const handlerprofileEnter = () => {
@@ -100,7 +100,7 @@ const handlerprofileLeave = () => {
     profileTimer.current = setTimeout(() => {
 
     setProfileOpen(false);
-  }, 300); // delay before hiding
+  }, 200); // delay before hiding
     //
 };
 

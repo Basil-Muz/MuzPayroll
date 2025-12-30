@@ -227,7 +227,7 @@ font-family: "Roboto", sans-serif; */
 .location {
     color: var(--brand);
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 }
 .location-date .date {
     color: var(--text-dark);

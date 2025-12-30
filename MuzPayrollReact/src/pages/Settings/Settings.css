@@ -3,7 +3,7 @@
 /* overall layout */
 .settigs-app-shell {
     display: flex;
-    padding-top:3.3rem;
+    padding-top:66px;   //height of Header component
     width: 100%;                      /* full responsive width */
     /* max-width: 95rem;         same visual width as screenshot */
     /*margin: 0 auto;   */       /* center it horizontally */

@@ -87,7 +87,7 @@ const handleCancel = () => {
   return <>
 
   <Header backendError={backendError} />
-   <div className="app-shell">
+   <div className="master-app-shell">
       {/* LEFT SIDEBAR */}
      <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>
 
