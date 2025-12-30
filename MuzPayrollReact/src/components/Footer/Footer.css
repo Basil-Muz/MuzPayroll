@@ -1,11 +1,11 @@
 .app-footer {
-  height: 40px;
+  /* height: 40px; */
   background-color: #f3f3f3;        /* light grey like screenshot */
   border-top: 1px solid #e0e0e0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
+  padding: 5px 40px;
   font-size: 12px;
   color: #777777;
 }

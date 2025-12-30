@@ -87,7 +87,7 @@ const handleCancel = () => {
      <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>
 
       {/* MAIN AREA */}
-      <div className="main-area">
+      <div className="settigs-main-area">
         {/* TOP BAR */}
         {/* <header className="top-bar">
           <div className="top-left" />

@@ -188,7 +188,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
 
   const formik = useFormik({
     initialValues: {
-      code: "",
+      // code: "",
       company: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
@@ -212,17 +212,17 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       companyImage: null,
       withaffectdate: "",
       authorizationStatus: "0",
-      user_code: user_code,
+      userCode: user_code,
       authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
-      code: Yup.string()
-        .required("Code is required")
-        .test(
-          "only-numbers-symbols",
-          "Code must contain only numbers and symbols, no alphabets or spaces",
-          (value) => /^[0-9\W_]+$/.test(value || ""),
-        ),
+      // code: Yup.string()
+      //   .required("Code is required")
+      //   .test(
+      //     "only-numbers-symbols",
+      //     "Code must contain only numbers and symbols, no alphabets or spaces",
+      //     (value) => /^[0-9\W_]+$/.test(value || ""),
+      //   ),
       company: Yup.string().required("Company Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
@@ -277,36 +277,82 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
           formData.append("companyImage", values.companyImage);
         }
 
-        const response = await fetch("http://localhost:8087/saveCompany", {
+        console.log("Sending request to backend...");
+
+        const response = await fetch("http://localhost:8087/company/save", {
           method: "POST",
           body: formData,
         });
 
-        // 👇 READ BACKEND MESSAGE
-        const message = await response.text();
+        console.log("Response status:", response.status);
+
+        // Try to parse as JSON first
+        let result;
+        try {
+          const responseText = await response.text();
+          console.log("Raw response:", responseText);
+
+          if (responseText) {
+            result = JSON.parse(responseText);
+          }
+        } catch (parseError) {
+          console.error("Error parsing response:", parseError);
+        }
+
+        console.log("Parsed response:", result);
 
         if (!response.ok) {
-          // Field-level error (unique code)
-          if (message.toLowerCase().includes("code")) {
-            formik.setFieldError("code", message);
-            onBackendError(prev => [
-              ...(Array.isArray(prev) ? prev : []),//when prev is not array or null
-                  { id: Date.now(), msg: message , status: false },
-            ]); // show in header
-  // } else {
-            
+          // Extract error message
+          let errorMessage = "Server error occurred";
 
+          if (result && result.message) {
+            errorMessage = result.message;
+          } else if (result && result.error) {
+            errorMessage = result.error;
           }
+
+          console.error("Backend error:", errorMessage);
+
+          // Split multiple errors if they exist
+          let errorArray = [];
+          if (errorMessage.includes(";")) {
+            errorArray = errorMessage.split(";").map((err) => err.trim());
+          } else {
+            errorArray = [errorMessage];
+          }
+
+          // Send errors to parent component
+          onBackendError(
+            errorArray.map((msg, index) => ({
+              id: Date.now() + index,
+              msg: msg,
+              status: false,
+            })),
+          );
+
+          // Show alert with errors
+          alert("Validation Failed:\n" + errorArray.join("\n"));
           return;
         }
 
         // ✅ SUCCESS
-        alert("Company saved successfully!");
-        resetToInitialState();
-        } catch (error) {
-          console.error(error);
-          onBackendError(["Something went wrong. Please try again."]);
+        if (result && result.success) {
+          alert("Company saved successfully!");
+          resetToInitialState();
+        } else {
+          alert("Unknown response from server");
         }
+      } catch (error) {
+        console.error("Network error:", error);
+        onBackendError([
+          {
+            id: Date.now(),
+            msg: "Network error. Check if server is running.",
+            status: false,
+          },
+        ]);
+        alert("Network error. Please check console.");
+      }
     },
   });
 
@@ -373,8 +419,9 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
                   formik.handleChange(e);
                 }}
                 onBlur={formik.handleBlur}
-                disabled={!startDate}
+                // disabled={!startDate}
                 value={formik.values.code}
+                disabled
                 className={
                   formik.touched.code && formik.errors.code ? "input-error" : ""
                 }

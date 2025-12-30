@@ -17,47 +17,41 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 const Designation = () => {
 
     const [advanceTypes, setAdvanceTypes] = useState([ {
-    code: "ADV001",
+    code: "DES001",
     activeDate: "2024-01-15",
-    name: "Travel Advance",
-    shortName: "Travel",
-    description: "Advance provided to employees for official travel expenses."
+    name: "HR EXECUTIVE",
+    shortName: "HR",
+    description: "HR EXECUTIVE"
   },
   {
-    code: "ADV002",
+    code: "DES002",
     activeDate: "2024-02-01",
-    name: "Medical Advance",
-    shortName: "Medical",
-    description: "Advance issued to cover medical emergencies or planned treatments."
+    name: "ASSISTANT ACCOUNTANT",
+    shortName: "AACT",
+    description: "ASSISTANT ACCOUNTANT"
   },
   {
-    code: "ADV003",
+    code: "DES003",
     activeDate: "2024-03-10",
-    name: "Salary Advance",
-    shortName: "Salary",
-    description: "Short-term advance against monthly salary for urgent needs."
+    name: "MANAGER ADMIN",
+    shortName: "MADMIN",
+    description: "MANAGER ADMIN"
   },
   {
-    code: "ADV004",
+    code: "DES004",
     activeDate: "2024-04-05",
-    name: "Project Advance",
-    shortName: "Project",
-    description: "Funds released in advance for project-related operational costs."
+    name: "JR.SOFTWARE ANALYST",
+    shortName: "SOFT_ANALIST",
+    description: "JR.SOFTWARE ANALYST"
   },
   {
-    code: "ADV005",
+    code: "DES005",
     activeDate: "2024-05-20",
-    name: "Education Advance",
-    shortName: "Education",
-    description: "Advance to support employee education or certification programs."
+    name: "ASSISTANT MANAGER SALES",
+    shortName: "ASTMS",
+    description: "ASSISTANT MANAGER"
   },
-{
-    code: "ADV004",
-    activeDate: "2024-04-05",
-    name: "Project Advance",
-    shortName: "Project",
-    description: "Funds released in advance for project-related operational costs."
-  }]);
+]);
     const [boxView, setBoxView] = useState(true);
     const [listView, setListView] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
@@ -83,9 +77,6 @@ const Designation = () => {
 //       .catch(console.error);
 //   }
 // }, []);
-
-
-
 
   const handleSave = () => {
     console.log("Save clicked");
@@ -158,11 +149,7 @@ useEffect(() => {
  if (showForm) {
        setSelectedItem(null);
   }}
-  //   const containerStyle = boxView
-  // ? { display: 'flex', flexDirection: 'row' }
-  // : listView
-  //   ? { display: 'flex', flexDirection: 'column' }
-  //   : {}
+    const containerStyle = { display: 'flex' }
   
     const hanbleSearchChange = (item) => {
         setSelectedItem(item);
@@ -172,7 +159,7 @@ useEffect(() => {
   return (
     <>
     <Header backendError={headerError}/>
-    <div className="advance-type-page">
+    <div className="designation-page">
     <div className="header-section">
   <h2 className="page-title">Designation</h2>
 
@@ -185,7 +172,6 @@ useEffect(() => {
       >
         <BsGrid3X3GapFill size={18} />
       </button>
-
       <button
         className={`icon-btn ${listView ? "active" : ""}`}
         title="List View"
@@ -223,11 +209,12 @@ useEffect(() => {
         </div>
 <div className={`card-grid ${listView ? 'list' : 'tile'}`}>
   {advanceTypes.map((item) => (
-    <div className="advance-card" key={item.code}>
+    <div className="advance-card" key={item.code} >
 
       <div className="card-header">
         <span
           className="code"
+          
           onClick={() => hanbleSearchChange(item)}
         >
           {item.code}
@@ -241,14 +228,18 @@ useEffect(() => {
 
       <div
         className="card-title"
+        style={listView ? containerStyle : null }
         onClick={() => hanbleSearchChange(item)}
       >
         {item.name}
       </div>
 
-      <div className="card-shortname">{item.shortName}</div>
+      <div className="card-shortname" style={listView ? containerStyle : null }>
+        {item.shortName}
+        </div>
 
-      <div className="card-description">
+      <div className="card-description" 
+      style={listView ? containerStyle : null }>
         {item.description}
       </div>
     </div>
@@ -284,7 +275,10 @@ useEffect(() => {
     },
     new: {
       onClick: toggleForm,  //to toggle the designation form
-    }
+    },
+    // refresh: {
+    //   onClick: () => window.location.reload(),  // Refresh the page
+    // },
   }}/>
 
            {showForm && selectedItem && loading && <Loading />}

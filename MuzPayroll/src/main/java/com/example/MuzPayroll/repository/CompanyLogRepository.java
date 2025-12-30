@@ -7,5 +7,5 @@ import com.example.MuzPayroll.entity.CompanyLog;
 
 @Repository
 public interface CompanyLogRepository extends JpaRepository<CompanyLog, Long> {
-    
+    long count();
 }
