@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.MuzPayroll.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.CompanyMst;
+import com.example.MuzPayroll.entity.DTO.CompanyDTO;
+import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.CompanyRepository;
 import com.example.MuzPayroll.service.CompanyService;
 

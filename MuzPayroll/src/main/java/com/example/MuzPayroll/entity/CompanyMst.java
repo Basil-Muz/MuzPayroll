@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -91,6 +92,9 @@ public class CompanyMst {
 
     @Column(nullable = false)
     private LocalDate withaffectdate;
+
+    @Transient
+    private Authorization authorization;
 
     // Getters and setters
     public Long getId() {
@@ -276,4 +280,13 @@ public class CompanyMst {
     public void setWithaffectdate(LocalDate withaffectdate) {
         this.withaffectdate = withaffectdate;
     }
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
+
 }
