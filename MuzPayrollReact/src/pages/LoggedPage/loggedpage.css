@@ -159,4 +159,46 @@
   .logged-details {
     grid-template-columns: 1fr;
   }
+  /* ---------- MOBILE ---------- */
+@media (max-width: 768px) {
+  .main-section {
+    flex-direction: column;
+  }
+
+  .logo-homesection {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .logged-details {
+    grid-template-columns: 1fr;
+  }
+
+  .logged-details label {
+    margin-bottom: 0.25rem;
+  }
+
+  .logged-btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* ---------- SMALL MOBILE ---------- */
+@media (max-width: 480px) {
+  .home-logo {
+    max-width: 140px;
+  }
+
+  .logged-box {
+    padding: 1rem;
+  }
+
+  .logged-heading {
+    font-size: 1rem;
+  }
+}
+
+
 }

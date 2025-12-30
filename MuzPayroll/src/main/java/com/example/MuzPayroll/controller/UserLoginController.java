@@ -26,12 +26,12 @@ public class UserLoginController {
     @Autowired
     private UserRepository userRepo;
 
-    @PostMapping("/login")
+@PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
         return service.login(request);
     }
 @GetMapping("/user-context")
-public LoginResponse getUserContext(
+    public LoginResponse getUserContext(
         @RequestParam Long companyId,
         @RequestParam Long branchId,
         @RequestParam Long locationId,
@@ -55,20 +55,13 @@ public LoginResponse getUserContext(
     return resp;
 }
 @PostMapping("/change-password")
-public ResponseEntity<?> changePassword(
-        @RequestBody ChangePasswordRequest request) {
-
-    service.changePassword(request);
-    return ResponseEntity.ok(
-        Map.of("message", "Password changed successfully")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        service.changePassword(request);
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully")
     );
 }
 @PostMapping("/forgot-password")
-    public ForgotPasswordResponse forgotPassword(
-            @RequestBody ForgotPasswordRequest request) {
-
+    public ForgotPasswordResponse forgotPassword(@RequestBody ForgotPasswordRequest request) {
         return service.forgotPassword(request);
     }
-
-
 }

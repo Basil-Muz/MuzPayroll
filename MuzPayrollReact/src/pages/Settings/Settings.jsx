@@ -1,6 +1,7 @@
 // import React, { useState } from "react";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
+import React, { useState } from "react";
 import { MdOutlineCancel } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
@@ -13,6 +14,7 @@ import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 import Sidebar from "../../components/SideBar/Sidebar";
 export default function Setting() {
     // const [open, setOpen] = useState(false);    //sidebar state
+    const [backendError, setBackendError] = useState([]);
 
 const sitemapData = [
   {
@@ -25,7 +27,7 @@ const sitemapData = [
     subtitle: "Payroll",
     rows: [
       [
-        { title: "Payroll Group", subtitle: "Payroll Group", link: "/payroll/payroll-group" },
+        { title: "Payroll Group", subtitle: "Payroll Group", link: "/payrollgroup" },
         { title: "Minimum Wages Group", subtitle: "Minimum Wages Group", link: "/payroll/minimum-wages-group" },
         { title: "DA Base Point And Rate Settings", subtitle: "DA Base Point And Rate Settings", link: "/payroll/da-base-point-rate" },
       ],
@@ -79,7 +81,7 @@ const handleCancel = () => {
   window.location.href = "/home";
 }
   return <>
-  <Header />
+ <Header backendError={backendError} />
    <div className="app-shell">
       {/* LEFT SIDEBAR */}
      <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>

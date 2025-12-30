@@ -59,10 +59,8 @@ public class UserMstService {
             return resp;
         }
            System.out.println("USER NAME FROM ENTITY: " + user.getUserName());
-    System.out.println("LOCATION ENTITY: " + user.getLocationEntity());
-    System.out.println(
-        "LOCATION NAME: " +
-        (user.getLocationEntity() != null ? user.getLocationEntity().getLocation() : "NULL")
+           System.out.println("LOCATION ENTITY: " + user.getLocationEntity());
+           System.out.println("LOCATION NAME: " +(user.getLocationEntity() != null ? user.getLocationEntity().getLocation() : "NULL")
     );
 
         resp.setSuccess(true);
@@ -94,7 +92,7 @@ public class UserMstService {
     public List<LocationMst> getAllLocations() {
         return locationRepo.findAll();
     }
-  public void changePassword(ChangePasswordRequest request) {
+    public void changePassword(ChangePasswordRequest request) {
 
     String userCode = request.getUserCode();
     if (userCode != null) {
@@ -119,7 +117,7 @@ public class UserMstService {
 // ============================
 // FORGOT PASSWORD
 // ============================
-public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
+    public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
 
     ForgotPasswordResponse resp = new ForgotPasswordResponse();
 
@@ -143,9 +141,4 @@ public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
     resp.setMessage("Password sent to registered email");
     return resp;
 }
-
-
-
-
-
 }
