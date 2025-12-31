@@ -132,8 +132,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         }
 
         // ===== CREATE AUTHORIZATION =====
-        // System.out.println("Creating authorization in entityPopulate...");
-
         Authorization auth = new Authorization();
         auth.setAuthorizationDate(dto.getAuthorizationDate());
         auth.setAuthorizationStatus(dto.getAuthorizationStatus());
@@ -145,18 +143,12 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         // Store authorization temporarily
         company.setAuthorization(auth);
 
-        // System.out.println("✅ Entity created in entityPopulate");
-        // System.out.println("=== ENTITY POPULATE END ===");
-
         return Response.success(company);
     }
 
     // =================== 3️⃣ BUSINESS VALIDATION ===================
     @Override
     public Response<Boolean> businessValidate(CompanyDTO dto, CompanyMst entity) {
-        // System.out.println("=== BUSINESS VALIDATION START ===");
-        // System.out.println("Entity received in businessValidate: " + (entity != null
-        // ? "Present" : "Null"));
 
         List<String> errors = new ArrayList<>();
 
@@ -176,24 +168,16 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             // Set in entity
             if (entity != null) {
                 entity.setCompanyImage(imagePath);
-                // System.out.println("✅ Image path set in entity during businessValidate: " +
-                // imagePath);
             } else {
                 System.out.println("⚠️ Entity is null, cannot set image path");
             }
 
-            // System.out.println("✅ Image validated and processed:");
-            // System.out.println(" - DTO image path: " + dto.getCompanyImagePath());
         } else if (imageValidationResult.isSuccess() && dto.getCompanyImagePath() != null) {
             // If using existing image path
             if (entity != null) {
                 entity.setCompanyImage(dto.getCompanyImagePath());
-                // System.out.println("✅ Using existing image path in entity: " +
-                // dto.getCompanyImagePath());
             }
         }
-
-        // System.out.println("=== BUSINESS VALIDATION END ===");
 
         if (!errors.isEmpty()) {
             return Response.error(errors);
@@ -212,9 +196,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     @Override
     public Response<String> generateSerialNo(CompanyDTO dto, CompanyMst entity) {
         try {
-            // System.out.println("=== GENERATE SERIAL NO START ===");
-            // System.out.println("Entity received in generateSerialNo: " + (entity != null
-            // ? "Present" : "Null"));
 
             String prefix = "CM";
 
@@ -223,16 +204,12 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             List<CompanyMst> companies = companyRepository.findLatestCompanyWithCMPrefix(pageable);
 
             String generatedCode;
-            // System.out.println("Latest companies found: " + (companies != null ?
-            // companies.size() : 0));
 
             if (companies == null || companies.isEmpty()) {
                 generatedCode = prefix + "01";
-                // System.out.println("No existing companies, starting with: " + generatedCode);
             } else {
                 CompanyMst latestCompany = companies.get(0);
                 String latestCode = latestCompany.getCode();
-                // System.out.println("Latest company code: " + latestCode);
 
                 // Extract and increment
                 String numberPart = latestCode.substring(prefix.length());
@@ -246,25 +223,20 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
                 }
 
                 generatedCode = prefix + String.format("%02d", nextNumber);
-                // System.out.println("Generated next code: " + generatedCode);
             }
 
             // SET CODE IN BOTH DTO AND ENTITY
             dto.setCode(generatedCode);
-            // System.out.println("Code set in DTO: " + generatedCode);
 
             if (entity != null) {
                 entity.setCode(generatedCode);
-                // System.out.println("✅ Code set in entity: " + generatedCode);
             } else {
-                // System.err.println("⚠️ WARNING: Entity is null in generateSerialNo!");
+                System.err.println("⚠️ WARNING: Entity is null in generateSerialNo!");
             }
 
-            // System.out.println("=== GENERATE SERIAL NO END ===");
             return Response.success(generatedCode);
 
         } catch (Exception e) {
-            System.err.println("❌ ERROR in generateSerialNo: " + e.getMessage());
             e.printStackTrace();
 
             // Last resort fallback
@@ -309,7 +281,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         // Set image path if already available in DTO
         if (dto.getCompanyImagePath() != null) {
             company.setCompanyImage(dto.getCompanyImagePath());
-            System.out.println("Setting company image in dtoToEntity: " + dto.getCompanyImagePath());
         }
 
         return company;
@@ -344,26 +315,16 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     // =================== 8️⃣ SAVE ENTITY IN SERVICE ===================
     @Override
     @Transactional(rollbackFor = Exception.class)
-    protected CompanyMst saveEntityInService(CompanyMst company, CompanyDTO dto) {
+    protected CompanyMst saveEntity(CompanyMst company, CompanyDTO dto) {
         try {
-            System.out.println("=== SAVE ENTITY IN SERVICE STARTED ===");
-            System.out.println("Company code: " + company.getCode());
-            System.out.println("Company image path: " + company.getCompanyImage());
-            System.out.println("Company ID in memory: " + System.identityHashCode(company));
-
             // ===== 1️⃣ SAVE MAIN COMPANY FIRST =====
-            System.out.println("Saving company to database...");
             CompanyMst savedCompany = companyRepository.save(company);
-            System.out.println("✅ Company saved with ID: " + savedCompany.getId());
 
             // ===== 2️⃣ SAVE AUTHORIZATION WITH COMPANY ID =====
-            System.out.println("Saving authorization...");
-
             // Get the authorization created in entityPopulate
             Authorization auth = company.getAuthorization();
             if (auth == null) {
                 // Fallback: create new authorization if not set
-                System.out.println("⚠️ Authorization not found in company, creating new...");
                 UserMst user = userRepository.findByUserCode(dto.getUserCode());
                 if (user == null) {
                     throw new RuntimeException("User not found with code: " + dto.getUserCode());
@@ -380,13 +341,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
             // Save the authorization
             Authorization savedAuth = authorizationRepository.save(auth);
-            System.out.println("✅ Authorization saved with ID: " + savedAuth.getAuthId());
-            System.out.println("✅ Company ID in authorization: " + savedAuth.getMstId());
-            System.out.println("✅ Authorization Date: " + savedAuth.getAuthorizationDate());
-            System.out.println("✅ Authorization Status: " + savedAuth.getAuthorizationStatus());
 
             // ===== 3️⃣ SAVE COMPANY LOG =====
-            System.out.println("Saving company log...");
 
             CompanyLog log = new CompanyLog();
 
@@ -419,13 +375,10 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             log.setAuthorization(savedAuth);
 
             CompanyLog savedLog = companyLogRepository.save(log);
-            System.out.println("✅ Company log saved with ID: " + savedLog.getId());
 
-            System.out.println("=== ALL ENTITIES SAVED SUCCESSFULLY ===");
             return savedCompany;
 
         } catch (Exception e) {
-            System.err.println("❌ Error saving company and related entities: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error saving company and related entities: " + e.getMessage(), e);
         }
@@ -439,36 +392,29 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
     // =================== 🔟 IMAGE VALIDATION AND PROCESSING ===================
     private Response<String> validateAndProcessImage(CompanyDTO dto) {
-        System.out.println("=== VALIDATE AND PROCESS IMAGE START ===");
         MultipartFile file = dto.getCompanyImage();
 
         // If no new image uploaded and no existing image path, image is required
         // if ((file == null || file.isEmpty()) && isEmpty(dto.getCompanyImagePath())) {
-        // System.out.println("❌ No image provided");
         // return Response.error("Company image is required");
         // }
 
         // If new image is uploaded, validate and process it
         if (file != null && !file.isEmpty()) {
-            System.out.println("Processing new image upload...");
 
             // Validate image file
             List<String> imageErrors = validateImageFile(file);
             if (!imageErrors.isEmpty()) {
                 String errorMessage = String.join("; ", imageErrors);
-                System.out.println("❌ Image validation failed: " + errorMessage);
                 return Response.error(errorMessage);
             }
 
             // Save the image and get the path
             try {
                 String imagePath = saveImageFile(file);
-                System.out.println("✅ Image saved: " + imagePath);
-                System.out.println("=== VALIDATE AND PROCESS IMAGE END ===");
                 return Response.success(imagePath);
 
             } catch (IOException e) {
-                System.err.println("❌ Failed to save company image: " + e.getMessage());
                 return Response.error("Failed to save company image: " + e.getMessage());
             }
         }
@@ -477,15 +423,11 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         if (!isEmpty(dto.getCompanyImagePath())) {
             Path existingPath = Paths.get(dto.getCompanyImagePath());
             if (!Files.exists(existingPath)) {
-                System.out.println("❌ Existing image not found: " + dto.getCompanyImagePath());
                 return Response.error("Existing company image not found at path: " + dto.getCompanyImagePath());
             }
-            System.out.println("✅ Using existing image path: " + dto.getCompanyImagePath());
-            System.out.println("=== VALIDATE AND PROCESS IMAGE END ===");
             return Response.success(dto.getCompanyImagePath());
         }
 
-        System.out.println("=== VALIDATE AND PROCESS IMAGE END ===");
         return Response.success(null);
     }
 
@@ -537,7 +479,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         Path uploadPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
-            System.out.println("Created upload directory: " + UPLOAD_DIR);
         }
 
         // Get original filename and extension
@@ -553,10 +494,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
         String imagePath = UPLOAD_DIR + filename;
-        System.out.println("✅ Image saved: " + imagePath);
-        System.out.println("✅ Image size: " + file.getSize() + " bytes");
-        System.out.println("✅ Image type: " + file.getContentType());
-
         return imagePath;
     }
 

@@ -16,7 +16,7 @@ public abstract class MuzirisAbstractService<D, E> {
     // Generate PK if needed
     public abstract Response<Object> generatePK(D dto);
 
-    // Generate serial/code - NOW WITH ENTITY PARAMETER!
+    // Generate serial code 
     public abstract Response<String> generateSerialNo(D dto, E entity);
 
     // Convert entity → DTO
@@ -26,7 +26,7 @@ public abstract class MuzirisAbstractService<D, E> {
     protected abstract E dtoToEntity(D dto);
 
     // Concrete service must implement this to save the entity in DB
-    protected abstract E saveEntityInService(E entity, D dto);
+    protected abstract E saveEntity(E entity, D dto);
 
     public final Response<D> save(D dto) {
 
@@ -65,7 +65,7 @@ public abstract class MuzirisAbstractService<D, E> {
         }
 
         // 6. Save entity
-        E savedEntity = saveEntityInService(entity, dto);
+        E savedEntity = saveEntity(entity, dto);
 
         // 7. Convert to DTO
         D savedDto = entityToDto(savedEntity);

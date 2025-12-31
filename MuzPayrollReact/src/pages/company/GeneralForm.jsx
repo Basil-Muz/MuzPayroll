@@ -18,6 +18,7 @@ import { IoClose } from "react-icons/io5";
 const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   let page = "company";
   const user_code = 1001;
+
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
@@ -76,16 +77,16 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
     // Formik reset
     formik.resetForm();
 
-    // 🔒 Lock everything again
+    // Lock everything again
     setStartDate(null);
     setIsDateLocked(false);
     setDateLocked(false);
     setInputsUnlocked(false);
 
-    // 📅 Show calendar again
+    // Show calendar again
     setShowCalendar(true);
 
-    // 🖼 Clear image
+    // Clear image
     setFile(null);
     setError("");
     formik.setFieldValue("companyImage", null);
@@ -188,7 +189,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
 
   const formik = useFormik({
     initialValues: {
-      // code: "",
       company: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
@@ -282,8 +282,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
           console.error("Error parsing response:", parseError);
         }
 
-        console.log("Response from backend:", .);
-
         if (result && result.success === true) {
           alert("Company saved successfully!");
           resetToInitialState();
@@ -295,9 +293,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
           // Log to console
           console.log("Status code:", result.statusCode);
           console.log("Errors:", result.errors);
-
-          // Show alert with all errors
-          alert("Errors:\n" + result.errors.join("\n"));
 
           // Send to parent component
           if (onBackendError) {
@@ -327,7 +322,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
     setInputsUnlocked(false);
     setAuthorization("entry");
 
-    // ✅ Clear image
+    // Clear image
     setFile(null);
     setError("");
     formik.setFieldValue("companyImage", null);
@@ -365,32 +360,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               <div className="headertext">
                 <h4>General Info</h4>
               </div>
-              {/* {onBackendError.length > 0 && (
-                <div className="backend-errors">
-                  {onBackendError.length}
-                </div>)} */}
-              <label htmlFor="code" className="fancy-label">
-                Code
-              </label>
-              <input
-                type="text"
-                id="code"
-                name="code"
-                onChange={(e) => {
-                  onBackendError([]); // 👈 clear backend error
-                  formik.handleChange(e);
-                }}
-                onBlur={formik.handleBlur}
-                // disabled={!startDate}
-                value={formik.values.code}
-                disabled
-                className={
-                  formik.touched.code && formik.errors.code ? "input-error" : ""
-                }
-              />
-              {formik.touched.code && formik.errors.code ? (
-                <div className="error">{formik.errors.code}</div>
-              ) : null}
 
               <label htmlFor="company" className="fancy-label">
                 Name
@@ -976,19 +945,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
-          </div>
-
-          <div className="form-buttons">
-            <button
-              type="submit"
-              className="submit-btn"
-              onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
-            >
-              Submit
-            </button>
-            <button type="button" className="cancel-btn" onClick={cancelForm}>
-              Cancel
-            </button>
           </div>
         </form>
       </div>

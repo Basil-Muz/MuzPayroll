@@ -950,18 +950,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
-            <div className="form-buttons">
-              <button
-                type="submit"
-                className="submit-btn"
-                onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
-              >
-                Submit
-              </button>
-              <button type="button" className="cancel-btn" onClick={cancelForm}>
-                Cancel
-              </button>
-            </div>
           </div>
         </form>
       </div>
