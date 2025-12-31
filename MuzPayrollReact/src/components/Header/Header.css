@@ -1,9 +1,4 @@
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    padding-top: 0px; /* Adjust this value based on the header height */
-    background-color: #F2F2F2;
-}
+
 header.header {
     margin: 0;
     position: fixed;
@@ -14,7 +9,7 @@ header.header {
     width: 100%;
     z-index: 100;
     display: flex;
-    border-bottom: 1px solid #c7c4c4ff;
+    border-bottom: 1px solid #c7c4c7ff;
     align-items: center;
     justify-content: space-between;
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
@@ -222,12 +217,12 @@ font-family: "Roboto", sans-serif; */
     flex-direction: column;
     height: 38px;
     font-size: 13px;
-    padding: 9px 12px 8px 12px;
+    padding: 9px 0 8px 0;
 }
 .location {
     color: var(--brand);
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
 }
 .location-date .date {
     color: var(--text-dark);
@@ -235,7 +230,8 @@ font-family: "Roboto", sans-serif; */
     font-size: 12px;
     background: none;
     border: 0;
-    display: block;
+    display: flex;
+    justify-content: center;
     width: 114px;
 }
 

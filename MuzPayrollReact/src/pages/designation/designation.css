@@ -16,7 +16,7 @@
 /* ================= GRID BASE ================= */
 
 .card-grid {
-  margin-right: 5rem;
+  margin-right: 6rem;
   will-change: opacity, transform;
 }
 

@@ -280,7 +280,7 @@ const handleMouseUp = () => {
         <div className="full-content">
       {/* Code */}
       <div className="form-row">
-        <label name="code"><span className="required">C</span>ode</label>
+        <label className="required" name="code">Code</label>
         <div className="input code">
           <input
             id='code'
@@ -304,7 +304,7 @@ const handleMouseUp = () => {
       {/* Name */}
       <div className="full-content">
       <div className="form-row">
-        <label><span className="required">N</span>ame</label>
+        <label className="required">Name</label>
         <div className="input name">
           <input
           id='name'
@@ -326,7 +326,7 @@ const handleMouseUp = () => {
       {/* Short Name */}
       <div className="full-content">
       <div className="form-row">
-        <label><span className="required">S</span>hort Name</label>
+        <label className="required">Short Name</label>
         <div className="input shortName">
           <input
           id='shortName'
@@ -348,7 +348,7 @@ const handleMouseUp = () => {
       {/* Recovery Head */}
       <div className="full-content">
       <div className="form-row">
-        <label><span className="required">R</span>ecovery Head</label>
+        <label className="required">Recovery Head</label>
         <div className="input recoveryHead">
           <select
           id='recoveryHead'
@@ -376,7 +376,7 @@ const handleMouseUp = () => {
       {/* Description */}
       <div className="full-content description">
         <div className="form-row">
-        <label><span className="required">D</span>escription</label>
+        <label className="required">Description</label>
         <div className="input description">
           <textarea
           id='description'

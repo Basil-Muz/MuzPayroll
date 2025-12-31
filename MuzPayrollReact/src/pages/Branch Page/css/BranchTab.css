@@ -1,0 +1,75 @@
+.branch-container {
+  max-width: 1200px;
+  /* margin: 64px auto 0; */
+  padding: 0 16px;
+  padding-top: 69px;
+}
+
+
+/* ===== Tabs ===== */
+.tabs-header {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid var(--border-light);
+  padding: 0 24px;
+}
+
+.tab-btn {
+  padding: 12px 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted);
+  position: relative;
+}
+
+.tab-btn.active {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: var(--brand);
+}
+
+
+/* ===== Content ===== */
+.tabs-content {
+  /* padding: 6px;
+  border-radius: 14px; */
+  /* margin-top: 66px; */
+}
+
+/* ===== Documents Table ===== */
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.doc-table th,
+.doc-table td {
+  border: 1px solid var(--border-light);
+  padding: 10px;
+  font-size: 13px;
+}
+
+.doc-table th {
+  background: var(--primary-light);
+}
+
+/* ===== Buttons ===== */
+.btn-upload {
+  background: var(--brand);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}

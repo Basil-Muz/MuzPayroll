@@ -23,6 +23,8 @@ import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import Designation from "./pages/designation/designation.jsx";
 
+import BranchPageForm from "./pages/Branch Page/Tabs/BranchTabs.jsx";
+
 function App() {
   return (
     <Routes>
@@ -46,6 +48,7 @@ function App() {
       <Route path="/generalform" element={<LocationGeneralForm />} />
       <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
       <Route path="/designation" element={<Designation/>} />
+      <Route path="/branchform" element={<BranchPageForm/>} />
     </Routes>
   );
 }

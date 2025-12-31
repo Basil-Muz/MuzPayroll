@@ -106,7 +106,7 @@ const handleCancel = () => {
         {/* CONTENT */}
         <main className="content">
           <div className="main-header">
-          <h1 className="page-title">Sitemap</h1>
+          <h1 className="page-title" style={{fontWeight:500}}>Masters</h1>
           <div className="main-cancel">
             <MdOutlineCancel size={20} onClick={handleCancel}/>
             </div>
