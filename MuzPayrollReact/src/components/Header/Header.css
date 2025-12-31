@@ -10,7 +10,7 @@ header.header {
     top: 0;
     background-color: white;
     left: 0;
-    min-height: 10%;
+    min-height: 66px;
     width: 100%;
     z-index: 100;
     display: flex;
@@ -20,17 +20,22 @@ header.header {
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 .logo {
-    /* font-family: "Roboto", sans-serif; */
+font-family: "Roboto", sans-serif; */
     font-optical-sizing: auto;
     font-style: normal;
     font-size: 17px;
+    margin-top: 0px;
     color: #C71E64;
-    height: 26px;
+    height: 56px;
+    /* display: flex; */
     padding: 0;
-    margin-top: -39px;
-    margin-left: 20px;
+    /* margin-top: -39px; */
+    margin-left: 2px;
     font-weight: bold;
     width: auto;
+    /* flex-wrap: nowrap; */
+    /* align-content: center; */
+
 }
 
 .header-right {
@@ -220,12 +225,12 @@ header.header {
     padding: 9px 12px 8px 12px;
 }
 .location {
-    color: #188bd8;
+    color: var(--brand);
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 }
 .location-date .date {
-    color: black;
+    color: var(--text-dark);
     margin-top: -3px;
     font-size: 12px;
     background: none;
@@ -308,3 +313,13 @@ background-color: rgba(219, 37, 235, 0.06);
     margin:auto;// center both axis
     color: #161414bd; 
 }
+@media (max-width: 768px) {
+    .header-right {
+        padding-right: 1rem;
+        gap: 4px;
+    }
+    .location-date {
+        display: none; /* Hide location and date on small screens */
+    }
+}
+

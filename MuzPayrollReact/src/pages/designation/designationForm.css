@@ -3,7 +3,8 @@
   --primary: #7d6b80ff;
   --primary-hover: #251127ff;
   --button-primary: #e525ebff;
-  --primary-light: #eadcf3;
+    --button-primary-hover: #c31ed2ff;
+  --primary-light: #f0dcf3ff;
   /* --primary-hover: rgba(219, 37, 235, 0.06); */
 
  --brand-success: #d218d8ff;    /* same color */
@@ -11,8 +12,9 @@
 
   --brand-danger: #d218d8ff;    /* same color */
   --brand-danger-bg: rgba(210, 24, 216, 0.12);
-
-  --text-dark: #2f2f2f;
+    --danger: #d44242ff;
+    --danger-light: rgba(212, 69, 69, 0.12);    
+  --text-dark: #2f2f2fff;
   --text-muted: #6f6f6f;
 
   --border-light: rgba(0, 0, 0, 0.08);
@@ -39,9 +41,11 @@
     background-color: white;
     padding: 10px 15px;
     position: absolute;
-    top: 7%;
+    top: 12%;
     left: 26%;
-    width: 581px;
+    width: 38rem;
+    height: fit-content;
+    overflow: hidden; /* default: no scroll */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     max-height: 90vh;
     border-radius: 4px;
@@ -86,13 +90,12 @@
     border-radius: 4px;
 }
 
-
  .main-model-content {
   display: flex;
   flex-direction: column;
   padding-top: 15px;
   font-size: 14px;
-  /* gap: 11px; */
+  gap: 12px;
 }
 .model-header .h3{
     color: var(--primary);
@@ -124,7 +127,7 @@
     padding: 0 5px;
     border-radius: 50%;
     border: 1px solid rgba(212, 37, 235, 0.24);
-    cursor: default;
+    cursor: pointer;
 }
 .modal-designation-form .close:hover {
     background-color: none;
@@ -175,7 +178,7 @@ margin-top: 5px;
 
 .modal-designation-form .notifications-dropdown{
     position: absolute;
-    bottom: 39%;
+    top: 9%;
     right: 70px;
     cursor: pointer;
     width: 234px;
@@ -236,7 +239,7 @@ margin-top: 5px;
 }
 
 .modal-designation-form .full-content {
-    padding-bottom: 15px;
+    padding-bottom: 6px;
 }
 
 .modal-designation-form .input {
@@ -268,13 +271,14 @@ margin-top: 5px;
     box-sizing: border-box;
     background:none;
     color: black;
+    border-radius: 9px;
     /* margin-top: 4px; */
     border: 1px solid #d0c4dc;
     transition: border-color 0.2s ease;
     /* border-radius: 4px;*/
     outline: none;
 }
-.modal-designation-form select {
+.modal-designation-form select { onClick={(e) => e.stopPropagation()} // ⬅ prevent close
     height: 35px;
 }
 .modal-designation-form textarea {
@@ -282,9 +286,9 @@ margin-top: 5px;
   min-height: 33px;
 }
 
-.modal-designation-form input[type="date"] {
+.modal-designation-form input[type="date onClick={(e) => e.stopPropagation()} // ⬅ prevent close"] {
     /* margin-top: -5px; */
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.4rem;
 }
 .modal-designation-form input:focus,
 .modal-designation-form select:focus,
@@ -294,6 +298,10 @@ margin-top: 5px;
 /* .active-date{
     margin-top: -5px; 
 } */
+
+select#status {
+    height: max-content;
+}
 
 .modal-designation-form .form-buttons {
   display: flex;
@@ -347,18 +355,18 @@ margin-top: 5px;
 }
 
 .modal-designation-form .save-btn{
-    color: #677e6aff;
+    color: #409e4cff;
 }
 .modal-designation-form .save-btn:hover {
-    color: #335e37ff;
+    color: #33793aff;
   background: rgba(210, 24, 216, 0.16);
 }
 
 .modal-designation-form .cancel-btn {
-    color: #a33d3dff;
+    color: #d44242ff;
 }
 .modelal-designation-form .cancel-btn:hover {
-    color: #6b3d3dff;
+    color: #833c3cff;
 }
   /* --primary: #7d6b80ff;
   --primary-hover: #251127ff; */
@@ -372,7 +380,7 @@ margin-top: 5px;
 
 .main-error .error {
     color: var(--danger);
-    background: var(--danger-light);
+    /* background: var(--danger-light); */
     padding: 6px 10px;
     border-radius: 4px;
     font-size: 12.5px;
@@ -380,4 +388,166 @@ margin-top: 5px;
 .modal-designation-form .cancel-btn:disabled {
     background-color: rgba(212, 69, 69, 0.925);
     cursor: not-allowed;
+}
+
+@media (min-width:1726px) { /* large screens */ 
+  .modal-content {
+    left: 50% !important;
+    top: 46% !important;
+    transform: translate(-50%, -50%);
+        width: 42rem;
+    height:fit-content;
+  }
+  .modal-designation-form input, select, textarea {
+    width: 100%;
+  }
+  .main-model-content {
+    gap: 20px;
+    
+  }
+  .modal-designation-form .form-row {
+    width: 100%;
+  }
+  .modal-designation-form .save-btn, .modal-designation-form .cancel-btn {
+    padding: 12px 37px;
+    margin-bottom: 10px;
+}
+.full-content.description {
+    padding-bottom: 0;
+}
+}
+
+@media (max-width: 1024px) {
+    /* .main-model-content {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    }
+.modal-designation-form .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+} */
+  .modal-content {
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 680px;
+  }
+
+  .modal-designation-form .input {
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+
+  /* Modal wrapper */
+  .modal-designation-form {
+
+  }
+.modal-designation-form .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2px;
+}
+.modal-designation-form .notifications-dropdown{
+    position: absolute;
+    bottom: 0;
+    top: 10%;
+    right: 70px;
+    cursor: pointer;
+    width: 234px;
+}
+
+  /* Modal becomes bottom sheet */
+  .modal-content {
+        position: fixed;
+        left: 1% !important;
+        right: 0;
+        bottom: 0;
+        top: 4% !important;
+        width: 92%;
+        max-height: 92vh;
+        /* border-radius: 18px 18px 0 0; */
+        transform: none !important;
+        animation: slideUpMobile 0.35s ease;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; /* smooth iOS scroll */
+  }
+
+  /* Disable drag on mobile */
+  .modal-header {
+    cursor: default !important;
+  }
+
+
+.modal-designation-form .notifications-dropdown{
+    position: absolute;
+    top: 7.3%;
+}
+
+  /* Stack form rows */
+  .modal-designation-form .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .modal-designation-form label {
+    padding-left: 0;
+    font-size: 13px;
+  }
+
+  .modal-designation-form .input {
+    width: 100%;
+    padding-right: 0;
+  }
+
+  .modal-designation-form input,
+  .modal-designation-form select,
+  .modal-designation-form textarea {
+    font-size: 14px;
+  }
+
+  /* Buttons full width */
+  .modal-designation-form .form-buttons {
+    flex-direction: column;
+         gap: 11px;
+  }
+
+  .modal-designation-form .save-btn,
+  .modal-designation-form .cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+@media (max-width: 480px) {
+
+  .modal-content {
+    max-height: 95vh;
+    padding: 12px;
+  }
+
+  .modal-header {
+    height: 42px;
+    padding: 0 16px;
+  }
+
+  .modal-header .h3 {
+    font-size: 14.5px;
+  }
+
+  .modal-designation-form textarea {
+    min-height: 60px;
+  }
+}
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }

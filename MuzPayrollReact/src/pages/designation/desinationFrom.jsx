@@ -230,23 +230,24 @@ const handleMouseUp = () => {
 };
 
   return (
-<div className="modal-designation-form"> 
+  <div className="modal-designation-form"  onClick={toggleForm}   // ⬅ click outside closes
+  > 
     <div className="modal-content"
-   
+      onClick={(e) => e.stopPropagation()} // ⬅ prevent closing when clicking inside
        style={{
-        left: position.x,
-        top: position.y,
+        // left: position.x,
+        // top: position.y,
        
         userSelect: 'none',
       }}
   
     >
     <div className="modal-header"
-     onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      style={ {cursor: dragging.current ? 'grabbing' : 'grab'}}
+    //  onMouseDown={handleMouseDown}
+    //   onMouseMove={handleMouseMove}
+    //   onMouseUp={handleMouseUp}
+    //   onMouseLeave={handleMouseUp}
+    //   style={ {cursor: dragging.current ? 'grabbing' : 'grab'}}
     >
         {/* <div className={`slide-container ${showSearch ? 'show' : 'hide'}`}>
         
@@ -373,8 +374,8 @@ const handleMouseUp = () => {
       </div>
 
       {/* Description */}
-        <div className="full-content">
-      <div className="form-row">
+      <div className="full-content description">
+        <div className="form-row">
         <label><span className="required">D</span>escription</label>
         <div className="input description">
           <textarea
@@ -396,7 +397,7 @@ const handleMouseUp = () => {
       </div>
 
       {/* Active Date */}
-      
+      <div className="full-content">
       <div className="form-row">
         <label className='active-date'>Active Date</label>
         <div className="input activeDate">
@@ -410,8 +411,10 @@ const handleMouseUp = () => {
           />
         </div>
       </div>
+      </div>
 
       {/* Authorization */}
+      <div className="full-content">
       <div className="form-row">
         <label>Authorization</label>
         <div className="input authorization">
@@ -430,6 +433,7 @@ const handleMouseUp = () => {
             <option value="VERIFIED">VERIFIED:</option></>)}
           </select>
         </div>
+      </div>
       </div>
     </div>
 

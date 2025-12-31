@@ -9,6 +9,7 @@ import { HiMiniSwatch } from "react-icons/hi2";
 import { RxCross2 } from "react-icons/rx";
 import { MdOutlineMenu } from "react-icons/md";
 import { ImStack } from "react-icons/im";
+// import { useState } from "react";
 import "./Master.css";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 import Sidebar from "../../components/SideBar/Sidebar";
@@ -84,13 +85,14 @@ const handleCancel = () => {
   window.location.href = "/home";
 }
   return <>
+
   <Header backendError={backendError} />
-   <div className="app-shell">
+   <div className="master-app-shell">
       {/* LEFT SIDEBAR */}
      <Sidebar initialOpen={true} onNavigate={(id) => console.log("nav to", id)} toggleMenu={true}/>
 
       {/* MAIN AREA */}
-      <div className="main-area">
+      <div className="master-main-area">
         {/* TOP BAR */}
         {/* <header className="top-bar">
           <div className="top-left" />

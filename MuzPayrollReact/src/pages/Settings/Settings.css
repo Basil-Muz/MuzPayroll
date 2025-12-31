@@ -1,17 +1,12 @@
 
-#root{
-    max-width: 1349px;
-    /* margin: 0 auto; */
-    /* padding: 2rem; */
-    text-align: center;
-}
+
 /* overall layout */
-.app-shell {
+.settigs-app-shell {
     display: flex;
-    padding-top:3.3rem;
+    padding-top:66px;   //height of Header component
     width: 100%;                      /* full responsive width */
-    max-width: 95rem;         /* same visual width as screenshot */
-    margin: 0 auto;          /* center it horizontally */
+    /* max-width: 95rem;         same visual width as screenshot */
+    /*margin: 0 auto;   */       /* center it horizontally */
     background-color: #e9e9e9ff;
     font-family: "Roboto", Arial, sans-serif;
 }
@@ -98,7 +93,7 @@
 }
 
 /* main area */
-.main-area {
+.settigs-main-area {
     width: 78.6rem;
     flex: 1;
     display: flex;
