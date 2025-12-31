@@ -16,14 +16,22 @@ public abstract class MuzirisAbstractService<D, E> {
     // Generate PK if needed
     public abstract Response<Object> generatePK(D dto);
 
-    // Generate serial code 
+    // Generate serial code
     public abstract Response<String> generateSerialNo(D dto, E entity);
 
-    // Convert entity → DTO
-    public abstract D entityToDto(E entity);
+    // Convert entity → DTO (Optional - provide default implementation)
+    public D entityToDto(E entity) {
+        // Default implementation throws UnsupportedOperationException
+        // Subclasses can override if they need this functionality
+        throw new UnsupportedOperationException("entityToDto not implemented");
+    }
 
-    // Convert DTO → entity
-    protected abstract E dtoToEntity(D dto);
+    // Convert DTO → entity (Optional - provide default implementation)
+    protected E dtoToEntity(D dto) {
+        // Default implementation throws UnsupportedOperationException
+        // Subclasses can override if they need this functionality
+        throw new UnsupportedOperationException("dtoToEntity not implemented");
+    }
 
     // Concrete service must implement this to save the entity in DB
     protected abstract E saveEntity(E entity, D dto);

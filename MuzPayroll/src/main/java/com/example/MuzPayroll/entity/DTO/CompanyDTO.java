@@ -86,7 +86,17 @@ public class CompanyDTO {
     @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    private Long authId;
+
     // Getters and setters
+
+    public Long getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(Long authId) {
+        this.authId = authId;
+    }
 
     public String getCode() {
         return code;

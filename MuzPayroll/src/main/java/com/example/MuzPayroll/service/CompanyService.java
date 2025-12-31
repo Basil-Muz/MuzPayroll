@@ -50,6 +50,9 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CompanyLogService companyLogService;
+
     // ================= FINAL SAVE WRAPPER =================
     @Transactional
     public Response<CompanyDTO> saveWrapper(CompanyDTO dto) {
@@ -115,6 +118,16 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             return Response.error(errors);
         }
 
+        // if log table present ---->
+        // CALL CompanyLogService entityValidate
+        Response<Boolean> logEntityValidate = companyLogService.entityValidate(dto);
+
+        // If log validation fails, return those errors
+        if (!logEntityValidate.isSuccess()) {
+            return logEntityValidate;
+        }
+        // <-----
+
         return Response.success(true);
     }
 
@@ -143,6 +156,18 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         // Store authorization temporarily
         company.setAuthorization(auth);
 
+        // if log table present ---->
+
+        // CALL CompanyLogService entityValidate
+        Response<CompanyLog> logEntityPopulate = companyLogService.entityPopulate(dto);
+
+        // If log entityPopulate fails, return errors
+        if (!logEntityPopulate.isSuccess()) {
+            return Response.error(logEntityPopulate.getErrors());
+        }
+
+        // <-----
+
         return Response.success(company);
     }
 
@@ -169,7 +194,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             if (entity != null) {
                 entity.setCompanyImage(imagePath);
             } else {
-                System.out.println("⚠️ Entity is null, cannot set image path");
+                System.out.println("Entity is null, cannot set image path");
             }
 
         } else if (imageValidationResult.isSuccess() && dto.getCompanyImagePath() != null) {
@@ -183,12 +208,32 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             return Response.error(errors);
         }
 
+        // if log table present ---->
+        CompanyLog logEntity = new CompanyLog();
+
+        Response<Boolean> logbusinessValidate = companyLogService.businessValidate(dto, logEntity);
+        // If log businessValidate fails, return errors
+        if (!logbusinessValidate.isSuccess()) {
+            return Response.error(logbusinessValidate.getErrors());
+        }
+
+        // <-----
+
         return Response.success(true);
     }
 
     // =================== 4️⃣ GENERATE PK ===================
     @Override
     public Response<Object> generatePK(CompanyDTO dto) {
+
+        // if log table present ---->
+        Response<Object> logGeneratePK = companyLogService.generatePK(dto);
+        if (!logGeneratePK.isSuccess()) {
+            // Return log service's error
+            return logGeneratePK;
+        }
+        // <-----
+
         return Response.success(true);
     }
 
@@ -342,39 +387,19 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             // Save the authorization
             Authorization savedAuth = authorizationRepository.save(auth);
 
+            // if log table present --->
             // ===== 3️⃣ SAVE COMPANY LOG =====
 
-            CompanyLog log = new CompanyLog();
+            // Create a CompanyLog entity first
+            CompanyLog logEntity = new CompanyLog();
 
-            // Copy ALL DATA FROM CompanyMst to CompanyLog
-            log.setCompany(savedCompany.getCompany());
-            log.setCode(savedCompany.getCode());
-            log.setShortName(savedCompany.getShortName());
-            log.setActiveDate(savedCompany.getActiveDate());
-            log.setWithaffectdate(savedCompany.getWithaffectdate());
-            log.setAddress(savedCompany.getAddress());
-            log.setAddress1(savedCompany.getAddress1());
-            log.setAddress2(savedCompany.getAddress2());
-            log.setCountry(savedCompany.getCountry());
-            log.setState(savedCompany.getState());
-            log.setDistrict(savedCompany.getDistrict());
-            log.setPlace(savedCompany.getPlace());
-            log.setPincode(savedCompany.getPincode());
-            log.setLatitude(savedCompany.getLatitude());
-            log.setLongitude(savedCompany.getLongitude());
-            log.setLandlineNumber(savedCompany.getLandlineNumber());
-            log.setMobileNumber(savedCompany.getMobileNumber());
-            log.setEmail(savedCompany.getEmail());
-            log.setEmployerName(savedCompany.getEmployerName());
-            log.setDesignation(savedCompany.getDesignation());
-            log.setEmployerNumber(savedCompany.getEmployerNumber());
-            log.setEmployerEmail(savedCompany.getEmployerEmail());
-            log.setCompanyImage(savedCompany.getCompanyImage());
+            // ✅ Set authId in DTO before passing to log service
+            dto.setAuthId(savedAuth.getAuthId());
 
-            // Set authorization (with date and status)
-            log.setAuthorization(savedAuth);
+            // ✅ Now call saveEntity with the created entity
+            CompanyLog savedLog = companyLogService.saveEntity(logEntity, dto);
 
-            CompanyLog savedLog = companyLogRepository.save(log);
+            // <------
 
             return savedCompany;
 
