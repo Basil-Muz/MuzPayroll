@@ -1,61 +1,100 @@
-:root {
-  --primary: #7d6b80ff;
-  --primary-hover: #251127ff;
-  --button-primary: #e525ebff;
-    --button-primary-hover: #c31ed2ff;
-  --primary-light: #f0dcf3ff;
-  /* --primary-hover: rgba(219, 37, 235, 0.06); */
-
- --brand-success: #d218d8ff;    /* same color */
-  --brand-success-bg: rgba(210, 24, 216, 0.08);
-
-  --brand-danger: #d218d8ff;    /* same color */
-  --brand-danger-bg: rgba(210, 24, 216, 0.12);
-    --danger: #d44242ff;
-    --danger-light: rgba(212, 69, 69, 0.12);    
-  --text-dark: #2f2f2fff;
-  --text-muted: #6f6f6f;
-
-  --border-light: rgba(0, 0, 0, 0.08);
-  --glass-bg: rgba(255, 255, 255, 0.88);
-   --brand-border: rgba(210, 24, 216, 0.35);
---brand: #d218d8ff;
-}
-
 .to-top-btn {
   position: fixed;
-  bottom: 23px;
-  right: 14px;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: #fcf0fdff;
   display: flex;
   align-items: center;
-  padding: 0 10px;
-  outline: none;
-  width: 56px;
-  height: 56px;
   justify-content: center;
   cursor: pointer;
   opacity: 0;
-  z-index: 1000;
+  visibility: hidden;
+  z-index: 2000;
   transform: translateY(20px);
   pointer-events: none;
-  transition: all 0.35s ease;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--brand-border);
-  /* box-shadow: 0 4px 12px rgba(0,0,0,0.25); */
-
-  z-index: 2000;
-}
-
-.to-top-btn:hover {
-  /* border:1px solid #a7a7a7ff; */
-  /* box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-  background: #fdf0fdff; */
+  box-shadow: 
+    0 4px 12px rgba(210, 24, 216, 0.15),
+    0 0 0 0px rgba(210, 24, 216, 0.1);
+  outline: none;
 }
 
 .to-top-btn.show {
   opacity: 1;
-  outline: none;
+  visibility: visible;
   transform: translateY(0);
   pointer-events: auto;
 }
+
+.to-top-btn:hover,
+.to-top-btn:focus {
+  background: var(--button-primary);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(210, 24, 216, 0.3),
+    0 0 0 3px rgba(210, 24, 216, 0.1);
+}
+
+.to-top-btn:hover svg,
+.to-top-btn:focus svg {
+  color: white;
+  transform: translateY(-1px);
+}
+
+.to-top-btn svg {
+  color: #c71e9d;
+  transition: all 0.2s ease;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .to-top-btn {
+    width: 60px;
+    height: 60px;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .to-top-btn:active {
+    background: var(--button-primary);
+    transform: scale(0.95);
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .to-top-btn {
+    transition: opacity 0.2s ease;
+  }
+  
+  .to-top-btn:hover {
+    transform: none;
+  }
+  
+  .scroll-to-top {
+    scroll-behavior: auto;
+  }
+}
+
+/* Dark mode support */
+/* @media (prefers-color-scheme: dark) {
+  .to-top-btn {
+    background: rgba(40, 20, 42, 0.95);
+    border-color: rgba(210, 24, 216, 0.5);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      0 0 0 0px rgba(210, 24, 216, 0.2);
+  }
+  
+  .to-top-btn.show {
+    background: rgba(40, 20, 42, 0.98);
+  }
+  
+  .to-top-btn:hover {
+    background: var(--brand);
+  }
+} */

@@ -156,8 +156,8 @@ export default function AddressForm({
                       placeholder="Enter branch Place"
                       {...register('branchPlace', { required: "Branch place required" ,
                         pattern:{
-                          value: /^[a-zA-Z]+([a-zA-Z]+)*$/,
-                          message: "Please enter a valid branch latitude"
+                          value: /^[a-zA-Z]+([a-zA-Z\\s]+)*$/,
+                          message: "Please enter a valid branch place"
                         },
                       })}
                     />

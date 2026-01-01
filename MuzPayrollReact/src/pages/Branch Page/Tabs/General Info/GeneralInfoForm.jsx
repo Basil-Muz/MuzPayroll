@@ -67,7 +67,7 @@ export default function GeneralInfoForm({
                   <input
                     type="date"
                     className="form-control"
-                    max={new Date().toISOString().split("T")[0]}
+                    min={new Date().toISOString().split("T")[0]}
                     {...register("activeDate", { required: true })}
                   />
                   {errors.activeDate && (

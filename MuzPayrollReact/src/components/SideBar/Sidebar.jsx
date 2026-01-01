@@ -62,7 +62,7 @@ const menuItems = [
         { id: "process.gratiutyProcess", label: "Gratiuty Process",link:"/process/gratiuty-process"  },
         ]
 },
-    { id: "Statutary", label: "Statutary Complients", icon: <ImStack size={18} />,
+    { id: "Statutary", label: "Statutary Complients", icon: <ImStack  />,
     children: [
     // complients letter,letter,report
         { id: "Statutary.complientsLetter", label: "Complients Letter" ,link:"/statutary/complients-letter" },
@@ -85,8 +85,8 @@ export default function Sidebar({ forceOpen }) {
   const sidebarRef = useRef(null);
   const closeTimer = useRef(null);
 
-  const isMobile = useIsMobile();//for mobile check
-  const isTab = useIsTab();//for tab check
+  const isMobile = useIsMobile(); //for mobile check
+  const isTab = useIsTab(); //for tab check
   const [open, setOpen] = useState(true);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [submenuStyle, setSubmenuStyle] = useState({ top: 0 });
@@ -126,7 +126,9 @@ export default function Sidebar({ forceOpen }) {
     navigate(child.link);
     setOpenSubmenu(null);
   };
-
+  const toggleMenu = (id) => {
+  setOpenSubmenu(prev => (prev === id ? null : id));
+};
   const openSubmenuFor = (e, item) => {
     if (!sidebarRef.current) return;
 

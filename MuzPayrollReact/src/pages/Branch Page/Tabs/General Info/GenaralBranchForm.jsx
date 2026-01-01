@@ -7,6 +7,7 @@ import "../../css/From.css";
 import StepProgress from "./StepProgress";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import DocumentsTab from "../Documents Info/DocumentsTab";
+import Header from "../../../../components/Header/Header";
 
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
@@ -113,6 +114,7 @@ export default function GenaralBranchForm() {
 
   return (
     <> 
+    <Header backendError={backendErrors}/>
    <div className="branch-container-tab">
   <div className="form-card">
     {/* Header */}

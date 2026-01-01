@@ -9,7 +9,7 @@ header.header {
     width: 100%;
     z-index: 100;
     display: flex;
-    border-bottom: 1px solid #c7c4c7ff;
+    border-bottom: 1px solid #c7c4c4ff;
     align-items: center;
     justify-content: space-between;
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
@@ -217,7 +217,7 @@ font-family: "Roboto", sans-serif; */
     flex-direction: column;
     height: 38px;
     font-size: 13px;
-    padding: 9px 0 8px 0;
+    padding: 5px 0 8px 0;
 }
 .location {
     color: var(--brand);
@@ -319,3 +319,97 @@ background-color: rgba(219, 37, 235, 0.06);
     }
 }
 
+/* Dropdown improvements */
+.notification-dropdown,
+.profile-dropdown {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 250px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.clear-all-btn {
+  background: none;
+  border: none;
+  color: #d218d8;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.clear-all-btn:hover {
+  text-decoration: underline;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.notification-item.error {
+  background: rgba(212, 66, 66, 0.05);
+}
+
+.notification-item.info {
+  background: rgba(210, 24, 216, 0.05);
+}
+
+.notification-msg {
+  margin: 0;
+  font-size: 14px;
+  color: #2f2f2f;
+  flex: 1;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #94a3b8;
+}
+
+.remove-btn:hover {
+  color: #d44242;
+}
+
+/* Focus states for accessibility */
+.notification:focus,
+.dashboard:focus,
+.user-profile:focus {
+  outline: 2px solid #d218d8;
+  outline-offset: 2px;
+}
+
+.profile-link {
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #2f2f2f;
+  transition: background-color 0.2s;
+}
+
+.profile-link:hover {
+  background-color: #f8fafc;
+}
+
+.profile-link.logout {
+  color: #d44242;
+}

@@ -1,199 +1,404 @@
-import { useState,useRef,useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import "./Header.css";
 import { IoMdSettings } from "react-icons/io";
-import {useLocation} from "react-router-dom";
-import { IoNotificationsSharp } from "react-icons/io5"; // Example from Ionicons
+import { IoNotificationsSharp } from "react-icons/io5";
 import { BiSolidCollection } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
-// import { FaUserTie } from "react-icons/fa6";
 import { ImUser } from "react-icons/im";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
-const Header = ({backendError}) => {
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+// Constants for better maintainability
+const BLOCKED_PATHS = ["/masters", "/home", "/settings"];
+const HOVER_DELAY = 300; // Increased from 200ms for better UX
+const INITIAL_NOTIFICATIONS = [];
+
+const Header = ({ backendError = [] }) => {
+  const [notOpen, setNotOpen] = useState(false);
+  const [dashOpen, setDashOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [dashNotifications, setDashNotifications] = useState(INITIAL_NOTIFICATIONS);
   
-//   const toggleMenu = () => {
-//     setIsMenuOpen(!isMenuOpen);
-//   };
+  const location = useLocation();
+  const notifTimer = useRef(null);
+  const dashTimer = useRef(null);
+  const profileTimer = useRef(null);
 
-const [notOpen, setNotOpen] = useState(false);
-const location = useLocation();
-const [dashOpen, setDashOpen] = useState(false);
-const [profileOpen, setProfileOpen] = useState(false);
-const notifTimer = useRef(null);
-const dashTimer = useRef(null);
-const profileTimer = useRef(null);
-
-const date=new Date().toLocaleDateString();
-
-const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
-const locationName = loginData.locationName || "Kochi_Kakkanad";
-
-const [notifications, setNotifications] = useState([]);
-
-const [dashNotifications, setDashNotifications] = useState([
-//   { id: 1, msg: "New user registered", status: true },
-//   { id: 2, msg: "Server overloaded", status: false },
-  // { id: 3, msg: "New order received", status: true },
-]);
-
-//path check for dashboard rendering
-const currentPath = location.pathname;
-const blockedPaths = ["/masters", "/home", "/settings"];
-const shouldRender = !blockedPaths.includes(currentPath);
-//path check for profile-dropdown rendering
-
-const blockedProfilePaths = ["/masters", "/home", "/settings"];
-const shouldProfileRender = blockedProfilePaths.includes(currentPath);
-
-useEffect(() => {
-  setNotifications(backendError || []);
-}, [backendError]);
-  useEffect(() => {
-    if (backendError.length > 0) {
-      setNotOpen(true);
+  // Parse login data safely
+  const getLoginData = () => {
+    try {
+      const data = localStorage.getItem("loginData");
+      return data ? JSON.parse(data) : {};
+    } catch (error) {
+      console.error("Error parsing login data:", error);
+      return {};
     }
-  }, [backendError.length]);
-// Notification removal functions
-const removeNotification = (id) => {
-  setNotifications(prev =>
-    prev.filter(notification => notification.id !== id)
-  );
-};
-const removeDashNotification = (id) => {
-  setDashNotifications(prev =>
-    prev.filter(notification => notification.id !== id)
-  );
-};
+  };
 
+  const loginData = getLoginData();
+  const locationName = loginData.locationName || "Kochi_Kakkanad";
+  const currentPath = location.pathname;
+  const date = new Date().toLocaleDateString();
 
-const handleNotifEnter = () => {
-  clearTimeout(notifTimer.current);
-  setDashOpen(false); // Close dashboard dropdown if open
-  setNotOpen(true);
-};
+  // Determine visibility
+  const shouldRenderDashboard = !BLOCKED_PATHS.includes(currentPath);
+  const shouldRenderProfile = BLOCKED_PATHS.includes(currentPath);
 
-const handleNotifLeave = () => {
-  notifTimer.current = setTimeout(() => {
-    setNotOpen(false);
-  }, 200); // delay before hiding
-};
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(notifTimer.current);
+      clearTimeout(dashTimer.current);
+      clearTimeout(profileTimer.current);
+    };
+  }, []);
 
-const handleDashEnter = () => {
-    clearTimeout(dashTimer.current);
-    setNotOpen(false); // Close notification dropdown if open
-    setDashOpen(true);
-};
+  // Update notifications from backend errors
+  useEffect(() => {
+    if (Array.isArray(backendError)) {
+      setNotifications(backendError);
+      
+      // Auto-open notifications if there are new errors
+      if (backendError.length > 0) {
+        setNotOpen(true);
+        
+        // Auto-close after 5 seconds for new errors
+        const autoCloseTimer = setTimeout(() => {
+          setNotOpen(false);
+        }, 5000);
+        
+        return () => clearTimeout(autoCloseTimer);
+      }
+    }
+  }, [backendError]);
 
-const handleDashLeave = () => {
-    dashTimer.current = setTimeout(() => {
+  // Notification removal functions
+  const removeNotification = useCallback((id) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== id));
+  }, []);
+
+  const removeDashNotification = useCallback((id) => {
+    setDashNotifications(prev => prev.filter(notification => notification.id !== id));
+  }, []);
+
+  // Clear all notifications
+  const clearAllNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
+  // Clear all dashboard notifications
+  const clearAllDashNotifications = useCallback(() => {
+    setDashNotifications([]);
+  }, []);
+
+  // Hover handlers with better UX
+  const handleNotifEnter = useCallback(() => {
+    clearTimeout(notifTimer.current);
     setDashOpen(false);
-  }, 200); // delay before hiding
-};
+    setNotOpen(true);
+  }, []);
 
-const handlerprofileEnter = () => {
+  const handleNotifLeave = useCallback(() => {
+    notifTimer.current = setTimeout(() => {
+      setNotOpen(false);
+    }, HOVER_DELAY);
+  }, []);
+
+  const handleDashEnter = useCallback(() => {
+    clearTimeout(dashTimer.current);
+    setNotOpen(false);
+    setDashOpen(true);
+  }, []);
+
+  const handleDashLeave = useCallback(() => {
+    dashTimer.current = setTimeout(() => {
+      setDashOpen(false);
+    }, HOVER_DELAY);
+  }, []);
+
+  const handleProfileEnter = useCallback(() => {
     clearTimeout(profileTimer.current);
     setProfileOpen(true);
-};
+  }, []);
 
-const handlerprofileLeave = () => {
+  const handleProfileLeave = useCallback(() => {
     profileTimer.current = setTimeout(() => {
+      setProfileOpen(false);
+    }, HOVER_DELAY);
+  }, []);
 
-    setProfileOpen(false);
-  }, 200); // delay before hiding
-    //
-};
+  // Handle escape key to close dropdowns
+  useEffect(() => {
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        setNotOpen(false);
+        setDashOpen(false);
+        setProfileOpen(false);
+      }
+    };
 
-// Notification addition/removal example:
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, []);
 
-// setNotifications(prev => [
-//   ...prev,
-//   {
-//     id: Date.now(),   // unique id
-//     msg: "Something happened",
-//     status: false,    // or true
-//   }
-// ]);
-// const removeNotification = (id) => {
-//   setNotifications(prev => prev.filter(n => n.id !== id));
-// };
-// setNotifications([]);
+  // Handle click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const isNotification = event.target.closest('.notification');
+      const isDashboard = event.target.closest('.dashboard');
+      const isProfile = event.target.closest('.user-profile');
+      
+      if (!isNotification && notOpen) {
+        setNotOpen(false);
+      }
+      if (!isDashboard && dashOpen) {
+        setDashOpen(false);
+      }
+      if (!isProfile && profileOpen) {
+        setProfileOpen(false);
+      }
+    };
 
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [notOpen, dashOpen, profileOpen]);
 
-
-    return (
-    <header className="header">
-        <div className="logo"><img src="/muziris-png.ico" alt="" width="106px" height="55px "/></div>
-        <div className="header-right">
-            <div className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`} 
-            onMouseEnter={handleNotifEnter}
-            onMouseLeave={handleNotifLeave}>
-                <IoNotificationsSharp size={19} />
-
-                {(notifications.length!=0)&&<div className="msgs">{notifications.length}</div>}
-                {notOpen && (
-      <div className="notification-dropdown">
-            {notifications.length > 0 ? (
-        notifications.map((notification) => (
-            <p className="error-msg" key={notification.id} style={{color:'black'}}>{notification.msg} <RxCross2 size={20} color="red" onClick={() => removeNotification(notification.id)}/></p>
-            ))
-        ) : (
-        <p className="no-msg">no notifications</p>
-        )}
+  return (
+    <header className="header" role="banner">
+      <div className="logo">
+        <img 
+          src="/muziris-png.ico" 
+          alt="Muziris Logo" 
+          width="106" 
+          height="55"
+          loading="lazy"
+        />
       </div>
+      
+      <div className="header-right">
+        {/* Notifications */}
+        <div 
+          className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`}
+          onMouseEnter={handleNotifEnter}
+          onMouseLeave={handleNotifLeave}
+          onClick={() => setNotOpen(!notOpen)}
+          role="button"
+          tabIndex="0"
+          aria-label="Notifications"
+          aria-expanded={notOpen}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setNotOpen(!notOpen);
+            }
+          }}
+        >
+          <IoNotificationsSharp size={19} aria-hidden="true" />
+          
+          {notifications.length > 0 && (
+            <div 
+              className="msgs" 
+              role="status"
+              aria-label={`${notifications.length} unread notifications`}
+            >
+              {notifications.length}
+            </div>
+          )}
+          
+          {notOpen && (
+            <div className="notification-dropdown" role="menu">
+              <div className="dropdown-header">
+                {/* <span>Notifications</span> */}
+                {notifications.length > 0 && (
+                  <button 
+                    onClick={clearAllNotifications}
+                    className="clear-all-btn"
+                    aria-label="Clear all notifications"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </div>
+              
+              {notifications.length > 0 ? (
+                <div className="notifications-list">
+                  {notifications.map((notification) => (
+                    <div 
+                      key={notification.id} 
+                      className={`notification-item ${notification.status ? 'error' : 'info'}`}
+                      role="menuitem"
+                    >
+                      <p className="notification-msg">
+                        {notification.msg}
+                      </p>
+                      <button
+                        onClick={() => removeNotification(notification.id)}
+                        className="remove-btn"
+                        aria-label={`Remove notification: ${notification.msg}`}
+                      >
+                        <RxCross2 size={16} aria-hidden="true" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="no-msg" role="alert">No notifications</p>
               )}
             </div>
-        <div>
-            {shouldRender &&
-            <div className="dashboard" onMouseEnter={handleDashEnter}
-    onMouseLeave={handleDashLeave}>
-                <BiSolidCollection size={19} />
-                {dashNotifications.length!=0 &&
-                <div className="msgs">{dashNotifications.length}</div>
-                }
-                {dashOpen && (
-                    <div className="notification-dropdown">
-                        {dashNotifications.length > 0 ? (
-                        dashNotifications.map((notification) => (
-                            <p className="error-msg" key={notification.id} style={{color:'black'}}>
-                              {notification.msg} 
-                              <RxCross2 size={20} color="red" 
-                              onClick={() => removeDashNotification(notification.id)}/></p>
-                        ))
-                    ) : (   
-                        <p className="no-msg">no notifications</p>
-                    )}
-                    </div>
-                )} 
-            </div>}
+          )}
         </div>
-            <div className="location-date">
-            <span className="location">{locationName}</span>
-            <span className="date">{date}</span>
-            </div>
+
+        {/* Dashboard */}
+        {shouldRenderDashboard && (
+          <div 
+            className="dashboard"
+            onMouseEnter={handleDashEnter}
+            onMouseLeave={handleDashLeave}
+            onClick={() => setDashOpen(!dashOpen)}
+            role="button"
+            tabIndex="0"
+            aria-label="Dashboard notifications"
+            aria-expanded={dashOpen}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setDashOpen(!dashOpen);
+              }
+            }}
+          >
+            <BiSolidCollection size={19} aria-hidden="true" />
+            
+            {dashNotifications.length > 0 && (
+              <div 
+                className="msgs"
+                role="status"
+                aria-label={`${dashNotifications.length} dashboard notifications`}
+              >
+                {dashNotifications.length}
+              </div>
+            )}
+            
+            {dashOpen && (
+              <div className="notification-dropdown" role="menu">
+                <div className="dropdown-header">
+                  {/* <span>Dashboard</span> */}
+                  {dashNotifications.length > 0 && (
+                    <button 
+                      onClick={clearAllDashNotifications}
+                      className="clear-all-btn"
+                      aria-label="Clear all dashboard notifications"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
+                
+                {dashNotifications.length > 0 ? (
+                  <div className="notifications-list">
+                    {dashNotifications.map((notification) => (
+                      <div 
+                        key={notification.id} 
+                        className={`notification-item ${notification.status ? 'error' : 'info'}`}
+                        role="menuitem"
+                      >
+                        <p className="notification-msg">
+                          {notification.msg}
+                        </p>
+                        <button
+                          onClick={() => removeDashNotification(notification.id)}
+                          className="remove-btn"
+                          aria-label={`Remove dashboard notification: ${notification.msg}`}
+                        >
+                          <RxCross2 size={16} aria-hidden="true" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-msg" role="alert">No dashboard notifications</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Location & Date */}
+        <div className="location-date">
+          <span 
+            className="location" 
+            title={locationName}
+            aria-label={`Current location: ${locationName}`}
+          >
+            {locationName}
+          </span>
+          <span 
+            className="date" 
+            title={date}
+            aria-label={`Current date: ${date}`}
+          >
+            {date}
+          </span>
+        </div>
+
+        {/* User Profile */}
         <div 
-            className="user-profile" 
-            onMouseEnter={handlerprofileEnter} 
-            onMouseLeave={handlerprofileLeave}
-            >
-            <ImUser size={21} style={{ color: '#d218d8ff'}}/>
-
-            {shouldProfileRender && profileOpen && (
-
-                    <div className="profile-dropdown">
-                        <a href="/changePassword">Change Password</a>
-                        <a href="/logout">Logout</a>
-                    </div>
-                )} 
+          className="user-profile"
+          onMouseEnter={handleProfileEnter}
+          onMouseLeave={handleProfileLeave}
+          onClick={() => setProfileOpen(!profileOpen)}
+          role="button"
+          tabIndex="0"
+          aria-label="User profile"
+          aria-expanded={profileOpen}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setProfileOpen(!profileOpen);
+            }
+          }}
+        >
+          <ImUser 
+            size={21} 
+            style={{ color: '#d218d8ff' }} 
+            aria-hidden="true"
+          />
+          
+          {shouldRenderProfile && profileOpen && (
+            <div className="profile-dropdown" role="menu">
+              <a 
+                href="/changePassword" 
+                role="menuitem"
+                className="profile-link"
+              >
+                Change Password
+              </a>
+              <a 
+                href="/logout" 
+                role="menuitem"
+                className="profile-link logout"
+              >
+                Logout
+              </a>
+            </div>
+          )}
         </div>
-       {/* {currentPath=="/masters/" && 
-       <div className="settings">
-            <IoMdSettings size={19} color="#161414e6"/>
-        </div>} */}
+
+        {/* Optional Settings */}
+        {currentPath === "/masters/" && (
+          <div className="settings">
+            <IoMdSettings 
+              size={19} 
+              color="#161414e6"
+              aria-label="Settings"
+              role="button"
+              tabIndex="0"
+            />
+          </div>
+        )}
 
         {/* <ThemeToggle /> */}
-        </div>
-        
+      </div>
     </header>
   );
 };
