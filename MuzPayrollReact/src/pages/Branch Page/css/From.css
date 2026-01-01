@@ -47,6 +47,12 @@
   --radius-sm: 8px;
   --radius-lg: 16px;
   --radius-xl: 24px;
+
+  /* text sizes */
+  --text-sm: 13px;
+  --text-md: 16px;
+  --text-lg: 19px;
+  --text-xl: 24px;
 }
 
 /* ===== LAYOUT RESET ===== */
@@ -88,7 +94,8 @@ body > * {
   justify-content: center;
   align-items: flex-start;
   padding: 32px 16px;
-  padding-bottom: 9px; /* for scroll to top button space */
+  padding-bottom: 27px; /* for scroll to top button space */
+  padding-top:66px; /* for header space */
 }
 
 
@@ -151,7 +158,7 @@ body > * {
     left: 130px;
     right: 40px;
     height: 2px;
-    width: 71%;
+    width: 72%;
   background: var(--border);
   transform: translateY(-50%);
   z-index: 1;
@@ -268,7 +275,7 @@ body > * {
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--text);
 }
@@ -284,6 +291,7 @@ body > * {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
+  margin-bottom: 19px;
 }
 
 .branch-form-group {
@@ -342,6 +350,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background-color: var(--brand);
 } */
 
+.form-grid textarea{
+  resize: vertical;
+}
 
 /* Fix date picker for styled inputs */
 
@@ -416,7 +427,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* ===== DOCUMENTS SECTION ===== */
 .documents-section {
-  margin-top: 32px;
+  /* margin-top: 32px; */
 }
 
 .documents-card {
@@ -511,7 +522,199 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* ===== RESPONSIVE ===== */
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  .branch-container-tab {
+    padding: 24px 16px;
+    padding-top:72px;
+  }
+  
+  .form-header,
+  .progress-container,
+  .form-content,
+  .branch-form-actions {
+    padding: 20px 24px;
+  }
+  
+  .form-card {
+    /* max-height: calc(100vh - 48px); */
+  }
+  
+  .progress-line,
+  .progress-fill {
+    left: 100px;
+    right: 30px;
+    width: calc(100% - 201px);
+  }
+  /* .progress-fill{
+     left: 121px;
+  } */
+}
+
+/* Mobile (576px - 768px) */
 @media (max-width: 768px) {
+  .branch-container-tab {
+    padding: 16px 12px;
+    padding-top:72px;
+    align-items: stretch;
+  }
+  
+  .form-card {
+    max-height: calc(100vh - 32px);
+    min-height: 500px;
+    overflow: auto;
+  }
+  
+  .form-header {
+    padding: 20px 16px 12px;
+  }
+  
+  .form-header h1 {
+    font-size: var(--text-lg);
+  }
+  
+  .progress-container {
+    padding: 12px 16px 16px;
+  }
+  
+  .progress-steps {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .progress-line,
+  .progress-fill {
+    display: none;
+  }
+  
+  .step-item {
+    flex-direction: row;
+    width: 100%;
+    gap: 12px;
+  }
+  
+  .step-icon {
+    margin-bottom: 0;
+    width: 36px;
+    height: 36px;
+    font-size: var(--text-sm);
+  }
+  
+  .step-label {
+    text-align: left;
+    font-size: var(--text-sm);
+  }
+  
+  .form-content {
+    padding: 20px 16px;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    
+  }
+  
+  .step-animate {
+    min-height: 300px;
+  }
+  
+  .branch-form-actions {
+    padding: 16px;
+    flex-direction: column;
+    gap: 12px;
+    position: relative; /* Remove sticky on mobile for better flow */
+  }
+  
+  .branch-form-actions > div {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .btn {
+    padding: 12px 20px;
+    font-size: var(--text-sm);
+    width: 48%;
+  }
+}
+
+/* Small Mobile (up to 576px) */
+@media (max-width: 576px) {
+  .branch-container-tab {
+    padding: 12px 8px;
+    padding-top:72px;
+  }
+  
+  .form-card {
+    max-height: calc(100vh - 24px);
+    min-height: 450px;
+  }
+  /* .form-header{
+    display:flex;
+    justify-contant:center;
+  } */
+  
+  .form-header h1 {
+    font-size: var(--text-md);
+  }
+
+  .form-container h3{
+    font-size: var(--text-sm);
+  }
+
+  .form-container span{
+    font-size: var(--text-sm);
+  }
+
+  .form-header p {
+    font-size: var(--text-sm);
+    display: none;
+  }
+  
+  .form-content {
+    padding: 16px 12px;
+  }
+  
+  .branch-form-group .form-label,
+  .form-control{
+    font-size:var(--text-sm);
+  }
+
+  .step-animate {
+    min-height: 250px;
+  }
+  .btn-primary,
+  .btn-secondary{
+    width: 37%;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-evenly;
+    /* width: 27%; */
+  }
+  .btn-add{
+    width: 100%;
+  }
+}
+  /* Stack buttons vertically on very small screens */
+  @media (max-width: 400px) {
+    .branch-form-actions > div {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .btn {
+      width: 100%;
+    }
+  }
+
+
+/* @media (max-width: 768px) {
   .branch-container-tab  {
     margin: 16px auto;
     padding: 0 16px;
@@ -531,10 +734,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   
 .progress-steps {
   position: relative;
-  padding: 0 80px; /* controls start & end */
-}
+  padding: 0 80px; 
+  /* controls start & end */
+/* } */
 
-  
+/*   
   .progress-line,
   .progress-fill {
   left: 0;
@@ -552,7 +756,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-bottom: 0;
     flex-shrink: 0;
   }
-}
+}  */
 
 /* ===== UTILITY CLASSES ===== */
 .text-hint {

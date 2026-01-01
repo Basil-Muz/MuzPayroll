@@ -6,6 +6,7 @@ import ContactForm from "./ContactForm";
 import "../../css/From.css";
 import StepProgress from "./StepProgress";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import DocumentsTab from "../Documents Info/DocumentsTab";
 
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
@@ -111,6 +112,7 @@ export default function GenaralBranchForm() {
   };
 
   return (
+    <> 
    <div className="branch-container-tab">
   <div className="form-card">
     {/* Header */}
@@ -125,7 +127,7 @@ export default function GenaralBranchForm() {
         <div className="progress-line"></div>
         <div 
           className="progress-fill" 
-          style={{ width: `${(step / (steps.length - 1)) * 70}%` }}
+          style={{ width: `${(step / (steps.length - 1)) * 74}%` }}
         ></div>
         
         {steps.map((stepItem, index) => (
@@ -149,8 +151,11 @@ export default function GenaralBranchForm() {
           {step === 0 && (
             <div className="form-section">
             <GeneralInfoForm
-              register={register}
-              errors={errors}
+                register={register}
+                errors={errors}
+                watch={watch}
+                setValue={setValue}
+                setError={setError}
             />
             </div>
           )}
@@ -160,20 +165,38 @@ export default function GenaralBranchForm() {
               <AddressForm
                 register={register}
                 errors={errors}
+                watch={watch}
+                setValue={setValue}
+                setError={setError}
               />
             </div>
           )}
           
           {step === 2 && (
             <div className="form-section">
-              <div className="section-header">
-                <span className="section-number">3</span>
-                <h2 className="section-title">Contact Information</h2>
-                <span className="section-subtitle">Communication details</span>
-              </div>
+              
               {/* Contact form fields */}
+              <ContactForm
+                register={register}
+                errors={errors}
+                watch={watch}
+                setValue={setValue}
+                setError={setError}
+              />
             </div>
           )}
+          {step === 3 &&(
+            <div className="form-section">
+              {/* Documentation form fields */}
+              <DocumentsTab
+                register={register}
+                errors={errors}
+                watch={watch}
+                setValue={setValue}
+                setError={setError}
+              />
+            </div>)}
+
         </div>
 
         {/* Form Actions */}
@@ -222,5 +245,6 @@ export default function GenaralBranchForm() {
     </div>
   </div>
 </div>
+</>
   );
 }

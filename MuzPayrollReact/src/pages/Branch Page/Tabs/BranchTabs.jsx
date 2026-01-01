@@ -1,16 +1,18 @@
-import { useState } from "react";
+// import { useState } from "react";
 import GeneralTab from "../Tabs/General Info/GenaralBranchForm";
 import DocumentsTab from "../Tabs/Documents Info/DocumentsTab";
 import "../css/BranchTab.css";
 
 export default function BranchTabs() {
-  const [activeTab, setActiveTab] = useState("general");
-
+//   const [activeTab, setActiveTab] = useState("general");
+      const [backendErrors, setBackendErrors] = useState({});
   return (
+    <>
+    <Header backendError=backendErrors />
     <div className="branch-container">
       {/* Tabs Header */}
       <div className="tabs-header">
-        <button
+        {/* <button
           className={`tab-btn ${activeTab === "general" ? "active" : ""}`}
           onClick={() => setActiveTab("general")}
         >
@@ -22,14 +24,15 @@ export default function BranchTabs() {
           onClick={() => setActiveTab("documents")}
         >
           Documents Info
-        </button>
+        </button> */}
       </div>
 
       {/* Tabs Content */}
       <div className="tabs-content glass">
-        {activeTab === "general" && <GeneralTab />}
-        {activeTab === "documents" && <DocumentsTab />}
+         <GeneralTab />
+        {/* {activeTab === "documents" && <DocumentsTab />} */}
       </div>
     </div>
+    </>
   );
 }

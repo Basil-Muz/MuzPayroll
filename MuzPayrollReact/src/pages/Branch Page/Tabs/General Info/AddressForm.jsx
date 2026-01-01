@@ -1,63 +1,71 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 
 export default function AddressForm({
   register,
   errors,
-  disabled = false,
-  requiredMap = {},
+  watch,
+  setValue,
+  setError,
+  // disabled = false,
+  // requiredMap = {},
 }) {
 
-    const {
-      // register,
-      handleSubmit,
-      trigger,
-      setError,
-      setValue,
-      watch,
-      // formState: { errors },
-    } = useForm({ mode: "onBlur" });
+    // const {
+    //   register,
+    //   handleSubmit,
+    //   trigger,
+    //   setError,
+    //   setValue,
+    //   watch,
+    //   formState: { errors },
+    // } = useForm({ mode: "onBlur" });
+
     const watchedPincode = watch("branchPinCode");
-    useEffect(() => {
-      if (!watchedPincode || watchedPincode.length !== 6) return;
-  
-      const fetchLocationByPincode = async () => {
-          try {
-              // Example: India pincode API
-              const response = await fetch(
-                  `https://api.postalpincode.in/pincode/${watchedPincode}`
-              );
-              const data = await response.json();
-  
-              if (data[0]?.Status !== "Success") {
-                  setError("branchPinCode", {
-                      type: "manual",
-                      message: "Invalid Pincode",
-                  });
-                  return;
-              }
-  
-              const postOffice = data[0].PostOffice[0];
-  
-              // Auto-fill fields
-              setValue("branchCountry", "India");
-              setValue("branchState", postOffice.State);
-              setValue("branchDistrict", postOffice.District);
-              setValue("branchPlace", postOffice.Name);
-  
-              // Optional: Lat/Lng (if you use a geocoding API)
-              setValue("branchLatitude", "");
-              setValue("branchLongitude", "");
-  
-          } catch (error) {
-              setError("branchPinCode", {
-                  type: "manual",
-                  message: "Unable to fetch location details",
-              });
-              console.error("Error fetching pincode data:", error);
-          }
-      };
-    fetchLocationByPincode();
+
+  useEffect(() => {
+    if (!watchedPincode || watchedPincode.length !== 6) return;
+
+    const fetchLocationByPincode = async () => {
+      try {
+        const response = await fetch(
+          `https://api.postalpincode.in/pincode/${watchedPincode}`
+        );
+        const data = await response.json();
+        
+        if (data[0]?.Status !== "Success") {
+          setError("branchPinCode", {
+            type: "manual",
+            message: "Invalid Pincode",
+          });
+          return;
+        }
+
+        const postOffice = data[0].PostOffice[0];
+
+        const address = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State}, India`;
+
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
+        );
+        const locationdata = await res.json();
+        // console.log("srgfwergwer location",locationdata);
+        if (locationdata.length > 0) {
+          setValue("branchLatitude", locationdata[0].lat);
+          setValue("branchLongitude", locationdata[0].lon);
+        }
+        setValue("branchCountry", "India");
+        setValue("branchState", postOffice.State);
+        setValue("branchDistrict", postOffice.District);
+        setValue("branchPlace", postOffice.Name);
+
+      } catch (err) {
+        setError("branchPinCode", {
+          type: "manual",
+          message: "Unable to fetch location details "+err.msg,
+        });
+      }
+    };
+  fetchLocationByPincode();
   }, [watchedPincode, setValue, setError]);
   return (
     <>
@@ -91,13 +99,13 @@ export default function AddressForm({
                       {...register("branchPinCode", {
                         required: "Branch PinCode is required",
                         pattern: {
-                                    value: /^[0-9]{6}$/,
-                                    message: "Enter valid 6 digit pincode",
-                                  },
+                          value: /^[0-9]{6}$/,
+                          message: "Enter valid 6 digit pincode",
+                        },
                       })}
                     />
                     {errors.branchPinCode && (
-                      <span className="error-message">Branch PinCode is required</span>
+                      <span className="error-message">{errors.branchPinCode.message}</span>
                     )}
                   </div>
 
@@ -146,10 +154,15 @@ export default function AddressForm({
                       type="text" 
                       className="form-control"
                       placeholder="Enter branch Place"
-                      {...register('branchPlace', { required: true })}
+                      {...register('branchPlace', { required: "Branch place required" ,
+                        pattern:{
+                          value: /^[a-zA-Z]+([a-zA-Z]+)*$/,
+                          message: "Please enter a valid branch latitude"
+                        },
+                      })}
                     />
                     {errors.branchPlace && (
-                      <span className="error-message">Branch Place is required</span>
+                      <span className="error-message">{errors.branchPlace.message}</span>
                     )}
                   </div>
 
@@ -159,10 +172,15 @@ export default function AddressForm({
                       type="text" 
                       className="form-control"
                       placeholder="Enter branch Latitude"
-                      {...register('branchLatitude', { required: true })}
+                      {...register('branchLatitude', { required: "Branch latitude required" ,
+                        pattern:{
+                          value: /^-?([0-8]?[0-9]|90)(\.[0-9]{1,10})?$/,
+                          message: "Please enter a valid branch latitude"
+                        },
+                      })}
                     />
                     {errors.branchLatitude && (
-                      <span className="error-message"> Latitude is required</span>
+                      <span className="error-message">{errors.branchLatitude.message}</span>
                     )}
                   </div>
 
@@ -172,10 +190,15 @@ export default function AddressForm({
                       type="text" 
                       className="form-control"
                       placeholder="Enter branch Longitude"
-                      {...register('branchLongitude', { required: true })}
+                      {...register('branchLongitude', { required: "Branch longitude required",
+                         pattern:{
+                          value: /^-?([0-8]?[0-9]|90)(\.[0-9]{1,10})?$/,
+                          message: "Please enter a valid branch longitude"
+                        },
+                       })}
                     />
                     {errors.branchLongitude && (
-                      <span className="error-message"> Longitude is required</span>
+                      <span className="error-message">{errors.branchLongitude.message}</span>
                     )}
                   </div>
                 </div>

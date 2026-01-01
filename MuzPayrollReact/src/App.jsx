@@ -23,7 +23,7 @@ import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import Designation from "./pages/designation/designation.jsx";
 
-import BranchPageForm from "./pages/Branch Page/Tabs/BranchTabs.jsx";
+import BranchPageForm from "./pages/Branch Page/Tabs/General Info/GenaralBranchForm.jsx";
 
 function App() {
   return (
