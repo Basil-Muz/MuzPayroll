@@ -53,6 +53,8 @@
   --text-md: 16px;
   --text-lg: 19px;
   --text-xl: 24px;
+
+  --header-padding:94px;//Header width 66px
 }
 
 /* ===== LAYOUT RESET ===== */
@@ -79,7 +81,7 @@ body {
 }
 body > * {
   max-width: 100vw !important;
-  /* overflow-x: hidden !important; */
+  overflow-x: hidden !important;
 }
 /* ===== MAIN CONTAINER ===== */
 /* .branch-container-tab {
@@ -95,7 +97,7 @@ body > * {
   align-items: flex-start;
   padding: 32px 16px;
   padding-bottom: 27px; /* for scroll to top button space */
-  padding-top: 7rem; /* for header space */
+  padding-top: var(--header-padding); /* for header space */
 }
 
 
@@ -110,7 +112,7 @@ body > * {
 } */
 .form-card {
   width: 100%;
-  max-width: 1000px;
+  max-width: 1100px;
   background: var(--background);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
@@ -142,7 +144,7 @@ body > * {
 
 /* ===== PROGRESS BAR - MODERN ===== */
 .progress-container {
-  padding: 9px 31px 17px;
+  padding: 15px 31px 17px;
   background: var(--background);
 }
 
@@ -158,7 +160,7 @@ body > * {
     left: 130px;
     right: 40px;
     height: 2px;
-    width: 72%;
+    width: 73%;
   background: var(--border);
   transform: translateY(-50%);
   z-index: 1;
@@ -170,7 +172,7 @@ body > * {
     left: 130px;
     right: 40px;
     height: 2px;
-    width: 71%;
+    width: 72%;
   background: linear-gradient(90deg, var(--brand) 0%, var(--brand-light) 100%);
   transform: translateY(-50%);
   z-index: 2;
@@ -319,25 +321,84 @@ body > * {
   margin-left: 4px;
 }
 
-.form-control {
+.form-control{
   padding: 12px 16px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-lg);
   font-size: 14px;
   color: var(--text);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   background: var(--background);
 }
 
 .form-control:focus {
   outline: none;
-  border-color: var(--brand);
+  border-color: var(--brand-border);
   box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1);
 } 
+.error{
+  border-color: var(--danger);
+}
+.css-13cymwt-control{
+  border-radius:0;
+}
+.form-control-select__control {
+  /* padding: 4px 8px; */
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-lg)!important;
+  font-size: 14px !important;
+  background: var(--background) !important;
+  min-height: 44px !important;
+  transition: all 0.3s ease !important;
+}
+
+.form-control-select__control--is-focused {
+  border-color: var(--brand-border) !important;
+  box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1) !important;
+}
+
+/* Error state */
+.error .form-control-select__control {
+  border-color: var(--danger) !important;
+}
+
+.form-control-select__placeholder{
+  color: var(--text-light) !important;
+}
+
+.form-control-select__menu .css-lnmdiq5-menu {
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  background: var(--background);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+/* Individual option */
+.form-control-select__option {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--text) !important;
+  background-color: var(--background);
+  cursor: pointer;
+}
+
+.form-control-select__option--is-focused {
+  background-color: rgba(208, 99, 241, 0.1) !important;
+  /* color: var(--text); */
+}
+
+/* Selected option */
+.form-control-select__option--is-selected {
+  background-color: var(--brand-border) !important; // overriding style by default
+  /* color: #fff; */
+}
 
 input.form-control {
     font-family: Arial, sans-serif;
 } 
+
+
 
 /* Make calendar icon visible */
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -382,7 +443,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* ===== BUTTONS ===== */
 .btn {
-  padding: 12px 28px;
+  padding: 10px 28px;
   border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
@@ -397,12 +458,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .btn-primary {
   background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 8px rgba(224, 99, 241, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgba(213, 99, 241, 0.4);
 }
 
 .btn-primary:active {
@@ -425,100 +486,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   height: 16px;
 }
 
-/* ===== DOCUMENTS SECTION ===== */
-.documents-section {
-  /* margin-top: 32px; */
-}
+/* .doc-table .btn-upload {
+  background: #de28e3;
+  color: white;
+  padding: 8px 16px;
+  font-size: 13px;
+} */
 
-.documents-card {
+/* .doc-table .btn-download {
   background: var(--background);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.doc-header {
-  padding: 20px 24px;
-  background: var(--background-alt);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.doc-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.doc-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.btn-add {
-  background: var(--success);
-  color: white;
+  border: 1px solid #de28e3;
+  color: #de28e3;
   padding: 8px 16px;
   font-size: 13px;
-}
+} */
 
-.doc-table-container {
-  overflow-x: auto;
-}
-
-.doc-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 800px;
-}
-
-.doc-table thead {
-  background: var(--background-alt);
-}
-
-.doc-table th {
-  padding: 16px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-.doc-table td {
-  padding: 16px;
-  border-bottom: 1px solid var(--border-light);
-  vertical-align: middle;
-}
-
-.doc-table tr:hover {
-  background: var(--background-alt);
-}
-
-.doc-table select,
-.doc-table input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-}
-
-.doc-table .btn-upload {
-  background: var(--brand);
-  color: white;
-  padding: 8px 16px;
-  font-size: 13px;
-}
-
-.doc-table .btn-download {
-  background: var(--success);
-  color: white;
-  padding: 8px 16px;
-  font-size: 13px;
+.branch-container-tab .floating-action-bar{
+  right:37px;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -526,7 +510,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 @media (max-width: 1024px) {
   .branch-container-tab {
     padding: 24px 16px;
-    padding-top:72px;
+    padding-top:var(--header-padding);
   }
   
   .form-header,
@@ -555,13 +539,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 @media (max-width: 768px) {
   .branch-container-tab {
     padding: 16px 12px;
-    padding-top:72px;
+    padding-top:var(--header-padding);
     align-items: stretch;
   }
   
   .form-card {
-    max-height: calc(100vh - 32px);
-    min-height: 500px;
+    /* max-height: calc(100vh - 32px);
+    min-height: 500px; */
     overflow: auto;
   }
   
@@ -607,7 +591,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
   
   .form-content {
-    padding: 20px 16px;
+    padding: 23px 31px;
+    padding-top: 18px;
   }
   
   .form-grid {
@@ -638,18 +623,22 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: var(--text-sm);
     width: 48%;
   }
+
+  .branch-container-tab .floating-action-bar{
+    bottom:3rem;
+  }
 }
 
 /* Small Mobile (up to 576px) */
 @media (max-width: 576px) {
   .branch-container-tab {
     padding: 12px 8px;
-    padding-top:72px;
+    padding-top: var(--header-padding);
   }
   
   .form-card {
-    max-height: calc(100vh - 24px);
-    min-height: 450px;
+    /* max-height: calc(100vh - 24px);
+    min-height: 450px; */
   }
   /* .form-header{
     display:flex;
@@ -712,51 +701,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       width: 100%;
     }
   }
-
-
-/* @media (max-width: 768px) {
-  .branch-container-tab  {
-    margin: 16px auto;
-    padding: 0 16px;
-  }
-  
-  .form-header,
-  .progress-container,
-  .form-content,
-  .branch-form-actions {
-    padding: 24px;
-  }
-  
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-.progress-steps {
-  position: relative;
-  padding: 0 80px; 
-  /* controls start & end */
-/* } */
-
-/*   
-  .progress-line,
-  .progress-fill {
-  left: 0;
-  right: 0;
-  width: 100%;
-  }
-  
-  .step-item {
-    flex-direction: row;
-    width: 100%;
-    gap: 12px;
-  }
-  
-  .step-icon {
-    margin-bottom: 0;
-    flex-shrink: 0;
-  }
-}  */
 
 /* ===== UTILITY CLASSES ===== */
 .text-hint {

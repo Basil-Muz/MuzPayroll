@@ -8,6 +8,7 @@ import StepProgress from "./StepProgress";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import DocumentsTab from "../Documents Info/DocumentsTab";
 import Header from "../../../../components/Header/Header";
+import FloatingActionBar from "../../../../components/demo_buttons/FloatingActionBar";
 
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
@@ -21,6 +22,7 @@ export default function GenaralBranchForm() {
     setError,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm({ mode: "onBlur" });
   const watchedPincode = watch("branchPinCode");
@@ -158,6 +160,7 @@ export default function GenaralBranchForm() {
                 watch={watch}
                 setValue={setValue}
                 setError={setError}
+                control={control}
             />
             </div>
           )}
@@ -219,7 +222,7 @@ export default function GenaralBranchForm() {
           </div>
           
           <div>
-            {step < steps.length - 1 ? (
+            {step < steps.length - 1 && (
               <button 
                 type="button" 
                 className="btn btn-primary"
@@ -230,23 +233,60 @@ export default function GenaralBranchForm() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
-            ) : (
-              <button 
-                type="submit" 
-                className="btn btn-primary"
-              >
-                Complete Registration
-                <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </button>
-            )}
+            ) 
+            // : (
+            //   <button 
+            //     type="submit" 
+            //     className="btn btn-primary"
+            //   >
+            //     Complete Registration
+            //     <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            //       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            //     </svg>
+            //   </button>
+            // )
+            }
           </div>
         </div>
       </form>
     </div>
   </div>
+  <FloatingActionBar
+  actions={{
+    save: {
+      // onClick: handleSave,
+      // disabled:true,
+      disabled: step < steps.length - 1
+    },
+    search: {
+      // onClick: handleSearch,
+      disabled:true,
+    },
+    clear: {
+      // onClick: handleClear,
+      // disabled:true,
+
+    },
+    // delete: {
+    //   // onClick: handleDelete,
+    //   // disabled: !hasDeletePermission
+    //   disabled: true,
+    // },
+    print: {
+      // onClick: handlePrint,
+      // disabled: isNewRecord
+      disabled: true,
+    },
+    // new: {
+      // onClick: toggleForm,  
+      //to toggle the designation form
+    // },
+    refresh: {
+      onClick: () => window.location.reload(),  // Refresh the page
+    },
+  }}/>
 </div>
+
 </>
   );
 }

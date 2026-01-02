@@ -1,8 +1,11 @@
 export default function ContactForm({
   register,
   errors,
-  disabled = false,
-  requiredMap = {},
+  // watch,
+  // setValue,
+  // setError,
+  disabled = {branchEmail:false},
+  // requiredMap = {},
 }) {
   
   return (
@@ -16,8 +19,8 @@ export default function ContactForm({
         <div className="branch-form-group">
         <label className="form-label required">Email</label>
         <input
-        className="form-control"
-          disabled={disabled}
+        className={`form-control ${errors.branchEmail ? "error" : ""}`}
+          disabled={disabled.branchEmail}
           {...register("branchEmail", {
             required: "Branch email is required",
             pattern: {
@@ -35,9 +38,9 @@ export default function ContactForm({
       <div className="branch-form-group">
         <label className="form-label required">Phone</label>
         <input
-        className="form-control"
-          disabled={disabled}
-           {...register('branchPhone', { required: "Branch phone number required",
+        className={`form-control ${errors.branchPhone ? "error" : ""}`}
+          // disabled={disabled.branchPhone}
+          {...register('branchPhone', { required: "Branch phone number required",
             pattern:{
               value: /^[0-9]{10}$/,
               message: "Please enter a valid phone number",
@@ -51,8 +54,8 @@ export default function ContactForm({
       <div className="branch-form-group">
         <label className="form-label">Landline</label>
         <input
-        className="form-control"
-          disabled={disabled}
+        className={`form-control ${errors.branchLandline ? "error" : ""}`}
+          // disabled={disabled.branchLandline}
           {...register('branchLandline', { required: false ,
             pattern:{
               value: /^[0-9]{8}$/,
@@ -73,9 +76,9 @@ export default function ContactForm({
          <div className="branch-form-group">
         <label className="form-label">Name</label>
         <input
-        className="form-control"
-          disabled={disabled}
-           {...register('employerName', { required: false , 
+        className={`form-control ${errors.employerName ? "error" : ""}`}
+          // disabled={disabled}
+          {...register('employerName', { required: false , 
             pattern: {
               value: /^[a-zA-Z\u00C0-\u01FF\s'-]+$/,
               message: "Please enter a valid name",
@@ -90,8 +93,8 @@ export default function ContactForm({
         <div className="branch-form-group">
         <label className="form-label">Email</label>
         <input
-        className="form-control"
-          disabled={disabled}
+        className={`form-control ${errors.employerEmail ? "error" : ""}`}
+          // disabled={disabled}
           {...register("employerEmail", {
             // required: "Employer Email is required",
             pattern: {
@@ -109,8 +112,8 @@ export default function ContactForm({
       <div className="branch-form-group">
         <label className="form-label">Phone</label>
         <input
-        className="form-control"
-          disabled={disabled}
+        className={`form-control ${errors.employerPhone ? "error" : ""}`}
+          // disabled={disabled}
           {...register('employerPhone', { required: false,
             pattern:{
               value: /^[0-9]{10}$/,
@@ -125,8 +128,8 @@ export default function ContactForm({
       <div className="branch-form-group">
         <label className="form-label">Landline</label>
         <input
-        className="form-control"
-          disabled={disabled}
+        className={`form-control ${errors.employerLandline ? "error" : ""}`}
+          // disabled={disabled}
           {...register('employerLandline', { required: false,
             pattern:{
               value: /^[0-9]{8}$/,

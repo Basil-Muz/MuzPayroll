@@ -1,7 +1,7 @@
 /* ================= PAGE ================= */
 
 .designation-page {
-  padding: 65px 13px 21px 12px;
+  padding: var(--header-padding) 13px 21px 12px;
   font-family: sans-serif;
   background-color: #f2f2f2;
 }
@@ -270,6 +270,7 @@ position: fixed;
 @media (max-width: 768px) {
   .designation-page {
     padding: 55px 10px;
+    padding-top:var(--header-padding);
   }
 
   .header-section {
