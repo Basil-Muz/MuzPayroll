@@ -108,7 +108,7 @@ const Companyform = forwardRef((props, ref) => {
           delete: {
             // onClick: handleDelete,
             // disabled: !hasDeletePermission
-            disabled: true,
+            disabled: true, 
           },
           // print: {
           //   // onClick: handlePrint,

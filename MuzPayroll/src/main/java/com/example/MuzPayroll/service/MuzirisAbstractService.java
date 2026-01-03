@@ -19,17 +19,13 @@ public abstract class MuzirisAbstractService<D, E> {
     // Generate serial code
     public abstract Response<String> generateSerialNo(D dto, E entity);
 
-    // Convert entity → DTO (Optional - provide default implementation)
+    // Convert entity → DTO (Optional)
     public D entityToDto(E entity) {
-        // Default implementation throws UnsupportedOperationException
-        // Subclasses can override if they need this functionality
         throw new UnsupportedOperationException("entityToDto not implemented");
     }
 
-    // Convert DTO → entity (Optional - provide default implementation)
+    // Convert DTO → entity (Optional)
     protected E dtoToEntity(D dto) {
-        // Default implementation throws UnsupportedOperationException
-        // Subclasses can override if they need this functionality
         throw new UnsupportedOperationException("dtoToEntity not implemented");
     }
 

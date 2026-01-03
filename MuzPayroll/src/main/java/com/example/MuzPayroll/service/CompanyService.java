@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,9 +23,9 @@ import com.example.MuzPayroll.entity.CompanyLog;
 import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.CompanyDTO;
+import com.example.MuzPayroll.entity.DTO.CompanyLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
-import com.example.MuzPayroll.repository.CompanyLogRepository;
 import com.example.MuzPayroll.repository.CompanyRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
@@ -40,9 +41,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
     @Autowired
     private CompanyRepository companyRepository;
-
-    @Autowired
-    private CompanyLogRepository companyLogRepository;
 
     @Autowired
     private AuthorizationRepository authorizationRepository;
@@ -86,10 +84,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             errors.add("Place is required");
         if (isEmpty(dto.getPincode()))
             errors.add("Pincode is required");
-        if (isEmpty(dto.getLatitude()))
-            errors.add("Latitude is required");
-        if (isEmpty(dto.getLongitude()))
-            errors.add("Longitude is required");
         if (isEmpty(dto.getLandlineNumber()))
             errors.add("Landline number is required");
         if (isEmpty(dto.getMobileNumber()))
@@ -120,7 +114,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
         // if log table present ---->
         // CALL CompanyLogService entityValidate
-        Response<Boolean> logEntityValidate = companyLogService.entityValidate(dto);
+        CompanyLogDTO logDto = convertToCompanyLogDTO(dto);
+        Response<Boolean> logEntityValidate = companyLogService.entityValidate(logDto);
 
         // If log validation fails, return those errors
         if (!logEntityValidate.isSuccess()) {
@@ -158,8 +153,15 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
         // if log table present ---->
 
+        // ******* Populate Log Entity *********************
+        List<CompanyLog> CompanyLogs = populateLogEntityfromEntity(company);
+        company.setCompanyLogs(CompanyLogs);
+
         // CALL CompanyLogService entityValidate
-        Response<CompanyLog> logEntityPopulate = companyLogService.entityPopulate(dto);
+        CompanyLogDTO logDto = convertToCompanyLogDTO(dto);
+        Response<CompanyLog> logEntityPopulate = companyLogService.entityPopulate(logDto);
+
+        // System.out.println("Log files :" + dto.getCompanyDtoLogs());
 
         // If log entityPopulate fails, return errors
         if (!logEntityPopulate.isSuccess()) {
@@ -211,7 +213,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         // if log table present ---->
         CompanyLog logEntity = new CompanyLog();
 
-        Response<Boolean> logbusinessValidate = companyLogService.businessValidate(dto, logEntity);
+        CompanyLogDTO logDto = convertToCompanyLogDTO(dto);
+        Response<Boolean> logbusinessValidate = companyLogService.businessValidate(logDto, logEntity);
         // If log businessValidate fails, return errors
         if (!logbusinessValidate.isSuccess()) {
             return Response.error(logbusinessValidate.getErrors());
@@ -227,7 +230,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     public Response<Object> generatePK(CompanyDTO dto) {
 
         // if log table present ---->
-        Response<Object> logGeneratePK = companyLogService.generatePK(dto);
+        CompanyLogDTO logDto = convertToCompanyLogDTO(dto);
+        Response<Object> logGeneratePK = companyLogService.generatePK(logDto);
         if (!logGeneratePK.isSuccess()) {
             // Return log service's error
             return logGeneratePK;
@@ -279,6 +283,16 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
                 System.err.println("⚠️ WARNING: Entity is null in generateSerialNo!");
             }
 
+            // if log table present ---->
+            CompanyLog logEntity = new CompanyLog();
+            CompanyLogDTO logDto = convertToCompanyLogDTO(dto);
+            Response<String> loggenerateSerialNo = companyLogService.generateSerialNo(logDto, logEntity);
+            if (!loggenerateSerialNo.isSuccess()) {
+                // Return log service's error
+                return loggenerateSerialNo;
+            }
+            // <-----
+
             return Response.success(generatedCode);
 
         } catch (Exception e) {
@@ -312,8 +326,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         company.setDistrict(dto.getDistrict());
         company.setPlace(dto.getPlace());
         company.setPincode(dto.getPincode());
-        company.setLatitude(dto.getLatitude());
-        company.setLongitude(dto.getLongitude());
         company.setLandlineNumber(dto.getLandlineNumber());
         company.setMobileNumber(dto.getMobileNumber());
         company.setEmail(dto.getEmail());
@@ -347,8 +359,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         dto.setDistrict(entity.getDistrict());
         dto.setPlace(entity.getPlace());
         dto.setPincode(entity.getPincode());
-        dto.setLatitude(entity.getLatitude());
-        dto.setLongitude(entity.getLongitude());
         dto.setLandlineNumber(entity.getLandlineNumber());
         dto.setMobileNumber(entity.getMobileNumber());
         dto.setEmail(entity.getEmail());
@@ -362,57 +372,116 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     @Transactional(rollbackFor = Exception.class)
     protected CompanyMst saveEntity(CompanyMst company, CompanyDTO dto) {
         try {
-            // ===== 1️⃣ SAVE MAIN COMPANY FIRST =====
-            CompanyMst savedCompany = companyRepository.save(company);
+            // ===== SAVE MAIN COMPANY FIRST =====
+            if (company != null) {
+                CompanyMst savedCompany = companyRepository.save(company);
 
-            // ===== 2️⃣ SAVE AUTHORIZATION WITH COMPANY ID =====
-            // Get the authorization created in entityPopulate
-            Authorization auth = company.getAuthorization();
-            if (auth == null) {
-                // Fallback: create new authorization if not set
-                UserMst user = userRepository.findByUserCode(dto.getUserCode());
-                if (user == null) {
-                    throw new RuntimeException("User not found with code: " + dto.getUserCode());
-                }
+                // ===== SAVE AUTHORIZATION WITH COMPANY ID =====
+                // Get the authorization created in entityPopulate
+                Authorization auth = company.getAuthorization();
 
-                auth = new Authorization();
-                auth.setAuthorizationDate(dto.getAuthorizationDate());
-                auth.setAuthorizationStatus(dto.getAuthorizationStatus());
-                auth.setUserMst(user);
+                // Set the company ID
+                auth.setMstId(savedCompany.getId());
+
+                // Save the authorization
+                Authorization savedAuth = authorizationRepository.save(auth);
+
+                // if log table present --->
+                // ===== SAVE COMPANY LOG =====
+
+                // Create a CompanyLog entity first
+                CompanyLog logEntity = new CompanyLog();
+
+                // Set authId in DTO before passing to log service
+                dto.setAuthId(savedAuth.getAuthId());
+
+                // Now call saveEntity with the created entity
+                CompanyLogDTO logDto = convertToCompanyLogDTO(dto);
+                CompanyLog savedLog = companyLogService.saveEntity(logEntity, logDto);
+
+                // <------
+
+                return savedCompany;
+
+            } else {
+                // Handle null case
+                throw new IllegalArgumentException("Company entity cannot be null");
             }
-
-            // Set the company ID
-            auth.setMstId(savedCompany.getId());
-
-            // Save the authorization
-            Authorization savedAuth = authorizationRepository.save(auth);
-
-            // if log table present --->
-            // ===== 3️⃣ SAVE COMPANY LOG =====
-
-            // Create a CompanyLog entity first
-            CompanyLog logEntity = new CompanyLog();
-
-            // ✅ Set authId in DTO before passing to log service
-            dto.setAuthId(savedAuth.getAuthId());
-
-            // ✅ Now call saveEntity with the created entity
-            CompanyLog savedLog = companyLogService.saveEntity(logEntity, dto);
-
-            // <------
-
-            return savedCompany;
 
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error saving company and related entities: " + e.getMessage(), e);
         }
+
     }
 
     // =================== 9️⃣ UTILITY METHODS ===================
 
     private boolean isEmpty(String str) {
         return str == null || str.trim().isEmpty();
+    }
+
+    private List<CompanyLog> populateLogEntityfromEntity(CompanyMst entity) {
+        List<CompanyLog> CompanyLogs = new ArrayList<>();
+        CompanyLog companyLog = new CompanyLog();
+
+        companyLog.setCompany(entity.getCompany());
+        companyLog.setCode(entity.getCode());
+        companyLog.setShortName(entity.getShortName());
+        companyLog.setActiveDate(entity.getActiveDate());
+        companyLog.setWithaffectdate(entity.getWithaffectdate());
+        companyLog.setAddress(entity.getAddress());
+        companyLog.setAddress1(entity.getAddress1());
+        companyLog.setAddress2(entity.getAddress2());
+        companyLog.setCountry(entity.getCountry());
+        companyLog.setState(entity.getState());
+        companyLog.setDistrict(entity.getDistrict());
+        companyLog.setPlace(entity.getPlace());
+        companyLog.setPincode(entity.getPincode());
+        companyLog.setLandlineNumber(entity.getLandlineNumber());
+        companyLog.setMobileNumber(entity.getMobileNumber());
+        companyLog.setEmail(entity.getEmail());
+        companyLog.setEmployerName(entity.getEmployerName());
+        companyLog.setDesignation(entity.getDesignation());
+        companyLog.setEmployerNumber(entity.getEmployerNumber());
+        companyLog.setEmployerEmail(entity.getEmployerEmail());
+
+        CompanyLogs.add(companyLog);
+        return CompanyLogs;
+    }
+
+    private CompanyLogDTO convertToCompanyLogDTO(CompanyDTO dto) {
+        if (dto == null)
+            return null;
+
+        CompanyLogDTO logDto = new CompanyLogDTO();
+        logDto.setAuthId(dto.getAuthId());
+        logDto.setCode(dto.getCode());
+        logDto.setCompany(dto.getCompany());
+        logDto.setShortName(dto.getShortName());
+        logDto.setAddress(dto.getAddress());
+        logDto.setAddress1(dto.getAddress1());
+        logDto.setAddress2(dto.getAddress2());
+        logDto.setCountry(dto.getCountry());
+        logDto.setState(dto.getState());
+        logDto.setDistrict(dto.getDistrict());
+        logDto.setPlace(dto.getPlace());
+        logDto.setPincode(dto.getPincode());
+        logDto.setLandlineNumber(dto.getLandlineNumber());
+        logDto.setMobileNumber(dto.getMobileNumber());
+        logDto.setEmail(dto.getEmail());
+        logDto.setEmployerName(dto.getEmployerName());
+        logDto.setDesignation(dto.getDesignation());
+        logDto.setEmployerNumber(dto.getEmployerNumber());
+        logDto.setEmployerEmail(dto.getEmployerEmail());
+        logDto.setActiveDate(dto.getActiveDate());
+        logDto.setWithaffectdate(dto.getWithaffectdate());
+        logDto.setAuthorizationDate(dto.getAuthorizationDate());
+        logDto.setAuthorizationStatus(dto.getAuthorizationStatus());
+        logDto.setUserCode(dto.getUserCode());
+        logDto.setCompanyImagePath(dto.getCompanyImagePath());
+
+        return logDto;
     }
 
     // =================== 🔟 IMAGE VALIDATION AND PROCESSING ===================
@@ -442,15 +511,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             } catch (IOException e) {
                 return Response.error("Failed to save company image: " + e.getMessage());
             }
-        }
-
-        // If existing image path is provided, validate it exists
-        if (!isEmpty(dto.getCompanyImagePath())) {
-            Path existingPath = Paths.get(dto.getCompanyImagePath());
-            if (!Files.exists(existingPath)) {
-                return Response.error("Existing company image not found at path: " + dto.getCompanyImagePath());
-            }
-            return Response.success(dto.getCompanyImagePath());
         }
 
         return Response.success(null);

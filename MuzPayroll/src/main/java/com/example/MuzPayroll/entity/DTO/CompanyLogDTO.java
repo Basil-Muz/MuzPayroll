@@ -1,30 +1,12 @@
-package com.example.MuzPayroll.entity;
+package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
-@Entity
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class CompanyMst {
-
-    @Transient
-    private List<CompanyLog> CompanyLogs;
-
-    @Transient
-    private Authorization authorization;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class CompanyLogDTO {
 
     @Column(nullable = false)
     private String company;
@@ -47,7 +29,10 @@ public class CompanyMst {
     private LocalDate activeDate;
 
     @Column(nullable = true)
-    private String companyImage;
+    private MultipartFile companyImage;
+
+    @Column(nullable = true)
+    private String companyImagePath;
 
     @Column(nullable = false)
     private String address;
@@ -94,13 +79,16 @@ public class CompanyMst {
     @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    private Long authId;
+
     // Getters and setters
-    public Long getId() {
-        return id;
+
+    public Long getAuthId() {
+        return authId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setAuthId(Long authId) {
+        this.authId = authId;
     }
 
     public String getCode() {
@@ -127,11 +115,11 @@ public class CompanyMst {
         this.activeDate = activeDate;
     }
 
-    public String getCompanyImage() {
+    public MultipartFile getCompanyImage() {
         return companyImage;
     }
 
-    public void setCompanyImage(String companyImage) {
+    public void setCompanyImage(MultipartFile companyImage) {
         this.companyImage = companyImage;
     }
 
@@ -263,19 +251,58 @@ public class CompanyMst {
         this.withaffectdate = withaffectdate;
     }
 
-    public Authorization getAuthorization() {
-        return authorization;
+    public String getCompanyImagePath() {
+        return companyImagePath;
     }
 
-    public void setAuthorization(Authorization authorization) {
-        this.authorization = authorization;
+    public void setCompanyImagePath(String companyImagePath) {
+        this.companyImagePath = companyImagePath;
     }
 
-    public List<CompanyLog> getCompanyLogs() {
-        return CompanyLogs;
+    // Authorization
+
+    @Column
+    private Long mstId;
+
+    @Column(nullable = false)
+    private String userCode;
+
+    @Column(nullable = false)
+    private LocalDate authorizationDate;
+
+    public LocalDate getAuthorizationDate() {
+        return authorizationDate;
     }
 
-    public void setCompanyLogs(List<CompanyLog> companyLogs) {
-        CompanyLogs = companyLogs;
+    public void setAuthorizationDate(LocalDate authorizationDate) {
+        this.authorizationDate = authorizationDate;
     }
+
+    @Column(nullable = false)
+    private Boolean authorizationStatus;
+
+    public Boolean getAuthorizationStatus() {
+        return authorizationStatus;
+    }
+
+    public void setAuthorizationStatus(Boolean authorizationStatus) {
+        this.authorizationStatus = authorizationStatus;
+    }
+
+    public Long getMstId() {
+        return mstId;
+    }
+
+    public void setMstId(Long mstId) {
+        this.mstId = mstId;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
+    }
+
 }

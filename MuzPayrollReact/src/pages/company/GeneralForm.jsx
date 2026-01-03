@@ -156,8 +156,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       formik.setFieldValue("district", "");
       formik.setFieldValue("place", "");
       formik.setFieldValue("pincode", "");
-      formik.setFieldValue("latitude", "");
-      formik.setFieldValue("longitude", "");
       formik.setErrors({});
       formik.setTouched({});
     }
@@ -200,8 +198,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       district: "",
       place: "",
       pincode: "",
-      latitude: "",
-      longitude: "",
       landlineNumber: "",
       mobileNumber: "",
       email: "",
@@ -227,12 +223,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       pincode: Yup.string()
         .matches(/^\d+$/, "Pincode must be only numbers")
         .required("Pincode is required"),
-      latitude: Yup.string()
-        .matches(/^\d+(\.\d+)?$/, "Latitude must be only numbers")
-        .required("Latitude is required"),
-      longitude: Yup.string()
-        .matches(/^\d+(\.\d+)?$/, "Longitude must be only numbers")
-        .required("Longitude is required"),
       landlineNumber: Yup.string()
         .matches(/^\d+$/, "Landline Number must be only numbers")
         .required("Landline Number is required"),
@@ -725,48 +715,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               />
               {formik.touched.pincode && formik.errors.pincode ? (
                 <div className="error">{formik.errors.pincode}</div>
-              ) : null}
-
-              <label htmlFor="latitude" className="fancy-label">
-                Latitude
-              </label>
-              <input
-                type="text"
-                id="latitude"
-                name="latitude"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!addressEditable || !startDate}
-                value={formik.values.latitude}
-                className={
-                  formik.touched.latitude && formik.errors.latitude
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.latitude && formik.errors.latitude ? (
-                <div className="error">{formik.errors.latitude}</div>
-              ) : null}
-
-              <label htmlFor="longitude" className="fancy-label">
-                Longitude
-              </label>
-              <input
-                type="text"
-                id="longitude"
-                name="longitude"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!addressEditable || !startDate}
-                value={formik.values.longitude}
-                className={
-                  formik.touched.longitude && formik.errors.longitude
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.longitude && formik.errors.longitude ? (
-                <div className="error">{formik.errors.longitude}</div>
               ) : null}
             </div>
           </div>
