@@ -77,12 +77,6 @@ public class CompanyLog {
     private String pincode;
 
     @Column(nullable = false)
-    private String latitude;
-
-    @Column(nullable = false)
-    private String longitude;
-
-    @Column(nullable = false)
     private String landlineNumber;
 
     @Column(nullable = false)
@@ -209,22 +203,6 @@ public class CompanyLog {
 
     public void setPincode(String pincode) {
         this.pincode = pincode;
-    }
-
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
     }
 
     public String getLandlineNumber() {

@@ -8,7 +8,7 @@ import "../company/Companyform.css";
 import GeneralForm from "../company/GeneralForm.jsx";
 import DocumentsInfo from "../company/DocumentsInfo.jsx";
 import Header from "../../components/Header/Header.jsx";
-import ManinButtons from "../../components/MainButtons/MainButtons.jsx";
+import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar.jsx";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton.jsx";
 
 const Companyform = forwardRef((props, ref) => {
@@ -50,7 +50,6 @@ const Companyform = forwardRef((props, ref) => {
       <div className="pagename">
         <h2>Company</h2>
         {/* {headerError.length > 0 && (<div className="error-count">{headerError.length}</div>)} */}
-      
       </div>
       <div
         className={`button-toggle ${showdiv === "generalinfo" ? "general-active" : showdiv === "docinfo" ? "doc-active" : ""}`}
@@ -69,9 +68,7 @@ const Companyform = forwardRef((props, ref) => {
           Documents Info
         </button>
       </div>
-
       <div className="form-tabs-container">
-        
         <div
           className={`form-tab ${showdiv === "generalinfo" ? "visible" : "hidden"}`}
         >
@@ -84,7 +81,55 @@ const Companyform = forwardRef((props, ref) => {
           <DocumentsInfo ref={documentsInfoRef} />
         </div>
       </div>
-      <ManinButtons />
+
+      {/* <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/> */}
+     
+      <FloatingActionBar
+        actions={{
+          save: {
+            onClick: () => {
+              if (generalFormRef.current?.save) {
+                generalFormRef.current.save();
+              }
+            },
+            disabled: false,
+            // disabled: isViewMode || isSubmitted
+          },
+          search: {
+            // onClick: handleSearch,
+            disabled: true,
+          },
+          clear: {
+            onClick: () => {
+              if (generalFormRef.current) generalFormRef.current.resetForm();
+              if (documentsInfoRef.current)
+                documentsInfoRef.current.resetForm();
+            },
+            // disabled:true,
+          },
+          delete: {
+            // onClick: handleDelete,
+            // disabled: !hasDeletePermission
+            disabled: true, 
+          },
+          // print: {
+          //   // onClick: handlePrint,
+          //   // disabled: isNewRecord
+          //   disabled: true,
+          // },
+          // new: {
+          //   // onClick: toggleForm,
+          //   //to toggle the designation form
+          // },
+          refresh: {
+            onClick: () => {
+              if (generalFormRef.current?.refresh)
+                generalFormRef.current.refresh();
+            },
+            disabled: true,
+          },
+        }}
+      />{" "}
       <ScrollToTopButton />
     </div>
   );

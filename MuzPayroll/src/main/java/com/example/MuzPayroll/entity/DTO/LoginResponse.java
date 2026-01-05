@@ -1,4 +1,4 @@
-package com.example.MuzPayroll.DTO;
+package com.example.MuzPayroll.entity.DTO;
 
 import java.util.List;
 import com.example.MuzPayroll.entity.CompanyMst;

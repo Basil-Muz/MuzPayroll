@@ -1,4 +1,4 @@
-package com.example.MuzPayroll.DTO;
+package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
 
@@ -6,9 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.Column;
 
-public class CompanyDTO {
+public class CompanyLogDTO {
 
-    // CompanyMst
     @Column(nullable = false)
     private String company;
 
@@ -57,12 +56,6 @@ public class CompanyDTO {
     private String pincode;
 
     @Column(nullable = false)
-    private String latitude;
-
-    @Column(nullable = false)
-    private String longitude;
-
-    @Column(nullable = false)
     private String landlineNumber;
 
     @Column(nullable = false)
@@ -86,7 +79,17 @@ public class CompanyDTO {
     @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    private Long authId;
+
     // Getters and setters
+
+    public Long getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(Long authId) {
+        this.authId = authId;
+    }
 
     public String getCode() {
         return code;
@@ -182,22 +185,6 @@ public class CompanyDTO {
 
     public void setPincode(String pincode) {
         this.pincode = pincode;
-    }
-
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
     }
 
     public String getLandlineNumber() {
