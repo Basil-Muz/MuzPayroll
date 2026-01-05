@@ -81,7 +81,9 @@ const Companyform = forwardRef((props, ref) => {
           <DocumentsInfo ref={documentsInfoRef} />
         </div>
       </div>
+
       {/* <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/> */}
+     
       <FloatingActionBar
         actions={{
           save: {
@@ -108,7 +110,7 @@ const Companyform = forwardRef((props, ref) => {
           delete: {
             // onClick: handleDelete,
             // disabled: !hasDeletePermission
-            disabled: true,
+            disabled: true, 
           },
           // print: {
           //   // onClick: handlePrint,

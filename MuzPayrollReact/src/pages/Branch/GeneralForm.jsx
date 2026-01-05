@@ -16,8 +16,8 @@ import axios from "axios";
 
 const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   let page = "branch";
-  const companyId = 2;
   const user_code = 1001;
+
   const [initialCompanyId, setInitialCompanyId] = useState("");
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
@@ -45,6 +45,17 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   const districts = selectedState
     ? City.getCitiesOfState(selectedCountry, selectedState)
     : [];
+
+  const getLoginData = () => {
+    const stored = localStorage.getItem("loginData");
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return null;
+  };
+  const loginData = getLoginData();
+  // const user_code = loginData?.userCode;
+  const companyId = loginData?.companyId;
 
   const loadCompanyAndBranches = async () => {
     try {

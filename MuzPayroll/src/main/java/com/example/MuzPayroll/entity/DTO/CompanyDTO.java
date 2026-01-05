@@ -1,24 +1,29 @@
 package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
 
 public class CompanyDTO {
+
+    @Transient
+    private List<CompanyLogDTO> companyDtoLogs;
+
+    public List<CompanyLogDTO> getCompanyDtoLogs() {
+        return companyDtoLogs;
+    }
+
+    public void setCompanyDtoLogs(List<CompanyLogDTO> companyDtoLogs) {
+        this.companyDtoLogs = companyDtoLogs;
+    }
 
     // CompanyMst
     @Column(nullable = false)
     private String company;
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
 
     @Column(nullable = false, unique = true)
     private String code;
@@ -57,12 +62,6 @@ public class CompanyDTO {
     private String pincode;
 
     @Column(nullable = false)
-    private String latitude;
-
-    @Column(nullable = false)
-    private String longitude;
-
-    @Column(nullable = false)
     private String landlineNumber;
 
     @Column(nullable = false)
@@ -89,6 +88,14 @@ public class CompanyDTO {
     private Long authId;
 
     // Getters and setters
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
 
     public Long getAuthId() {
         return authId;
@@ -192,22 +199,6 @@ public class CompanyDTO {
 
     public void setPincode(String pincode) {
         this.pincode = pincode;
-    }
-
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
     }
 
     public String getLandlineNumber() {

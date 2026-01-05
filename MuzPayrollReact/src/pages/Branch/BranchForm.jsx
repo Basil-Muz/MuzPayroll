@@ -9,7 +9,7 @@ import GeneralForm from "../Branch/GeneralForm.jsx";
 import DocumentsInfo from "../Branch/DocumentsInfo.jsx";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton.jsx";
 import Header from "../../components/Header/Header.jsx";
-import ManinButtons from "../../components/MainButtons/MainButtons.jsx";
+import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar.jsx";
 const BranchForm = forwardRef((props, ref) => {
   const generalFormRef = useRef();
   const documentsInfoRef = useRef();
@@ -65,7 +65,6 @@ const BranchForm = forwardRef((props, ref) => {
           Documents Info
         </button>
       </div>
-
       <div className="form-tabs-container">
         <Header backendError={headerError} />
 
@@ -81,8 +80,52 @@ const BranchForm = forwardRef((props, ref) => {
           <DocumentsInfo ref={documentsInfoRef} />
         </div>
       </div>
-      <ManinButtons />
-
+      <FloatingActionBar
+        actions={{
+          save: {
+            onClick: () => {
+              if (generalFormRef.current?.save) {
+                generalFormRef.current.save();
+              }
+            },
+            disabled: false,
+            // disabled: isViewMode || isSubmitted
+          },
+          search: {
+            // onClick: handleSearch,
+            disabled: true,
+          },
+          clear: {
+            onClick: () => {
+              if (generalFormRef.current) generalFormRef.current.resetForm();
+              if (documentsInfoRef.current)
+                documentsInfoRef.current.resetForm();
+            },
+            // disabled:true,
+          },
+          delete: {
+            // onClick: handleDelete,
+            // disabled: !hasDeletePermission
+            disabled: true,
+          },
+          // print: {
+          //   // onClick: handlePrint,
+          //   // disabled: isNewRecord
+          //   disabled: true,
+          // },
+          // new: {
+          //   // onClick: toggleForm,
+          //   //to toggle the designation form
+          // },
+          refresh: {
+            onClick: () => {
+              if (generalFormRef.current?.refresh)
+                generalFormRef.current.refresh();
+            },
+            disabled: true,
+          },
+        }}
+      />{" "}
       <ScrollToTopButton />
     </div>
   );
