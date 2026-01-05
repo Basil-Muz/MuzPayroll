@@ -1,11 +1,11 @@
 package com.example.MuzPayroll.controller;
 
-import com.example.MuzPayroll.DTO.ChangePasswordRequest;
-import com.example.MuzPayroll.DTO.ForgotPasswordRequest;
-import com.example.MuzPayroll.DTO.ForgotPasswordResponse;
-import com.example.MuzPayroll.DTO.LoginRequest;
-import com.example.MuzPayroll.DTO.LoginResponse;
 import com.example.MuzPayroll.entity.UserMst;
+import com.example.MuzPayroll.entity.DTO.ChangePasswordRequest;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordRequest;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordResponse;
+import com.example.MuzPayroll.entity.DTO.LoginRequest;
+import com.example.MuzPayroll.entity.DTO.LoginResponse;
 import com.example.MuzPayroll.repository.UserRepository;
 import com.example.MuzPayroll.service.UserMstService;
 

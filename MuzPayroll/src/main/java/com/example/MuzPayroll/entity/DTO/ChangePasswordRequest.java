@@ -1,4 +1,4 @@
-package com.example.MuzPayroll.DTO;
+package com.example.MuzPayroll.entity.DTO;
 
 public class ChangePasswordRequest {
 

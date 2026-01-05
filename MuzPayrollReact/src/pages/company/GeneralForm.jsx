@@ -18,6 +18,7 @@ import { IoClose } from "react-icons/io5";
 const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   let page = "company";
   const user_code = 1001;
+
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
   const [contactInfoEditable, setContactInfoEditable] = useState(false);
@@ -26,7 +27,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
-  const codeInputRef = useRef(null);
+  const nameInputRef = useRef(null);
   const calendarRef = useRef(null);
 
   const [startDate, setStartDate] = useState(null);
@@ -76,16 +77,16 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
     // Formik reset
     formik.resetForm();
 
-    // 🔒 Lock everything again
+    // Lock everything again
     setStartDate(null);
     setIsDateLocked(false);
     setDateLocked(false);
     setInputsUnlocked(false);
 
-    // 📅 Show calendar again
+    // Show calendar again
     setShowCalendar(true);
 
-    // 🖼 Clear image
+    // Clear image
     setFile(null);
     setError("");
     formik.setFieldValue("companyImage", null);
@@ -123,7 +124,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       setShowCalendar(false);
       setInputsUnlocked(true);
       setIsDateLocked(true);
-      focusWithTimeout(codeInputRef);
+      focusWithTimeout(nameInputRef);
     }
   };
   useEffect(() => {
@@ -188,7 +189,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
 
   const formik = useFormik({
     initialValues: {
-      // code: "",
       company: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
@@ -216,13 +216,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
-      // code: Yup.string()
-      //   .required("Code is required")
-      //   .test(
-      //     "only-numbers-symbols",
-      //     "Code must contain only numbers and symbols, no alphabets or spaces",
-      //     (value) => /^[0-9\W_]+$/.test(value || ""),
-      //   ),
       company: Yup.string().required("Company Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
@@ -261,37 +254,27 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
     }),
     onSubmit: async (values) => {
       try {
-        onBackendError([]); // clear previous backend error
+        onBackendError([]);
 
         const formData = new FormData();
-
-        // Append all fields except image
         Object.keys(values).forEach((key) => {
           if (key !== "companyImage") {
             formData.append(key, values[key]);
           }
         });
 
-        // Append image if exists
         if (values.companyImage) {
           formData.append("companyImage", values.companyImage);
         }
-
-        console.log("Sending request to backend...");
 
         const response = await fetch("http://localhost:8087/company/save", {
           method: "POST",
           body: formData,
         });
 
-        console.log("Response status:", response.status);
-
-        // Try to parse as JSON first
         let result;
         try {
           const responseText = await response.text();
-          console.log("Raw response:", responseText);
-
           if (responseText) {
             result = JSON.parse(responseText);
           }
@@ -299,58 +282,33 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
           console.error("Error parsing response:", parseError);
         }
 
-        console.log("Parsed response:", result);
-
-        if (!response.ok) {
-          // Extract error message
-          let errorMessage = "Server error occurred";
-
-          if (result && result.message) {
-            errorMessage = result.message;
-          } else if (result && result.error) {
-            errorMessage = result.error;
-          }
-
-          console.error("Backend error:", errorMessage);
-
-          // Split multiple errors if they exist
-          let errorArray = [];
-          if (errorMessage.includes(";")) {
-            errorArray = errorMessage.split(";").map((err) => err.trim());
-          } else {
-            errorArray = [errorMessage];
-          }
-
-          // Send errors to parent component
-          onBackendError(
-            errorArray.map((msg, index) => ({
-              id: Date.now() + index,
-              msg: msg,
-              status: false,
-            })),
-          );
-
-          // Show alert with errors
-          alert("Validation Failed:\n" + errorArray.join("\n"));
+        if (result && result.success === true) {
+          alert("Company saved successfully!");
+          resetToInitialState();
           return;
         }
 
-        // ✅ SUCCESS
-        if (result && result.success) {
-          alert("Company saved successfully!");
-          resetToInitialState();
+        // Show all errors
+        if (result && result.errors && result.errors.length > 0) {
+          // Log to console
+          console.log("Status code:", result.statusCode);
+          console.log("Errors:", result.errors);
+
+          // Send to parent component
+          if (onBackendError) {
+            onBackendError(
+              result.errors.map((msg, index) => ({
+                id: Date.now() + index,
+                msg: msg,
+                status: false,
+              })),
+            );
+          }
         } else {
-          alert("Unknown response from server");
+          alert("An error occurred");
         }
       } catch (error) {
         console.error("Network error:", error);
-        onBackendError([
-          {
-            id: Date.now(),
-            msg: "Network error. Check if server is running.",
-            status: false,
-          },
-        ]);
         alert("Network error. Please check console.");
       }
     },
@@ -364,7 +322,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
     setInputsUnlocked(false);
     setAuthorization("entry");
 
-    // ✅ Clear image
+    // Clear image
     setFile(null);
     setError("");
     formik.setFieldValue("companyImage", null);
@@ -402,33 +360,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               <div className="headertext">
                 <h4>General Info</h4>
               </div>
-              {/* {onBackendError.length > 0 && (
-                <div className="backend-errors">
-                  {onBackendError.length}
-                </div>)} */}
-              <label htmlFor="code" className="fancy-label">
-                Code
-              </label>
-              <input
-                type="text"
-                id="code"
-                name="code"
-                ref={codeInputRef}
-                onChange={(e) => {
-                  onBackendError([]); // 👈 clear backend error
-                  formik.handleChange(e);
-                }}
-                onBlur={formik.handleBlur}
-                // disabled={!startDate}
-                value={formik.values.code}
-                disabled
-                className={
-                  formik.touched.code && formik.errors.code ? "input-error" : ""
-                }
-              />
-              {formik.touched.code && formik.errors.code ? (
-                <div className="error">{formik.errors.code}</div>
-              ) : null}
 
               <label htmlFor="company" className="fancy-label">
                 Name
@@ -437,6 +368,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
                 type="text"
                 id="company"
                 name="company"
+                ref={nameInputRef}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 disabled={!startDate}
@@ -475,7 +407,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               <label htmlFor="activeDate" className="fancy-label">
                 Active Date
               </label>
-
               <div className="active-date-wrapper">
                 <div className="active-date-input">
                   <DatePicker
@@ -484,11 +415,16 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
                     disabled={!startDate}
                     selected={
                       formik.values.activeDate
-                        ? new Date(formik.values.activeDate)
+                        ? new Date(formik.values.activeDate + "T00:00:00") // Add time part for Date object
                         : new Date() // fallback to today just in case
                     }
                     onChange={(date) => {
-                      formik.setFieldValue("activeDate", date.toISOString());
+                      if (date) {
+                        formik.setFieldValue(
+                          "activeDate",
+                          date.toISOString().split("T")[0],
+                        );
+                      }
                     }}
                     dateFormat="dd/MM/yyyy"
                     className={
@@ -1009,19 +945,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
                 <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
-          </div>
-
-          <div className="form-buttons">
-            <button
-              type="submit"
-              className="submit-btn"
-              onClick={formik.handleSubmit} // optional, Formik already handles this with type="submit"
-            >
-              Submit
-            </button>
-            <button type="button" className="cancel-btn" onClick={cancelForm}>
-              Cancel
-            </button>
           </div>
         </form>
       </div>
