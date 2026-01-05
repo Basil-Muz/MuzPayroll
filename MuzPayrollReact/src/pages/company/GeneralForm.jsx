@@ -17,7 +17,7 @@ import { IoClose } from "react-icons/io5";
 
 const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   let page = "company";
-  const user_code = 1001;
+  const user_code = "1001";
 
   const [employerEditable, setemployerEditable] = useState(false);
   const [addressEditable, setAddressEditable] = useState(false);
@@ -50,6 +50,17 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   const districts = selectedState
     ? City.getCitiesOfState(selectedCountry, selectedState)
     : [];
+
+  const getLoginData = () => {
+    const stored = localStorage.getItem("loginData");
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return null;
+  };
+  const loginData = getLoginData();
+  // const user_code = loginData?.userCode;
+  // console.log("user:", user_code);
 
   useEffect(() => {
     const today = new Date();

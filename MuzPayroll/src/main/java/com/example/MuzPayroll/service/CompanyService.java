@@ -113,7 +113,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         }
 
         // if log table present ---->
-        // CALL CompanyLogService entityValidate
         CompanyLogDTO logDto = convertToCompanyLogDTO(dto);
         Response<Boolean> logEntityValidate = companyLogService.entityValidate(logDto);
 
@@ -160,8 +159,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         // CALL CompanyLogService entityValidate
         CompanyLogDTO logDto = convertToCompanyLogDTO(dto);
         Response<CompanyLog> logEntityPopulate = companyLogService.entityPopulate(logDto);
-
-        // System.out.println("Log files :" + dto.getCompanyDtoLogs());
 
         // If log entityPopulate fails, return errors
         if (!logEntityPopulate.isSuccess()) {
