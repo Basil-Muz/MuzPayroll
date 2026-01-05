@@ -147,6 +147,7 @@ export default function DocumentsTab(
                 <select
                   // className={`form-control ${errors.documentType ? "error" : ""}`}
                     placeholder="Enter document type"
+                    className={`form-control ${errors?.documents?.[index]?.type ? "doc-error" : ""}`}
                     {...register(`documents.${index}.type`, {
                       required: "Document type is required"
                     })}
@@ -177,6 +178,7 @@ export default function DocumentsTab(
                 <label className="required">Document Number</label>
                 <input
                   type="text"
+                  className={`form-control ${errors?.documents?.[index]?.number ? "doc-error" : ""}`}
                   // value={doc.number}
                   placeholder="Enter document number"
                   {...register(`documents.${index}.number`, {
@@ -197,6 +199,7 @@ export default function DocumentsTab(
               <div className="field">
                 <label>Expiry Date</label>
                 <input
+                 className={`form-control ${errors?.documents?.[index]?.expiryDate ? "doc-error" : ""}`}
                 type="date"
                 min={new Date().toISOString().split("T")[0]}
                 {...register(`documents.${index}.expiryDate`)}
@@ -315,6 +318,7 @@ export default function DocumentsTab(
               <input
                 type="text"
                 placeholder="Remarks (Optional)"
+                className={`form-control ${errors?.documents?.[index]?.remarks ? "doc-error" : ""}`}
                 {...register(`documents.${index}.remarks`, {
                   maxLength: {
                     value: 150,

@@ -5,10 +5,10 @@ import "../css/BranchTab.css";
 
 export default function BranchTabs() {
 //   const [activeTab, setActiveTab] = useState("general");
-      const [backendErrors, setBackendErrors] = useState({});
+      // const [backendErrors, setBackendErrors] = useState([]);
   return (
     <>
-    <Header backendError=backendErrors />
+    {/* <Header backendError=backendErrors /> */}
     <div className="branch-container">
       {/* Tabs Header */}
       <div className="tabs-header">

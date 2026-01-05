@@ -14,7 +14,7 @@ const steps = ["General Info", "Address", "Contact", "Document Into"];
 
 export default function GenaralBranchForm() {
   const [step, setStep] = useState(0); //switch steps
-  const [backendErrors, setBackendErrors] = useState({}); //pass the back end error to front end
+  const [backendErrors, setBackendErrors] = useState([]); //pass the back end error to front end
 
   const {
     register,
@@ -39,6 +39,14 @@ export default function GenaralBranchForm() {
       ]
     }
   });
+
+  // From content changes
+  const [formFlags, setFormFlags] = useState({
+  companyForm: false,
+  branchForm: true,
+  locationForm: false
+});
+
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -83,7 +91,6 @@ export default function GenaralBranchForm() {
             setValue("branchState", postOffice.State);
             setValue("branchDistrict", postOffice.District);
             setValue("branchPlace", postOffice.Name);
-
             // Optional: Lat/Lng (if you use a geocoding API)
             setValue("branchLatitude", "");
             setValue("branchLongitude", "");
@@ -101,11 +108,11 @@ export default function GenaralBranchForm() {
 
 
   /** Backend error mapping */
-  const mapBackendErrors = (apiErrors) => {
-    Object.entries(apiErrors).forEach(([field, message]) => {
-      setError(field, { type: "server", message });
-    });
-  };
+  // const mapBackendErrors = (apiErrors) => {
+  //   Object.entries(apiErrors).forEach(([field, message]) => {
+  //     setError(field, { type: "server", message });
+  //   });
+  // };
 
   const nextStep = async () => {
     const valid = await trigger();
@@ -115,25 +122,79 @@ export default function GenaralBranchForm() {
   const prevStep = () => setStep((s) => s - 1);
 
   const onSubmit = async (data) => {
-    try {
-      console.log("Submitting:", data);
+  try {
+    const formData = new FormData();
 
-      //  Simulated backend error
-      throw {
-        response: {
-          data: {
-            errors: {
-              email: "Email already exists",
-              pincode: "Invalid pincode",
-            },
-          },
-        },
+    console.log("Submitting raw data:", data);
+
+    /* -------------------------------
+       1️⃣ Prepare documents JSON
+       (NO FileList inside JSON)
+    -------------------------------- */
+    const documentsPayload = data.documents.map((doc) => {
+      // Append file separately
+      if (doc.file && doc.file.length > 0) {
+        formData.append("files", doc.file[0]); //  backend handles array
+      }
+
+      return {
+        type: doc.type,
+        number: doc.number,
+        expiryDate: doc.expiryDate,
+        remarks: doc.remarks || ""
       };
-    } catch (err) {
-      const apiErrors = err.response?.data?.errors;
-      if (apiErrors) mapBackendErrors(apiErrors);
+    });
+
+    /* -------------------------------
+        Prepare final JSON payload
+    -------------------------------- */
+    const payload = {
+      ...data,
+      documents: documentsPayload
+    };
+        console.log("payload:",payload)
+    //  VERY IMPORTANT: remove FileList from payload
+    delete payload.documents?.file;
+
+    /* -------------------------------
+        Append JSON as Blob
+    -------------------------------- */
+    formData.append(
+      "data",
+      new Blob([JSON.stringify(payload)], {
+        type: "application/json"
+      })
+    );
+
+    /* -------------------------------
+        Debug FormData (correct way)
+    -------------------------------- */
+    console.log("FormData entries:");
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
     }
-  };
+    for (const [key, value] of formData.entries()) {
+  console.log(key, value instanceof File ? "FILE" : value);
+}
+
+    /* -------------------------------
+        API CALL (example)
+    -------------------------------- */
+    // await fetch("/api/branch/save", {
+    //   method: "POST",
+    //   body: formData
+    // });
+
+  } catch (err) {
+    const apiErrors = err.response?.data?.errors;
+    if (apiErrors) {
+      Object.entries(apiErrors).forEach(([field, message]) => {
+        setError(field, { type: "server", message });
+      });
+    }
+  }
+};
+
 
   return (
     <> 
@@ -142,8 +203,16 @@ export default function GenaralBranchForm() {
   <div className="form-card">
     {/* Header */}
     <div className="form-header">
-      <h1>Branch Registration</h1>
-      <p>Register a new branch by filling in the details below</p>
+      <h1>
+       {formFlags.locationForm && " Location "}
+        {formFlags.companyForm && "Company "}
+        {formFlags.branchForm && "Branch "} 
+        Registration</h1>
+      <p>Register a new 
+       {formFlags.locationForm && " company location "}
+        {formFlags.companyForm && " company "}
+        {formFlags.branchForm && " branch "} 
+        by filling in the details below</p>
     </div>
 
     {/* Progress Steps */}
@@ -182,6 +251,7 @@ export default function GenaralBranchForm() {
                 setValue={setValue}
                 setError={setError}
                 control={control}
+                flags={formFlags}
             />
             </div>
           )}
@@ -195,6 +265,7 @@ export default function GenaralBranchForm() {
                 setValue={setValue}
                 setError={setError}
                 control={control}
+                flags={formFlags}
               />
             </div>
           )}
@@ -209,6 +280,7 @@ export default function GenaralBranchForm() {
                 watch={watch}
                 setValue={setValue}
                 setError={setError}
+                flags={formFlags}
               />
             </div>
           )}
@@ -280,7 +352,7 @@ export default function GenaralBranchForm() {
   <FloatingActionBar
   actions={{
     save: {
-      // onClick: handleSave,
+      onClick: handleSubmit(onSubmit),
       // disabled:true,
       disabled: step < steps.length - 1
     },

@@ -1,10 +1,11 @@
 export default function ContactForm({
   register,
   errors,
+  flags,
   // watch,
   // setValue,
   // setError,
-  disabled = {branchEmail:false},
+  // disabled = {branchEmail:false},
   // requiredMap = {},
 }) {
   
@@ -12,67 +13,67 @@ export default function ContactForm({
     <>
       <div className="section-header">
         {/* <span className="section-number">3</span> */}
-        <h3 className="section-title">Branch Contact Information</h3>
-        <span className="section-subtitle">Branch Communication details</span>
+        <h3 className="section-title">{flags.branchForm && "Branch"}{flags.companyForm && "Company"}{flags.locationForm && "Location"} Contact Information</h3>
+        <span className="section-subtitle">{flags.branchForm && "Branch"}{flags.companyForm && "Company"}{flags.locationForm && "Location"} Communication details</span>
       </div>
       <div className="form-grid">
         <div className="branch-form-group">
         <label className="form-label required">Email</label>
         <input
-        className={`form-control ${errors.branchEmail ? "error" : ""}`}
-          disabled={disabled.branchEmail}
-          {...register("branchEmail", {
-            required: "Branch email is required",
+        className={`form-control ${errors.email ? "error" : ""}`}
+          {...register("email", {
+            required: "Email is required",
             pattern: {
               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
               message: "Please enter a valid email address",
             },
           })}
         />
-        {errors.branchEmail && (
+        {errors.email && (
           <span className="error-message">
-            {errors.branchEmail.message}
+            {errors.email.message}
           </span>
         )}
       </div>
       <div className="branch-form-group">
         <label className="form-label required">Phone</label>
         <input
-        className={`form-control ${errors.branchPhone ? "error" : ""}`}
-          // disabled={disabled.branchPhone}
-          {...register('branchPhone', { required: "Branch phone number required",
+        className={`form-control ${errors.phone ? "error" : ""}`}
+          // disabled={disabled.phone}
+          {...register('phone', { required: "Branch phone number required",
             pattern:{
               value: /^[0-9]{10}$/,
               message: "Please enter a valid phone number",
           }})}
         />
-        {errors.branchPhone && (
-            <span className="error-message"> {errors.branchPhone.message}</span>
+        {errors.phone && (
+            <span className="error-message"> {errors.phone.message}</span>
           )}
       </div>
 
       <div className="branch-form-group">
         <label className="form-label">Landline</label>
         <input
-        className={`form-control ${errors.branchLandline ? "error" : ""}`}
-          // disabled={disabled.branchLandline}
-          {...register('branchLandline', { required: false ,
+        className={`form-control ${errors.landline ? "error" : ""}`}
+          // disabled={disabled.landline}
+          {...register('landline', { required: false ,
             pattern:{
               value: /^[0-9]{8}$/,
               message: "Please enter a valid landline number",
           }})}
         />
-        {errors.branchLandline && (
-          <span className="error-message"> {errors.branchLandline.message}</span>
+        {errors.landline && (
+          <span className="error-message"> {errors.landline.message}</span>
         )}
       </div>
       </div>
-      <div className="section-header">
+
+      {!flags.branchForm && <div className="section-header">
         {/* <span className="section-number">3</span> */}
         <h3 className="section-title">Employer Contact Information</h3>
         <span className="section-subtitle">Employer Communication details</span>
-      </div>
-      <div className="form-grid">
+      </div>}
+      {!flags.branchForm && <div className="form-grid">
         <div className="branch-form-group">
         <label className="form-label">Name</label>
         <input
@@ -140,7 +141,7 @@ export default function ContactForm({
           <span className="error-message">{errors.employerLandline.message}</span>
         )}
       </div>
-      </div>
+      </div>}
     </>
   );
 }

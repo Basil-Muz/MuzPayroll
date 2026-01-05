@@ -10,6 +10,7 @@ export default function AddressForm({
   setValue,
   setError,
   control,
+    flags,
   // disabled = false,
   // requiredMap = {},
 }) {
@@ -23,7 +24,7 @@ export default function AddressForm({
     //   formState: { errors },
     // } = useForm({ mode: "onBlur" });
 
-  const watchedPincode = watch("branchPinCode");
+  const watchedPincode = watch("pinCode");
   // const countryOptions = useMemo(() => countryList().getData(), []);
   const [countryCode, setCountryCode] = useState("");
   const [stateCode, setStateCode] = useState("");
@@ -39,7 +40,7 @@ export default function AddressForm({
         const data = await response.json();
         
         if (data[0]?.Status !== "Success") {
-          setError("branchPinCode", {
+          setError("pinCode", {
             type: "manual",
             message: "Invalid Pincode",
           });
@@ -47,16 +48,16 @@ export default function AddressForm({
         }
 
         const postOffice = data[0].PostOffice[0];
-        const address = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State}, India`;
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
-        );
-        const locationdata = await res.json();
+        // const address = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State}, India`;
+        // const res = await fetch(
+        //   `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
+        // );
+        // const locationdata = await res.json();
         // console.log("srgfwergwer location",locationdata);
-        if (locationdata.length > 0) {
-          setValue("branchLatitude", locationdata[0].lat);
-          setValue("branchLongitude", locationdata[0].lon);
-        }
+        // if (locationdata.length > 0) {
+        //   setValue("branchLatitude", locationdata[0].lat);
+        //   setValue("branchLongitude", locationdata[0].lon);
+        // }
           const countryIso = "IN";
         setCountryCode(countryIso);
         setValue("branchCountry", countryIso);
@@ -69,15 +70,15 @@ export default function AddressForm({
         );
 
       if (!matchedState) return;
-        setValue("branchState", matchedState.isoCode);
+        setValue("state", matchedState.isoCode);
         setStateCode(matchedState.isoCode); 
-        // console.log("branchState", postOffice.State);
+        // console.log("state", postOffice.State);
         //  District / City (store NAME)
-        setValue("branchDistrict", postOffice.District);
-        setValue("branchPlace", postOffice.Name);
+        setValue("district", postOffice.District);
+        setValue("place", postOffice.Name);
 
       } catch (err) {
-        setError("branchPinCode", {
+        setError("pinCode", {
           type: "manual",
           message: "Unable to fetch location details "+err.msg,
         });
@@ -131,20 +132,20 @@ const districtOptions = useMemo(
             <label className="form-label required">Pincode</label>
             <input
               type="text"
-              className={`form-control ${errors.branchPinCode ? "error" : ""}`}
-              placeholder="Enter branch Pincode"
+              className={`form-control ${errors.pinCode ? "error" : ""}`}
+              placeholder="Enter Pincode"
               maxLength={6}
               inputMode="numeric"
-              {...register("branchPinCode", {
-                required: "Branch PinCode is required",
+              {...register("pinCode", {
+                required: "PinCode is required",
                 pattern: {
                   value: /^[0-9]{6}$/,
                   message: "Enter valid 6 digit pincode",
                 },
               })}
             />
-            {errors.branchPinCode && (
-              <span className="error-message">{errors.branchPinCode.message}</span>
+            {errors.pinCode && (
+              <span className="error-message">{errors.pinCode.message}</span>
             )}
           </div>
 
@@ -153,10 +154,10 @@ const districtOptions = useMemo(
             <textarea
               type="text" 
               className="form-control"
-              placeholder="Enter branch Address"
-              {...register('branchAddress', { required: true })}
+              placeholder="Enter Address"
+              {...register('address', { required: true })}
             />
-            {errors.branchAddress && (
+            {errors.address && (
               <span className="error-message">Branch Address is required</span>
             )}
           </div>
@@ -173,11 +174,11 @@ const districtOptions = useMemo(
                   placeholder="Select country"
                   isSearchable
                     onChange={(option) => {
-                      field.onChange(option?.value);   // store ISO code
+                      field.onChange(option?.name);   // store ISO code
                       setCountryCode(option?.value || "");
                       setStateCode("");
-                      setValue("branchState", "");
-                      setValue("branchDistrict", "");
+                      setValue("state", "");
+                      setValue("district", "");
                     }}
                   classNamePrefix="form-control-select"
                   className={errors.branchCountry ? "error" : ""}
@@ -201,7 +202,7 @@ const districtOptions = useMemo(
               <label className="form-label required">State</label>
 
               <Controller
-              name="branchState"
+              name="state"
               control={control}
               rules={{ required: "State is required" }}
               render={({ field }) => (
@@ -210,12 +211,15 @@ const districtOptions = useMemo(
                   placeholder="Select state"
                   isSearchable
                     onChange={(option) => {
-                      field.onChange(option?.value);   // store ISO code
+                      field.onChange({
+                        code: option.value,  // "KA"
+                        name: option.name    // "Karnataka"
+                      });   // store name
                       setStateCode(option?.value || "");
-                      setValue("branchDistrict", "");
+                      setValue("district", "");
                     }}
                   classNamePrefix="form-control-select"
-                  className={errors.branchState ? "error" : ""}
+                  className={errors.state ? "error" : ""}
                    value={
           stateOptions.find(
             (option) => option.value === field.value
@@ -225,9 +229,9 @@ const districtOptions = useMemo(
               )}
             />
 
-  {errors.branchState && (
+  {errors.state && (
     <span className="error-message">
-      {errors.branchState.message}
+      {errors.state.message}
     </span>
   )}
 </div>
@@ -236,7 +240,7 @@ const districtOptions = useMemo(
   <label className="form-label required">District</label>
 
   <Controller
-    name="branchDistrict"
+    name="district"
     control={control}
     rules={{ required: "District is required" }}
     render={({ field }) => (
@@ -246,7 +250,7 @@ const districtOptions = useMemo(
         isSearchable
         isDisabled={!stateCode}
         classNamePrefix="form-control-select"
-        className={errors.branchDistrict ? "error" : ""}
+        className={errors.district ? "error" : ""}
         value={
           districtOptions.find(
             (option) => option.value === field.value
@@ -259,9 +263,9 @@ const districtOptions = useMemo(
     )}
   />
 
-  {errors.branchDistrict && (
+  {errors.district && (
     <span className="error-message">
-      {errors.branchDistrict.message}
+      {errors.district.message}
     </span>
   )}
 </div>
@@ -270,21 +274,21 @@ const districtOptions = useMemo(
             <label className="form-label required">Place</label>
             <input
               type="text" 
-              className={`form-control ${errors.branchPlace ? "error" : ""}`}
+              className={`form-control ${errors.place ? "error" : ""}`}
               placeholder="Enter branch Place"
-              {...register('branchPlace', { required: "Branch place required" ,
+              {...register('place', { required: "Branch place required" ,
                 pattern:{
                   value: /^[a-zA-Z ]*$/,
                   message: "Please enter a valid branch place"
                 },
               })}
             />
-            {errors.branchPlace && (
-              <span className="error-message">{errors.branchPlace.message}</span>
+            {errors.place && (
+              <span className="error-message">{errors.place.message}</span>
             )}
           </div>
 
-          <div className="branch-form-group">
+          {/* {flags.locationForm && <div className="branch-form-group">
             <label className="form-label">Latitude</label>
             <input
               type="text" 
@@ -300,9 +304,9 @@ const districtOptions = useMemo(
             {errors.branchLatitude && (
               <span className="error-message">{errors.branchLatitude.message}</span>
             )}
-          </div>
+          </div>}
 
-          <div className="branch-form-group">
+          {flags.locationForm && <div className="branch-form-group">
             <label className="form-label">Longitude</label>
             <input
               type="text" 
@@ -313,12 +317,12 @@ const districtOptions = useMemo(
                   value: /^-?([0-8]?[0-9]|90)(\.[0-9]{1,10})?$/,
                   message: "Please enter a valid branch longitude"
                 },
-               })}
+              })}
             />
             {errors.branchLongitude && (
               <span className="error-message">{errors.branchLongitude.message}</span>
             )}
-          </div>
+          </div>} */}
         </div>
     </>
   );

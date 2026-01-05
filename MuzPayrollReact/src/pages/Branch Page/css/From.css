@@ -208,7 +208,7 @@ body > * {
   background: var(--brand);
   border-color: var(--brand);
   color: white;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(224, 99, 241, 0.3);
 }
 
 .step-item.completed .step-icon {

@@ -9,11 +9,12 @@ export default function GeneralInfoForm({
   watch,
   setValue,
   control,
+  flags,
   // setError,
   // disabled = {false},
   // requiredMap = {},
 }) {
-  const watchName = watch("branchName");
+  const watchName = watch("name");
   // const watchCompany = watch("company");
   // if(watchCompany){
   //   console.log("Comapny: ",register.company);
@@ -31,12 +32,12 @@ export default function GeneralInfoForm({
   { value: "IK", label: "InfoPark Kochi" },
 ];
 
-  const locations = [
-  { value: "Kochi", label: "Kochi" },
-  { value: "Kolkata", label: "Kolkata" },
-  { value: "Hyderabad", label: "Hyderabad" },
-    { value: "Bengaluru", label: "Bengaluru" },
-];
+//   const locations = [
+//   { value: "Kochi", label: "Kochi" },
+//   { value: "Kolkata", label: "Kolkata" },
+//   { value: "Hyderabad", label: "Hyderabad" },
+//     { value: "Bengaluru", label: "Bengaluru" },
+// ];
 
   useEffect(()=>{
     const PatternName = /^[a-zA-Z\s-]+$/;
@@ -48,7 +49,7 @@ export default function GeneralInfoForm({
     .map(word => word[0])  // take first letter
     .join("")
     .toUpperCase();
-    setValue('branchShortName',shortName)
+    setValue('shortName',shortName)
 
   },[watchName, setValue])
 
@@ -57,10 +58,14 @@ export default function GeneralInfoForm({
       <div className="section-header">
                 {/* <span className="section-number">1</span> */}
                 <h2 className="section-title">General Information</h2>
-                <span className="section-subtitle">Basic branch details</span>
+                <span className="section-subtitle">Basic 
+                  {flags.locationForm && " company location "}
+                  {flags.companyForm && " company "}
+                  {flags.branchForm && " branch "} 
+                  details</span>
               </div>
               <div className="form-grid">
-                <div className="branch-form-group">
+                {!flags.companyForm  && <div className="branch-form-group">
                   <label className="form-label required">Company</label>
                   {/* <input 
                     type="text" 
@@ -92,9 +97,9 @@ export default function GeneralInfoForm({
                   {errors.company && (
                     <span className="error-message">{errors.company.message}</span>
                   )}
-                </div>
+                </div>}
 
-                <div className="branch-form-group">
+                {(!flags.companyForm && !flags.branchForm) && <div className="branch-form-group">
                   <label className="form-label required">Branch</label>
                   <Controller
                     name="branch"
@@ -115,9 +120,9 @@ export default function GeneralInfoForm({
                   {errors.branch && (
                     <span className="error-message">{errors.branch.message}</span>
                   )}
-                </div>
+                </div>}
 
-                <div className="branch-form-group">
+                {/* {(!flags.companyForm && !flags.branchForm) && <div className="branch-form-group">
                   <label className="form-label required">Location</label>
                   <Controller
                     name="location"
@@ -138,41 +143,49 @@ export default function GeneralInfoForm({
                   {errors.location && (
                     <span className="error-message">{errors.location.message}</span>
                   )}
-                </div>
+                </div>} */}
 
                 <div className="branch-form-group">
-                  <label className="form-label required">Branch Name</label>
+                  <label className="form-label required">
+                    {flags.locationForm && "Location "}
+                  {flags.companyForm && "Company "}
+                  {flags.branchForm && "Branch "} 
+                    Name</label>
                   <input 
                     type="text" 
-                    className={`form-control ${errors.branchName ? "error" : ""}`}
-                    placeholder="Enter branch name"
-                    {...register('branchName', { required: "Branch name is required",
+                    className={`form-control ${errors.name ? "error" : ""}`}
+                    placeholder="Enter name"
+                    {...register('name', { required: "Name is required",
                       pattern:{
                         value: /^[a-zA-Z\s-]+$/,
-                        message:"Please enter valide branch name",
+                        message:"Please enter valide name",
                       }
                     })}
                   />
-                  {errors.branchName && (
-                    <span className="error-message">{errors.branchName.message}</span>
+                  {errors.name && (
+                    <span className="error-message">{errors.name.message}</span>
                   )}
                 </div>
 
                 <div className="branch-form-group">
-                  <label className="form-label required">Branch Short Name</label>
+                  <label className="form-label required">
+                      {flags.locationForm && "Location "}
+                  {flags.companyForm && "Company "}
+                  {flags.branchForm && "Branch "} 
+                     Short Name</label>
                   <input 
                     type="text" 
-                    className={`form-control ${errors.branchShortName ? "error" : ""}`}
+                    className={`form-control ${errors.shortName ? "error" : ""}`}
                     placeholder="eg: TCS, IBM , SAP.."
-                    {...register('branchShortName', { required: "Branch short name is required",
+                    {...register('shortName', { required: "short name is required",
                        pattern:{
                         value:/^[A-Z0-9]*$/,
-                        message:"Please enter valide branch name",
+                        message:"Please enter valide name",
                       }
                      })}
                   />
-                  {errors.branchShortName && (
-                    <span className="error-message">{errors.branchShortName.message}</span>
+                  {errors.shortName && (
+                    <span className="error-message">{errors.shortName.message}</span>
                   )}
                 </div>
                 
@@ -200,7 +213,7 @@ export default function GeneralInfoForm({
                   )}
                 </div>
 
-                <div className="branch-form-group">
+                {flags.locationForm && <div className="branch-form-group">
                   <label className="form-label required">ESI Reagion</label>
                   <input
                     type="text"
@@ -216,7 +229,7 @@ export default function GeneralInfoForm({
                   {errors.esiReagion && (
                     <span className="error-message">{errors.esiReagion.message}</span>
                   )}
-                </div>
+                </div>}
                 {/* Add more form fields as needed */}
               </div>
               
