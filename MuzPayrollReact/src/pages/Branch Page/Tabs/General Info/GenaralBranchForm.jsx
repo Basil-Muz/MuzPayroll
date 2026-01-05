@@ -1,20 +1,21 @@
 import { useState,useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import GeneralInfoForm from "./GeneralInfoForm";
 import AddressForm from "./AddressForm";
 import ContactForm from "./ContactForm";
 import "../../css/From.css";
 import StepProgress from "./StepProgress";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import DocumentsTab from "../Documents Info/DocumentsTab";
+import DocumentsTab from "../Documents-Info/DocumentsTab";
 import Header from "../../../../components/Header/Header";
 import FloatingActionBar from "../../../../components/demo_buttons/FloatingActionBar";
 
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
 export default function GenaralBranchForm() {
-  const [step, setStep] = useState(0);
-  const [backendErrors, setBackendErrors] = useState({});
+  const [step, setStep] = useState(0); //switch steps
+  const [backendErrors, setBackendErrors] = useState({}); //pass the back end error to front end
+
   const {
     register,
     handleSubmit,
@@ -24,7 +25,27 @@ export default function GenaralBranchForm() {
     watch,
     control,
     formState: { errors },
-  } = useForm({ mode: "onBlur" });
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      documents: [
+        {
+          type: "",
+          number: "",
+          expiryDate: "",
+          file: null,
+          remarks: ""
+        }
+      ]
+    }
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "documents"
+  });
+
+  const watchedDocuments = watch("documents");
   const watchedPincode = watch("branchPinCode");
   
   useEffect(() => {
@@ -173,6 +194,7 @@ export default function GenaralBranchForm() {
                 watch={watch}
                 setValue={setValue}
                 setError={setError}
+                control={control}
               />
             </div>
           )}
@@ -190,7 +212,7 @@ export default function GenaralBranchForm() {
               />
             </div>
           )}
-          {step === 3 &&(
+          {step === 3 && (
             <div className="form-section">
               {/* Documentation form fields */}
               <DocumentsTab
@@ -199,6 +221,10 @@ export default function GenaralBranchForm() {
                 watch={watch}
                 setValue={setValue}
                 setError={setError}
+                fields={fields}
+                append={append}
+                remove={remove}
+                watchDocuments={watchedDocuments}
               />
             </div>)}
 
@@ -282,7 +308,8 @@ export default function GenaralBranchForm() {
       //to toggle the designation form
     // },
     refresh: {
-      onClick: () => window.location.reload(),  // Refresh the page
+      // onClick: () => window.location.reload(),  
+      // Refresh the page
     },
   }}/>
 </div>

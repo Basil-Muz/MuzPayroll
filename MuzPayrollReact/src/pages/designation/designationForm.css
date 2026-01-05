@@ -291,7 +291,9 @@ margin-top: 5px;
   /* margin-right: 5px; */
 }
 
-.modal-designation-form input, select, textarea {
+.modal-designation-form input,
+.modal-designation-form  select,
+.modal-designation-form  textarea {
     width: 100%;
     padding: 8px 10px;
     box-sizing: border-box;

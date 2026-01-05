@@ -73,7 +73,7 @@ export default function ContactForm({
         <span className="section-subtitle">Employer Communication details</span>
       </div>
       <div className="form-grid">
-         <div className="branch-form-group">
+        <div className="branch-form-group">
         <label className="form-label">Name</label>
         <input
         className={`form-control ${errors.employerName ? "error" : ""}`}

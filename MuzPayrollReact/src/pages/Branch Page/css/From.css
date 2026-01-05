@@ -252,6 +252,7 @@ body > * {
 /* ===== FORM SECTIONS ===== */
 .form-section {
   margin-bottom: 32px;
+      /* padding-top: 7px; */
 }
 
 .section-header {
@@ -398,7 +399,16 @@ input.form-control {
     font-family: Arial, sans-serif;
 } 
 
-
+/* Address form */
+select.form-control-select{
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    font-size: 14px !important;
+    color:var(--text);
+    background: var(--background) !important;
+    min-height: 44px !important;
+    transition: all 0.3s ease !important;
+}
 
 /* Make calendar icon visible */
 input[type="date"]::-webkit-calendar-picker-indicator {

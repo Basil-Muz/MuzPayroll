@@ -1,4 +1,7 @@
-import { useEffect } from "react";
+import { Country, State, City } from "country-state-city";
+import { Controller } from "react-hook-form";
+import Select from "react-select";
+import { useState, useEffect, useMemo } from "react";
 
 export default function AddressForm({
   register,
@@ -6,10 +9,10 @@ export default function AddressForm({
   watch,
   setValue,
   setError,
+  control,
   // disabled = false,
   // requiredMap = {},
 }) {
-
     // const {
     //   register,
     //   handleSubmit,
@@ -20,7 +23,10 @@ export default function AddressForm({
     //   formState: { errors },
     // } = useForm({ mode: "onBlur" });
 
-    const watchedPincode = watch("branchPinCode");
+  const watchedPincode = watch("branchPinCode");
+  // const countryOptions = useMemo(() => countryList().getData(), []);
+  const [countryCode, setCountryCode] = useState("");
+  const [stateCode, setStateCode] = useState("");
 
   useEffect(() => {
     if (!watchedPincode || watchedPincode.length !== 6) return; // Invalide pincode
@@ -41,9 +47,7 @@ export default function AddressForm({
         }
 
         const postOffice = data[0].PostOffice[0];
-
         const address = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State}, India`;
-
         const res = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
         );
@@ -53,8 +57,22 @@ export default function AddressForm({
           setValue("branchLatitude", locationdata[0].lat);
           setValue("branchLongitude", locationdata[0].lon);
         }
-        setValue("branchCountry", "India");
-        setValue("branchState", postOffice.State);
+          const countryIso = "IN";
+        setCountryCode(countryIso);
+        setValue("branchCountry", countryIso);
+        const matchedState = State
+        .getStatesOfCountry(countryIso)
+        .find(
+          (s) =>
+            s.name.toLowerCase() ===
+            postOffice.State.toLowerCase()
+        );
+
+      if (!matchedState) return;
+        setValue("branchState", matchedState.isoCode);
+        setStateCode(matchedState.isoCode); 
+        // console.log("branchState", postOffice.State);
+        //  District / City (store NAME)
         setValue("branchDistrict", postOffice.District);
         setValue("branchPlace", postOffice.Name);
 
@@ -67,6 +85,39 @@ export default function AddressForm({
     };
   fetchLocationByPincode();
   }, [watchedPincode, setValue, setError]);
+
+  //filtering the list value, label format
+const countryOptions = useMemo(
+  () =>
+    Country.getAllCountries().map((c) => ({
+      value: c.isoCode,
+      label: c.name,
+    })),
+  []
+);
+
+const stateOptions = useMemo(
+  () =>
+    countryCode
+      ? State.getStatesOfCountry(countryCode).map((s) => ({
+          value: s.isoCode,
+          label: s.name,
+        }))
+      : [],
+  [countryCode]
+);
+
+const districtOptions = useMemo(
+  () =>
+    countryCode && stateCode
+      ? City.getCitiesOfState(countryCode, stateCode).map((d) => ({
+          value: d.name,
+          label: d.name,
+        }))
+      : [],
+  [countryCode, stateCode]
+);
+
   return (
     <>
      <div className="section-header">
@@ -111,43 +162,109 @@ export default function AddressForm({
           </div>
 
           <div className="branch-form-group">
-            <label className="form-label required"> Country</label>
-            <input
-              type="text" 
-              className={`form-control ${errors.branchCountry ? "error" : ""}`}
-              placeholder="Enter branch Country"
-              {...register('branchCountry', { required: true })}
+            <label className="form-label required">Country</label>
+            <Controller
+              name="branchCountry"
+              control={control}
+              rules={{ required: "Country is required" }}
+              render={({ field }) => (
+                <Select
+                  options={countryOptions}
+                  placeholder="Select country"
+                  isSearchable
+                    onChange={(option) => {
+                      field.onChange(option?.value);   // store ISO code
+                      setCountryCode(option?.value || "");
+                      setStateCode("");
+                      setValue("branchState", "");
+                      setValue("branchDistrict", "");
+                    }}
+                  classNamePrefix="form-control-select"
+                  className={errors.branchCountry ? "error" : ""}
+                  value={
+                    countryOptions.find(
+                      (option) => option.value === field.value
+                    ) || null
+                  }             
+                />
+              )}
             />
-            {errors.branchCountry && (
-              <span className="error-message">Branch Country is required</span>
-            )}
-          </div>
+  {errors.branchCountry && (
+    <span className="error-message">
+      {errors.branchCountry.message}
+    </span>
+  )}
+</div>
+
 
           <div className="branch-form-group">
-            <label className="form-label required"> State</label>
-            <input
-              type="text" 
-              className={`form-control ${errors.branchState ? "error" : ""}`}
-              placeholder="Enter branch State"
-              {...register('branchState', { required: true })}
-            />
-            {errors.branchState && (
-              <span className="error-message">Branch State is required</span>
-            )}
-          </div>
+              <label className="form-label required">State</label>
 
-          <div className="branch-form-group">
-            <label className="form-label required">District</label>
-            <input
-              type="text" 
-              className={`form-control ${errors.branchDistrict ? "error" : ""}`}
-              placeholder="Enter branch District"
-              {...register('branchDistrict', { required: true })}
+              <Controller
+              name="branchState"
+              control={control}
+              rules={{ required: "State is required" }}
+              render={({ field }) => (
+                <Select
+                  options={stateOptions}
+                  placeholder="Select state"
+                  isSearchable
+                    onChange={(option) => {
+                      field.onChange(option?.value);   // store ISO code
+                      setStateCode(option?.value || "");
+                      setValue("branchDistrict", "");
+                    }}
+                  classNamePrefix="form-control-select"
+                  className={errors.branchState ? "error" : ""}
+                   value={
+          stateOptions.find(
+            (option) => option.value === field.value
+          ) || null
+        }        
+                />
+              )}
             />
-            {errors.branchDistrict && (
-              <span className="error-message">Branch District is required</span>
-            )}
-          </div>
+
+  {errors.branchState && (
+    <span className="error-message">
+      {errors.branchState.message}
+    </span>
+  )}
+</div>
+
+<div className="branch-form-group">
+  <label className="form-label required">District</label>
+
+  <Controller
+    name="branchDistrict"
+    control={control}
+    rules={{ required: "District is required" }}
+    render={({ field }) => (
+      <Select
+        options={districtOptions}
+        placeholder="Select district"
+        isSearchable
+        isDisabled={!stateCode}
+        classNamePrefix="form-control-select"
+        className={errors.branchDistrict ? "error" : ""}
+        value={
+          districtOptions.find(
+            (option) => option.value === field.value
+          ) || null
+        }
+        onChange={(option) =>
+          field.onChange(option?.value)
+        }
+      />
+    )}
+  />
+
+  {errors.branchDistrict && (
+    <span className="error-message">
+      {errors.branchDistrict.message}
+    </span>
+  )}
+</div>
 
           <div className="branch-form-group">
             <label className="form-label required">Place</label>
@@ -157,7 +274,7 @@ export default function AddressForm({
               placeholder="Enter branch Place"
               {...register('branchPlace', { required: "Branch place required" ,
                 pattern:{
-                  value: /^[a-zA-Z]+([a-zA-Z\\s]+)*$/,
+                  value: /^[a-zA-Z ]*$/,
                   message: "Please enter a valid branch place"
                 },
               })}
@@ -168,12 +285,12 @@ export default function AddressForm({
           </div>
 
           <div className="branch-form-group">
-            <label className="form-label required">Latitude</label>
+            <label className="form-label">Latitude</label>
             <input
               type="text" 
               className={`form-control ${errors.branchLatitude ? "error" : ""}`}
               placeholder="Enter branch Latitude"
-              {...register('branchLatitude', { required: "Branch latitude required" ,
+              {...register('branchLatitude', { 
                 pattern:{
                   value: /^-?([0-8]?[0-9]|90)(\.[0-9]{1,10})?$/,
                   message: "Please enter a valid branch latitude"
@@ -186,13 +303,13 @@ export default function AddressForm({
           </div>
 
           <div className="branch-form-group">
-            <label className="form-label required"> Longitude</label>
+            <label className="form-label">Longitude</label>
             <input
               type="text" 
               className={`form-control ${errors.branchLongitude ? "error" : ""}`}
               placeholder="Enter branch Longitude"
-              {...register('branchLongitude', { required: "Branch longitude required",
-                 pattern:{
+              {...register('branchLongitude', { 
+                pattern:{
                   value: /^-?([0-8]?[0-9]|90)(\.[0-9]{1,10})?$/,
                   message: "Please enter a valid branch longitude"
                 },
