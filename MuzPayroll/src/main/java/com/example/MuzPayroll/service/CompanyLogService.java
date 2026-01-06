@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.CompanyLog;
 import com.example.MuzPayroll.entity.UserMst;
+import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.CompanyLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.CompanyLogRepository;
@@ -27,8 +28,8 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     // =================== 1️⃣ ENTITY VALIDATION ===================
     @Override
-    public Response<Boolean> entityValidate(CompanyLogDTO dto) {
-        if (dto == null)
+    public Response<Boolean> entityValidate(List<CompanyLogDTO> dtos) {
+        if (dtos == null)
             return Response.error("DTO cannot be null");
         List<String> errors = new ArrayList<>();
 
@@ -39,10 +40,11 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         return Response.success(true);
     }
 
-    // =================== 2️⃣ ENTITY POPULATE ===================
+    // // =================== 2️⃣ ENTITY POPULATE ===================
     @Override
-    public Response<Boolean> entityPopulate(CompanyLogDTO dto) {
+    public Response<Boolean> entityPopulate(List<CompanyLogDTO> dtos) {
         List<String> errors = new ArrayList<>();
+        CompanyLogDTO dto = dtos.get(0);
 
         UserMst user = userRepository.findByUserCode(dto.getUserCode());
         if (user == null)
@@ -56,7 +58,8 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     // =================== 3️⃣ BUSINESS VALIDATION ===================
     @Override
-    public Response<Boolean> businessValidate(CompanyLogDTO dto) {
+    public Response<Boolean> businessValidate(List<CompanyLogDTO> dtos) {
+        CompanyLogDTO dto = dtos.get(0);
 
         List<String> errors = new ArrayList<>();
 
@@ -86,13 +89,13 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     // =================== 4️⃣ GENERATE PK ===================
     @Override
-    public Response<Object> generatePK(CompanyLogDTO dto) {
+    public Response<Object> generatePK(List<CompanyLogDTO> dto) {
         return Response.success(true);
     }
 
     // =================== 5️⃣ GENERATE SERIAL NO ===================
     @Override
-    public Response<String> generateSerialNo(CompanyLogDTO dto) {
+    public Response<String> generateSerialNo(List<CompanyLogDTO> dto) {
         // try {
 
         // String prefix = "CM";
@@ -154,16 +157,19 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
     // =================== 6️⃣ converttoEntity ===================
 
     @Override
-    public Response<CompanyLog> converttoEntity(CompanyLogDTO dto) {
+    public Response<CompanyLog> converttoEntity(List<CompanyLogDTO> dto) {
 
         // ===== CREATE COMPANY ENTITY =====
-        CompanyLog company = dtoToEntity(dto);
+        // CompanyLog company = dtoToEntity(dto);
+        CompanyLog company = new CompanyLog();
         return Response.success(company);
     }
 
     // =================== DTO → ENTITY ===================
     @Override
-    protected CompanyLog dtoToEntity(CompanyLogDTO dto) {
+    protected CompanyLog dtoToEntity(List<CompanyLogDTO> dtos) {
+        CompanyLogDTO dto = dtos.get(0);
+
         CompanyLog companyLog = new CompanyLog();
 
         // Set ALL fields
@@ -219,7 +225,8 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
     // =================== SAVE ENTITY IN SERVICE ===================
     @Override
     @Transactional(rollbackFor = Exception.class)
-    protected CompanyLog saveEntity(CompanyLog log, CompanyLogDTO dto) {
+    protected CompanyLog saveEntity(CompanyLog log, List<CompanyLogDTO> dtos) {
+        CompanyLogDTO dto = dtos.get(0);
         try {
             log.setCompany(dto.getCompany());
             log.setCode(dto.getCode());
