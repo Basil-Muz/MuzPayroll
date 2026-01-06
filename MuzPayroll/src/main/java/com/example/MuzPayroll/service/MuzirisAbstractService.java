@@ -8,16 +8,18 @@ public abstract class MuzirisAbstractService<D, E> {
     public abstract Response<Boolean> entityValidate(D dto);
 
     // business Validations
-    public abstract Response<Boolean> businessValidate(D dto, E entity);
+    public abstract Response<Boolean> businessValidate(D dto);
 
     // Populate entity from DTO
-    public abstract Response<E> entityPopulate(D dto);
+    public abstract Response<Boolean> entityPopulate(D dto);
 
     // Generate PK if needed
     public abstract Response<Object> generatePK(D dto);
 
     // Generate serial code
-    public abstract Response<String> generateSerialNo(D dto, E entity);
+    public abstract Response<String> generateSerialNo(D dto);
+
+    public abstract Response<E> converttoEntity(D dto);
 
     // Convert entity → DTO (Optional)
     public D entityToDto(E entity) {
@@ -41,16 +43,13 @@ public abstract class MuzirisAbstractService<D, E> {
         }
 
         // 2. Entity Populate
-        Response<E> r2 = entityPopulate(dto);
+        Response<Boolean> r2 = entityPopulate(dto);
         if (!r2.isSuccess()) {
             return Response.error(r2.getErrors(), r2.getStatusCode());
         }
 
-        // Get the entity after populate
-        E entity = r2.getData();
-
         // 3. Business validation
-        Response<Boolean> r3 = businessValidate(dto, entity);
+        Response<Boolean> r3 = businessValidate(dto);
         if (!r3.isSuccess()) {
             return Response.error(r3.getErrors(), r3.getStatusCode());
         }
@@ -62,16 +61,26 @@ public abstract class MuzirisAbstractService<D, E> {
         }
 
         // 5. Generate serial code
-        Response<String> r5 = generateSerialNo(dto, entity);
+        Response<String> r5 = generateSerialNo(dto);
 
         if (!r5.isSuccess()) {
             return Response.error(r5.getErrors(), r5.getStatusCode());
         }
 
-        // 6. Save entity
+        // 6. Generate entity
+        Response<E> r6 = converttoEntity(dto);
+
+        if (!r6.isSuccess()) {
+            return Response.error(r6.getErrors(), r6.getStatusCode());
+        }
+
+        // Get the entity after populate
+        E entity = r6.getData();
+
+        // 7. Save entity
         E savedEntity = saveEntity(entity, dto);
 
-        // 7. Convert to DTO
+        // 8. Convert to DTO
         D savedDto = entityToDto(savedEntity);
 
         return Response.success(savedDto);

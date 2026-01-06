@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.CompanyLog;
 import com.example.MuzPayroll.entity.UserMst;
-import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.CompanyLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.CompanyLogRepository;
@@ -42,7 +41,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     // =================== 2️⃣ ENTITY POPULATE ===================
     @Override
-    public Response<CompanyLog> entityPopulate(CompanyLogDTO dto) {
+    public Response<Boolean> entityPopulate(CompanyLogDTO dto) {
         List<String> errors = new ArrayList<>();
 
         UserMst user = userRepository.findByUserCode(dto.getUserCode());
@@ -52,16 +51,12 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         if (!errors.isEmpty()) {
             return Response.error(errors);
         }
-
-        // ===== CREATE COMPANY LOG ENTITY =====
-        CompanyLog companyLog = new CompanyLog();
-
-        return Response.success(companyLog);
+        return Response.success(true);
     }
 
     // =================== 3️⃣ BUSINESS VALIDATION ===================
     @Override
-    public Response<Boolean> businessValidate(CompanyLogDTO dto, CompanyLog log) {
+    public Response<Boolean> businessValidate(CompanyLogDTO dto) {
 
         List<String> errors = new ArrayList<>();
 
@@ -77,13 +72,6 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
             if (!isValid) {
                 errors.add("Invalid image path format for audit log");
-            }
-
-            // Set it in the CompanyLog entity
-            if (log != null) {
-                log.setCompanyImage(imagePath);
-            } else {
-                System.out.println("Entity is null, cannot set image path");
             }
         } else {
             System.out.println("No image path in DTO");
@@ -104,7 +92,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     // =================== 5️⃣ GENERATE SERIAL NO ===================
     @Override
-    public Response<String> generateSerialNo(CompanyLogDTO dto, CompanyLog entity) {
+    public Response<String> generateSerialNo(CompanyLogDTO dto) {
         // try {
 
         // String prefix = "CM";
@@ -163,7 +151,17 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     }
 
-    // =================== 6️⃣ DTO → ENTITY ===================
+    // =================== 6️⃣ converttoEntity ===================
+
+    @Override
+    public Response<CompanyLog> converttoEntity(CompanyLogDTO dto) {
+
+        // ===== CREATE COMPANY ENTITY =====
+        CompanyLog company = dtoToEntity(dto);
+        return Response.success(company);
+    }
+
+    // =================== DTO → ENTITY ===================
     @Override
     protected CompanyLog dtoToEntity(CompanyLogDTO dto) {
         CompanyLog companyLog = new CompanyLog();
@@ -189,16 +187,12 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         companyLog.setEmployerNumber(dto.getEmployerNumber());
         companyLog.setEmployerEmail(dto.getEmployerEmail());
         companyLog.setWithaffectdate(dto.getWithaffectdate());
-
-        // Set image path if already available in DTO
-        if (dto.getCompanyImagePath() != null) {
-            companyLog.setCompanyImage(dto.getCompanyImagePath());
-        }
+        companyLog.setCompanyImage(dto.getCompanyImagePath());
 
         return companyLog;
     }
 
-    // =================== 7️⃣ ENTITY → DTO ===================
+    // =================== ENTITY → DTO ===================
     @Override
     public CompanyLogDTO entityToDto(CompanyLog entity) {
         CompanyLogDTO dto = new CompanyLogDTO();
@@ -222,7 +216,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         return dto;
     }
 
-    // =================== 8️⃣ SAVE ENTITY IN SERVICE ===================
+    // =================== SAVE ENTITY IN SERVICE ===================
     @Override
     @Transactional(rollbackFor = Exception.class)
     protected CompanyLog saveEntity(CompanyLog log, CompanyLogDTO dto) {
@@ -247,13 +241,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
             log.setDesignation(dto.getDesignation());
             log.setEmployerNumber(dto.getEmployerNumber());
             log.setEmployerEmail(dto.getEmployerEmail());
-
-            // SET COMPANY IMAGE FROM DTO
-            if (dto.getCompanyImagePath() != null) {
-                log.setCompanyImage(dto.getCompanyImagePath());
-            } else {
-                System.out.println("No image path in DTO");
-            }
+            log.setCompanyImage(dto.getCompanyImagePath());
 
             // SET AUTHORIZATION
             if (dto.getAuthId() != null) {
@@ -274,12 +262,6 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
             e.printStackTrace();
             throw new RuntimeException("Error saving company log: " + e.getMessage(), e);
         }
-    }
-
-    // =================== 9️⃣ UTILITY METHODS ===================
-
-    private boolean isEmpty(String str) {
-        return str == null || str.trim().isEmpty();
     }
 
 }

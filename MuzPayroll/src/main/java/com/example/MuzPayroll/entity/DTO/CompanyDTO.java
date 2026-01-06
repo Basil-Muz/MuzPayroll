@@ -5,10 +5,23 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.Authorization;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
 
 public class CompanyDTO {
+
+    @Transient
+    private Authorization authorization;
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
 
     @Transient
     private List<CompanyLogDTO> companyDtoLogs;
