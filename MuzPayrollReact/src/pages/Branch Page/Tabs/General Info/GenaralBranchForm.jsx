@@ -14,13 +14,15 @@ const steps = ["General Info", "Address", "Contact", "Document Into"];
 
 export default function GenaralBranchForm() {
   const [step, setStep] = useState(0); //switch steps
-  const [backendErrors, setBackendErrors] = useState([]); //pass the back end error to front end
+  // const [backendErrors, setBackendErrors] = useState([]); 
+  //pass the back end error to front end
 
   const {
     register,
     handleSubmit,
     trigger,
     setError,
+    clearErrors,
     setValue,
     watch,
     control,
@@ -41,12 +43,13 @@ export default function GenaralBranchForm() {
   });
 
   // From content changes
-  const [formFlags, setFormFlags] = useState({
+  const [formFlags] = useState({
   companyForm: false,
   branchForm: true,
   locationForm: false
 });
 
+  const [selectedAmendment, setSelectedAmendment] = useState(null);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -54,8 +57,66 @@ export default function GenaralBranchForm() {
   });
 
   const watchedDocuments = watch("documents");
-  const watchedPincode = watch("branchPinCode");
+  // const watchedPincode = watch("branchPinCode");
   
+  const amendments = [
+      {
+    id: 1,
+    type: "VERIFIED",
+    authorizationLabel: "AUTHORIZATION : 01/01/2022",
+    date: "2022-01-01",
+    expiryDate: "2023-12-31",
+    generatedBy: {
+      name: "System",
+      role: "Auto Generated",
+      email: "system@company.com",
+      mobile: null
+    },
+    changes: []
+  },
+  {
+    id: 2,
+    type: "VERIFIED",
+    authorizationLabel: "ENTRY : 10/10/2025",
+    date: "2025-10-10",
+        country:"IN",
+    name:"Demo6456",
+    company:"TCS",
+    expiryDate: "2026-10-09",
+    generatedBy: {
+      name: "HR Manager",
+      role: "Manager",
+      email: "hr@company.com",
+      mobile: "+91 9898989898"
+    },
+    changes: [
+      { field: "district", oldValue: "Ernakulam", newValue: "Thrissur" }
+    ]
+  },
+
+    {
+    id: 3,
+    type: "ENTRY",
+    authorizationLabel: "ENTRY : 20/10/2025",
+    date: "2025-10-20",       
+    expiryDate: null,
+    country:"IN",
+    name:"Demo",
+    company:"TCS",
+    generatedBy: {
+      name: "Admin User",
+      role: "System Administrator",
+      email: "admin@company.com",
+      mobile: "+91 9876543210"
+    },
+    changes: [
+      { field: "companyName", oldValue: "Medical Advance Pvt Ltd", newValue: "Medical Advance Ltd" },
+      { field: "pincode", oldValue: "680001", newValue: "680004" }
+    ]
+  },
+];
+
+
   useEffect(() => {
     const date=new Date(); // current date
     // const createdAt = date.toLocaleDateString('en-GB'); //dd-mm-yyyy format
@@ -66,46 +127,41 @@ export default function GenaralBranchForm() {
   }, [setValue]);
 
   useEffect(() => {
-    if (!watchedPincode || watchedPincode.length !== 6) return;
+    //Api call should bo here
+    //after doing the api call then you must add the field values i added name and company for demo
+    
+  if (!amendments?.length) return;
 
-    const fetchLocationByPincode = async () => {
-        try {
-            // Example: India pincode API
-            const response = await fetch(
-                `https://api.postalpincode.in/pincode/${watchedPincode}`
-            );
-            const data = await response.json();
+  // prevent infinite loop
+  if (selectedAmendment !== null) return;
 
-            if (data[0]?.Status !== "Success") {
-                setError("branchPinCode", {
-                    type: "manual",
-                    message: "Invalid Pincode",
-                });
-                return;
-            }
+  const latest = amendments[amendments.length - 1];
 
-            const postOffice = data[0].PostOffice[0];
+  setSelectedAmendment(latest.id);
 
-            // Auto-fill fields
-            setValue("branchCountry", "India");
-            setValue("branchState", postOffice.State);
-            setValue("branchDistrict", postOffice.District);
-            setValue("branchPlace", postOffice.Name);
-            // Optional: Lat/Lng (if you use a geocoding API)
-            setValue("branchLatitude", "");
-            setValue("branchLongitude", "");
+  setValue("name", latest.name, { shouldDirty: false });
+  setValue("company", latest.company, { shouldDirty: false });
+}, [amendments, selectedAmendment, setValue]);
 
-        } catch (error) {
-            setError("branchPinCode", {
-                type: "manual",
-                message: "Unable to fetch location details",
-            });
-            console.error("Error fetching pincode data:", error);
-        }
-    };
-  fetchLocationByPincode();
-}, [watchedPincode, setValue, setError]);
 
+const handleSelectAmendment = (id,index) => {
+  setSelectedAmendment(id);
+  setValue("name", amendments[index].name);
+   setValue("company", amendments[index].company, {
+    shouldDirty: true,
+    shouldValidate: true,
+  });
+};
+
+const latestAmendmentId = amendments.reduce((latest, current) => { //compute the latest amend Id
+  return new Date(current.date) > new Date(latest.date)
+    ? current
+    : latest;
+}).id;
+
+// setBackendErrors(prev =>
+//   JSON.stringify(prev) === JSON.stringify(errors) ? prev : errors
+// );
 
   /** Backend error mapping */
   // const mapBackendErrors = (apiErrors) => {
@@ -198,7 +254,7 @@ export default function GenaralBranchForm() {
 
   return (
     <> 
-    <Header backendError={backendErrors}/>
+    {/* <Header backendError={backendErrors}/> */}
    <div className="branch-container-tab">
   <div className="form-card">
     {/* Header */}
@@ -250,6 +306,7 @@ export default function GenaralBranchForm() {
                 watch={watch}
                 setValue={setValue}
                 setError={setError}
+                clearErrors={ clearErrors}
                 control={control}
                 flags={formFlags}
             />
@@ -264,6 +321,7 @@ export default function GenaralBranchForm() {
                 watch={watch}
                 setValue={setValue}
                 setError={setError}
+                clearErrors={ clearErrors}
                 control={control}
                 flags={formFlags}
               />
@@ -299,8 +357,71 @@ export default function GenaralBranchForm() {
                 watchDocuments={watchedDocuments}
               />
             </div>)}
-
+            <div className="form-amend">
+              {/* Documentation form fields */}
+              
+            </div>
         </div>
+{/* Authorization + Amendments */}
+<div className="amend-section">
+  <div className="amend-header-row">
+    <div className="amend-field">
+      <label className="form-label">Authorization</label>
+      <select className="form-control">
+        <option>ENTRY : 10/10/2025</option>
+        <option>GENERATE NEW : 20/10/2025</option>
+        <option>AUTHORIZATION : 01/01/2022</option>
+      </select>
+    </div>
+
+    <button className="btn amend-generate">
+      Generate Amendment
+    </button>
+  </div>
+
+<div className="amend-container">
+  {[...amendments]  // shallow copy to avoid mutating state
+  .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
+  .map((item, index) => { // then map
+    const isSelected =
+      selectedAmendment === item.id ||
+      (selectedAmendment === null && item.id === latestAmendmentId);
+    return (
+      <div
+        key={item.id}
+        className={`amend-pill 
+          ${item.type === "ENTRY" ? "entry" : "verified"}
+          ${isSelected ? "selected" : ""}
+        `}
+        onClick={() => handleSelectAmendment(item.id,index)}
+      >
+        <div className="pill-left">
+          <span className="pill-index">{item.id}</span>
+          <div className="pill-info">
+            <span className="pill-type">{item.type}</span>
+            <span className="pill-date">
+              {new Date(item.date).toLocaleDateString("en-GB")}
+            </span>
+          </div>
+        </div>
+
+        <div className="pill-right">
+          {item.type !== "ENTRY" && (
+            <span className="pill-badge verified">✔ Verified</span>
+          )}
+          {item.id === latestAmendmentId && (
+            <span className="pill-badge latest">Latest</span>
+          )}
+        </div>
+      </div>
+    );
+  })}
+</div>
+
+
+</div>
+
+
 
         {/* Form Actions */}
         <div className="branch-form-actions">
@@ -334,7 +455,7 @@ export default function GenaralBranchForm() {
             ) 
             // : (
             //   <button 
-            //     type="submit" 
+            //     type="submit" p-bott
             //     className="btn btn-primary"
             //   >
             //     Complete Registration
@@ -346,6 +467,8 @@ export default function GenaralBranchForm() {
             }
           </div>
         </div>
+        
+        
       </form>
     </div>
   </div>

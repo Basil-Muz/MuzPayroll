@@ -251,8 +251,8 @@ export default function DocumentsTab(
                   
                     {file && (
                       <div className="file-info">
-                        <span className="file-name">{file.name}</span>
-                        <span className="file-size">
+                        <span className="doc-file-name">{file.name}</span>
+                        <span className="doc-file-size">
                           {(file.size / 1024).toFixed(2)} KB
                         </span>
                       </div>

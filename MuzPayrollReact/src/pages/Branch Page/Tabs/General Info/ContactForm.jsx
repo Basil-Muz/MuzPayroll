@@ -127,18 +127,18 @@ export default function ContactForm({
       </div>
 
       <div className="branch-form-group">
-        <label className="form-label">Landline</label>
+        <label className="form-label">Designation</label>
         <input
-        className={`form-control ${errors.employerLandline ? "error" : ""}`}
+        className={`form-control ${errors.employerDesignation ? "error" : ""}`}
           // disabled={disabled}
-          {...register('employerLandline', { required: false,
+          {...register('employerDesignation', { required: false,
             pattern:{
-              value: /^[0-9]{8}$/,
-              message: "Please enter a valid phone number",
+              value: /^[a-zA-Z\u00C0-\u01FF\s'-]+$/,
+              message: "Please enter a valid designation",
           }})}
         />
-        {errors.employerLandline && (
-          <span className="error-message">{errors.employerLandline.message}</span>
+        {errors.employerDesignation && (
+          <span className="error-message">{errors.employerDesignation.message}</span>
         )}
       </div>
       </div>}

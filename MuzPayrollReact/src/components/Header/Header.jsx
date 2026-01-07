@@ -55,23 +55,30 @@ const Header = ({ backendError = [] }) => {
   }, []);
 
   // Update notifications from backend errors
-  useEffect(() => {
-    if (Array.isArray(backendError)) {
-      setNotifications(backendError);
-      
-      // Auto-open notifications if there are new errors
-      if (backendError.length > 0) {
-        setNotOpen(true);
-        
-        // Auto-close after 5 seconds for new errors
-        const autoCloseTimer = setTimeout(() => {
-          setNotOpen(false);
-        }, 5000);
-        
-        return () => clearTimeout(autoCloseTimer);
-      }
+ useEffect(() => {
+  if (!Array.isArray(backendError)) return;
+
+  setNotifications(prev => {
+    // prevent unnecessary updates
+    if (JSON.stringify(prev) === JSON.stringify(backendError)) {
+      return prev;
     }
-  }, [backendError]);
+    return backendError;
+  });
+
+  if (backendError.length > 0) {
+    setNotOpen(prev => {
+      if (prev) return prev; // already open
+      return true;
+    });
+
+    const autoCloseTimer = setTimeout(() => {
+      setNotOpen(false);
+    }, 5000);
+
+    return () => clearTimeout(autoCloseTimer);
+  }
+}, [backendError]);
 
   // Notification removal functions
   const removeNotification = useCallback((id) => {

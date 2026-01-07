@@ -10,6 +10,7 @@ export default function AddressForm({
   setValue,
   setError,
   control,
+   clearErrors,
     flags,
   // disabled = false,
   // requiredMap = {},
@@ -60,7 +61,7 @@ export default function AddressForm({
         // }
           const countryIso = "IN";
         setCountryCode(countryIso);
-        setValue("branchCountry", countryIso);
+        setValue("country", countryIso);
         const matchedState = State
         .getStatesOfCountry(countryIso)
         .find(
@@ -76,7 +77,10 @@ export default function AddressForm({
         //  District / City (store NAME)
         setValue("district", postOffice.District);
         setValue("place", postOffice.Name);
-
+        clearErrors("country")
+        clearErrors("state")
+        clearErrors("district")
+        clearErrors("place")
       } catch (err) {
         setError("pinCode", {
           type: "manual",
@@ -85,7 +89,7 @@ export default function AddressForm({
       }
     };
   fetchLocationByPincode();
-  }, [watchedPincode, setValue, setError]);
+  }, [watchedPincode, setValue, setError, clearErrors]);
 
   //filtering the list value, label format
 const countryOptions = useMemo(
@@ -153,7 +157,7 @@ const districtOptions = useMemo(
             <label className="form-label required">Address</label>
             <textarea
               type="text" 
-              className="form-control"
+               className={`form-control ${errors.pinCode ? "error" : ""}`}
               placeholder="Enter Address"
               {...register('address', { required: true })}
             />
@@ -165,7 +169,7 @@ const districtOptions = useMemo(
           <div className="branch-form-group">
             <label className="form-label required">Country</label>
             <Controller
-              name="branchCountry"
+              name="country"
               control={control}
               rules={{ required: "Country is required" }}
               render={({ field }) => (
@@ -181,7 +185,7 @@ const districtOptions = useMemo(
                       setValue("district", "");
                     }}
                   classNamePrefix="form-control-select"
-                  className={errors.branchCountry ? "error" : ""}
+                  className={errors.country ? "error" : ""}
                   value={
                     countryOptions.find(
                       (option) => option.value === field.value
@@ -190,9 +194,9 @@ const districtOptions = useMemo(
                 />
               )}
             />
-  {errors.branchCountry && (
+  {errors.country && (
     <span className="error-message">
-      {errors.branchCountry.message}
+      {errors.country.message}
     </span>
   )}
 </div>

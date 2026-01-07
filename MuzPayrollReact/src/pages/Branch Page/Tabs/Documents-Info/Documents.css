@@ -215,7 +215,7 @@ input #file{
   display:none
 }
 
-.file-name {
+.doc-file-name {
   font-size: 13px;
   color: var(--text);
   font-weight: 500;
@@ -232,7 +232,7 @@ input #file{
   gap: 8px;
 }
 
-.file-size {
+.doc-file-size {
   font-size: 11px;
   color: var(--text-muted);
   background: var(--background);

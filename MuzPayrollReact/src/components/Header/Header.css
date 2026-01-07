@@ -3,13 +3,16 @@ header.header {
     margin: 0;
     position: fixed;
     top: 0;
-    background-color: white;
+    background-color: var(--background);
     left: 0;
     min-height: 66px;
+    padding-left: 8px;
+    padding-right: 17px;
     width: 100%;
     z-index: 100;
     display: flex;
-    border-bottom: 1px solid #c7c4c4ff;
+  border-bottom: 1px solid rgba(211, 197, 211, 1);
+
     align-items: center;
     justify-content: space-between;
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
@@ -35,7 +38,7 @@ font-family: "Roboto", sans-serif; */
 
 .header-right {
     display: flex;
-    align-items: center;
+    align-items: center;    /* border-bottom: 1px solid #d3c5d3ff;
     justify-content: space-between;
     cursor: pointer;
     padding: 0;
