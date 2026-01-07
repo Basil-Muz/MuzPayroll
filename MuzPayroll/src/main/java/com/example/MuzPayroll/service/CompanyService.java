@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,19 +233,79 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     // =================== 4️⃣ GENERATE PK ===================
     @Override
     public Response<Object> generatePK(List<CompanyDTO> dtos) {
+        List<String> errors = new ArrayList<>();
 
-        // if log table present ---->
-
-        List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
-        Response<Object> logGeneratePK = companyLogService.generatePK(logDtos);
-
-        if (!logGeneratePK.isSuccess()) {
-            // Return log service's error
-            return logGeneratePK;
+        if (dtos == null || dtos.isEmpty()) {
+            errors.add("No company data provided");
         }
-        // <-----
+        CompanyDTO dto = dtos.get(0);
+        Long companyMstID = dto.getCompanyMstID();
 
-        return Response.success(true);
+        try {
+            Long generatedId;
+
+            // SCENARIO 1: ID IS PROVIDED IN DTO
+            if (companyMstID != null) {
+                // Check if this ID exists in database
+                boolean existsInDB = companyRepository.existsByCompanyMstID(companyMstID);
+
+                if (existsInDB) {
+                    // ID is present in DB - use it as is
+                    generatedId = companyMstID;
+                    // Set the generated ID to DTO
+                    dto.setCompanyMstID(generatedId);
+                } else {
+                    // ID provided but NOT in DB - RETURN ERROR
+                    errors.add("Company ID " + companyMstID + " does not exist in database");
+                }
+
+            }
+            // SCENARIO 2: ID IS NOT PROVIDED IN DTO (null)
+            else {
+                // Find maximum ID from database
+                Long maxId = companyRepository.findMaxCompanyMstID();
+
+                if (maxId == null) {
+                    // No data in DB - start from 100000
+                    generatedId = 100000L;
+                } else {
+                    // Data exists - get latest data and increment
+                    Optional<CompanyMst> latestCompany = companyRepository.findLatestById(maxId);
+
+                    if (latestCompany.isPresent()) {
+                        // Get the latest ID and increment by 1
+                        Long latestId = latestCompany.get().getCompanyMstID();
+                        generatedId = latestId + 1;
+
+                        // Ensure it doesn't exceed 6 digits
+                        if (generatedId > 999999L) {
+                            errors.add("Cannot generate ID. Maximum limit (999999) reached.");
+                        }
+
+                    } else {
+                        // Fallback - use maxId + 1
+                        generatedId = maxId + 1;
+                    }
+                }
+
+                // Set the generated ID to DTO
+                dto.setCompanyMstID(generatedId);
+            }
+
+            // Process log table
+            List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+            // Response<Object> logGeneratePK = companyLogService.generatePK(logDtos);
+
+            // if (!logGeneratePK.isSuccess()) {
+            //     return logGeneratePK;
+            // }
+
+            return Response.success(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.error("Error generating PK: " + e.getMessage());
+        }
     }
 
     // =================== 5️⃣ GENERATE SERIAL NO ===================
@@ -345,6 +406,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         CompanyMst company = new CompanyMst();
 
         // Set ALL fields from the first DTO
+        company.setCompanyMstID(dto.getCompanyMstID());
         company.setCode(dto.getCode());
         company.setCompany(dto.getCompany());
         company.setShortName(dto.getShortName());
@@ -383,6 +445,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     @Override
     public CompanyDTO entityToDto(CompanyMst entity) {
         CompanyDTO dto = new CompanyDTO();
+
+        dto.setCompanyMstID(entity.getCompanyMstID());
         dto.setCode(entity.getCode());
         dto.setCompany(entity.getCompany());
         dto.setShortName(entity.getShortName());
@@ -419,7 +483,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             Authorization auth = company.getAuthorization();
 
             // Set the company ID
-            auth.setMstId(savedCompany.getId());
+            auth.setMstId(savedCompany.getCompanyMstID());
 
             // Save the authorization
             Authorization savedAuth = authorizationRepository.save(auth);
@@ -458,6 +522,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         List<CompanyLogDTO> CompanyDtoLogs = new ArrayList<>();
         CompanyLogDTO companyDtoLog = new CompanyLogDTO();
 
+        companyDtoLog.setCompanyLogID(dto.getCompanyMstID());
         companyDtoLog.setCompany(dto.getCompany());
         companyDtoLog.setCode(dto.getCode());
         companyDtoLog.setShortName(dto.getShortName());
@@ -498,6 +563,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
             CompanyLogDTO logDto = new CompanyLogDTO();
 
+            logDto.setCompanyMstID(dto.getCompanyMstID());
             logDto.setAuthId(dto.getAuthId());
             logDto.setCode(dto.getCode());
             logDto.setCompany(dto.getCompany());

@@ -266,6 +266,8 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
 
         if (values.companyImage) {
           formData.append("companyImage", values.companyImage);
+                    console.log(formData);
+
         }
 
         const response = await fetch("http://localhost:8087/company/save", {

@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
@@ -23,8 +21,8 @@ public class CompanyMst {
     private Authorization authorization;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "CompanyMstID", unique = true, nullable = false)
+    private Long companyMstID;
 
     @Column(nullable = false)
     private String company;
@@ -95,12 +93,12 @@ public class CompanyMst {
     private LocalDate withaffectdate;
 
     // Getters and setters
-    public Long getId() {
-        return id;
+    public Long getCompanyMstID() {
+        return companyMstID;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
     }
 
     public String getCode() {

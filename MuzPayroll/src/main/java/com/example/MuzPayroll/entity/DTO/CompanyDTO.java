@@ -35,6 +35,17 @@ public class CompanyDTO {
     }
 
     // CompanyMst
+    @Column(name = "CompanyMstID")
+    private Long companyMstID;
+
+    public Long getCompanyMstID() {
+        return companyMstID;
+    }
+
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
+    }
+
     @Column(nullable = false)
     private String company;
 

@@ -9,6 +9,6 @@ import com.example.MuzPayroll.entity.BranchMst;
 
 @Repository
 public interface BranchRepository extends JpaRepository<BranchMst, Long> {
-    List<BranchMst> findByCompanyEntity_Id(Long companyId); 
+    List<BranchMst> findByCompanyEntity_CompanyMstID(Long companyId); 
 }
 

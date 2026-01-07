@@ -2,6 +2,7 @@ package com.example.MuzPayroll.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.CompanyLog;
+import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.CompanyLogDTO;
@@ -89,7 +91,81 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     // =================== 4️⃣ GENERATE PK ===================
     @Override
-    public Response<Object> generatePK(List<CompanyLogDTO> dto) {
+    public Response<Object> generatePK(List<CompanyLogDTO> dtos) {
+
+        List<String> errors = new ArrayList<>();
+
+        if (dtos == null || dtos.isEmpty()) {
+            return Response.error("No company data provided");
+        }
+
+        CompanyLogDTO dto = dtos.get(0);
+        Long companyMstID = dto.getCompanyMstID();
+        // System.out.println("companymstid*************************************************"
+        // + companyMstID);
+        // try {
+        // Long generatedRowNO;
+
+        // // SCENARIO 1: ID IS PROVIDED IN DTO
+        // if (companyMstID != null) {
+        // String prefix = String.valueOf(companyMstID);
+
+        // List<CompanyLog> companies =
+        // companyLogRepository.findAllByCompanyLogIDStartingWith(prefix);
+
+        // if (companies == null || companies.isEmpty()) {
+        // // No existing records - start from 1
+        // generatedRowNO = 1L;
+        // dto.setRowNo(generatedRowNO);
+
+        // } else {
+        // // Get max ID and split it
+        // Long maxID = companyLogRepository.findMaxByCompanyLogIDStartingWith(prefix);
+
+        // if (maxID == null) {
+        // // Shouldn't happen if companies list is not empty, but handle it
+        // generatedRowNO = 1L;
+        // } else {
+        // // Convert to String
+        // String maxIDStr = String.valueOf(maxID);
+
+        // // Extract suffix (everything after the prefix)
+        // String suffix = maxIDStr.substring(prefix.length());
+
+        // System.out.println("Prefix: " + prefix);
+        // System.out.println("Max ID: " + maxIDStr);
+        // System.out.println("Suffix extracted: " + suffix);
+
+        // try {
+        // // Convert suffix to number and increment
+        // Long suffixNumber = Long.parseLong(suffix);
+        // generatedRowNO = suffixNumber + 1;
+
+        // } catch (NumberFormatException e) {
+        // // If suffix is not a valid number, start from 1
+        // generatedRowNO = 1L;
+        // }
+        // }
+
+        // dto.setRowNo(generatedRowNO);
+        // }
+
+        // System.out.println("Generated Row No: " + dto.getRowNo());
+
+        // } else {
+        // // SCENARIO 2: ID IS NOT PROVIDED
+        // errors.add("CompanyMstID is required");
+        // }
+
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // errors.add("Error generating PK: " + e.getMessage());
+        // }
+        // // Process further if needed
+
+        Long generatedRowNO = 1L;
+        dto.setRowNo(generatedRowNO);
+
         return Response.success(true);
     }
 
@@ -194,6 +270,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         companyLog.setEmployerEmail(dto.getEmployerEmail());
         companyLog.setWithaffectdate(dto.getWithaffectdate());
         companyLog.setCompanyImage(dto.getCompanyImagePath());
+        // companyLog.setRowNo(dto.getRowNo());
 
         return companyLog;
     }
@@ -219,6 +296,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         dto.setEmail(entity.getEmail());
         dto.setCompanyImagePath(entity.getCompanyImage());
         dto.setWithaffectdate(entity.getWithaffectdate());
+        // dto.setRowNo(entity.getRowNo());
         return dto;
     }
 
@@ -249,6 +327,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
             log.setEmployerNumber(dto.getEmployerNumber());
             log.setEmployerEmail(dto.getEmployerEmail());
             log.setCompanyImage(dto.getCompanyImagePath());
+            // log.setRowNo(dto.getRowNo());
 
             // SET AUTHORIZATION
             if (dto.getAuthId() != null) {

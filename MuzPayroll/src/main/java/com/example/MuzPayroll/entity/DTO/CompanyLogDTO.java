@@ -8,6 +8,38 @@ import jakarta.persistence.Column;
 
 public class CompanyLogDTO {
 
+    private Long companyLogID;
+
+    @Column(name = "RowNo")
+    private Long rowNo;
+
+    @Column(name = "CompanyMstID")
+    private Long companyMstID;
+
+    public Long getCompanyMstID() {
+        return companyMstID;
+    }
+
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
+    }
+
+    public Long getRowNo() {
+        return rowNo;
+    }
+
+    public void setRowNo(Long rowNo) {
+        this.rowNo = rowNo;
+    }
+
+    public Long getCompanyLogID() {
+        return companyLogID;
+    }
+
+    public void setCompanyLogID(Long companyLogID) {
+        this.companyLogID = companyLogID;
+    }
+
     @Column(nullable = false)
     private String company;
 

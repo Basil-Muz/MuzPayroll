@@ -7,23 +7,21 @@ import com.example.MuzPayroll.entity.DTO.Response;
 public abstract class MuzirisAbstractService<D, E> {
 
     // Validations
-    public abstract Response<Boolean> entityValidate(List<D>dtos);
+    public abstract Response<Boolean> entityValidate(List<D> dtos);
 
     // Populate entity from DTO
-    public abstract Response<Boolean> entityPopulate(List<D>dtos);
-
+    public abstract Response<Boolean> entityPopulate(List<D> dtos);
 
     // business Validations
-    public abstract Response<Boolean> businessValidate(List<D>dtos);
-
+    public abstract Response<Boolean> businessValidate(List<D> dtos);
 
     // Generate PK if needed
-    public abstract Response<Object> generatePK(List<D>dtos);
+    public abstract Response<Object> generatePK(List<D> dtos);
 
     // Generate serial code
-    public abstract Response<String> generateSerialNo(List<D>dtos);
+    public abstract Response<String> generateSerialNo(List<D> dtos);
 
-    public abstract Response<E> converttoEntity(List<D>dtos);
+    public abstract Response<E> converttoEntity(List<D> dtos);
 
     // Convert entity → DTO (Optional)
     public D entityToDto(E entity) {
@@ -36,7 +34,7 @@ public abstract class MuzirisAbstractService<D, E> {
     }
 
     // Concrete service must implement this to save the entity in DB
-    protected abstract E saveEntity(E entity, List<D>dtos);
+    protected abstract E saveEntity(E entity, List<D> dtos);
 
     public final Response<D> save(List<D> dtos) {
 
