@@ -1,5 +1,9 @@
 import { useState,useEffect } from "react";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
+import Select from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Controller } from "react-hook-form";
 import GeneralInfoForm from "./GeneralInfoForm";
 import AddressForm from "./AddressForm";
 import ContactForm from "./ContactForm";
@@ -49,7 +53,7 @@ export default function GenaralBranchForm() {
   locationForm: false
 });
 
-  const [selectedAmendment, setSelectedAmendment] = useState(null);
+
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -59,64 +63,65 @@ export default function GenaralBranchForm() {
   const watchedDocuments = watch("documents");
   // const watchedPincode = watch("branchPinCode");
   
-  const amendments = [
-      {
-    id: 1,
-    type: "VERIFIED",
-    authorizationLabel: "AUTHORIZATION : 01/01/2022",
-    date: "2022-01-01",
-    expiryDate: "2023-12-31",
-    generatedBy: {
-      name: "System",
-      role: "Auto Generated",
-      email: "system@company.com",
-      mobile: null
-    },
-    changes: []
-  },
-  {
-    id: 2,
-    type: "VERIFIED",
-    authorizationLabel: "ENTRY : 10/10/2025",
-    date: "2025-10-10",
-        country:"IN",
-    name:"Demo6456",
-    company:"TCS",
-    expiryDate: "2026-10-09",
-    generatedBy: {
-      name: "HR Manager",
-      role: "Manager",
-      email: "hr@company.com",
-      mobile: "+91 9898989898"
-    },
-    changes: [
-      { field: "district", oldValue: "Ernakulam", newValue: "Thrissur" }
-    ]
-  },
-
-    {
-    id: 3,
-    type: "ENTRY",
-    authorizationLabel: "ENTRY : 20/10/2025",
-    date: "2025-10-20",       
-    expiryDate: null,
-    country:"IN",
-    name:"Demo",
-    company:"TCS",
-    generatedBy: {
-      name: "Admin User",
-      role: "System Administrator",
-      email: "admin@company.com",
-      mobile: "+91 9876543210"
-    },
-    changes: [
-      { field: "companyName", oldValue: "Medical Advance Pvt Ltd", newValue: "Medical Advance Ltd" },
-      { field: "pincode", oldValue: "680001", newValue: "680004" }
-    ]
-  },
+  const amendmentTypeOptions = [
+  { label: "Entry", value: "ENTRY" },
+  { label: "Verified", value: "VERIFIED" },
 ];
 
 
+
+  const amendments = [
+    //  {
+    //       id: 1,
+    //       authorization: "ENTRY",
+    //       date: "2025-10-20",
+    //       name:"Demo",
+    //       company:"TCS",
+    //       status: "active",
+    //       expiryDate: "2025-10-10",
+    //       generatedBy: "Admin User"
+    //     },
+    //     {
+    //       id: 2,
+    //       authorization: "VERIFIED",
+    //       date: "2025-10-10",
+    //       status: "expired",
+    //       expiryDate: "2021-12-31",
+    //       generatedBy: "System"
+    //     },
+    //     {
+    //       id: 3,
+    //       authorization: "VERIFIED",
+    //       date: "2025-01-01",
+    //       status: "inactive",
+    //       expiryDate: "",
+    //       generatedBy: "Manager"
+    //     }
+];
+
+const latestAmendmentId = amendments.length
+  ? amendments.reduce((latest, current) =>
+      new Date(current.date) > new Date(latest.date) ? current : latest
+    )
+  : null;
+
+    const [selectedAmendment, setSelectedAmendment] = useState(latestAmendmentId);
+const amendmentAuthorizationOptions = [
+  {
+    label:
+      selectedAmendment?.authorization === "ENTRY"
+        ? `ENTRY : ${selectedAmendment.date}`
+        : "ENTRY",
+    value: "ENTRY",
+  },
+  {
+    label:
+      selectedAmendment?.authorization === "VERIFIED"
+        ? `VERIFIED : ${selectedAmendment.date}`
+        : "VERIFIED",
+    value: "VERIFIED",
+  },
+];
   useEffect(() => {
     const date=new Date(); // current date
     // const createdAt = date.toLocaleDateString('en-GB'); //dd-mm-yyyy format
@@ -126,26 +131,42 @@ export default function GenaralBranchForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  useEffect(() => {
-    //Api call should bo here
-    //after doing the api call then you must add the field values i added name and company for demo
-    
-  if (!amendments?.length) return;
+//   useEffect(() => {
+//     //Api call should bo here
+//     //after doing the api call then you must add the field values i added name and company for demo
 
-  // prevent infinite loop
-  if (selectedAmendment !== null) return;
+//   if (!amendments?.length) return;
 
-  const latest = amendments[amendments.length - 1];
+//   // prevent infinite loop
+//   if (selectedAmendment !== null) return;
 
-  setSelectedAmendment(latest.id);
+//   const latest = amendments[amendments.length - 1];
 
-  setValue("name", latest.name, { shouldDirty: false });
-  setValue("company", latest.company, { shouldDirty: false });
-}, [amendments, selectedAmendment, setValue]);
+//   setSelectedAmendment(latest);
+
+//   setValue("name", latest.name, { shouldDirty: false });
+//   setValue("company", latest.company, { shouldDirty: false });
+// }, [amendments, selectedAmendment, setValue]);
+
+useEffect(() => {
+  //Api call should bo here
+  //after doing the api call then you must add the field values i added name and company for demo
+
+  if (!selectedAmendment) return;
+
+  setValue("name", selectedAmendment.name ?? "", {
+    shouldDirty: false,
+  });
+
+  setValue("company", selectedAmendment.company ?? "", {
+    shouldDirty: false,
+  });
+}, [selectedAmendment, setValue]);
+
 
 
 const handleSelectAmendment = (id,index) => {
-  setSelectedAmendment(id);
+  setSelectedAmendment(amendments[index]);
   setValue("name", amendments[index].name);
    setValue("company", amendments[index].company, {
     shouldDirty: true,
@@ -153,11 +174,8 @@ const handleSelectAmendment = (id,index) => {
   });
 };
 
-const latestAmendmentId = amendments.reduce((latest, current) => { //compute the latest amend Id
-  return new Date(current.date) > new Date(latest.date)
-    ? current
-    : latest;
-}).id;
+
+
 
 // setBackendErrors(prev =>
 //   JSON.stringify(prev) === JSON.stringify(errors) ? prev : errors
@@ -184,7 +202,7 @@ const latestAmendmentId = amendments.reduce((latest, current) => { //compute the
     console.log("Submitting raw data:", data);
 
     /* -------------------------------
-       1️⃣ Prepare documents JSON
+        Prepare documents JSON
        (NO FileList inside JSON)
     -------------------------------- */
     const documentsPayload = data.documents.map((doc) => {
@@ -363,15 +381,34 @@ const latestAmendmentId = amendments.reduce((latest, current) => { //compute the
             </div>
         </div>
 {/* Authorization + Amendments */}
+{amendments.length > 0 && 
 <div className="amend-section">
   <div className="amend-header-row">
     <div className="amend-field">
       <label className="form-label">Authorization</label>
-      <select className="form-control">
-        <option>ENTRY : 10/10/2025</option>
-        <option>GENERATE NEW : 20/10/2025</option>
-        <option>AUTHORIZATION : 01/01/2022</option>
-      </select>
+     <Controller
+  name="authorization"
+  control={control}
+  rules={{ required: "Please select authorization" }}
+  render={({ field }) => {
+    const selectedOption = amendmentAuthorizationOptions.find(
+      (opt) => opt.value === field.value
+    );
+
+    return (
+      <Select
+        options={amendmentAuthorizationOptions}
+        placeholder="Select authorization"
+        isSearchable={false}
+        classNamePrefix="form-control-select"
+        className={errors.authorization ? "error" : ""}
+        value={selectedOption || null}                 //  label from options
+        onChange={(option) => field.onChange(option.value)} //  store ONLY value
+      />
+    );
+  }}
+/>
+
     </div>
 
     <button className="btn amend-generate">
@@ -383,22 +420,23 @@ const latestAmendmentId = amendments.reduce((latest, current) => { //compute the
   {[...amendments]  // shallow copy to avoid mutating state
   .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
   .map((item, index) => { // then map
-    const isSelected =
-      selectedAmendment === item.id ||
-      (selectedAmendment === null && item.id === latestAmendmentId);
+  const isSelected = selectedAmendment?.id === item.id;
+
+    console.log("isSelected: ",isSelected,selectedAmendment?.id)
     return (
-      <div
-        key={item.id}
-        className={`amend-pill 
-          ${item.type === "ENTRY" ? "entry" : "verified"}
-          ${isSelected ? "selected" : ""}
-        `}
-        onClick={() => handleSelectAmendment(item.id,index)}
-      >
+     <div
+  key={item.id}
+  className={`amend-pill 
+    ${item.authorization === "ENTRY" ? "entry" : "verified"}
+    ${isSelected ? "selected" : ""}
+  `}
+  onClick={() => handleSelectAmendment(item.id, index)}
+>
+
         <div className="pill-left">
           <span className="pill-index">{item.id}</span>
           <div className="pill-info">
-            <span className="pill-type">{item.type}</span>
+            <span className="pill-type">{item.authorization}</span>
             <span className="pill-date">
               {new Date(item.date).toLocaleDateString("en-GB")}
             </span>
@@ -406,10 +444,10 @@ const latestAmendmentId = amendments.reduce((latest, current) => { //compute the
         </div>
 
         <div className="pill-right">
-          {item.type !== "ENTRY" && (
+          {item.authorization !== "ENTRY" && (
             <span className="pill-badge verified">✔ Verified</span>
           )}
-          {item.id === latestAmendmentId && (
+          {item.authorization == "ENTRY" && (
             <span className="pill-badge latest">Latest</span>
           )}
         </div>
@@ -417,11 +455,63 @@ const latestAmendmentId = amendments.reduce((latest, current) => { //compute the
     );
   })}
 </div>
+</div>}
 
+{amendments.length == 0 && 
+<div className="amend-section">
+  <div className="amend-header-row">
+    <div className="amend-field">
+      <label className="form-label required">Authorization</label>
+      <Controller
+  name="amendmentType"
+  control={control}
+  rules={{ required: "Please select amendment type" }}
+  render={({ field }) => {
+    const selectedOption = amendmentTypeOptions.find(
+      (opt) => opt.value === field.value
+    );
 
+    return (
+      <Select
+        options={amendmentTypeOptions}
+        placeholder="Select amendment type"
+        isSearchable={false}
+        classNamePrefix="form-control-select"
+        className={errors.amendmentType ? "error" : ""}
+        value={selectedOption || null}              //  label from options
+        onChange={(option) => field.onChange(option.value)} //  store ONLY value
+      />
+    );
+  }}
+  />
+
+    </div>
+     <div className="amend-field">
+     <label className="form-label required">Authorization</label>
+     <Controller
+  name="authorizationDate"
+  control={control}
+  rules={{ required: "Please select a date" }}
+  render={({ field }) => (
+    <DatePicker
+      placeholderText="Select date"
+      className={`form-control ${errors.authorizationDate ? "error" : ""}`}
+      selected={field.value ? new Date(field.value) : null}
+      onChange={(date) =>
+        field.onChange(date ? date.toISOString().slice(0, 10) : null)
+      }
+      dateFormat="dd/MM/yyyy"
+      minDate={new Date()}
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
+    />
+  )}
+/>
 </div>
-
-
+       </div>
+     
+</div>}
 
         {/* Form Actions */}
         <div className="branch-form-actions">

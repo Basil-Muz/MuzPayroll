@@ -11,7 +11,7 @@ export default function AddressForm({
   setError,
   control,
    clearErrors,
-    flags,
+    // flags,
   // disabled = false,
   // requiredMap = {},
 }) {

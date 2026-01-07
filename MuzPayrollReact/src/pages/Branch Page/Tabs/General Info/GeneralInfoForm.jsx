@@ -287,7 +287,7 @@ export default function GeneralInfoForm({
                 </div>}
 
                 {flags.companyForm && (
-                 <div className="branch-form-group">
+                <div className="branch-form-group">
   <label className="form-label required">
     Company Image (300 × 250)
   </label>
