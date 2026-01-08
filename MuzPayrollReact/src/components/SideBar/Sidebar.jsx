@@ -6,7 +6,7 @@ import { ImStack } from "react-icons/im";
 import { IoIosArrowForward } from "react-icons/io";
 import { VscActivateBreakpoints } from "react-icons/vsc";
 import "./sidebar.css";
-import {  } from "axios";
+import axios from "axios";
 import useIsMobile from "../../hook/useIsMobile";
 import useIsTab from "../../hook/useIsTab";
 // import { href } from "react-router-dom";
@@ -93,12 +93,30 @@ export default function Sidebar({ forceOpen }) {
   const [sidebarEnabled, setSidebarEnabled] = useState(false);
   const [active, setActive] = useState(localStorage.getItem("activeMenu") || "");
 
-  const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
-  const userName = loginData.userName || "";
+
 
   const sidebarClass = isMobile
   ? open ? "mobile-open" : "mobile-closed"
   : open ? "expanded" : "collapsed";
+
+
+    // 🔹 LIVE loginData (for username, location, etc.)
+  const [loginData, setLoginData] = useState(() =>
+    JSON.parse(localStorage.getItem("loginData") || "{}")
+  );
+
+  useEffect(() => {
+    const syncLoginData = () => {
+      setLoginData(JSON.parse(localStorage.getItem("loginData") || "{}"));
+    };
+
+    window.addEventListener("loginDataChanged", syncLoginData);
+
+    return () => {
+      window.removeEventListener("loginDataChanged", syncLoginData);
+    };
+  }, []);
+  const userName = loginData.userName || "User";
 
   /* 🔁 Sync sidebar enable */
   useEffect(() => {

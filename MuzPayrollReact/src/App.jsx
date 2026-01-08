@@ -23,6 +23,8 @@ import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import Designation from "./pages/designation/designation.jsx";
 import PayrollGroup from "./pages/payrollgroup/payrollgroup.jsx";
+import PayrollGroupList from "./pages/payrollgroup/payrollgrouplist.jsx";
+import PayrollGroupSearch from "./pages/payrollgroup/payrollgroupsearch.jsx";
 function App() {
   return (
     <Routes>
@@ -47,6 +49,8 @@ function App() {
       <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
       <Route path="/designation" element={<Designation/>} />
       <Route path="/payrollgroup" element={<PayrollGroup/>} />
+      <Route path="/payrollgroupsearch" element={<PayrollGroupSearch/>} />
+      <Route path="/payrollgrouplist" element={<PayrollGroupList/>} />
     </Routes>
   );
 }

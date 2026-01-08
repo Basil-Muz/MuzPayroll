@@ -100,14 +100,14 @@
   cursor: pointer;
   border: none;
   margin-right: 8px;
-  background: #4b79ff;
+  background: var(--button-primary);
   color: #fff;
   font-size: 14px;
   transition: 0.25s ease;
 }
 
 .logged-btn:hover {
-  background: #3a63d8;
+  background: var(--button-primary-hover);
 }
 
 /* ---------- SIDEBAR OVERLAY ---------- */
@@ -143,31 +143,40 @@
   cursor: not-allowed;
   pointer-events: none;
 }
+/* ---------- RESPONSIVE ENHANCEMENTS ---------- */
 
+/* Tablets & small laptops */
+@media (max-width: 1024px) {
+  .logo-homesection {
+    gap: 60px;                /* reduce large gap */
+    padding: 20px;
+  }
 
-/* ---------- SIDEBAR TOGGLE BUTTON ---------- */
+  .logged-box {
+    max-width: 600px;
+  }
+}
 
-
-/* ---------- RESPONSIVE ---------- */
+/* Tablets & large phones */
 @media (max-width: 800px) {
-  .logo-homesection {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .logged-details {
-    grid-template-columns: 1fr;
-  }
-  /* ---------- MOBILE ---------- */
-@media (max-width: 768px) {
   .main-section {
-    flex-direction: column;
+    margin-top: 57px;
   }
 
   .logo-homesection {
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem;
+    gap: 30px;
+    min-height: auto;
+  }
+
+  .left-section,
+  .logged-container {
+    width: 100%;
+  }
+
+  .logged-box {
+    width: 100%;
+    max-width: 520px;
   }
 
   .logged-details {
@@ -175,29 +184,31 @@
   }
 
   .logged-details label {
-    margin-bottom: 0.25rem;
+    margin-bottom: 4px;
+  }
+
+  .logged-details input[type="date"] {
+    width: 100%;             /* remove fixed width */
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .home-logo {
+    max-width: 150px;
+  }
+
+  .logged-box {
+    padding: 16px;
+    border-radius: 6px;
+  }
+
+  .logged-heading {
+    font-size: 16px;
   }
 
   .logged-btn {
     width: 100%;
-    margin-bottom: 0.5rem;
+    margin-bottom: 10px;
   }
-}
-
-/* ---------- SMALL MOBILE ---------- */
-@media (max-width: 480px) {
-  .home-logo {
-    max-width: 140px;
-  }
-
-  .logged-box {
-    padding: 1rem;
-  }
-
-  .logged-heading {
-    font-size: 1rem;
-  }
-}
-
-
 }

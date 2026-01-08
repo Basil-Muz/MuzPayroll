@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef} from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -7,13 +7,21 @@ import muzLogo from "../../assets/muzlogo_transparent.png";
 import Sidebar from "../../components/SideBar/Sidebar";
 
 function LoggedPage() {
+   console.log("🟢 LoggedPage component rendered");
   const navigate = useNavigate();
+
+  const loginDataRef = React.useRef(null);
+
+const [companyName, setCompanyName] = useState("");
 
   //  Fields lock
   const [fieldsLocked, setFieldsLocked] = useState(true);
 
   // Sidebar
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+  const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+  return stored.sidebarOpen === true;
+});
 
   //  Button states (ONLY ONE TRUE)
   const [okEnabled, setOkEnabled] = useState(true);
@@ -32,27 +40,20 @@ function LoggedPage() {
   const [locationList, setLocationList] = useState([]);
  const [backendError, setBackendError] = useState([]);
   // Load from localStorage
-  useEffect(() => {
+ useEffect(() => {
   const stored = localStorage.getItem("loginData");
-
   if (!stored) {
     navigate("/login");
     return;
   }
 
   const data = JSON.parse(stored);
+  loginDataRef.current = data; // 🔴 IMPORTANT
 
-  setCompanyId(Number(data.companyId));
-  setBranchId(Number(data.branchId));
-  setLocationId(Number(data.locationId));
+  setCompanyId(String(data.companyId));
+  setBranchId(String(data.branchId));
+  setLocationId(String(data.locationId));
   setFinYear(data.finYear || "");
-
-  setSidebarOpen(data.sidebarOpen === true);
-
-  // Restore UI state
-  setFieldsLocked(data.fieldsLocked ?? true);
-  setOkEnabled(data.okEnabled ?? true);
-  setChangeEnabled(data.changeEnabled ?? false);
 
   fetchContextData(
     data.companyId,
@@ -60,42 +61,75 @@ function LoggedPage() {
     data.locationId,
     data.userCode
   );
-}, [navigate]);
+}, []);
 
 
   // Fetch dropdown data
-  const fetchContextData = async (companyId, branchId, locationId, userCode ) => {
-    try {
-      const res = await fetch(
-     `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`
-      );
-      const data = await res.json();
-      
+  const fetchContextData = async (companyId, branchId, locationId, userCode) => {
+  const res = await fetch(
+    `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`
+  );
 
-      setCompanyList(data.companyList || []);
-      setBranchList(data.branchList || []);
-      setLocationList(data.locationList || []);
+  const data = await res.json();
 
+  const filteredBranches = (data.branchList || []).filter(
+    b => b.companyEntity && String(b.companyEntity.id) === String(companyId)
+  );
 
-      const stored = JSON.parse(localStorage.getItem("loginData"));
+  const filteredLocations = (data.locationList || []).filter(
+    l => l.branchEntity && String(l.branchEntity.id) === String(branchId)
+  );
+
+  if (filteredBranches.length > 0) {
+    setCompanyName(filteredBranches[0].companyEntity.company);
+  }
+
+  setBranchList(filteredBranches);
+  setLocationList(filteredLocations);
+  if (filteredLocations.length > 0) {
+  const selectedLocation = filteredLocations.find(
+    l => String(l.id) === String(locationId)
+  );
+
+  if (selectedLocation) {
+    const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
 
     localStorage.setItem(
       "loginData",
       JSON.stringify({
         ...stored,
-        userName: data.userName,
-        locationName: data.locationName,
+        locationName: selectedLocation.location, // ✅ location name
       })
     );
+  }
+}
 
-    } catch (err) {
-      console.error(err);
-    }
-  };
+};
+
+  useEffect(() => {
+  const stored = JSON.parse(localStorage.getItem("loginData"));
+  if (!stored || fieldsLocked) return;
+
+  fetchContextData(
+    companyId,
+    branchId,
+    locationId,
+    stored.userCode
+  );
+}, [branchId]);
+
 
   // ✅ OK BUTTON
-  const handleOk = () => {
-  const stored = JSON.parse(localStorage.getItem("loginData"));
+const handleOk = () => {
+  const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+
+  const selectedBranch = branchList.find(
+    b => String(b.id) === String(branchId)
+  );
+
+  const selectedLocation = locationList.find(
+    l => String(l.id) === String(locationId)
+  );
 
   localStorage.setItem(
     "loginData",
@@ -103,7 +137,9 @@ function LoggedPage() {
       ...stored,
       companyId,
       branchId,
+      branchName: selectedBranch?.branch || "",
       locationId,
+      locationName: selectedLocation?.location || "",
       finYear,
       sidebarOpen: true,
       fieldsLocked: true,
@@ -113,12 +149,11 @@ function LoggedPage() {
   );
 
   setSidebarOpen(true);
-
   setFieldsLocked(true);
-  setSidebarOpen(true);
   setOkEnabled(false);
   setChangeEnabled(true);
 };
+
 
 
   // 🔁 CHANGE CREDENTIALS
@@ -158,14 +193,12 @@ function LoggedPage() {
 
               <div className="logged-details">
                 <label>Company</label>
-                <select value={companyId} disabled>
-                  <option value="">Select Company</option>
-                  {companyList.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.company}
-                    </option>
-                  ))}
-                </select>
+    <select disabled>
+  <option>
+    {companyName || "Company"}
+  </option>
+</select>
+
               </div>
 
               <div className="logged-details">
@@ -184,7 +217,7 @@ function LoggedPage() {
                   disabled={fieldsLocked}
                   onChange={(e) => setBranchId(e.target.value)}
                 >
-                  <option value="">Select Branch</option>
+                  {/* <option value="">Select Branch</option> */}
                   {branchList.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.branch}
@@ -213,7 +246,7 @@ function LoggedPage() {
                   disabled={fieldsLocked}
                   onChange={(e) => setLocationId(e.target.value)}
                 >
-                  <option value="">Select Location</option>
+                  {/* <option value="">Select Location</option> */}
                   {locationList.map((l) => (
                     <option key={l.id} value={l.id}>
                       {l.location}

@@ -30,6 +30,10 @@ function LoginPage() {
     let value = userCode.trim().replace("@muziris", "");
     if (value) setUserCode(value + "@muziris");
   };
+  const handleSubmit = (e) => {
+    e.preventDefault();   // ⭐ KEY FIX
+    handleLogin();
+  };
 
   const handleLogin = async () => {
     setUserCodeError("");
@@ -63,10 +67,11 @@ function LoginPage() {
         setPasswordError(data.message || "Invalid login.");
         return;
       }
-
+     const cleanUserCode = userCode.replace("@muziris", "");
       // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
       const loginData = {
-        userCode: userCode,  
+        userCode: cleanUserCode,
+        userName: data.userName, 
         companyId: data.companyId,
         branchId: data.branchId,
         locationId: data.locationId,
@@ -88,8 +93,8 @@ function LoginPage() {
           <img src={muzLogo} alt="Logo" className="login-logo" />
           <h2>Login</h2>
         </div>
-
-        <div className="form-group">
+<form className="form-group" onSubmit={handleSubmit}>
+          <div className="form-group">
 
           {/* User Code */}
           <label>User Code</label>
@@ -126,9 +131,12 @@ function LoginPage() {
           >
             Forgot Password?
           </p>
+          
         </div>
+          </form>
       </div>
     </div>
+    
   );
 }
 

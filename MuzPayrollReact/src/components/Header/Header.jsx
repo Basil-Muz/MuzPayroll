@@ -27,7 +27,7 @@ const profileTimer = useRef(null);
 const date=new Date().toLocaleDateString();
 
 const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
-const locationName = loginData.locationName || "Kochi_Kakkanad";
+const locationName = loginData.locationName|| "";
 
 const [notifications, setNotifications] = useState([]);
 
