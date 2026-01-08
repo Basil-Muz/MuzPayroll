@@ -7,9 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
@@ -17,28 +14,16 @@ import jakarta.persistence.ManyToOne;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompanyLog {
 
-    // @Id
-    // @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // private Long companyLogID;
-
     @EmbeddedId
-    private CompanyLogPK companyLogID;
+    private CompanyLogPK companyLogPK;
 
-    public CompanyLogPK getCompanyLogID() {
-        return companyLogID;
+    public CompanyLogPK getCompanyLogPK() {
+        return companyLogPK;
     }
 
-    public void setCompanyLogID(CompanyLogPK companyLogID) {
-        this.companyLogID = companyLogID;
+    public void setCompanyLogPK(CompanyLogPK companyLogPK) {
+        this.companyLogPK = companyLogPK;
     }
-
-    // public Long getCompanyLogID() {
-    // return companyLogID;
-    // }
-
-    // public void setCompanyLogID(Long companyLogID) {
-    // this.companyLogID = companyLogID;
-    // }
 
     @Column(nullable = false)
     private String company;

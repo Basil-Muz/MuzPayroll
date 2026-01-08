@@ -8,7 +8,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.CompanyLog;
+import com.example.MuzPayroll.entity.CompanyLogPK;
 import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.CompanyDTO;
@@ -236,69 +236,87 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         List<String> errors = new ArrayList<>();
 
         if (dtos == null || dtos.isEmpty()) {
-            errors.add("No company data provided");
+            return Response.error("No company data provided");
         }
-        CompanyDTO dto = dtos.get(0);
-        Long companyMstID = dto.getCompanyMstID();
 
         try {
-            Long generatedId;
-
-            // SCENARIO 1: ID IS PROVIDED IN DTO
-            if (companyMstID != null) {
-                // Check if this ID exists in database
-                boolean existsInDB = companyRepository.existsByCompanyMstID(companyMstID);
-
-                if (existsInDB) {
-                    // ID is present in DB - use it as is
-                    generatedId = companyMstID;
-                    // Set the generated ID to DTO
-                    dto.setCompanyMstID(generatedId);
-                } else {
-                    // ID provided but NOT in DB - RETURN ERROR
-                    errors.add("Company ID " + companyMstID + " does not exist in database");
+            // Process each DTO in the list
+            for (CompanyDTO dto : dtos) {
+                if (dto == null) {
+                    errors.add("Null DTO found in list");
+                    continue;
                 }
 
-            }
-            // SCENARIO 2: ID IS NOT PROVIDED IN DTO (null)
-            else {
-                // Find maximum ID from database
-                Long maxId = companyRepository.findMaxCompanyMstID();
+                Long companyMstID = dto.getCompanyMstID();
+                Long generatedId = null;
 
-                if (maxId == null) {
-                    // No data in DB - start from 100000
-                    generatedId = 100000L;
-                } else {
-                    // Data exists - get latest data and increment
-                    Optional<CompanyMst> latestCompany = companyRepository.findLatestById(maxId);
+                // ID IS PROVIDED IN DTO
+                if (companyMstID != null) {
+                    // Check if this ID exists in database
+                    boolean existsInDB = companyRepository.existsById(companyMstID);
 
-                    if (latestCompany.isPresent()) {
-                        // Get the latest ID and increment by 1
-                        Long latestId = latestCompany.get().getCompanyMstID();
-                        generatedId = latestId + 1;
-
-                        // Ensure it doesn't exceed 6 digits
-                        if (generatedId > 999999L) {
-                            errors.add("Cannot generate ID. Maximum limit (999999) reached.");
-                        }
-
+                    if (existsInDB) {
+                        // ID is present in DB
+                        generatedId = companyMstID;
                     } else {
-                        // Fallback - use maxId + 1
-                        generatedId = maxId + 1;
+                        // ID provided but NOT in DB - RETURN ERROR
+                        errors.add("Company ID " + companyMstID + " does not exist in database");
+                        continue;
                     }
+
+                }
+                // ID IS NOT PROVIDED IN DTO (null)
+                else {
+                    // Find maximum ID from database
+                    Long maxId = companyRepository.findMaxCompanyMstID();
+
+                    if (maxId == null) {
+                        // No data in DB - start from 100000
+                        generatedId = 100000L;
+                    } else {
+                        // Data exists - get latest data and increment
+                        generatedId = maxId + 1;
+
+                        if (generatedId > 999999L) {
+                            errors.add("Cannot generate ID. Maximum limit (999999) reached for company: " +
+                                    (dto.getCompany() != null ? dto.getCompany() : "Unknown"));
+                            continue;
+                        }
+                    }
+
+                    dto.setCompanyMstID(generatedId);
                 }
 
-                // Set the generated ID to DTO
-                dto.setCompanyMstID(generatedId);
+                // Process log rows for this DTO
+                if (generatedId != null) {
+                    Long transID = generatedId;
+                    Long logRowNo = 1L; // Default to 1
+
+                    // Get max row number for this transaction
+                    Response<Long> responseLogMaxRowNo = companyLogService.getMaxRowNo(transID);
+
+                    if (responseLogMaxRowNo.isSuccess() && responseLogMaxRowNo.getData() != null) {
+                        logRowNo = responseLogMaxRowNo.getData() + 1;
+                    }
+
+                    System.out.println("Generated ID: " + generatedId + ", LogRowNo: " + logRowNo);
+                    // Populate log entity PK
+                    populateLogEntityPKfromEntity(transID, logRowNo, dto);
+                }
             }
 
-            // Process log table
-            List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
-            // Response<Object> logGeneratePK = companyLogService.generatePK(logDtos);
+            // If any errors occurred, return them
+            if (!errors.isEmpty()) {
+                return Response.error(errors);
+            }
 
-            // if (!logGeneratePK.isSuccess()) {
-            //     return logGeneratePK;
-            // }
+            // Process all log DTOs together
+            List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+            Response<Object> logGeneratePK = companyLogService.generatePK(logDtos);
+
+            if (!logGeneratePK.isSuccess()) {
+                return logGeneratePK;
+            }
 
             return Response.success(true);
 
@@ -589,7 +607,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             logDto.setAuthorizationStatus(dto.getAuthorizationStatus());
             logDto.setUserCode(dto.getUserCode());
             logDto.setCompanyImagePath(dto.getCompanyImagePath());
-
+            logDto.setCompanyLogPK(dto.getCompanyLogPK());
             logDtos.add(logDto);
         }
         return logDtos;
@@ -716,5 +734,17 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         } else {
             return String.format("%.1f MB", size / (1024.0 * 1024.0));
         }
+    }
+
+    private void populateLogEntityPKfromEntity(Long logPk, Long logRowNo, CompanyDTO entity) {
+        for (CompanyLogDTO entityLog : entity.getCompanyDtoLogs()) {
+            CompanyLogPK companyLogPK = new CompanyLogPK();
+            companyLogPK.setCompanyMstID(logPk);
+            companyLogPK.setRowNo(logRowNo);
+            entityLog.setCompanyLogPK(companyLogPK);
+            entity.setCompanyLogPK(companyLogPK);
+            logRowNo++;
+        }
+
     }
 }

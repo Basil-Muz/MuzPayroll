@@ -14,9 +14,27 @@ import com.example.MuzPayroll.entity.CompanyLogPK;
 public interface CompanyLogRepository extends JpaRepository<CompanyLog, CompanyLogPK> {
     long count();
 
-    // @Query("SELECT c FROM CompanyLog c WHERE CAST(c.companyLogID AS string) LIKE CONCAT(:prefix, '%')")
-    // List<CompanyLog> findAllByCompanyLogIDStartingWith(@Param("prefix") String prefix);
+    // @Query("""
+    //             SELECT c
+    //             FROM CompanyLog c
+    //             WHERE CAST(c.companyLogPK.companyMstID AS string)
+    //                   LIKE CONCAT(:prefix, '%')
+    //         """)
+    // List<CompanyLog> findByCompanyMstIDPrefix(@Param("prefix") String prefix);
 
-    // @Query("SELECT MAX(c.companyLogID) FROM CompanyLog c WHERE CAST(c.companyLogID AS string) LIKE CONCAT(:prefix, '%')")
-    // Long findMaxByCompanyLogIDStartingWith(@Param("prefix") String prefix);
+    // @Query("""
+    //             SELECT MAX(c.companyLogPK.companyMstID)
+    //             FROM CompanyLog c
+    //             WHERE CAST(c.companyLogPK.companyMstID AS string)
+    //                   LIKE CONCAT(:prefix, '%')
+    //         """)
+    // Long findMaxCompanyMstIDByPrefix(@Param("prefix") String prefix);
+
+    @Query("""
+                SELECT MAX(c.companyLogPK.rowNo)
+                FROM CompanyLog c
+                WHERE c.companyLogPK.companyMstID = :companyMstID
+            """)
+    Long findMaxRowNo(@Param("companyMstID") Long companyMstID);
+
 }

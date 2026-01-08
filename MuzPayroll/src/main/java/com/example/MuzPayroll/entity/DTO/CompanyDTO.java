@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.CompanyLogPK;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
@@ -32,6 +33,16 @@ public class CompanyDTO {
 
     public void setCompanyDtoLogs(List<CompanyLogDTO> companyDtoLogs) {
         this.companyDtoLogs = companyDtoLogs;
+    }
+
+    private CompanyLogPK companyLogPK;
+
+    public CompanyLogPK getCompanyLogPK() {
+        return companyLogPK;
+    }
+
+    public void setCompanyLogPK(CompanyLogPK companyLogPK) {
+        this.companyLogPK = companyLogPK;
     }
 
     // CompanyMst
