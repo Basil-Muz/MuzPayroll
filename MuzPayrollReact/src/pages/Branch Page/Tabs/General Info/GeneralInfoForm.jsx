@@ -226,18 +226,18 @@ export default function GeneralInfoForm({
                       {flags.locationForm && "Location "}
                   {flags.companyForm && "Company "}
                   {flags.branchForm && "Branch "} 
-                     Short Name</label>
+                    Short Name</label>
                   <input 
                     type="text" 
                     className={`form-control ${errors.shortName ? "error" : ""}`}
                     placeholder="eg: TCS, IBM , SAP.."
                     {...register('shortName', { required: "short name is required",
-                       pattern:{
+                      pattern:{
                         value:/^[A-Z0-9]*$/,
                         message:"Please enter valide name",
                       },
                       
-                     })}
+                    })}
                   />
                   {errors.shortName && (
                     <span className="error-message">{errors.shortName.message}</span>
@@ -333,7 +333,7 @@ export default function GeneralInfoForm({
               className="image-input"
             />
             
-           { !field.value && <label htmlFor="company-image-upload" className="upload-label">
+          { !field.value && <label htmlFor="company-image-upload" className="upload-label">
               <div className="upload-icon">
                 <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />

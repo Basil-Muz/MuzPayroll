@@ -20,6 +20,7 @@ export default function GenaralBranchForm() {
   const [step, setStep] = useState(0); //switch steps
   // const [backendErrors, setBackendErrors] = useState([]); 
   //pass the back end error to front end
+  const [addNewAmend, setAddNewAmend] = useState(false); // true when latest amned is verified enables the genarate button
 
   const {
     register,
@@ -28,6 +29,7 @@ export default function GenaralBranchForm() {
     setError,
     clearErrors,
     setValue,
+    reset,
     watch,
     control,
     formState: { errors },
@@ -42,7 +44,7 @@ export default function GenaralBranchForm() {
           file: null,
           remarks: ""
         }
-      ]
+      ],
     }
   });
 
@@ -71,32 +73,32 @@ export default function GenaralBranchForm() {
 
 
   const amendments = [
-    //  {
-    //       id: 1,
-    //       authorization: "ENTRY",
-    //       date: "2025-10-20",
-    //       name:"Demo",
-    //       company:"TCS",
-    //       status: "active",
-    //       expiryDate: "2025-10-10",
-    //       generatedBy: "Admin User"
-    //     },
-    //     {
-    //       id: 2,
-    //       authorization: "VERIFIED",
-    //       date: "2025-10-10",
-    //       status: "expired",
-    //       expiryDate: "2021-12-31",
-    //       generatedBy: "System"
-    //     },
-    //     {
-    //       id: 3,
-    //       authorization: "VERIFIED",
-    //       date: "2025-01-01",
-    //       status: "inactive",
-    //       expiryDate: "",
-    //       generatedBy: "Manager"
-    //     }
+    {
+          id: 1,
+          authorization: "ENTRY",
+          date: "2025-10-20",
+          name:"Demo",
+          company:"TCS",
+          status: "active",
+          expiryDate: "2025-10-10",
+          generatedBy: "Admin User"
+        },
+        {
+          id: 2,
+          authorization: "VERIFIED",
+          date: "2025-10-10",
+          status: "expired",
+          expiryDate: "2021-12-31",
+          generatedBy: "System"
+        },
+        {
+          id: 3,
+          authorization: "VERIFIED",
+          date: "2025-01-01",
+          status: "inactive",
+          expiryDate: "",
+          generatedBy: "Manager"
+        }
 ];
 
 const latestAmendmentId = amendments.length
@@ -106,6 +108,7 @@ const latestAmendmentId = amendments.length
   : null;
 
     const [selectedAmendment, setSelectedAmendment] = useState(latestAmendmentId);
+    console.log("Selected item:",selectedAmendment)
 const amendmentAuthorizationOptions = [
   {
     label:
@@ -157,7 +160,10 @@ useEffect(() => {
   setValue("name", selectedAmendment.name ?? "", {
     shouldDirty: false,
   });
-
+   setValue("authorization", selectedAmendment.authorization, {
+    shouldDirty: false,
+    shouldValidate: true,
+  });
   setValue("company", selectedAmendment.company ?? "", {
     shouldDirty: false,
   });
@@ -267,7 +273,7 @@ const handleSelectAmendment = (id,index) => {
       });
     }
   }
-};
+}; 
 
 
   return (
@@ -377,15 +383,14 @@ const handleSelectAmendment = (id,index) => {
             </div>)}
             <div className="form-amend">
               {/* Documentation form fields */}
-              
             </div>
         </div>
 {/* Authorization + Amendments */}
-{amendments.length > 0 && 
+{(amendments.length > 0 || addNewAmend) && 
 <div className="amend-section">
-  <div className="amend-header-row">
+ <div className="amend-header-row">
     <div className="amend-field">
-      <label className="form-label">Authorization</label>
+      <label className="form-label required">Authorization</label>
      <Controller
   name="authorization"
   control={control}
@@ -402,18 +407,53 @@ const handleSelectAmendment = (id,index) => {
         isSearchable={false}
         classNamePrefix="form-control-select"
         className={errors.authorization ? "error" : ""}
-        value={selectedOption || null}                 //  label from options
+        value={selectedOption }                 //  label from options
         onChange={(option) => field.onChange(option.value)} //  store ONLY value
       />
     );
   }}
 />
-
     </div>
+{ selectedAmendment.authorization == "VERIFIED" && // Adding the new amend only if the latest amend is verified
+    <div 
+    className="btn amend-generate"
+    onClick={()=>{
+      setAddNewAmend(true);
+      reset({
+    documents: [
+      {
+        type: "",
+        number: "",
+        expiryDate: "",
+        file: null,
+        remarks: ""
+      }
+    ],
+    authorization: "",
+    name:"",
+    company:"",
+    shortName:"",
+    pinCode:"",
+    address:"",
+    country:"",
+    state:"",
+    district:"",
+    place:"",
+    employerDesignation:"",
+    employerPhone:"",
+    employerEmail:"",
+    employerName:"",
+    landline:"",
+    phone:"",
+    email:"",
 
-    <button className="btn amend-generate">
+  });
+
+  clearErrors();
+    }}
+    >
       Generate Amendment
-    </button>
+    </div>}
   </div>
 
 <div className="amend-container">
@@ -486,8 +526,8 @@ const handleSelectAmendment = (id,index) => {
   />
 
     </div>
-     <div className="amend-field">
-     <label className="form-label required">Authorization</label>
+    <div className="amend-field">
+    <label className="form-label required">Authorization</label>
      <Controller
   name="authorizationDate"
   control={control}

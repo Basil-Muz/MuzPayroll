@@ -35,7 +35,7 @@
   /* Background Colors */
   --background: #ffffffff;
   --dark-background: #381e3bff;
-  --background-alt: #fcf8fcff;
+  --background-alt: #ffefffff;
   --glass-bg: rgba(255, 255, 255, 0.88);
   
   /* Shadow Effects */
@@ -131,7 +131,7 @@ body > * {
 
 .form-header h1 {
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--text);
   margin-bottom: 8px;
   background: linear-gradient(135deg, var(--text) 0%, var(--text-muted) 100%);
@@ -191,8 +191,8 @@ body > * {
 }
 
 .step-icon {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   background: var(--background);
   border: 2px solid var(--border);
@@ -933,6 +933,173 @@ z-index:10 !important; */
   color: #9ca3af;
 }
 
+/* ===============================
+   Amendment Section
+================================ */
+
+.amend-section {
+  margin: 20px 0;
+}
+
+/* Header Row */
+.amend-header-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.amend-field {
+  min-width: 260px;
+}
+
+.amend-generate {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+.amend-generate:hover{
+  transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(224, 99, 241, 0.3);
+}
+/* ===============================
+   Amend Container
+================================ */
+
+.amend-container {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* ===============================
+  Amendment Pill (Base)
+================================ */
+
+.amend-pill {
+  width: 220px;
+  padding: 18px 15px;
+  border-radius: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: var(--background);
+  border: 1.5px solid var(--border-light);
+  box-shadow: var(--shadow);
+  transition: all 0.25s ease;
+}
+
+.amend-pill:hover {
+  /* transform: translateY(-2px); */
+}
+
+/* ===============================
+   Left Side
+================================ */
+
+.pill-left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.pill-index {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;onClick={toggleSidebar}
+  place-items: center;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--brand-light);
+  color: white;
+}
+
+.pill-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.pill-type {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.pill-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ===============================
+   Right Side Badges
+================================ */
+
+.pill-right {
+  display: flex;
+  gap: 6px;
+}
+
+.pill-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+/* ===============================
+   ENTRY
+================================ */
+
+.amend-pill.entry {
+  border-left: 4px solid var(--brand);
+}
+
+/* ===============================
+   VERIFIED
+================================ */
+
+.pill-badge.verified {
+  background: var(--success-light);
+  color: var(--brand);
+}
+
+/* ===============================
+   LATEST + SELECTED (SAME STYLE)
+================================ */
+
+.amend-pill.selected {
+  /* background: linear-gradient(
+    135deg,
+    var(--brand-light),
+    #f5c2ff
+  ); */
+  background: var(--background-alt);
+  border: 1.5px solid var(--brand);
+  /* box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1); */
+}
+
+.pill-badge.latest {
+  background: var(--brand);
+  color: #fff;
+}
+
+.amend-pill.selected .pill-index {
+  background: var(--brand);
+  color: #fff;
+}
+
+.amend-pill.selected .pill-type {
+  color: var(--brand);
+}
+
+
 /* Mobile */
 @media (max-width: 768px) {
   .amend-bar {
@@ -978,6 +1145,7 @@ z-index:10 !important; */
 
 /* Mobile (576px - 768px) */
 @media (max-width: 768px) {
+
   .branch-container-tab {
     padding: 16px 12px;
     padding-top:var(--header-padding);
@@ -1066,15 +1234,17 @@ z-index:10 !important; */
   }
 
   .branch-container-tab .floating-action-bar{
-    bottom:3rem;
+    bottom: 12rem;
   }
+
 }
 
 /* Small Mobile (up to 576px) */
 @media (max-width: 576px) {
   .branch-container-tab {
     padding: 12px 8px;
-    padding-top: var(--header-padding);
+    padding-top:18px;
+    /* padding-top: var(--header-padding); */
   }
   
   .form-card {
@@ -1088,6 +1258,10 @@ z-index:10 !important; */
   
   .form-header h1 {
     font-size: var(--text-md);
+  }
+
+  .section-title{
+    font-size: var(--text-sm);
   }
 
   .form-container h3{
@@ -1130,6 +1304,43 @@ z-index:10 !important; */
   .btn-add{
     width: 100%;
   }
+
+  .amend-header-row{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+    align-items: flex-end;
+    flex-direction: row;
+  }
+
+  .amend-field {
+        min-width: 213px;
+  }
+
+  .form-control-select__control{
+    width: 210px
+  }
+
+  .amend-pill{
+    min-width: 250px;
+    gap:12px;
+  }
+  .amend-generate{
+    width: 300px;
+  }
+  .branch-container-tab .floating-action-bar{
+    bottom: 2.5rem;
+    right: 25px;
+  }
+  .branch-form-actions {
+    padding: 16px;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    }
+    .branch-form-actions .btn{
+      width:150px;
+    }
 }
   /* Stack buttons vertically on very small screens */
   @media (max-width: 400px) {
@@ -1158,168 +1369,3 @@ z-index:10 !important; */
 .hidden {
   display: none;
 }
-/* ===============================
-   Amendment Section
-================================ */
-
-.amend-section {
-  margin: 20px 0;
-}
-
-/* Header Row */
-.amend-header-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.amend-field {
-  min-width: 260px;
-}
-
-.amend-generate {
-  height: 40px;
-  padding: 0 18px;
-  border-radius: var(--radius-sm);
-  background: var(--brand);
-  color: #fff;
-  font-weight: 600;
-}
-
-.amend-generate:hover{
-  transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(224, 99, 241, 0.3);
-}
-/* ===============================
-   Amend Container
-================================ */
-
-.amend-container {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-/* ===============================
-   Amendment Pill (Base)
-================================ */
-
-.amend-pill {
-  min-width: 220px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  background: var(--background);
-  border: 1.5px solid var(--border-light);
-  box-shadow: var(--shadow);
-  transition: all 0.25s ease;
-}
-
-.amend-pill:hover {
-  /* transform: translateY(-2px); */
-}
-
-/* ===============================
-   Left Side
-================================ */
-
-.pill-left {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.pill-index {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 14px;
-  background: var(--brand-light);
-  color: white;
-}
-
-.pill-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.pill-type {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.pill-date {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-/* ===============================
-   Right Side Badges
-================================ */
-
-.pill-right {
-  display: flex;
-  gap: 6px;
-}
-
-.pill-badge {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 10px;
-  text-transform: uppercase;
-}
-
-/* ===============================
-   ENTRY
-================================ */
-
-.amend-pill.entry {
-  border-left: 4px solid var(--brand);
-}
-
-/* ===============================
-   VERIFIED
-================================ */
-
-.pill-badge.verified {
-  background: var(--success-light);
-  color: var(--brand);
-}
-
-/* ===============================
-   LATEST + SELECTED (SAME STYLE)
-================================ */
-
-.amend-pill.selected {
-  /* background: linear-gradient(
-    135deg,
-    var(--brand-light),
-    #f5c2ff
-  ); */
-  border: 1.5px solid var(--brand);
-  box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1);
-}
-
-.pill-badge.latest {
-  background: var(--brand);
-  color: #fff;
-}
-
-.amend-pill.selected .pill-index {
-  background: var(--brand);
-  color: #fff;
-}
-
-.amend-pill.selected .pill-type {
-  color: var(--brand);
-}
-

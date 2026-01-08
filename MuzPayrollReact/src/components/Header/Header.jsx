@@ -55,30 +55,30 @@ const Header = ({ backendError = [] }) => {
   }, []);
 
   // Update notifications from backend errors
- useEffect(() => {
-  if (!Array.isArray(backendError)) return;
+//  useEffect(() => {
+//   if (!Array.isArray(backendError)) return;
 
-  setNotifications(prev => {
-    // prevent unnecessary updates
-    if (JSON.stringify(prev) === JSON.stringify(backendError)) {
-      return prev;
-    }
-    return backendError;
-  });
+//   setNotifications(prev => {
+//     // prevent unnecessary updates
+//     if (JSON.stringify(prev) === JSON.stringify(backendError)) {
+//       return prev;
+//     }
+//     return backendError;
+//   });
 
-  if (backendError.length > 0) {
-    setNotOpen(prev => {
-      if (prev) return prev; // already open
-      return true;
-    });
+//   if (backendError.length > 0) {
+//     setNotOpen(prev => {
+//       if (prev) return prev; // already open
+//       return true;
+//     });
 
-    const autoCloseTimer = setTimeout(() => {
-      setNotOpen(false);
-    }, 5000);
+//     const autoCloseTimer = setTimeout(() => {
+//       setNotOpen(false);
+//     }, 5000);
 
-    return () => clearTimeout(autoCloseTimer);
-  }
-}, [backendError]);
+//     return () => clearTimeout(autoCloseTimer);
+//   }
+// }, [backendError,notifications]);
 
   // Notification removal functions
   const removeNotification = useCallback((id) => {
