@@ -137,7 +137,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         }
 
         // if log table present ---->
-        List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+        List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
         Response<Boolean> logEntityValidate = companyLogService.entityValidate(logDtos);
 
         // If log validation fails, return those errors
@@ -178,7 +178,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         dto.setCompanyDtoLogs(CompanyDtoLogs);
 
         // CALL CompanyLogService entityValidate
-        List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+        List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
         Response<Boolean> logEntityPopulate = companyLogService.entityPopulate(logDtos);
 
         // If log entityPopulate fails, return errors
@@ -217,7 +217,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
         // if log table present ---->
 
-        List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+        List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
         Response<Boolean> logbusinessValidate = companyLogService.businessValidate(logDtos);
 
         // If log businessValidate fails, return errors
@@ -310,7 +310,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             }
 
             // Process all log DTOs together
-            List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+            List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
             Response<Object> logGeneratePK = companyLogService.generatePK(logDtos);
 
             if (!logGeneratePK.isSuccess()) {
@@ -367,7 +367,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
             // if log table present ---->
 
-            List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+            List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
             Response<String> loggenerateSerialNo = companyLogService.generateSerialNo(logDtos);
 
             if (!loggenerateSerialNo.isSuccess()) {
@@ -398,7 +398,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         CompanyMst company = dtoToEntity(dtos);
 
         // if log table present ---->
-        List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+        List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
         Response<CompanyLog> logconverttoEntity = companyLogService.converttoEntity(logDtos);
 
         if (!logconverttoEntity.isSuccess()) {
@@ -515,7 +515,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             dto.setAuthId(savedAuth.getAuthId());
 
             // Now call saveEntity with the created entity
-            List<CompanyLogDTO> logDtos = convertToCompanyLogDTO(dtos);
+            List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
             CompanyLog savedLog = companyLogService.saveEntity(logEntity, logDtos);
 
             // <------
@@ -565,7 +565,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         return CompanyDtoLogs;
     }
 
-    private List<CompanyLogDTO> convertToCompanyLogDTO(List<CompanyDTO> dtos) {
+    private List<CompanyLogDTO> convertToLogDTO(List<CompanyDTO> dtos) {
 
         if (dtos == null || dtos.isEmpty())
             return null;

@@ -1,15 +1,39 @@
 package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class BranchMst {
+
+    @Transient
+    private List<BranchLog> branchLogs;
+
+    public List<BranchLog> getBranchLogs() {
+        return branchLogs;
+    }
+
+    public void setBranchLogs(List<BranchLog> branchLogs) {
+        this.branchLogs = branchLogs;
+    }
+
+    @Transient
+    private Authorization authorization;
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
 
     @Id
     @Column(name = "BranchMstID", unique = true, nullable = false)
@@ -50,28 +74,16 @@ public class BranchMst {
     private String place;
 
     @Column(nullable = false)
-    private Integer pincode;
+    private String pincode;
 
     @Column(nullable = false)
-    private Long landlineNumber;
+    private String landlineNumber;
 
     @Column(nullable = false)
-    private Long mobileNumber;
+    private String mobileNumber;
 
     @Column(nullable = false)
     private String email;
-
-    @Column(nullable = false)
-    private String employerName;
-
-    @Column(nullable = false)
-    private String designation;
-
-    @Column(nullable = false)
-    private Long employerNumber;
-
-    @Column(nullable = false)
-    private String employerEmail;
 
     @Column(nullable = false)
     private LocalDate withaffectdate;
@@ -181,27 +193,27 @@ public class BranchMst {
         this.place = place;
     }
 
-    public Integer getPincode() {
+    public String getPincode() {
         return pincode;
     }
 
-    public void setPincode(Integer pincode) {
+    public void setPincode(String pincode) {
         this.pincode = pincode;
     }
 
-    public Long getLandlineNumber() {
+    public String getLandlineNumber() {
         return landlineNumber;
     }
 
-    public void setLandlineNumber(Long landlineNumber) {
+    public void setLandlineNumber(String landlineNumber) {
         this.landlineNumber = landlineNumber;
     }
 
-    public Long getMobileNumber() {
+    public String getMobileNumber() {
         return mobileNumber;
     }
 
-    public void setMobileNumber(Long mobileNumber) {
+    public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
 
@@ -211,38 +223,6 @@ public class BranchMst {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getEmployerName() {
-        return employerName;
-    }
-
-    public void setEmployerName(String employerName) {
-        this.employerName = employerName;
-    }
-
-    public String getDesignation() {
-        return designation;
-    }
-
-    public void setDesignation(String designation) {
-        this.designation = designation;
-    }
-
-    public Long getEmployerNumber() {
-        return employerNumber;
-    }
-
-    public void setEmployerNumber(Long employerNumber) {
-        this.employerNumber = employerNumber;
-    }
-
-    public String getEmployerEmail() {
-        return employerEmail;
-    }
-
-    public void setEmployerEmail(String employerEmail) {
-        this.employerEmail = employerEmail;
     }
 
     public LocalDate getWithaffectdate() {

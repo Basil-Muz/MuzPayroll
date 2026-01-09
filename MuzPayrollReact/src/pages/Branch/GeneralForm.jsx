@@ -65,7 +65,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       const company = companyResponse.data;
 
       setCompanyList([company]);
-      setInitialCompanyId(company.id); // ✅ store it
+      setInitialCompanyId(company.companyMstID); // ✅ store it
     } catch (error) {
       console.error("Failed to load company:", error);
     }
@@ -208,8 +208,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      company: initialCompanyId,
-      code: "",
+      CompanyID: initialCompanyId,
       branch: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0],
@@ -221,15 +220,9 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       district: "",
       place: "",
       pincode: "",
-      latitude: "",
-      longitude: "",
       landlineNumber: "",
       mobileNumber: "",
       email: "",
-      employerName: "",
-      designation: "",
-      employerNumber: "",
-      employerEmail: "",
       withaffectdate: "",
       authorizationStatus: "0",
       user_code: user_code,
@@ -237,13 +230,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
     },
     validationSchema: Yup.object({
       company: Yup.string().required("Company is required"),
-      code: Yup.string()
-        .required("Code is required")
-        .test(
-          "only-numbers-symbols",
-          "Code must contain only numbers and symbols, no alphabets or spaces",
-          (value) => /^[0-9\W_]+$/.test(value || ""),
-        ),
       branch: Yup.string().required("Branch Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
@@ -255,52 +241,86 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       pincode: Yup.string()
         .matches(/^\d+$/, "Pincode must be only numbers")
         .required("Pincode is required"),
-      latitude: Yup.string()
-        .matches(/^\d+(\.\d+)?$/, "Latitude must be only numbers")
-        .required("Latitude is required"),
-      longitude: Yup.string()
-        .matches(/^\d+(\.\d+)?$/, "Longitude must be only numbers")
-        .required("Longitude is required"),
-      landlineNumber: Yup.string()
-        .matches(/^\d+$/, "Landline Number must be only numbers")
-        .required("Landline Number is required"),
+
       mobileNumber: Yup.string()
         .matches(/^\d+$/, "Mobile Number must be only numbers")
         .required("Mobile Number is required"),
       email: Yup.string()
         .email("Invalid email format")
         .required("Email is required"),
-      employerName: Yup.string().required("Employer Name is required"),
-      designation: Yup.string().required("Designation is required"),
-      employerNumber: Yup.string()
-        .matches(/^\d+$/, "Employer Number must be only numbers")
-        .required("Employer Number is required"),
-      employerEmail: Yup.string()
-        .email("Invalid email format")
-        .required("Employer Email is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
-        onBackendError(""); // clear previous backend error
-        const formattedValues = {
-          ...values,
-          activeDate: values.activeDate.split("T")[0],
-          companyEntity: { id: values.company },
-        };
+        onBackendError("");
 
-        const response = await fetch("http://localhost:8087/saveBranch", {
+        // Create FormData
+        const formData = new FormData();
+
+        // Add ALL fields that match BranchDTO
+        // IMPORTANT: Field names must match exactly with DTO field names
+
+        // Basic fields
+        formData.append("CompanyID", values.company || "");
+        formData.append("branch", values.branch || ""); // Not branchName
+        formData.append("shortName", values.shortName || "");
+
+        // Date fields - format as YYYY-MM-DD with NO spaces
+        if (values.activeDate) {
+          formData.append("ActiveDate", values.activeDate.split("T")[0]);
+        }
+
+        // Address fields
+        formData.append("address", values.address || "");
+        formData.append("address1", values.address1 || "");
+        formData.append("address2", values.address2 || "");
+        formData.append("country", values.country || "");
+        formData.append("state", values.state || "");
+        formData.append("district", values.district || "");
+        formData.append("place", values.place || "");
+        formData.append("pincode", values.pincode || "");
+
+        // Contact fields
+        formData.append("landlineNumber", values.landlineNumber || "");
+        formData.append("mobileNumber", values.mobileNumber || "");
+        formData.append("email", values.email || "");
+
+        // Other fields
+        if (values.withaffectdate) {
+          formData.append(
+            "withaffectdate",
+            values.withaffectdate.split("T")[0],
+          );
+        }
+        formData.append(
+          "authorizationStatus",
+          values.authorizationStatus || "0",
+        );
+        formData.append("user_code", values.user_code || "");
+
+        if (values.authorizationDate) {
+          formData.append(
+            "authorizationDate",
+            values.authorizationDate.split("T")[0],
+          );
+        }
+
+        console.log("Sending form data with fields:");
+        for (let [key, value] of formData.entries()) {
+          console.log(key + ":", value);
+        }
+
+        const response = await fetch("http://localhost:8087/Branch/save", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formattedValues),
+          // Browser sets Content-Type automatically for FormData
+          body: formData,
         });
 
-        // 👇 READ BACKEND MESSAGE
         const message = await response.text();
+        console.log("Response:", response.status, message);
 
         if (!response.ok) {
-          // Field-level error (unique code)
           if (message.toLowerCase().includes("code")) {
-            formik.setFieldError("code", message);
+            formik.setFieldError("shortName", message); // shortName is your "code" field
           } else {
             onBackendError(message);
           }
@@ -310,7 +330,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
         alert("Branch saved successfully!");
         resetToInitialState();
       } catch (error) {
-        console.error(error);
+        console.error("Full error:", error);
         onBackendError("Something went wrong. Please try again.");
       }
     },
@@ -370,7 +390,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
                 id="company"
                 name="company"
                 value={formik.values.company || ""}
-                disabled
+                // disabled
                 onChange={formik.handleChange}
               >
                 {companyList.map((company) => (
@@ -382,29 +402,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
 
               {formik.touched.company && formik.errors.company ? (
                 <div className="error">{formik.errors.company}</div>
-              ) : null}
-
-              <label htmlFor="code" className="fancy-label">
-                Code
-              </label>
-              <input
-                type="text"
-                id="code"
-                name="code"
-                ref={codeInputRef}
-                onChange={(e) => {
-                  onBackendError(""); // 👈 clear backend error
-                  formik.handleChange(e);
-                }}
-                onBlur={formik.handleBlur}
-                disabled={!startDate}
-                value={formik.values.code}
-                className={
-                  formik.touched.code && formik.errors.code ? "input-error" : ""
-                }
-              />
-              {formik.touched.code && formik.errors.code ? (
-                <div className="error">{formik.errors.code}</div>
               ) : null}
 
               <label htmlFor="Branch" className="fancy-label">
@@ -688,48 +685,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               {formik.touched.pincode && formik.errors.pincode ? (
                 <div className="error">{formik.errors.pincode}</div>
               ) : null}
-
-              <label htmlFor="latitude" className="fancy-label">
-                Latitude
-              </label>
-              <input
-                type="text"
-                id="latitude"
-                name="latitude"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!addressEditable || !startDate}
-                value={formik.values.latitude}
-                className={
-                  formik.touched.latitude && formik.errors.latitude
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.latitude && formik.errors.latitude ? (
-                <div className="error">{formik.errors.latitude}</div>
-              ) : null}
-
-              <label htmlFor="longitude" className="fancy-label">
-                Longitude
-              </label>
-              <input
-                type="text"
-                id="longitude"
-                name="longitude"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!addressEditable || !startDate}
-                value={formik.values.longitude}
-                className={
-                  formik.touched.longitude && formik.errors.longitude
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.longitude && formik.errors.longitude ? (
-                <div className="error">{formik.errors.longitude}</div>
-              ) : null}
             </div>
           </div>
           <div className="screenright">
@@ -808,103 +763,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               />
               {formik.touched.email && formik.errors.email ? (
                 <div className="error">{formik.errors.email}</div>
-              ) : null}
-            </div>
-            <div className="EmployerInfo">
-              <div className="headertext2">
-                <h4>Employer Contact Info</h4>
-
-                <label className="edit-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={employerEditable}
-                    onChange={handleemployerEditable}
-                    disabled={!startDate || page === "branch"}
-                  />
-                  <span>Edit</span>
-                </label>
-              </div>
-              <label htmlFor="employerName" className="fancy-label">
-                Name
-              </label>
-              <input
-                type="text"
-                id="employerName"
-                name="employerName"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!employerEditable || !startDate}
-                value={formik.values.employerName}
-                className={
-                  formik.touched.employerName && formik.errors.employerName
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.employerName && formik.errors.employerName ? (
-                <div className="error">{formik.errors.employerName}</div>
-              ) : null}
-
-              <label htmlFor="designation" className="fancy-label">
-                Designation
-              </label>
-              <input
-                type="text"
-                id="designation"
-                name="designation"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!employerEditable || !startDate}
-                value={formik.values.designation}
-                className={
-                  formik.touched.designation && formik.errors.designation
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.designation && formik.errors.designation ? (
-                <div className="error">{formik.errors.designation}</div>
-              ) : null}
-
-              <label htmlFor="employerNumber" className="fancy-label">
-                Number
-              </label>
-              <input
-                type="text"
-                id="employerNumber"
-                name="employerNumber"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!employerEditable || !startDate}
-                value={formik.values.employerNumber}
-                className={
-                  formik.touched.employerNumber && formik.errors.employerNumber
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.employerNumber && formik.errors.employerNumber ? (
-                <div className="error">{formik.errors.employerNumber}</div>
-              ) : null}
-              <label htmlFor="employerEmail" className="fancy-label">
-                Email
-              </label>
-              <input
-                type="text"
-                id="employerEmail"
-                name="employerEmail"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!employerEditable || !startDate}
-                value={formik.values.employerEmail}
-                className={
-                  formik.touched.employerEmail && formik.errors.employerEmail
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.employerEmail && formik.errors.employerEmail ? (
-                <div className="error">{formik.errors.employerEmail}</div>
               ) : null}
             </div>
           </div>

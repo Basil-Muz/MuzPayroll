@@ -38,7 +38,6 @@ public class CompanyController {
         try {
             // Set the uploaded file
             dto.setCompanyImage(companyImage);
-
             // Call your service
             return companyService.saveWrapper(dto);
 

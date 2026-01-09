@@ -80,6 +80,7 @@ const BranchForm = forwardRef((props, ref) => {
           <DocumentsInfo ref={documentsInfoRef} />
         </div>
       </div>
+      {/* <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/> */}
       <FloatingActionBar
         actions={{
           save: {
