@@ -1,22 +1,55 @@
-package com.example.MuzPayroll.entity;
+package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.BranchLogPK;
+import com.example.MuzPayroll.entity.CompanyMst;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
-@Entity
-public class BranchLog {
+public class BranchDTO {
 
-    @EmbeddedId
+    @Transient
+    private List<BranchLogDTO> branchDtoLogs;
+
+    public List<BranchLogDTO> getBranchDtoLogs() {
+        return branchDtoLogs;
+    }
+
+    public void setBranchDtoLogs(List<BranchLogDTO> branchDtoLogs) {
+        this.branchDtoLogs = branchDtoLogs;
+    }
+
+    @Transient
+    private Authorization authorization;
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
+
     private BranchLogPK branchLogPK;
 
-    @ManyToOne
-    @JoinColumn(name = "AuthID", nullable = false)
-    private Authorization authorization;
+    public BranchLogPK getBranchLogPK() {
+        return branchLogPK;
+    }
+
+    public void setBranchLogPK(BranchLogPK branchLogPK) {
+        this.branchLogPK = branchLogPK;
+    }
+
+    @Id
+    @Column(name = "BranchMstID", unique = true, nullable = false)
+    private Long branchMstID;
 
     @ManyToOne
     @JoinColumn(name = "CompanyID", nullable = false)
@@ -67,21 +100,23 @@ public class BranchLog {
     @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    private Long authId;
+
+    public Long getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(Long authId) {
+        this.authId = authId;
+    }
+
     // Getters and setters
-    public BranchLogPK getBranchLogPK() {
-        return branchLogPK;
+    public Long getBranchMstID() {
+        return branchMstID;
     }
 
-    public void setBranchLogPK(BranchLogPK branchLogPK) {
-        this.branchLogPK = branchLogPK;
-    }
-
-    public Authorization getAuthorization() {
-        return authorization;
-    }
-
-    public void setAuthorization(Authorization authorization) {
-        this.authorization = authorization;
+    public void setBranchMstID(Long branchMstID) {
+        this.branchMstID = branchMstID;
     }
 
     public CompanyMst getCompanyEntity() {
@@ -218,5 +253,51 @@ public class BranchLog {
 
     public void setWithaffectdate(LocalDate withaffectdate) {
         this.withaffectdate = withaffectdate;
+    }
+
+    // Authorization
+
+    @Column
+    private Long mstId;
+
+    @Column(nullable = false)
+    private String userCode;
+
+    @Column(nullable = false)
+    private LocalDate authorizationDate;
+
+    public LocalDate getAuthorizationDate() {
+        return authorizationDate;
+    }
+
+    public void setAuthorizationDate(LocalDate authorizationDate) {
+        this.authorizationDate = authorizationDate;
+    }
+
+    @Column(nullable = false)
+    private Boolean authorizationStatus;
+
+    public Boolean getAuthorizationStatus() {
+        return authorizationStatus;
+    }
+
+    public void setAuthorizationStatus(Boolean authorizationStatus) {
+        this.authorizationStatus = authorizationStatus;
+    }
+
+    public Long getMstId() {
+        return mstId;
+    }
+
+    public void setMstId(Long mstId) {
+        this.mstId = mstId;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 }

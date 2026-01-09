@@ -223,35 +223,35 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
-      // company: Yup.string().required("Company Name is required"),
-      // shortName: Yup.string().required("Short Name is required"),
-      // activeDate: Yup.string().required("Active Date is required"),
-      // address: Yup.string().required("Address is required"),
-      // country: Yup.string().required("Country is required"),
-      // state: Yup.string().required("State is required"),
-      // district: Yup.string().required("District is required"),
-      // place: Yup.string().required("Place is required"),
-      // pincode: Yup.string()
-      //   .matches(/^\d+$/, "Pincode must be only numbers")
-      //   .required("Pincode is required"),
-      // landlineNumber: Yup.string()
-      //   .matches(/^\d+$/, "Landline Number must be only numbers")
-      //   .required("Landline Number is required"),
-      // mobileNumber: Yup.string()
-      //   .matches(/^\d+$/, "Mobile Number must be only numbers")
-      //   .required("Mobile Number is required"),
-      // email: Yup.string()
-      //   .email("Invalid email format")
-      //   .required("Email is required"),
-      // employerName: Yup.string().required("Employer Name is required"),
-      // designation: Yup.string().required("Designation is required"),
-      // employerNumber: Yup.string()
-      //   .matches(/^\d+$/, "Employer Number must be only numbers")
-      //   .required("Employer Number is required"),
-      // employerEmail: Yup.string()
-      //   .email("Invalid email format")
-      //   .required("Employer Email is required"),
-      // withaffectdate: Yup.string().required("with affect date is required"),
+      company: Yup.string().required("Company Name is required"),
+      shortName: Yup.string().required("Short Name is required"),
+      activeDate: Yup.string().required("Active Date is required"),
+      address: Yup.string().required("Address is required"),
+      country: Yup.string().required("Country is required"),
+      state: Yup.string().required("State is required"),
+      district: Yup.string().required("District is required"),
+      place: Yup.string().required("Place is required"),
+      pincode: Yup.string()
+        .matches(/^\d+$/, "Pincode must be only numbers")
+        .required("Pincode is required"),
+      landlineNumber: Yup.string()
+        .matches(/^\d+$/, "Landline Number must be only numbers")
+        .required("Landline Number is required"),
+      mobileNumber: Yup.string()
+        .matches(/^\d+$/, "Mobile Number must be only numbers")
+        .required("Mobile Number is required"),
+      email: Yup.string()
+        .email("Invalid email format")
+        .required("Email is required"),
+      employerName: Yup.string().required("Employer Name is required"),
+      designation: Yup.string().required("Designation is required"),
+      employerNumber: Yup.string()
+        .matches(/^\d+$/, "Employer Number must be only numbers")
+        .required("Employer Number is required"),
+      employerEmail: Yup.string()
+        .email("Invalid email format")
+        .required("Employer Email is required"),
+      withaffectdate: Yup.string().required("with affect date is required"),
     }),
     onSubmit: async (values) => {
       try {
@@ -261,13 +261,12 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
         Object.keys(values).forEach((key) => {
           if (key !== "companyImage") {
             formData.append(key, values[key]);
-
           }
+          console.log("formData1", formData);
         });
 
         if (values.companyImage) {
           formData.append("companyImage", values.companyImage);
-
         }
 
         const response = await fetch("http://localhost:8087/company/save", {
