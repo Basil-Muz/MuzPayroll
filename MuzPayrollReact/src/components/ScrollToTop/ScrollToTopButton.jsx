@@ -1,25 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { FaArrowUp } from "react-icons/fa";
 import "./ScrollToTopButton.css";
 
-const ScrollToTopButton = ({ showAfter = 120 }) => {
+const ScrollToTopButton = ({ showAfter = 300 }) => {
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > showAfter) {
-        setVisible(true);
-      } else {
-        setVisible(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  const handleScroll = useCallback(() => {
+    setVisible(window.scrollY > showAfter);
   }, [showAfter]);
 
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    // Initial check
+    handleScroll();
+    
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ 
+      top: 0, 
+      behavior: "smooth" 
+    });
   };
 
   return (
@@ -27,8 +30,10 @@ const ScrollToTopButton = ({ showAfter = 120 }) => {
       className={`to-top-btn ${visible ? "show" : ""}`}
       onClick={scrollToTop}
       aria-label="Scroll to top"
+      title="Scroll to top"
+      tabIndex={visible ? 0 : -1}
     >
-      <FaArrowUp size={20} style={{color:'#c71e9d'}} />
+      <FaArrowUp size={20} aria-hidden="true" />
     </button>
   );
 };

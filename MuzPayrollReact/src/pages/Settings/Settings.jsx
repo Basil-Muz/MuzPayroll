@@ -37,7 +37,7 @@ const sitemapData = [
         { title: "Holiday and Off day Group", subtitle: "Holiday and Off day Group", link: "/payroll/holiday-offday-group" },
       ],
       [
-        { title: "Shift Group", subtitle: "Shift Group", link: "/payroll/shift-group" },
+        { title: "Shift Group", subtitle: "Shift Group", link: "/shiftgroup" },
         { title: "Salary Head Group", subtitle: "Salary Head Group", link: "/payroll/salary-head-group" },
         { title: "Profession Tax Group", subtitle: "Profession Tax Group", link: "/payroll/profession-tax-group" },
       ],
@@ -58,8 +58,8 @@ const sitemapData = [
     subtitle: "User Rights",
     rows: [
       [
-        { title: "User Group", subtitle: "User Group", link: "/user-rights/user-group" },
-        { title: "Location Group", subtitle: "Location Group", link: "/user-rights/location-group" },
+        { title: "User Group", subtitle: "User Group", link: "/usergroup" },
+        { title: "Location Group", subtitle: "Location Group", link: "/locationgroup" },
         { title: "Location Group Rights", subtitle: "Location Group Rights", link: "/user-rights/location-group-rights" },
       ],
       [
@@ -101,7 +101,7 @@ const handleCancel = () => {
         {/* CONTENT */}
         <main className="content">
           <div className="main-header">
-          <h1 className="page-title">Sitemap</h1>
+          <h1 className="page-title">Settings</h1>
           <div className="main-cancel">
             <MdOutlineCancel size={20} onClick={handleCancel}/>
             </div>

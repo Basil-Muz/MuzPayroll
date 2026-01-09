@@ -247,15 +247,17 @@
     justify-content: space-between;
     align-items: center;
 }
-.main-cancel {
+.settigs-app-shell  .main-cancel {
     padding: 7px;
     display: flex;
-    width: 34px;
-    border-radius: 9px;
-    height: 21px;
+    width: 46px;
+    height: 36px;
+    border-radius: var(--radius-sm);
     background-color: #e61515ff;
     flex-wrap: nowrap;
-    color: azure;
+    color: white;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     justify-content: center;
 }

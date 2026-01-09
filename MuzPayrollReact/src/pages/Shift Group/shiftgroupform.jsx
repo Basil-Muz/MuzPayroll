@@ -1,13 +1,15 @@
-// DesignationForm.jsx
 import React, { useEffect, useState,useRef } from 'react';
-import './designationForm.css';
+import './shiftgroupform.css';
 import { FaSave} from "react-icons/fa";
 import { MdOutlineCancel } from "react-icons/md";
 import { IoNotificationsSharp } from "react-icons/io5";
 import axios from 'axios';
 import { RxCross2 } from "react-icons/rx";
+import { GrMoon } from "react-icons/gr";
+import { GrSun } from "react-icons/gr";
+import { LiaAdjustSolid } from "react-icons/lia";
 import Loading from '../../components/Loading/Loading';
-function DesignationForm({ toggleForm,data }) {
+function ShiftGroupForm({ toggleForm,data }) {
 
     const [position, setPosition] = useState({ x: 355, y: 43 });
     const dragging = useRef(false);
@@ -29,10 +31,11 @@ const [form, setForm] = useState({
     code: "",
     name: "",
     shortName: "",
-    recoveryHead: "",
-    description: "",
+    TimeFrom: "",
+    TimeTo:"",
+    ShiftType:"",
     activeDate: new Date().toISOString().split('T')[0], // sets today's date
-    status: 'ENTRY',
+    Authorization: 'ENTRY',
     date: new Date().toISOString().split('T')[0],
   });
     // const [isOpenForm, setIsOpenForm] = useState(true);
@@ -57,14 +60,15 @@ const [form, setForm] = useState({
         code: data.code,
         shortName: data.shortName,
         name: data.name,
-        recoveryHead: data.recoveryHead,
-        description: data.description,
+        timefrom: data.timefrom,
+        timeto: data.timeto,
+        shifttype: data.shifttype,
         activeDate: data.activeDate,
-        status: data.status,
+        Authorization: data.Authorization,
         date: data.date,
       // ... any other fields
     }));
-    setIsVarified(data.status === "VERIFIED");
+    setIsVarified(data.Authorization === "VERIFIED");
   }
    
 }, [data]);
@@ -129,8 +133,10 @@ const handleMouseUp = () => {
     }
     if (!form.name) newErrors.name = "Name is required.";
     if (!form.shortName) newErrors.shortName = "Short Name is required.";
-    if (!form.recoveryHead) newErrors.recoveryHead = "Recovery Head is required.";
-    if (!form.description) newErrors.description = "Description is required.";
+    if (!form.TimeFrom) newErrors.TimeFrom = "Time From is required.";
+    if (!form.TimeTo) newErrors.TimeTo = "Time To is required.";
+    if (!form.ShiftType) newErrors.ShiftType = "Shift Type is required.";
+    
     // alert(JSON.stringify(newErrors));
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -209,8 +215,10 @@ const handleMouseUp = () => {
       code: "",
       name: "",
       shortName: "",
-      recoveryHead: "",
-      description: "",
+        TimeFrom: "",
+        TimeTo:"",
+        ShiftType:"",
+      activeDate: new Date().toISOString().split('T')[0], // sets today's date
     });
     data=null;
     setErrors({});}
@@ -254,7 +262,7 @@ const handleMouseUp = () => {
       <Search/>
         
         </div> */}
-    <div className="h3">Designation</div>
+    <div className="h3">Shift Group</div>
     <div className="header-icons">
        <div className="notifications" 
         onMouseEnter={handleNotifEnter}
@@ -345,56 +353,79 @@ const handleMouseUp = () => {
         </div>
       </div>
 
-      {/* Recovery Head */}
+      {/* Time From */}
       <div className="full-content">
       <div className="form-row">
-        <label className="required">Recovery Head</label>
-        <div className="input recoveryHead">
-          <select
-          id='recoveryHead'
-            name="recoveryHead"
-            value={form.recoveryHead}
-            onChange={handleChange}
-            disabled={isVarified} 
-          >
-            <option value=""></option>
-            {salaryHeads.map((head) => (
-                <option key={head.id} value={head.name}>
-                {head.name}
-              </option>
-            ))}
-          </select>
-            </div>
-            </div>
-            <div className="main-error">
-          { errors.recoveryHead && (
-            <div className="error">{errors.recoveryHead}</div>
+        <label className="required">Time From</label>
+        <div className="input timeFrom">
+        <input
+        type="time"
+        name="TimeFrom"
+        value={form.TimeFrom}
+        onChange={handleChange}
+        disabled={isVarified}
+      />
+        </div>
+        </div>
+        <div className="main-error">
+          { errors.TimeFrom && (
+            <div className="error">{errors.TimeFrom}</div>
           )}
         </div>
       </div>
 
-      {/* Description */}
-      <div className="full-content description">
-        <div className="form-row">
-        <label className="required">Description</label>
-        <div className="input description">
-          <textarea
-          id='description'
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            rows="1"
-            cols="1"
-            disabled={isVarified} 
-          />
-            </div>
-            </div>
-            <div className="main-error">
-          { errors.description && (
-            <div className="error">{errors.description}</div>
+       {/* Time To */}
+      <div className="full-content">
+      <div className="form-row">
+        <label className="required">Time To</label>
+        <div className="input timeTo">
+        <input
+        type="time"
+        name="TimeTo"
+        value={form.TimeTo}
+        onChange={handleChange}
+        disabled={isVarified}
+      />
+        </div>
+        </div>
+        <div className="main-error">
+          { errors.TimeTo && (
+            <div className="error">{errors.TimeTo}</div>
           )}
         </div>
       </div>
+
+      {/* Shift Type */}
+    <div className="full-content">
+    <div className="form-row">
+    <label className="required">Shift Type</label>
+
+    <div className="shift-type-container">
+      <div
+        className={`shift-type ${form.ShiftType === "DAY" ? "active" : ""}`}
+        onClick={() => !isVarified && setForm({ ...form, ShiftType: "DAY" })}>
+    <GrSun />
+      </div>
+
+      <div
+        className={`shift-type ${form.ShiftType === "NIGHT" ? "active" : ""}`}
+        onClick={() => !isVarified && setForm({ ...form, ShiftType: "NIGHT" })}>
+   <GrMoon />
+      </div>
+
+      <div
+        className={`shift-type ${form.ShiftType === "GENERAL" ? "active" : ""}`}
+        onClick={() => !isVarified && setForm({ ...form, ShiftType: "GENERAL" })}>
+     <LiaAdjustSolid />
+      </div>
+    </div>
+  </div>
+
+  <div className="main-error">
+    {errors.ShiftType && <div className="error">{errors.ShiftType}</div>}
+  </div>
+</div>
+
 
       {/* Active Date */}
       <div className="full-content">
@@ -450,4 +481,4 @@ const handleMouseUp = () => {
   );
 }
 
-export default DesignationForm;
+export default ShiftGroupForm;

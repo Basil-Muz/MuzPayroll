@@ -1,0 +1,560 @@
+/* Documents Container */
+.documents-section {
+  padding: 7px 24px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.documents-header {
+    display: flex;
+    align-items: center;
+    justify-content:space-between;
+    gap: 10px;
+    margin-bottom: 24px;
+    background: #f5f5f5;
+    padding: 10px 12px;
+}
+
+.documents-header h3 {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+/* Document Grid */
+.document-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+/* Document Card */
+.document-card {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top:4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+/* .document-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: var(--brand-border);
+} */
+
+/* Card Header */
+/* .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+} */
+
+.doc-index {
+  font-weight: 600;
+  color: var(--brand);
+  font-size: 14px;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: capitalize;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-badge.pending {
+  background: rgba(210, 24, 216, 0.1);
+  color: var(--brand);
+  border: 1px solid rgba(210, 24, 216, 0.2);
+}
+
+.status-badge.uploaded {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.verified {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Card Body - Fields */
+.card-body {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+}
+
+.field label.required::after {
+  content: " *";
+  color: var(--danger);
+  margin-left: 4px;
+}
+
+/* .field input,
+.field select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);.field input,
+.field select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--background);
+  transition: all 0.2s ease;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px rgba(210, 24, 216, 0.1);
+}
+  font-size: 14px;
+  color: var(--text);
+  background: var(--background);
+  transition: all 0.2s ease;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px rgba(210, 24, 216, 0.1);
+} */
+
+.field input::placeholder {
+  color: var(--text-light);
+}
+
+/* File Upload Section */
+.card-upload {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--background-alt);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border);
+}
+
+.card-upload:hover {
+  border-color: var(--brand);
+  background: rgba(210, 24, 216, 0.02);
+}
+
+.file-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-input {
+  display: none;
+}
+
+.btn-upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--brand);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-upload:hover {
+  background: var(--brand-dark);
+  transform: translateY(-1px);
+}
+
+.btn-upload svg {
+  width: 16px;
+  height: 16px;
+}
+
+input #file{
+  display:none
+}
+
+.doc-file-name {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.doc-file-size {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--background);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* Card Footer - Actions */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+.card-footer .btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-preview {
+  background: white;
+  color: var(--brand);
+  border: 1.5px solid var(--brand) !important;
+}
+
+.btn-preview:hover:not(:disabled) {
+  background: var(--brand);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-preview:disabled,
+.btn-remove-file:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--border) !important;
+  color: var(--text-light);
+}
+
+.doc-btn-remove {
+  padding: 8px 16px;
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.doc-btn-remove:hover {
+  background: var(--danger);
+  color: white;
+}
+
+
+
+/* Remarks Section */
+.card-remarks {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+.card-remarks input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--background);
+  transition: all 0.2s ease;
+}
+
+.form-control {
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  color: var(--text);
+  transition: all 0.3s ease;
+  background: var(--background);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1);
+} 
+
+/* Error input border */
+.document-card .doc-error {
+  border: 1.5px solid var(--danger) !important;
+}
+.card-remarks input:focus {
+  outline: none;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px rgba(210, 24, 216, 0.1);
+}
+
+.card-remarks input::placeholder {
+  color: var(--text-light);
+}
+
+
+/* Add Document Button */
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--background);
+  color: var(--brand);
+  border: none;
+  border-radius: var(--radius-sm);
+  border:1px solid var(--brand);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+  background: var(--brand-dark);
+  color:var(--background);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(210, 24, 216, 0.2);
+}
+
+/* Form Validation */
+/* .field input:invalid,
+.field select:invalid {
+  border-color: var(--danger);
+}
+
+.field input:valid,
+.field select:valid {
+  border-color: var(--border);
+} */
+
+/* Remove File Button */
+.btn-remove-file {
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border:thin solid var(--danger);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-remove-file:hover:not(:disabled) {
+  background: var(--danger);
+  color:var(--background)
+}
+
+/* Responsive Design */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .documents-section {
+    padding: 20px;
+  }
+  
+  .document-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .document-card {
+    padding: 16px;
+  }
+}
+
+/* Mobile Large */
+@media (max-width: 768px) {
+  .documents-section {
+    padding: 16px;
+  }
+  
+  .documents-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .documents-header h3 {
+    font-size: 18px;
+  }
+  
+  .document-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .card-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .card-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+  .documents-section {
+    padding: 12px;
+  }
+  
+  .document-card {
+    padding: 16px 12px;
+  }
+  
+  .card-upload {
+    padding: 12px;
+  }
+  
+  .file-upload-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .file-name {
+    max-width: 100%;
+    text-align: center;
+  }
+  
+  .field input,
+  .field select {
+    padding: 10px;
+  }
+  
+  .btn-upload {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Loading States */
+.document-card.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.document-card.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius);
+}
+
+/* Empty State */
+.empty-documents {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.empty-documents svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  color: var(--border);
+  opacity: 0.5;
+}
+
+.empty-documents h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.empty-documents p {
+  font-size: 14px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Drag and Drop */
+.document-card.drag-over {
+  border-color: var(--brand);
+  background: rgba(210, 24, 216, 0.05);
+}
+
+/* Animation for new cards */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.document-card {
+  animation: fadeIn 0.3s ease;
+}

@@ -20,7 +20,7 @@
     gap: 125px;
     width: 100%;
     min-height: calc(100vh - 160px);
-    background-color: #e8d3ec;
+    background-color: var(--background);
     box-sizing: border-box;
     padding: 20px 40px 20px 17px;
     /* padding-left: 339px;
