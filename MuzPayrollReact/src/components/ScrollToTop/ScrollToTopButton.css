@@ -1,34 +1,100 @@
 .to-top-btn {
   position: fixed;
-  bottom: 23px;
-  right: 14px;
-  border-radius: 50%;
-  background: #fafafaff;
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-  outline: none;
+  bottom: 24px;
+  right: 24px;
   width: 56px;
   height: 56px;
+  border-radius: 50%;
+  background: #fcf0fdff;
+  display: flex;
+  align-items: center;
   justify-content: center;
   cursor: pointer;
   opacity: 0;
+  visibility: hidden;
+  z-index: 2000;
   transform: translateY(20px);
   pointer-events: none;
-  transition: all 0.35s ease;
-  border:1px solid #a7a7a7ff;
-  /* box-shadow: 0 4px 12px rgba(0,0,0,0.25); */
-
-  z-index: 2000;
-}
-
-.to-top-btn:hover {
-  border:1px solid #a7a7a7ff;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--brand-border);
+  box-shadow: 
+    0 4px 12px rgba(210, 24, 216, 0.15),
+    0 0 0 0px rgba(210, 24, 216, 0.1);
+  outline: none;
 }
 
 .to-top-btn.show {
   opacity: 1;
-  outline: none;
+  visibility: visible;
   transform: translateY(0);
   pointer-events: auto;
 }
+
+.to-top-btn:hover,
+.to-top-btn:focus {
+  background: var(--button-primary);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(210, 24, 216, 0.3),
+    0 0 0 3px rgba(210, 24, 216, 0.1);
+}
+
+.to-top-btn:hover svg,
+.to-top-btn:focus svg {
+  color: white;
+  transform: translateY(-1px);
+}
+
+.to-top-btn svg {
+  color: #c71e9d;
+  transition: all 0.2s ease;
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .to-top-btn {
+    width: 60px;
+    height: 60px;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .to-top-btn:active {
+    background: var(--button-primary);
+    transform: scale(0.95);
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .to-top-btn {
+    transition: opacity 0.2s ease;
+  }
+  
+  .to-top-btn:hover {
+    transform: none;
+  }
+  
+  .scroll-to-top {
+    scroll-behavior: auto;
+  }
+}
+
+/* Dark mode support */
+/* @media (prefers-color-scheme: dark) {
+  .to-top-btn {
+    background: rgba(40, 20, 42, 0.95);
+    border-color: rgba(210, 24, 216, 0.5);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      0 0 0 0px rgba(210, 24, 216, 0.2);
+  }
+  
+  .to-top-btn.show {
+    background: rgba(40, 20, 42, 0.98);
+  }
+  
+  .to-top-btn:hover {
+    background: var(--brand);
+  }
+} */

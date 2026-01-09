@@ -299,7 +299,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
                         logRowNo = responseLogMaxRowNo.getData() + 1;
                     }
 
-                    System.out.println("Generated ID: " + generatedId + ", LogRowNo: " + logRowNo);
                     // Populate log entity PK
                     populateLogEntityPKfromEntity(transID, logRowNo, dto);
                 }
@@ -540,7 +539,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         List<CompanyLogDTO> CompanyDtoLogs = new ArrayList<>();
         CompanyLogDTO companyDtoLog = new CompanyLogDTO();
 
-        companyDtoLog.setCompanyLogID(dto.getCompanyMstID());
         companyDtoLog.setCompany(dto.getCompany());
         companyDtoLog.setCode(dto.getCode());
         companyDtoLog.setShortName(dto.getShortName());
@@ -581,7 +579,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
             CompanyLogDTO logDto = new CompanyLogDTO();
 
-            logDto.setCompanyMstID(dto.getCompanyMstID());
             logDto.setAuthId(dto.getAuthId());
             logDto.setCode(dto.getCode());
             logDto.setCompany(dto.getCompany());

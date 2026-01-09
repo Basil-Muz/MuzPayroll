@@ -95,62 +95,8 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
     // =================== 5️⃣ GENERATE SERIAL NO ===================
     @Override
     public Response<String> generateSerialNo(List<CompanyLogDTO> dto) {
-        // try {
-
-        // String prefix = "CM";
-
-        // // Generate new code
-        // Pageable pageable = PageRequest.of(0, 1);
-        // List<CompanyMst> companies =
-        // companyRepository.findLatestCompanyWithCMPrefix(pageable);
-
-        // String generatedCode;
-
-        // if (companies == null || companies.isEmpty()) {
-        // generatedCode = prefix + "01";
-        // } else {
-        // CompanyMst latestCompany = companies.get(0);
-        // String latestCode = latestCompany.getCode();
-
-        // // Extract and increment
-        // String numberPart = latestCode.substring(prefix.length());
-        // String digits = numberPart.replaceAll("[^0-9]", "");
-        // int latestNumber = Integer.parseInt(digits);
-        // int nextNumber = latestNumber + 1;
-
-        // // Check limit
-        // if (nextNumber > 99) {
-        // return Response.error("Company code limit reached (max: CM99)");
-        // }
-
-        // generatedCode = prefix + String.format("%02d", nextNumber);
-        // }
-
-        // // SET CODE IN BOTH DTO AND ENTITY
-        // dto.setCode(generatedCode);
-
-        // if (entity != null) {
-        // entity.setCode(generatedCode);
-        // } else {
-        // System.err.println(" WARNING: Entity is null in generateSerialNo!");
-        // }
-
-        // return Response.success(generatedCode);
-
-        // } catch (Exception e) {
-        // e.printStackTrace();
-
-        // // Last resort fallback
-        // String fallbackCode = "CM01";
-        // dto.setCode(fallbackCode);
-        // if (entity != null) {
-        // entity.setCode(fallbackCode);
-        // }
-        // return Response.success(fallbackCode);
-        // }
 
         return Response.success("Operation successful");
-
     }
 
     // =================== 6️⃣ converttoEntity ===================
@@ -271,7 +217,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
             throw new RuntimeException("Error saving company log: " + e.getMessage(), e);
         }
     }
-    
+
 
     public Response<Long> getMaxRowNo(Long companyMstID) {
         System.out.println("companyMstID" + companyMstID);

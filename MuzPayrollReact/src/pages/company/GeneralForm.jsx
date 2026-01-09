@@ -261,12 +261,12 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
         Object.keys(values).forEach((key) => {
           if (key !== "companyImage") {
             formData.append(key, values[key]);
+
           }
         });
 
         if (values.companyImage) {
           formData.append("companyImage", values.companyImage);
-                    console.log(formData);
 
         }
 

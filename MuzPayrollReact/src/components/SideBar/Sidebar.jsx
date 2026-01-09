@@ -62,7 +62,7 @@ const menuItems = [
         { id: "process.gratiutyProcess", label: "Gratiuty Process",link:"/process/gratiuty-process"  },
         ]
 },
-    { id: "Statutary", label: "Statutary Complients", icon: <ImStack size={18} />,
+    { id: "Statutary", label: "Statutary Complients", icon: <ImStack  />,
     children: [
     // complients letter,letter,report
         { id: "Statutary.complientsLetter", label: "Complients Letter" ,link:"/statutary/complients-letter" },
@@ -85,8 +85,8 @@ export default function Sidebar({ forceOpen }) {
   const sidebarRef = useRef(null);
   const closeTimer = useRef(null);
 
-  const isMobile = useIsMobile();//for mobile check
-  const isTab = useIsTab();//for tab check
+  const isMobile = useIsMobile(); //for mobile check
+  const isTab = useIsTab(); //for tab check
   const [open, setOpen] = useState(true);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [submenuStyle, setSubmenuStyle] = useState({ top: 0 });
@@ -98,7 +98,7 @@ export default function Sidebar({ forceOpen }) {
 
   const sidebarClass = isMobile
   ? open ? "mobile-open" : "mobile-closed"
-  : open ? "expanded" : "collapsed";
+  : !open ? "expanded" : "collapsed";
 
   /* 🔁 Sync sidebar enable */
   useEffect(() => {
@@ -126,7 +126,9 @@ export default function Sidebar({ forceOpen }) {
     navigate(child.link);
     setOpenSubmenu(null);
   };
-
+  const toggleMenu = (id) => {
+  setOpenSubmenu(prev => (prev === id ? null : id));
+};
   const openSubmenuFor = (e, item) => {
     if (!sidebarRef.current) return;
 
@@ -174,7 +176,7 @@ export default function Sidebar({ forceOpen }) {
   className={`sidebar ${sidebarClass}`}
 >
       <div className="buttons"
-      style={{justifyContent:!open ?"center":"flex-end"}}
+      style={{justifyContent:open ?"center":"flex-end"}}
       >
         <button
           className={`collapse-btn ${!open ? "menu" : "cross"}`}
@@ -182,8 +184,8 @@ export default function Sidebar({ forceOpen }) {
           aria-pressed={open}
           aria-label={!open ?  "Collapse sidebar": "Expand sidebar" }
         >
-          <div className={`icon-transition ${!open ? "rotated" : "rotated-back"}`}>
-            {!open ? (
+          <div className={`icon-transition ${open ? "rotated" : "rotated-back"}`}>
+            {open ? (
               <MdOutlineMenu size={20} className="toggle-icon" />
             ) : (
                 <RxCross2 size={20} className="toggle-icon" />
@@ -195,7 +197,7 @@ export default function Sidebar({ forceOpen }) {
 
       <div className={`sidebar-top ${!open ? "brand-expanded" : "brand-collapsed"}`}
      style={{
-  justifyContent: !open && !isMobile ? "center" : "flex-start",
+  justifyContent: open && !isMobile ? "center" : "flex-start",
 }}
 
       >
@@ -210,13 +212,13 @@ export default function Sidebar({ forceOpen }) {
                {userName ? userName.charAt(0).toUpperCase() : "U"}
             </div>
             
-              <div className={`user-meta ${!open ? "hide" : "show"}`}>
+              <div className={`user-meta ${open ? "hide" : "show"}`}>
                 <div className="user-name">{userName}</div>
                
 
               </div>
            
-            {open && ( <button className="user-action" aria-label="User actions">
+            {!open && ( <button className="user-action" aria-label="User actions">
               <IoIosArrowForward size={14} />
             </button>)}
           </div>

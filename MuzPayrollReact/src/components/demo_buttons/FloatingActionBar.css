@@ -132,7 +132,7 @@
 @media (max-width: 1023px) {
 
   .floating-action-bar {
-    right: 16px;
+    right: 25px;
     bottom: 6rem;
     top: auto;
     transform: none;

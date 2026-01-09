@@ -54,7 +54,7 @@ public class BranchService {
 
             // Create Authorization record
             Authorization auth = new Authorization();
-            auth.setMstId(savedBranch.getId());
+            auth.setMstId(savedBranch.getBranchMstID());
 
             // Parse Date
             auth.setAuthorizationDate(LocalDate.parse(data.get("authorizationDate").toString()));

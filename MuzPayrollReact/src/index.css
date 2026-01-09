@@ -4,7 +4,7 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: rgba(189, 33, 33, 0.87);
   background-color: #242424;
 
   font-synthesis: none;
@@ -29,14 +29,18 @@ html, body, #root {
   width: 100%;
   height: 100%;
 }
-
+body {
+    font-family: Arial, sans-serif;
+    padding-top: 0px; /* Adjust this value based on the header height */
+   
+}
 
 body {
   margin: 0;
   /* display: flex; */
   /* place-items: center; */
   width: 100%;
-  background-color:#e9e9e9ff;
+  background-color:#f2f2f2;
   height: 100%;
 }
 
@@ -65,9 +69,17 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 } */
 
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  box-shadow: 0 0 0 1000px var(--background) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+
+
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
+    color: #422147ff;
     background-color: #ffffff;
   }
   a:hover {
@@ -96,21 +108,21 @@ button:focus-visible {
 
 /* ---------- DARK THEME ---------- */
 /* [data-theme="dark"] {
-  --bg: #0f172a;
-  --bg-card: #1e293b;
-  --text: #f1f5f9;
-  --text-secondary: #94a3b8;
+  --bg: #250f2aff;
+  --bg-card: #381e3bff;
+  --text: #f7f1f9ff;
+  --text-secondary: #b094b8ff;
 
-  --btn-bg: #1e293b;
-  --btn-border: #334155;
-  --btn-hover: #2b3b52;
+  --btn-bg: #381e3bff;
+  --btn-border: #4d3355ff;
+  --btn-hover: #4e2b52ff;
 
-  --toggle-bg: #475569;
+  --toggle-bg: #624769ff;
   --toggle-ball: #fff;
 } */
 
 /* Global apply */
 body {
-  background: var(--bg);
+  /* background: var(--bg); */
   color: var(--text);
 }

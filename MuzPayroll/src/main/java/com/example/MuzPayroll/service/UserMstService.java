@@ -67,8 +67,8 @@ public class UserMstService {
 
         // SEND ONLY IDs
         resp.setCompanyId(user.getCompanyEntity().getCompanyMstID());
-        resp.setBranchId(user.getBranchEntity().getId());
-        resp.setLocationId(user.getLocationEntity().getId());
+        resp.setBranchId(user.getBranchEntity().getBranchMstID());
+        resp.setLocationId(user.getLocationEntity().getLocationMstID());
 
         resp.setUserName(user.getUserName());
         resp.setLocationName(user.getLocationEntity().getLocation());

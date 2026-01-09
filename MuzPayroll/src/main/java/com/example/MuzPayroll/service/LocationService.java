@@ -49,7 +49,7 @@ public class LocationService {
 
             // Create Authorization record
             Authorization auth = new Authorization();
-            auth.setMstId(savedLocation.getId());
+            auth.setMstId(savedLocation.getLocationMstID());
 
             // Parse Date
             auth.setAuthorizationDate(LocalDate.parse(data.get("authorizationDate").toString()));

@@ -131,7 +131,8 @@ const Designation = () => {
 
 useEffect(() => {
   if (showForm) {
-            setLoading(true); // reset loading
+            setLoading(true); 
+            // reset loading
             const timer = setTimeout(() => {
                 setLoading(false);
             }, 2000);
