@@ -25,7 +25,6 @@ const Header = ({ backendError = [] }) => {
   const dashTimer = useRef(null);
   const profileTimer = useRef(null);
 
-
   // Parse login data safely
   const getLoginData = () => {
     try {
@@ -34,11 +33,8 @@ const Header = ({ backendError = [] }) => {
     } catch (error) {
       console.error("Error parsing login data:", error);
       return {};
-
     }
   };
-
-  
   const loginData = getLoginData();
   const locationName = loginData.locationName || "Kochi_Kakkanad";
   const currentPath = location.pathname;

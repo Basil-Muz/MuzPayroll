@@ -19,7 +19,6 @@ import com.example.MuzPayroll.repository.CompanyRepository;
 import com.example.MuzPayroll.repository.LocationRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
-
 @Service
 public class UserMstService {
 
@@ -37,7 +36,6 @@ public class UserMstService {
 
     @Autowired
     private EmailService emailService;
-
 
     // ============================
     // LOGIN (AUTHENTICATION ONLY)
@@ -67,16 +65,15 @@ public class UserMstService {
         resp.setMessage("Login successful");
 
         // SEND ONLY IDs
-        resp.setCompanyId(user.getCompanyEntity().getId());
-        resp.setBranchId(user.getBranchEntity().getId());
-        resp.setLocationId(user.getLocationEntity().getId());
+        resp.setCompanyId(user.getCompanyEntity().getCompanyMstID());
+        resp.setBranchId(user.getBranchEntity().getBranchMstID());
+        resp.setLocationId(user.getLocationEntity().getLocationMstID());
 
         resp.setUserName(user.getUserName());
         resp.setLocationName(user.getLocationEntity().getLocation());
 
         return resp;
     }
-    
 
     // ============================
     // CONTEXT DATA (DROPDOWNS)
@@ -94,51 +91,52 @@ public class UserMstService {
     }
     public void changePassword(ChangePasswordRequest request) {
 
-    String userCode = request.getUserCode();
-    if (userCode != null) {
-        userCode = userCode.replace("@muziris", "");
+        String userCode = request.getUserCode();
+        if (userCode != null) {
+            userCode = userCode.replace("@muziris", "");
+        }
+
+        UserMst user = userRepo.findByUserCode(userCode);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Verify current password (plain text)
+        if (!user.getPassword().equals(request.getCurrentPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        // Update new password (plain text)
+        user.setPassword(request.getNewPassword());
+        userRepo.save(user);
     }
 
-    UserMst user = userRepo.findByUserCode(userCode);
 
-    if (user == null) {
-        throw new RuntimeException("User not found");
-    }
-
-    // Verify current password (plain text)
-    if (!user.getPassword().equals(request.getCurrentPassword())) {
-        throw new RuntimeException("Current password is incorrect");
-    }
-
-    // Update new password (plain text)
-    user.setPassword(request.getNewPassword());
-    userRepo.save(user);
-}
-// ============================
 // FORGOT PASSWORD
 // ============================
-    public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
+  public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
 
-    ForgotPasswordResponse resp = new ForgotPasswordResponse();
+        ForgotPasswordResponse resp = new ForgotPasswordResponse();
 
-    String userCode = request.getUserCode();
-    if (userCode != null) {
-        userCode = userCode.replace("@muziris", "");
-    }
+        String userCode = request.getUserCode();
+        if (userCode != null) {
+            userCode = userCode.replace("@muziris", "");
+        }
 
-    UserMst user = userRepo.findByUserCode(userCode);
+        UserMst user = userRepo.findByUserCode(userCode);
 
-    if (user == null) {
-        resp.setSuccess(false);
-        resp.setMessage("Invalid user code");
+        if (user == null) {
+            resp.setSuccess(false);
+            resp.setMessage("Invalid user code");
+            return resp;
+        }
+
+        // Send password to email
+        emailService.sendPassword(user.getEmail(), user.getPassword());
+
+        resp.setSuccess(true);
+        resp.setMessage("Password sent to registered email");
         return resp;
     }
-
-    // Send password to registered email
-    emailService.sendPassword(user.getEmail(), user.getPassword());
-
-    resp.setSuccess(true);
-    resp.setMessage("Password sent to registered email");
-    return resp;
-}
 }

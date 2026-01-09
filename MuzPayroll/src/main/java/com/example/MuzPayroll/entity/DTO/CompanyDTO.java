@@ -5,10 +5,24 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.CompanyLogPK;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
 
 public class CompanyDTO {
+
+    @Transient
+    private Authorization authorization;
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
 
     @Transient
     private List<CompanyLogDTO> companyDtoLogs;
@@ -21,7 +35,28 @@ public class CompanyDTO {
         this.companyDtoLogs = companyDtoLogs;
     }
 
+    private CompanyLogPK companyLogPK;
+
+    public CompanyLogPK getCompanyLogPK() {
+        return companyLogPK;
+    }
+
+    public void setCompanyLogPK(CompanyLogPK companyLogPK) {
+        this.companyLogPK = companyLogPK;
+    }
+
     // CompanyMst
+    @Column(name = "CompanyMstID")
+    private Long companyMstID;
+
+    public Long getCompanyMstID() {
+        return companyMstID;
+    }
+
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
+    }
+
     @Column(nullable = false)
     private String company;
 

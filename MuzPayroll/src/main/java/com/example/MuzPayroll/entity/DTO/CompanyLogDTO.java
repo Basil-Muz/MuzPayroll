@@ -4,9 +4,22 @@ import java.time.LocalDate;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.CompanyLogPK;
+
 import jakarta.persistence.Column;
 
 public class CompanyLogDTO {
+
+
+    private CompanyLogPK companyLogPK;
+
+    public CompanyLogPK getCompanyLogPK() {
+        return companyLogPK;
+    }
+
+    public void setCompanyLogPK(CompanyLogPK companyLogPK) {
+        this.companyLogPK = companyLogPK;
+    }
 
     @Column(nullable = false)
     private String company;

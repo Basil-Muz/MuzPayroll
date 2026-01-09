@@ -4,8 +4,6 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -14,8 +12,8 @@ import jakarta.persistence.ManyToOne;
 public class LocationMst {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "LocationMstID", unique = true, nullable = false)
+    private Long locationMstID;
 
     @ManyToOne
     @JoinColumn(name = "CompanyID", nullable = false)
@@ -62,12 +60,6 @@ public class LocationMst {
     private Integer pincode;
 
     @Column(nullable = false)
-    private String latitude;
-
-    @Column(nullable = false)
-    private String longitude;
-
-    @Column(nullable = false)
     private Long landlineNumber;
 
     @Column(nullable = false)
@@ -92,12 +84,13 @@ public class LocationMst {
     private LocalDate withaffectdate;
 
     // Getters and setters
-    public Long getId() {
-        return id;
+
+    public Long getLocationMstID() {
+        return locationMstID;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLocationMstID(Long locationMstID) {
+        this.locationMstID = locationMstID;
     }
 
     public CompanyMst getCompanyEntity() {
@@ -218,22 +211,6 @@ public class LocationMst {
 
     public void setPincode(Integer pincode) {
         this.pincode = pincode;
-    }
-
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
     }
 
     public Long getLandlineNumber() {

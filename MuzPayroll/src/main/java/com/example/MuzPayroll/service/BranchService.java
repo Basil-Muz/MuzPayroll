@@ -40,7 +40,7 @@ public class BranchService {
     private ObjectMapper objectMapper;
 
     public List<BranchMst> getAllBranchByCompanyId(Long companyId) {
-        return branchRepository.findByCompanyEntity_Id(companyId);
+        return branchRepository.findByCompanyEntity_CompanyMstID(companyId);
     }
 
     public ResponseEntity<String> saveBranch(Map<String, Object> data) {
@@ -54,7 +54,7 @@ public class BranchService {
 
             // Create Authorization record
             Authorization auth = new Authorization();
-            auth.setMstId(savedBranch.getId());
+            auth.setMstId(savedBranch.getBranchMstID());
 
             // Parse Date
             auth.setAuthorizationDate(LocalDate.parse(data.get("authorizationDate").toString()));

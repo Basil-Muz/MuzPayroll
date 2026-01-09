@@ -3,19 +3,16 @@ package com.example.MuzPayroll.entity;
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
 public class LocationLog {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private LocationLogPK locationLogPK;
 
     @ManyToOne
     @JoinColumn(name = "AuthID", nullable = false)
@@ -66,12 +63,6 @@ public class LocationLog {
     private Integer pincode;
 
     @Column(nullable = false)
-    private String latitude;
-
-    @Column(nullable = false)
-    private String longitude;
-
-    @Column(nullable = false)
     private Long landlineNumber;
 
     @Column(nullable = false)
@@ -96,12 +87,12 @@ public class LocationLog {
     private LocalDate withaffectdate;
 
     // Getters and setters
-    public Long getId() {
-        return id;
+    public LocationLogPK getLocationLogPK() {
+        return locationLogPK;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLocationLogPK(LocationLogPK locationLogPK) {
+        this.locationLogPK = locationLogPK;
     }
 
     public Authorization getAuthorization() {
@@ -230,22 +221,6 @@ public class LocationLog {
 
     public void setPincode(Integer pincode) {
         this.pincode = pincode;
-    }
-
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
     }
 
     public Long getLandlineNumber() {
