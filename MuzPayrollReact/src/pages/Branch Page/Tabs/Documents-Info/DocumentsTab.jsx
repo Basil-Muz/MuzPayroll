@@ -1,5 +1,6 @@
 // import { useState } from "react";
 import "./Documents.css";
+import { toast } from "react-hot-toast";
 import { IoRemoveCircleOutline } from "react-icons/io5";
 import { AiOutlineDelete } from "react-icons/ai";
 import { MdDelete } from "react-icons/md";
@@ -11,8 +12,9 @@ export default function DocumentsTab(
       register,
       errors,
       watchDocuments,
-    // watch,
+    watch,
     setValue,
+    trigger,
     // setError,
     // control,
   // disabled = false,
@@ -21,7 +23,8 @@ export default function DocumentsTab(
 ) {
 
 
-
+  const doc = watch("documnets");
+  console.log("Douments: ",doc)
   const documentTypes = [
     { value: "", label: "Select document type" },
     { value: "business_license", label: "Business License", required: true },
@@ -30,20 +33,28 @@ export default function DocumentsTab(
     { value: "registration_certificate", label: "Registration Certificate", required: false },
     { value: "address_proof", label: "Address Proof", required: false },
   ];
+// const hasDocumentErrors = !!errors?.documents;
+  const addDocumentRow = async() => {
+      await trigger("documents"); //  validate all docs
+  if (errors?.documents) {
+    toast.error("Please complete the document details");
+    return;
+  }
 
-  const addDocumentRow = () => {
-    append({
-      type: "",
-      number: "",
-      expiryDate: "",
-      file: null,
-      remarks: ""
-    });
-  };
-
-  const removeDocumentRow = (index) => {
-  remove(index);
+  append({
+    type: "",
+    number: "",
+    expiryDate: "",
+    file: null,
+    remarks: ""
+  });
+  toast.success("New document row added");
 };
+
+
+//   const removeDocumentRow = (index) => {
+//   remove(index);
+// };
 
 //   const handleDocumentChange = (id, updates) => {
 //   setDocuments(prevDocs =>
@@ -104,12 +115,12 @@ export default function DocumentsTab(
     <div className="documents-section">
       <div className="documents-header">
         <h3>Required Documents</h3>
-        <button className="btn btn-add" onClick={addDocumentRow}>
+        <div className="btn-add" onClick={addDocumentRow}>
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Add Document
-        </button>
+        </div>
       </div>
 
       <div className="document-grid">
@@ -124,7 +135,7 @@ export default function DocumentsTab(
                 {doc.status}
               </span> */}
               <button
-                  className="btn doc-btn-remove"
+                  className=" doc-btn-remove"
                   onClick={() => remove(index)}
                   type="button"
                 >
@@ -343,5 +354,6 @@ export default function DocumentsTab(
         </div>
       )}
     </div>
+    
   );
 }

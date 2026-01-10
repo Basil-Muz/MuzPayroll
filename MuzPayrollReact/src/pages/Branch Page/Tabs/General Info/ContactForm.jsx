@@ -11,7 +11,7 @@ export default function ContactForm({
   
   return (
     <>
-      <div className="section-header">
+      <div className="form-section-header">
         {/* <span className="section-number">3</span> */}
         <h3 className="section-title">{flags.branchForm && "Branch"}{flags.companyForm && "Company"}{flags.locationForm && "Location"} Contact Information</h3>
         <span className="section-subtitle">{flags.branchForm && "Branch"}{flags.companyForm && "Company"}{flags.locationForm && "Location"} Communication details</span>

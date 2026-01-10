@@ -1,7 +1,7 @@
 import { Country, State, City } from "country-state-city";
 import { Controller } from "react-hook-form";
 import Select from "react-select";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 export default function AddressForm({
   register,
@@ -10,275 +10,304 @@ export default function AddressForm({
   setValue,
   setError,
   control,
-   clearErrors,
-    // flags,
+  clearErrors,
+  isReadOnly,
+  // flags,
   // disabled = false,
   // requiredMap = {},
 }) {
-    // const {
-    //   register,
-    //   handleSubmit,
-    //   trigger,
-    //   setError,
-    //   setValue,
-    //   watch,
-    //   formState: { errors },
-    // } = useForm({ mode: "onBlur" });
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   trigger,
+  //   setError,
+  //   setValue,
+  //   watch,
+  //   formState: { errors },
+  // } = useForm({ mode: "onBlur" });
 
   const watchedPincode = watch("pinCode");
   // const countryOptions = useMemo(() => countryList().getData(), []);
   const [countryCode, setCountryCode] = useState("");
   const [stateCode, setStateCode] = useState("");
 
-  useEffect(() => {
-    if (!watchedPincode || watchedPincode.length !== 6) return; // Invalide pincode
+  const [placeList, setPlaceList] = useState([]);
+  const prevPincodeRef = useRef(null); // track the old pincode
+  const pinCodeRegister = register("pinCode", {
+  required: "PinCode is required",
+  pattern: {
+    value: /^[0-9]{6}$/,
+    message: "Enter valid 6 digit pincode",
+  },
+});
 
-    const fetchLocationByPincode = async () => {
-      try {
-        const response = await fetch(
-          `https://api.postalpincode.in/pincode/${watchedPincode}`
-        );
-        const data = await response.json();
-        
-        if (data[0]?.Status !== "Success") {
-          setError("pinCode", {
-            type: "manual",
-            message: "Invalid Pincode",
-          });
-          return;
-        }
+  // const pincodeSelection=(firstPlace)=>{
+  // const place = watch("place");
+  // if(!place){
+  //   setValue("place", firstPlace, {
+  //         shouldDirty: true,
+  //       });
+  // }
+  // }
 
-        const postOffice = data[0].PostOffice[0];
-        // const address = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State}, India`;
-        // const res = await fetch(
-        //   `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
-        // );
-        // const locationdata = await res.json();
-        // console.log("srgfwergwer location",locationdata);
-        // if (locationdata.length > 0) {
-        //   setValue("branchLatitude", locationdata[0].lat);
-        //   setValue("branchLongitude", locationdata[0].lon);
-        // }
-          const countryIso = "IN";
-        setCountryCode(countryIso);
-        setValue("country", countryIso);
-        const matchedState = State
-        .getStatesOfCountry(countryIso)
-        .find(
-          (s) =>
-            s.name.toLowerCase() ===
-            postOffice.State.toLowerCase()
-        );
+  // useEffect(() => {
+  // if (!watchedPincode || watchedPincode.length !== 6) return;
 
-      if (!matchedState) return;
-        setValue("state", matchedState.isoCode);
-        setStateCode(matchedState.isoCode); 
-        // console.log("state", postOffice.State);
-        //  District / City (store NAME)
-        setValue("district", postOffice.District);
-        setValue("place", postOffice.Name);
-        clearErrors("country")
-        clearErrors("state")
-        clearErrors("district")
-        clearErrors("place")
-      } catch (err) {
+  const fetchLocationByPincode = async (pincode) => {
+    if (!pincode || pincode.length !== 6) return;
+
+    // prevent duplicate calls for same pincode
+    if (prevPincodeRef.current === pincode) return;
+
+    try {
+      const response = await fetch(
+        `https://api.postalpincode.in/pincode/${pincode}`
+      );
+      const data = await response.json();
+
+      if (data[0]?.Status !== "Success") {
         setError("pinCode", {
           type: "manual",
-          message: "Unable to fetch location details "+err.msg,
+          message: "Invalid Pincode",
         });
+        return;
       }
-    };
-  fetchLocationByPincode();
-  }, [watchedPincode, setValue, setError, clearErrors]);
+
+      const postOffices = data[0].PostOffice;
+
+      const mappedPlaces = postOffices.map((po) => ({
+        label: po.Name,
+        value: po.Name,
+      }));
+
+      console.log("Function Exccecuted");
+      setPlaceList(mappedPlaces);
+
+      const currentPlace = watch("place");
+      const placeExists = mappedPlaces.some((p) => p.value === currentPlace);
+
+      // set default place ONLY if invalid
+      if (!placeExists) {
+        setValue("place", mappedPlaces[0]?.value, { shouldDirty: false });
+      }
+
+      // Country
+      setValue("country", "IN");
+
+      // State
+      const matchedState = State.getStatesOfCountry("IN").find(
+        (s) => s.name.toLowerCase() === postOffices[0].State.toLowerCase()
+      );
+
+      if (matchedState) {
+        setCountryCode("IN");
+        setStateCode(matchedState.isoCode);
+        setValue("state", matchedState.isoCode);
+      }
+
+      // District
+      setValue("district", postOffices[0].District);
+
+      clearErrors(["country", "state", "district", "place"]);
+
+      prevPincodeRef.current = pincode;
+    } catch (err) {
+      setError("pinCode", {
+        type: "manual",
+        message: "Unable to fetch location details" + err,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!watchedPincode || watchedPincode.length !== 6) return;
+
+    fetchLocationByPincode(watchedPincode);
+  }, [watchedPincode]);
 
   //filtering the list value, label format
-const countryOptions = useMemo(
-  () =>
-    Country.getAllCountries().map((c) => ({
-      value: c.isoCode,
-      label: c.name,
-    })),
-  []
-);
+  const countryOptions = useMemo(
+    () =>
+      Country.getAllCountries().map((c) => ({
+        value: c.isoCode,
+        label: c.name,
+      })),
+    []
+  );
 
-const stateOptions = useMemo(
-  () =>
-    countryCode
-      ? State.getStatesOfCountry(countryCode).map((s) => ({
-          value: s.isoCode,
-          label: s.name,
-        }))
-      : [],
-  [countryCode]
-);
+  const stateOptions = useMemo(
+    () =>
+      countryCode
+        ? State.getStatesOfCountry(countryCode).map((s) => ({
+            value: s.isoCode,
+            label: s.name,
+          }))
+        : [],
+    [countryCode]
+  );
 
-const districtOptions = useMemo(
-  () =>
-    countryCode && stateCode
-      ? City.getCitiesOfState(countryCode, stateCode).map((d) => ({
-          value: d.name,
-          label: d.name,
-        }))
-      : [],
-  [countryCode, stateCode]
-);
+  const districtOptions = useMemo(
+    () =>
+      countryCode && stateCode
+        ? City.getCitiesOfState(countryCode, stateCode).map((d) => ({
+            value: d.name,
+            label: d.name,
+          }))
+        : [],
+    [countryCode, stateCode]
+  );
 
   return (
     <>
-     <div className="section-header">
+      <div className="form-section-header">
         {/* <span className="section-number">2</span> */}
         <h2 className="section-title">Address Details</h2>
         <span className="section-subtitle">Location information</span>
       </div>
       <div className="form-grid">
+        <div className="branch-form-group">
+          <label className="form-label required">Pincode</label>
+          <input
+            type="text"
+            disabled={isReadOnly}
+            className={`form-control ${errors.pinCode ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+            placeholder="Enter Pincode"
+            maxLength={6}
+            inputMode="numeric"
+  {...pinCodeRegister}
+  onChange={(e) => {
+    pinCodeRegister.onChange(e); //  let RHF handle validation first
+
+    const value = e.target.value;
+    if (value.length === 6) {
+      fetchLocationByPincode(value);
+    }
+  }}
+/>
+          {errors.pinCode && (
+            <span className="error-message">{errors.pinCode.message}</span>
+          )}
+        </div>
 
         <div className="branch-form-group">
-            <label className="form-label required">Pincode</label>
-            <input
+          <label className="form-label required">Address</label>
+          <textarea
+            type="text"
+            disabled={isReadOnly}
+            className={`form-control ${errors.address ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+            placeholder="Enter Address"
+            {...register("address", { required: true })}
+          />
+          {errors.address && (
+            <span className="error-message">Branch Address is required</span>
+          )}
+        </div>
+
+        <div className="branch-form-group">
+          <label className="form-label required">Country</label>
+          <Controller
+            name="country"
+            control={control}
+            rules={{ required: "Country is required" }}
+            render={({ field }) => (
+              <Select
+                options={countryOptions}
+                placeholder="Select country"
+                isDisabled={isReadOnly}
+                isSearchable
+                classNamePrefix="form-control-select"
+                className={`${errors.country ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                value={
+                  countryOptions.find(
+                    (option) => option.value === field.value
+                  ) || null
+                }
+                onChange={(option) => {
+                  field.onChange(option.value); // STORE ISO CODE ("IN")
+                  setCountryCode(option.value);
+                  setStateCode("");
+                  setValue("state", "");
+                  setValue("district", "");
+                }}
+              />
+            )}
+          />
+
+          {errors.country && (
+            <span className="error-message">{errors.country.message}</span>
+          )}
+        </div>
+
+        <div className="branch-form-group">
+          <label className="form-label required">State</label>
+
+          <Controller
+            name="state"
+            control={control}
+            rules={{ required: "State is required" }}
+            render={({ field }) => (
+              <Select
+                options={stateOptions}
+                placeholder="Select state"
+                isDisabled={isReadOnly || !countryCode}
+                isSearchable
+                classNamePrefix="form-control-select"
+                className={`${errors.state ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                value={
+                  stateOptions.find((option) => option.value === field.value) ||
+                  null
+                }
+                onChange={(option) => {
+                  field.onChange(option.value); // ✅ "KA"
+                  setStateCode(option.value);
+                  setValue("district", "");
+                }}
+              />
+            )}
+          />
+
+          {errors.state && (
+            <span className="error-message">{errors.state.message}</span>
+          )}
+        </div>
+
+        <div className="branch-form-group">
+          <label className="form-label required">District</label>
+
+          <Controller
+            name="district"
+            control={control}
+            rules={{ required: "District is required" }}
+            render={({ field }) => (
+              <Select
+                options={districtOptions}
+                placeholder="Select district"
+                isDisabled={isReadOnly || !stateCode}
+                // isDisabled={true}
+                isSearchable
+                classNamePrefix="form-control-select"
+                className={`${errors.district ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                value={
+                  districtOptions.find(
+                    (option) => option.value === field.value
+                  ) || null
+                }
+                onChange={(option) => field.onChange(option?.value)}
+              />
+            )}
+          />
+
+          {errors.district && (
+            <span className="error-message">{errors.district.message}</span>
+          )}
+        </div>
+
+        <div className="branch-form-group">
+          <label className="form-label required">Place</label>
+          {/* <input
               type="text"
-              className={`form-control ${errors.pinCode ? "error" : ""}`}
-              placeholder="Enter Pincode"
-              maxLength={6}
-              inputMode="numeric"
-              {...register("pinCode", {
-                required: "PinCode is required",
-                pattern: {
-                  value: /^[0-9]{6}$/,
-                  message: "Enter valid 6 digit pincode",
-                },
-              })}
-            />
-            {errors.pinCode && (
-              <span className="error-message">{errors.pinCode.message}</span>
-            )}
-          </div>
-
-        <div className="branch-form-group">
-            <label className="form-label required">Address</label>
-            <textarea
-              type="text" 
-               className={`form-control ${errors.pinCode ? "error" : ""}`}
-              placeholder="Enter Address"
-              {...register('address', { required: true })}
-            />
-            {errors.address && (
-              <span className="error-message">Branch Address is required</span>
-            )}
-          </div>
-
-          <div className="branch-form-group">
-            <label className="form-label required">Country</label>
-            <Controller
-              name="country"
-              control={control}
-              rules={{ required: "Country is required" }}
-              render={({ field }) => (
-                <Select
-                  options={countryOptions}
-                  placeholder="Select country"
-                  isSearchable
-                    onChange={(option) => {
-                      field.onChange(option?.name);   // store ISO code
-                      setCountryCode(option?.value || "");
-                      setStateCode("");
-                      setValue("state", "");
-                      setValue("district", "");
-                    }}
-                  classNamePrefix="form-control-select"
-                  className={errors.country ? "error" : ""}
-                  value={
-                    countryOptions.find(
-                      (option) => option.value === field.value
-                    ) || null
-                  }             
-                />
-              )}
-            />
-  {errors.country && (
-    <span className="error-message">
-      {errors.country.message}
-    </span>
-  )}
-</div>
-
-
-          <div className="branch-form-group">
-              <label className="form-label required">State</label>
-
-              <Controller
-              name="state"
-              control={control}
-              rules={{ required: "State is required" }}
-              render={({ field }) => (
-                <Select
-                  options={stateOptions}
-                  placeholder="Select state"
-                  isSearchable
-                    onChange={(option) => {
-                      field.onChange({
-                        code: option.value,  // "KA"
-                        name: option.name    // "Karnataka"
-                      });   // store name
-                      setStateCode(option?.value || "");
-                      setValue("district", "");
-                    }}
-                  classNamePrefix="form-control-select"
-                  className={errors.state ? "error" : ""}
-                   value={
-          stateOptions.find(
-            (option) => option.value === field.value
-          ) || null
-        }        
-                />
-              )}
-            />
-
-  {errors.state && (
-    <span className="error-message">
-      {errors.state.message}
-    </span>
-  )}
-</div>
-
-<div className="branch-form-group">
-  <label className="form-label required">District</label>
-
-  <Controller
-    name="district"
-    control={control}
-    rules={{ required: "District is required" }}
-    render={({ field }) => (
-      <Select
-        options={districtOptions}
-        placeholder="Select district"
-        isSearchable
-        isDisabled={!stateCode}
-        classNamePrefix="form-control-select"
-        className={errors.district ? "error" : ""}
-        value={
-          districtOptions.find(
-            (option) => option.value === field.value
-          ) || null
-        }
-        onChange={(option) =>
-          field.onChange(option?.value)
-        }
-      />
-    )}
-  />
-
-  {errors.district && (
-    <span className="error-message">
-      {errors.district.message}
-    </span>
-  )}
-</div>
-
-          <div className="branch-form-group">
-            <label className="form-label required">Place</label>
-            <input
-              type="text" 
-              className={`form-control ${errors.place ? "error" : ""}`}
+              disabled={isReadOnly}
+              className={`form-control ${errors.place ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
               placeholder="Enter branch Place"
               {...register('place', { required: "Branch place required" ,
                 pattern:{
@@ -286,13 +315,40 @@ const districtOptions = useMemo(
                   message: "Please enter a valid branch place"
                 },
               })}
-            />
-            {errors.place && (
-              <span className="error-message">{errors.place.message}</span>
-            )}
-          </div>
+            /> */}
 
-          {/* {flags.locationForm && <div className="branch-form-group">
+          <Controller
+            name="place"
+            control={control}
+            rules={{ required: "Place is required" }}
+            render={({ field }) => {
+              const selectedOption = placeList.find(
+                (opt) => opt.value === field.value
+              );
+
+              return (
+                <Select
+                  options={placeList}
+                  placeholder="Select place"
+                  isDisabled={isReadOnly || !placeList.length}
+                  isSearchable
+                  classNamePrefix="form-control-select"
+                  className={`${errors.place ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                  value={selectedOption || null}
+                  onChange={(option) => {
+                    field.onChange(option.value); // ✅ store STRING
+                  }}
+                />
+              );
+            }}
+          />
+
+          {errors.place && (
+            <span className="error-message">{errors.place.message}</span>
+          )}
+        </div>
+
+        {/* {flags.locationForm && <div className="branch-form-group">
             <label className="form-label">Latitude</label>
             <input
               type="text" 
@@ -327,7 +383,7 @@ const districtOptions = useMemo(
               <span className="error-message">{errors.branchLongitude.message}</span>
             )}
           </div>} */}
-        </div>
+      </div>
     </>
   );
 }

@@ -1,0 +1,235 @@
+/* =========================================================
+   TOAST BASE
+   ========================================================= */
+
+.custom-toast {
+  position: relative;
+  width: min(420px, 90vw);
+  min-height: 64px;
+
+  background:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--brand) 8%, transparent),
+      transparent
+    ),
+    var(--background);
+
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+
+  overflow: hidden;
+  animation: toastSlideIn 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* =========================================================
+   TOAST TYPES
+   ========================================================= */
+
+/* SUCCESS */
+.custom-toast.success {
+  background:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--success) 20%, transparent),
+      transparent
+    ),
+    var(--background);
+
+  border-left: 4px solid var(--success);
+}
+
+.custom-toast.success .toast-title {
+  color: var(--success);
+}
+
+.custom-toast.success .toast-progress {
+  background: linear-gradient(
+    90deg,
+    var(--success),
+    var(--brand-light)
+  );
+}
+
+/* ERROR */
+.custom-toast.error {
+  background:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--danger) 22%, transparent),
+      transparent
+    ),
+    var(--background);
+
+  border-left: 4px solid var(--danger);
+}
+
+.custom-toast.error .toast-title {
+  color: var(--danger);
+}
+
+.custom-toast.error .toast-progress {
+  background: linear-gradient(
+    90deg,
+    var(--danger),
+    color-mix(in srgb, var(--danger) 70%, white)
+  );
+}
+
+/* INFO / DEFAULT */
+.custom-toast.info {
+  border-left: 4px solid var(--brand);
+}
+
+.custom-toast.info .toast-title {
+  color: var(--brand);
+}
+
+.custom-toast.info .toast-progress {
+  background: linear-gradient(
+    90deg,
+    var(--brand),
+    var(--brand-light)
+  );
+}
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.toast-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.toast-message {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-title {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text-dark);
+}
+
+.toast-message p {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.toast-close {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+
+  color: var(--text-light);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.toast-close:hover {
+  background: color-mix(in srgb, var(--brand) 10%, transparent);
+  color: var(--text);
+}
+
+/* =========================================================
+   PROGRESS BAR
+   ========================================================= */
+
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  height: 3px;
+
+  transform-origin: left;
+  animation: progressShrink 2s linear forwards;
+}
+
+/* =========================================================
+   HOVER EFFECT
+   ========================================================= */
+
+.custom-toast:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes progressShrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .custom-toast {
+    width: calc(100vw - 32px);
+    margin: 8px;
+  }
+
+  .toast-content {
+    padding: 14px;
+  }
+
+  @keyframes toastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
