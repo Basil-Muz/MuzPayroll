@@ -1,42 +1,68 @@
-package com.example.MuzPayroll.entity;
+package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
-import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.BranchMst;
+import com.example.MuzPayroll.entity.CompanyMst;
+import com.example.MuzPayroll.entity.LocationLogPK;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
-@Entity
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class CompanyMst {
+public class LocationLogDTO {
+    private LocationLogPK locatioinLogPK;
 
-    @Transient
-    private List<CompanyLog> CompanyLogs;
-
-    @Transient
+    @ManyToOne
+    @JoinColumn(name = "AuthID", nullable = false)
     private Authorization authorization;
 
-    @Id
-    @Column(name = "CompanyMstID", unique = true, nullable = false)
-    private Long companyMstID;
+    @ManyToOne
+    @JoinColumn(name = "CompanyID", nullable = false)
+    private CompanyMst companyEntity;
 
-    @Column(nullable = false)
-    private String company;
+    @ManyToOne
+    @JoinColumn(name = "BranchID", nullable = false)
+    private BranchMst branchEntity;
 
-    public String getCompany() {
-        return company;
+    public BranchMst getBranchEntity() {
+        return branchEntity;
     }
 
-    public void setCompany(String company) {
-        this.company = company;
+    public void setBranchEntity(BranchMst branchEntity) {
+        this.branchEntity = branchEntity;
+    }
+
+    public CompanyMst getCompanyEntity() {
+        return companyEntity;
+    }
+
+    public void setCompanyEntity(CompanyMst companyEntity) {
+        this.companyEntity = companyEntity;
+    }
+
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
+
+    public LocationLogPK getLocatioinLogPK() {
+        return locatioinLogPK;
+    }
+
+    public void setLocatioinLogPK(LocationLogPK locatioinLogPK) {
+        this.locatioinLogPK = locatioinLogPK;
     }
 
     @Column(nullable = false, unique = true)
     private String code;
+
+    @Column(nullable = false)
+    private String location;
 
     @Column(nullable = false)
     private String shortName;
@@ -44,8 +70,8 @@ public class CompanyMst {
     @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
 
-    @Column(nullable = true)
-    private String companyImage;
+    @Column(nullable = false)
+    private String esiRegion;
 
     @Column(nullable = false)
     private String address;
@@ -93,13 +119,6 @@ public class CompanyMst {
     private LocalDate withaffectdate;
 
     // Getters and setters
-    public Long getCompanyMstID() {
-        return companyMstID;
-    }
-
-    public void setCompanyMstID(Long companyMstID) {
-        this.companyMstID = companyMstID;
-    }
 
     public String getCode() {
         return code;
@@ -107,6 +126,14 @@ public class CompanyMst {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getShortName() {
@@ -125,12 +152,12 @@ public class CompanyMst {
         this.activeDate = activeDate;
     }
 
-    public String getCompanyImage() {
-        return companyImage;
+    public String getEsiRegion() {
+        return esiRegion;
     }
 
-    public void setCompanyImage(String companyImage) {
-        this.companyImage = companyImage;
+    public void setEsiRegion(String esiRegion) {
+        this.esiRegion = esiRegion;
     }
 
     public String getAddress() {
@@ -261,19 +288,60 @@ public class CompanyMst {
         this.withaffectdate = withaffectdate;
     }
 
-    public Authorization getAuthorization() {
-        return authorization;
+    // Authorization
+
+    private Long authId;
+
+    public Long getAuthId() {
+        return authId;
     }
 
-    public void setAuthorization(Authorization authorization) {
-        this.authorization = authorization;
+    public void setAuthId(Long authId) {
+        this.authId = authId;
     }
 
-    public List<CompanyLog> getCompanyLogs() {
-        return CompanyLogs;
+    @Column
+    private Long mstId;
+
+    @Column(nullable = false)
+    private String userCode;
+
+    @Column(nullable = false)
+    private LocalDate authorizationDate;
+
+    public LocalDate getAuthorizationDate() {
+        return authorizationDate;
     }
 
-    public void setCompanyLogs(List<CompanyLog> companyLogs) {
-        CompanyLogs = companyLogs;
+    public void setAuthorizationDate(LocalDate authorizationDate) {
+        this.authorizationDate = authorizationDate;
     }
+
+    @Column(nullable = false)
+    private Boolean authorizationStatus;
+
+    public Boolean getAuthorizationStatus() {
+        return authorizationStatus;
+    }
+
+    public void setAuthorizationStatus(Boolean authorizationStatus) {
+        this.authorizationStatus = authorizationStatus;
+    }
+
+    public Long getMstId() {
+        return mstId;
+    }
+
+    public void setMstId(Long mstId) {
+        this.mstId = mstId;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
+    }
+
 }

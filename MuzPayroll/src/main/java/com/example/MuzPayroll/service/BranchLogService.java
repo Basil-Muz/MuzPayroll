@@ -4,30 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.MuzPayroll.entity.Authorization;
-import com.example.MuzPayroll.entity.CompanyLog;
+import com.example.MuzPayroll.entity.BranchLog;
 import com.example.MuzPayroll.entity.UserMst;
-import com.example.MuzPayroll.entity.DTO.CompanyLogDTO;
+import com.example.MuzPayroll.entity.DTO.BranchLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
-import com.example.MuzPayroll.repository.CompanyLogRepository;
+import com.example.MuzPayroll.repository.BranchLogRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
 @Service
-public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, CompanyLog> {
-
-    @Autowired
-    private CompanyLogRepository companyLogRepository;
+public class BranchLogService extends MuzirisAbstractService<BranchLogDTO, BranchLog> {
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BranchLogRepository branchLogRepository;
+
     // =================== 1️⃣ ENTITY VALIDATION ===================
     @Override
-    public Response<Boolean> entityValidate(List<CompanyLogDTO> dtos) {
+    public Response<Boolean> entityValidate(List<BranchLogDTO> dtos) {
         if (dtos == null)
             return Response.error("DTO cannot be null");
         List<String> errors = new ArrayList<>();
@@ -41,9 +40,9 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     // // =================== 2️⃣ ENTITY POPULATE ===================
     @Override
-    public Response<Boolean> entityPopulate(List<CompanyLogDTO> dtos) {
+    public Response<Boolean> entityPopulate(List<BranchLogDTO> dtos) {
         List<String> errors = new ArrayList<>();
-        CompanyLogDTO dto = dtos.get(0);
+        BranchLogDTO dto = dtos.get(0);
 
         UserMst user = userRepository.findByUserCode(dto.getUserCode());
         if (user == null)
@@ -57,44 +56,24 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
 
     // =================== 3️⃣ BUSINESS VALIDATION ===================
     @Override
-    public Response<Boolean> businessValidate(List<CompanyLogDTO> dtos) {
-        CompanyLogDTO dto = dtos.get(0);
-
+    public Response<Boolean> businessValidate(List<BranchLogDTO> dtos) {
         List<String> errors = new ArrayList<>();
-
-        String imagePath = dto.getCompanyImagePath();
-
-        if (imagePath != null) {
-            // Validate imagePath
-            String lowerPath = imagePath.toLowerCase();
-            boolean isValid = lowerPath.endsWith(".png") ||
-                    lowerPath.endsWith(".jpg") ||
-                    lowerPath.endsWith(".jpeg") ||
-                    lowerPath.endsWith(".gif");
-
-            if (!isValid) {
-                errors.add("Invalid image path format for audit log");
-            }
-        } else {
-            System.out.println("No image path in DTO");
-        }
 
         if (!errors.isEmpty()) {
             return Response.error(errors);
         }
-
         return Response.success(true);
     }
 
     // =================== 4️⃣ GENERATE PK ===================
     @Override
-    public Response<Object> generatePK(List<CompanyLogDTO> dtos) {
+    public Response<Object> generatePK(List<BranchLogDTO> dtos) {
         return Response.success(true);
     }
 
     // =================== 5️⃣ GENERATE SERIAL NO ===================
     @Override
-    public Response<String> generateSerialNo(List<CompanyLogDTO> dto) {
+    public Response<String> generateSerialNo(List<BranchLogDTO> dto) {
 
         return Response.success("Operation successful");
     }
@@ -102,54 +81,51 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
     // =================== 6️⃣ converttoEntity ===================
 
     @Override
-    public Response<CompanyLog> converttoEntity(List<CompanyLogDTO> dto) {
+    public Response<BranchLog> converttoEntity(List<BranchLogDTO> dto) {
 
-        // ===== CREATE COMPANY ENTITY =====
-        CompanyLog company = dtoToEntity(dto);
-        return Response.success(company);
+        // ===== CREATE ENTITY =====
+        BranchLog entity = dtoToEntity(dto);
+        return Response.success(entity);
     }
 
     // =================== DTO → ENTITY ===================
     @Override
-    protected CompanyLog dtoToEntity(List<CompanyLogDTO> dtos) {
-        CompanyLogDTO dto = dtos.get(0);
+    protected BranchLog dtoToEntity(List<BranchLogDTO> dtos) {
+        BranchLogDTO dto = dtos.get(0);
 
-        CompanyLog companyLog = new CompanyLog();
+        BranchLog log = new BranchLog();
 
         // Set ALL fields
-        companyLog.setCode(dto.getCode());
-        companyLog.setCompany(dto.getCompany());
-        companyLog.setShortName(dto.getShortName());
-        companyLog.setActiveDate(dto.getActiveDate());
-        companyLog.setAddress(dto.getAddress());
-        companyLog.setAddress1(dto.getAddress1());
-        companyLog.setAddress2(dto.getAddress2());
-        companyLog.setCountry(dto.getCountry());
-        companyLog.setState(dto.getState());
-        companyLog.setDistrict(dto.getDistrict());
-        companyLog.setPlace(dto.getPlace());
-        companyLog.setPincode(dto.getPincode());
-        companyLog.setLandlineNumber(dto.getLandlineNumber());
-        companyLog.setMobileNumber(dto.getMobileNumber());
-        companyLog.setEmail(dto.getEmail());
-        companyLog.setDesignation(dto.getDesignation());
-        companyLog.setEmployerName(dto.getEmployerName());
-        companyLog.setEmployerNumber(dto.getEmployerNumber());
-        companyLog.setEmployerEmail(dto.getEmployerEmail());
-        companyLog.setWithaffectdate(dto.getWithaffectdate());
-        companyLog.setCompanyImage(dto.getCompanyImagePath());
-        companyLog.setCompanyLogPK(dto.getCompanyLogPK());
-        return companyLog;
+        log.setBranch(dto.getBranch());
+        log.setCode(dto.getCode());
+        log.setCompanyEntity(dto.getCompanyEntity());
+        log.setShortName(dto.getShortName());
+        log.setActiveDate(dto.getActiveDate());
+        log.setAddress(dto.getAddress());
+        log.setAddress1(dto.getAddress1());
+        log.setAddress2(dto.getAddress2());
+        log.setCountry(dto.getCountry());
+        log.setState(dto.getState());
+        log.setDistrict(dto.getDistrict());
+        log.setPlace(dto.getPlace());
+        log.setPincode(dto.getPincode());
+        log.setLandlineNumber(dto.getLandlineNumber());
+        log.setMobileNumber(dto.getMobileNumber());
+        log.setEmail(dto.getEmail());
+        log.setWithaffectdate(dto.getWithaffectdate());
+        log.setBranchLogPK(dto.getBranchLogPK());
+        return log;
     }
 
     // =================== ENTITY → DTO ===================
     @Override
-    public CompanyLogDTO entityToDto(CompanyLog entity) {
+    public BranchLogDTO entityToDto(BranchLog entity) {
 
-        CompanyLogDTO dto = new CompanyLogDTO();
+        BranchLogDTO dto = new BranchLogDTO();
 
+        dto.setBranch(entity.getBranch());
         dto.setCode(entity.getCode());
-        dto.setCompany(entity.getCompany());
+        dto.setCompanyEntity(entity.getCompanyEntity());
         dto.setShortName(entity.getShortName());
         dto.setActiveDate(entity.getActiveDate());
         dto.setAddress(entity.getAddress());
@@ -163,12 +139,8 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         dto.setLandlineNumber(entity.getLandlineNumber());
         dto.setMobileNumber(entity.getMobileNumber());
         dto.setEmail(entity.getEmail());
-        dto.setCompanyImagePath(entity.getCompanyImage());
         dto.setWithaffectdate(entity.getWithaffectdate());
-        dto.setDesignation(entity.getDesignation());
-        dto.setEmployerName(entity.getEmployerName());
-        dto.setEmployerNumber(entity.getEmployerNumber());
-        dto.setEmployerEmail(entity.getEmployerEmail());
+        dto.setBranchLogPK(entity.getBranchLogPK());
 
         return dto;
     }
@@ -176,10 +148,11 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
     // =================== SAVE ENTITY IN SERVICE ===================
     @Override
     @Transactional(rollbackFor = Exception.class)
-    protected CompanyLog saveEntity(CompanyLog log, List<CompanyLogDTO> dtos) {
-        CompanyLogDTO dto = dtos.get(0);
+    protected BranchLog saveEntity(BranchLog log, List<BranchLogDTO> dtos) {
+        BranchLogDTO dto = dtos.get(0);
         try {
-            log.setCompany(dto.getCompany());
+            log.setBranch(dto.getBranch());
+            log.setCompanyEntity(dto.getCompanyEntity());
             log.setCode(dto.getCode());
             log.setShortName(dto.getShortName());
             log.setActiveDate(dto.getActiveDate());
@@ -195,12 +168,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
             log.setLandlineNumber(dto.getLandlineNumber());
             log.setMobileNumber(dto.getMobileNumber());
             log.setEmail(dto.getEmail());
-            log.setEmployerName(dto.getEmployerName());
-            log.setDesignation(dto.getDesignation());
-            log.setEmployerNumber(dto.getEmployerNumber());
-            log.setEmployerEmail(dto.getEmployerEmail());
-            log.setCompanyImage(dto.getCompanyImagePath());
-            log.setCompanyLogPK(dto.getCompanyLogPK());
+            log.setBranchLogPK(dto.getBranchLogPK());
 
             // SET AUTHORIZATION
             if (dto.getAuthId() != null) {
@@ -212,7 +180,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
             }
 
             // SAVE TO DATABASE
-            CompanyLog savedLog = companyLogRepository.save(log);
+            BranchLog savedLog = branchLogRepository.save(log);
 
             return savedLog;
 
@@ -226,7 +194,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
     public Response<Long> getMaxRowNo(Long companyMstID) {
         System.out.println("companyMstID" + companyMstID);
 
-        Long maxRowNo = companyLogRepository.findMaxRowNo(companyMstID);
+        Long maxRowNo = branchLogRepository.findMaxRowNo(companyMstID);
 
         System.out.println("maxRowNo" + maxRowNo);
 

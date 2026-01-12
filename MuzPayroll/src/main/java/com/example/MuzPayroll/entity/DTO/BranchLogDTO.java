@@ -1,17 +1,16 @@
-package com.example.MuzPayroll.entity;
+package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
 
+import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.BranchLogPK;
+import com.example.MuzPayroll.entity.CompanyMst;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-@Entity
-public class BranchLog {
-
-    @EmbeddedId
+public class BranchLogDTO {
     private BranchLogPK branchLogPK;
 
     @ManyToOne
@@ -218,5 +217,61 @@ public class BranchLog {
 
     public void setWithaffectdate(LocalDate withaffectdate) {
         this.withaffectdate = withaffectdate;
+    }
+
+    private Long authId;
+
+    public Long getAuthId() {
+        return authId;
+    }
+
+    public void setAuthId(Long authId) {
+        this.authId = authId;
+    }
+
+    // Authorization
+
+    @Column
+    private Long mstId;
+
+    @Column(nullable = false)
+    private String userCode;
+
+    @Column(nullable = false)
+    private LocalDate authorizationDate;
+
+    public LocalDate getAuthorizationDate() {
+        return authorizationDate;
+    }
+
+    public void setAuthorizationDate(LocalDate authorizationDate) {
+        this.authorizationDate = authorizationDate;
+    }
+
+    @Column(nullable = false)
+    private Boolean authorizationStatus;
+
+    public Boolean getAuthorizationStatus() {
+        return authorizationStatus;
+    }
+
+    public void setAuthorizationStatus(Boolean authorizationStatus) {
+        this.authorizationStatus = authorizationStatus;
+    }
+
+    public Long getMstId() {
+        return mstId;
+    }
+
+    public void setMstId(Long mstId) {
+        this.mstId = mstId;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 }

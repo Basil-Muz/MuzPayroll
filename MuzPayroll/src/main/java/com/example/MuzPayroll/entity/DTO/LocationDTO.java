@@ -1,38 +1,54 @@
-package com.example.MuzPayroll.entity;
+package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.BranchMst;
+import com.example.MuzPayroll.entity.CompanyMst;
+import com.example.MuzPayroll.entity.LocationLogPK;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
-@Entity
-public class BranchLog {
+public class LocationDTO {
+    @Transient
+    private List<LocationLogDTO> locationDtoLogs;
 
-    @EmbeddedId
-    private BranchLogPK branchLogPK;
-
-    @ManyToOne
-    @JoinColumn(name = "AuthID", nullable = false)
+    @Transient
     private Authorization authorization;
+
+    private LocationLogPK locationLogPK;
+
+    @Id
+    @Column(name = "LocationMstID", unique = true, nullable = false)
+    private Long locationMstID;
 
     @ManyToOne
     @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
+    @ManyToOne
+    @JoinColumn(name = "BranchID", nullable = false)
+    private BranchMst branchEntity;
+
     @Column(nullable = false, unique = true)
     private String code;
 
     @Column(nullable = false)
-    private String branch;
+    private String location;
 
     @Column(nullable = false)
     private String shortName;
 
     @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
+
+    @Column(nullable = false)
+    private String esiRegion;
 
     @Column(nullable = false)
     private String address;
@@ -65,15 +81,38 @@ public class BranchLog {
     private String email;
 
     @Column(nullable = false)
+    private String employerName;
+
+    @Column(nullable = false)
+    private String designation;
+
+    @Column(nullable = false)
+    private String employerNumber;
+
+    @Column(nullable = false)
+    private String employerEmail;
+
+    @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    private Long authId;
+
     // Getters and setters
-    public BranchLogPK getBranchLogPK() {
-        return branchLogPK;
+
+    public Long getAuthId() {
+        return authId;
     }
 
-    public void setBranchLogPK(BranchLogPK branchLogPK) {
-        this.branchLogPK = branchLogPK;
+    public void setAuthId(Long authId) {
+        this.authId = authId;
+    }
+
+    public List<LocationLogDTO> getLocationDtoLogs() {
+        return locationDtoLogs;
+    }
+
+    public void setLocationDtoLogs(List<LocationLogDTO> locationDtoLogs) {
+        this.locationDtoLogs = locationDtoLogs;
     }
 
     public Authorization getAuthorization() {
@@ -84,12 +123,36 @@ public class BranchLog {
         this.authorization = authorization;
     }
 
+    public LocationLogPK getLocationLogPK() {
+        return locationLogPK;
+    }
+
+    public void setLocationLogPK(LocationLogPK locationLogPK) {
+        this.locationLogPK = locationLogPK;
+    }
+
+    public Long getLocationMstID() {
+        return locationMstID;
+    }
+
+    public void setLocationMstID(Long locationMstID) {
+        this.locationMstID = locationMstID;
+    }
+
     public CompanyMst getCompanyEntity() {
         return companyEntity;
     }
 
     public void setCompanyEntity(CompanyMst companyEntity) {
         this.companyEntity = companyEntity;
+    }
+
+    public BranchMst getBranchEntity() {
+        return branchEntity;
+    }
+
+    public void setBranchEntity(BranchMst branchEntity) {
+        this.branchEntity = branchEntity;
     }
 
     public String getCode() {
@@ -100,12 +163,12 @@ public class BranchLog {
         this.code = code;
     }
 
-    public String getBranch() {
-        return branch;
+    public String getLocation() {
+        return location;
     }
 
-    public void setBranch(String branch) {
-        this.branch = branch;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public String getShortName() {
@@ -122,6 +185,14 @@ public class BranchLog {
 
     public void setActiveDate(LocalDate activeDate) {
         this.activeDate = activeDate;
+    }
+
+    public String getEsiRegion() {
+        return esiRegion;
+    }
+
+    public void setEsiRegion(String esiRegion) {
+        this.esiRegion = esiRegion;
     }
 
     public String getAddress() {
@@ -212,11 +283,89 @@ public class BranchLog {
         this.email = email;
     }
 
+    public String getEmployerName() {
+        return employerName;
+    }
+
+    public void setEmployerName(String employerName) {
+        this.employerName = employerName;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+
+    public String getEmployerNumber() {
+        return employerNumber;
+    }
+
+    public void setEmployerNumber(String employerNumber) {
+        this.employerNumber = employerNumber;
+    }
+
+    public String getEmployerEmail() {
+        return employerEmail;
+    }
+
+    public void setEmployerEmail(String employerEmail) {
+        this.employerEmail = employerEmail;
+    }
+
     public LocalDate getWithaffectdate() {
         return withaffectdate;
     }
 
     public void setWithaffectdate(LocalDate withaffectdate) {
         this.withaffectdate = withaffectdate;
+    }
+
+    // Authorization
+
+    @Column
+    private Long mstId;
+
+    @Column(nullable = false)
+    private String userCode;
+
+    @Column(nullable = false)
+    private LocalDate authorizationDate;
+
+    public LocalDate getAuthorizationDate() {
+        return authorizationDate;
+    }
+
+    public void setAuthorizationDate(LocalDate authorizationDate) {
+        this.authorizationDate = authorizationDate;
+    }
+
+    @Column(nullable = false)
+    private Boolean authorizationStatus;
+
+    public Boolean getAuthorizationStatus() {
+        return authorizationStatus;
+    }
+
+    public void setAuthorizationStatus(Boolean authorizationStatus) {
+        this.authorizationStatus = authorizationStatus;
+    }
+
+    public Long getMstId() {
+        return mstId;
+    }
+
+    public void setMstId(Long mstId) {
+        this.mstId = mstId;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 }

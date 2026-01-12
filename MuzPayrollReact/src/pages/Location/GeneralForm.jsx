@@ -84,7 +84,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       setInitialCompanyId(company.id);
 
       const branchResponse = await axios.get(
-        `http://localhost:8087/${companyId}/branches`,
+        `http://localhost:8087/branch/${companyId}`,
       );
 
       const branches = branchResponse.data;
@@ -192,7 +192,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
     initialValues: {
       company: initialCompanyId,
       branch: initialBranchId,
-      code: "",
       location: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
@@ -205,8 +204,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       district: "",
       place: "",
       pincode: "",
-      latitude: "",
-      longitude: "",
       landlineNumber: "",
       mobileNumber: "",
       email: "",
@@ -220,15 +217,8 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
-      company: Yup.string().required("Company is required"),
+      // company: Yup.string().required("Company is required"),
       branch: Yup.string().required("Branch is required"),
-      code: Yup.string()
-        .required("Code is required")
-        .test(
-          "only-numbers-symbols",
-          "Code must contain only numbers and symbols, no alphabets or spaces",
-          (value) => /^[0-9\W_]+$/.test(value || ""),
-        ),
       location: Yup.string().required("Location Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
@@ -241,12 +231,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       pincode: Yup.string()
         .matches(/^\d+$/, "Pincode must be only numbers")
         .required("Pincode is required"),
-      latitude: Yup.string()
-        .matches(/^\d+(\.\d+)?$/, "Latitude must be only numbers")
-        .required("Latitude is required"),
-      longitude: Yup.string()
-        .matches(/^\d+(\.\d+)?$/, "Longitude must be only numbers")
-        .required("Longitude is required"),
       landlineNumber: Yup.string()
         .matches(/^\d+$/, "Landline Number must be only numbers")
         .required("Landline Number is required"),
@@ -275,7 +259,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
           branchEntity: { id: values.branch },
         };
 
-        const response = await fetch("http://localhost:8087/saveLocation", {
+        const response = await fetch("http://localhost:8087/location/save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formattedValues),
@@ -415,29 +399,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               {formik.touched.branch && formik.errors.branch && (
                 <div className="error">{formik.errors.branch}</div>
               )}
-
-              <label htmlFor="code" className="fancy-label">
-                Code
-              </label>
-              <input
-                type="text"
-                id="code"
-                name="code"
-                ref={codeInputRef}
-                onChange={(e) => {
-                  onBackendError(""); // 👈 clear backend error
-                  formik.handleChange(e);
-                }}
-                onBlur={formik.handleBlur}
-                disabled={!startDate}
-                value={formik.values.code}
-                className={
-                  formik.touched.code && formik.errors.code ? "input-error" : ""
-                }
-              />
-              {formik.touched.code && formik.errors.code ? (
-                <div className="error">{formik.errors.code}</div>
-              ) : null}
 
               <label htmlFor="?Location" className="fancy-label">
                 Name
@@ -740,48 +701,6 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
               />
               {formik.touched.pincode && formik.errors.pincode ? (
                 <div className="error">{formik.errors.pincode}</div>
-              ) : null}
-
-              <label htmlFor="latitude" className="fancy-label">
-                Latitude
-              </label>
-              <input
-                type="text"
-                id="latitude"
-                name="latitude"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!addressEditable || !startDate}
-                value={formik.values.latitude}
-                className={
-                  formik.touched.latitude && formik.errors.latitude
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.latitude && formik.errors.latitude ? (
-                <div className="error">{formik.errors.latitude}</div>
-              ) : null}
-
-              <label htmlFor="longitude" className="fancy-label">
-                Longitude
-              </label>
-              <input
-                type="text"
-                id="longitude"
-                name="longitude"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                disabled={!addressEditable || !startDate}
-                value={formik.values.longitude}
-                className={
-                  formik.touched.longitude && formik.errors.longitude
-                    ? "input-error"
-                    : ""
-                }
-              />
-              {formik.touched.longitude && formik.errors.longitude ? (
-                <div className="error">{formik.errors.longitude}</div>
               ) : null}
             </div>
           </div>

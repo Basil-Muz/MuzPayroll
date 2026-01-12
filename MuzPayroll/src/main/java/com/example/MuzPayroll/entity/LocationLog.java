@@ -3,19 +3,16 @@ package com.example.MuzPayroll.entity;
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
 public class LocationLog {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private LocationLogPK locationLogPK;
 
     @ManyToOne
     @JoinColumn(name = "AuthID", nullable = false)
@@ -63,19 +60,13 @@ public class LocationLog {
     private String place;
 
     @Column(nullable = false)
-    private Integer pincode;
+    private String pincode;
 
     @Column(nullable = false)
-    private String latitude;
+    private String landlineNumber;
 
     @Column(nullable = false)
-    private String longitude;
-
-    @Column(nullable = false)
-    private Long landlineNumber;
-
-    @Column(nullable = false)
-    private Long mobileNumber;
+    private String mobileNumber;
 
     @Column(nullable = false)
     private String email;
@@ -87,7 +78,7 @@ public class LocationLog {
     private String designation;
 
     @Column(nullable = false)
-    private Long employerNumber;
+    private String employerNumber;
 
     @Column(nullable = false)
     private String employerEmail;
@@ -96,12 +87,12 @@ public class LocationLog {
     private LocalDate withaffectdate;
 
     // Getters and setters
-    public Long getId() {
-        return id;
+    public LocationLogPK getLocationLogPK() {
+        return locationLogPK;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLocationLogPK(LocationLogPK locationLogPK) {
+        this.locationLogPK = locationLogPK;
     }
 
     public Authorization getAuthorization() {
@@ -224,43 +215,27 @@ public class LocationLog {
         this.place = place;
     }
 
-    public Integer getPincode() {
+    public String getPincode() {
         return pincode;
     }
 
-    public void setPincode(Integer pincode) {
+    public void setPincode(String pincode) {
         this.pincode = pincode;
     }
 
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
-
-    public Long getLandlineNumber() {
+    public String getLandlineNumber() {
         return landlineNumber;
     }
 
-    public void setLandlineNumber(Long landlineNumber) {
+    public void setLandlineNumber(String landlineNumber) {
         this.landlineNumber = landlineNumber;
     }
 
-    public Long getMobileNumber() {
+    public String getMobileNumber() {
         return mobileNumber;
     }
 
-    public void setMobileNumber(Long mobileNumber) {
+    public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
 
@@ -288,11 +263,11 @@ public class LocationLog {
         this.designation = designation;
     }
 
-    public Long getEmployerNumber() {
+    public String getEmployerNumber() {
         return employerNumber;
     }
 
-    public void setEmployerNumber(Long employerNumber) {
+    public void setEmployerNumber(String employerNumber) {
         this.employerNumber = employerNumber;
     }
 

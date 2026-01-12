@@ -261,13 +261,12 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
         Object.keys(values).forEach((key) => {
           if (key !== "companyImage") {
             formData.append(key, values[key]);
-
           }
+          console.log("formData1", formData);
         });
 
         if (values.companyImage) {
           formData.append("companyImage", values.companyImage);
-          console.log(formData);
         }
 
         const response = await fetch("http://localhost:8087/company/save", {
