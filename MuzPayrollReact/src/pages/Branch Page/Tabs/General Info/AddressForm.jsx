@@ -26,13 +26,14 @@ export default function AddressForm({
   //   formState: { errors },
   // } = useForm({ mode: "onBlur" });
 
-  const watchedPincode = watch("pinCode");
   // const countryOptions = useMemo(() => countryList().getData(), []);
   const [countryCode, setCountryCode] = useState("");
   const [stateCode, setStateCode] = useState("");
 
   const [placeList, setPlaceList] = useState([]);
   const prevPincodeRef = useRef(null); // track the old pincode
+  const [isPincodeResolved, setIsPincodeResolved] = useState(false); // disable the selected boxs
+
   const pinCodeRegister = register("pinCode", {
     required: "PinCode is required",
     pattern: {
@@ -72,7 +73,7 @@ export default function AddressForm({
         });
         return;
       }
-
+      setIsPincodeResolved(true);
       const postOffices = data[0].PostOffice;
 
       const mappedPlaces = postOffices.map((po) => ({
@@ -119,10 +120,30 @@ export default function AddressForm({
     }
   };
 
-  useEffect(() => {
-    if (!watchedPincode || watchedPincode.length !== 6) return;
-    fetchLocationByPincode(watchedPincode);
-  }, [watchedPincode]);
+  const debounceRef = useRef(null);
+
+const handlePincodeChange = (value) => { // remove dobounding the api calls
+  // clear previous timer
+  if (debounceRef.current) {
+    clearTimeout(debounceRef.current);
+  }
+
+  // user editing → unlock fields
+  setIsPincodeResolved(false);
+
+  if (value.length !== 6) return;
+
+  // wait before calling API
+  debounceRef.current = setTimeout(() => {
+    fetchLocationByPincode(value);
+  }, 500); // ⏳ 500ms debounce
+};
+
+
+  // useEffect(() => {
+  //   if (!watchedPincode || watchedPincode.length !== 6) return;
+  //   fetchLocationByPincode(watchedPincode);
+  // }, [watchedPincode]);
 
   //filtering the list value, label format
   const countryOptions = useMemo(
@@ -155,6 +176,15 @@ export default function AddressForm({
         : [],
     [countryCode, stateCode]
   );
+    const pincode = watch("pinCode");
+  useEffect(() => {
+
+  if (pincode && pincode.length === 6) {
+    fetchLocationByPincode(pincode);
+  }
+
+}, [setCountryCode, setStateCode, pincode]);
+
 
   return (
     <>
@@ -177,10 +207,7 @@ export default function AddressForm({
             onChange={(e) => {
               pinCodeRegister.onChange(e); //  let RHF handle validation first
 
-              const value = e.target.value;
-              if (value.length === 6) {
-                fetchLocationByPincode(value);
-              }
+handlePincodeChange(e.target.value);
             }}
           />
           {errors.pinCode && (
@@ -212,7 +239,7 @@ export default function AddressForm({
               <Select
                 options={countryOptions}
                 placeholder="Select country"
-                isDisabled={isReadOnly}
+                isDisabled={isReadOnly || isPincodeResolved}
                 isSearchable
                 classNamePrefix="form-control-select"
                 className={`${errors.country ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
@@ -248,7 +275,7 @@ export default function AddressForm({
               <Select
                 options={stateOptions}
                 placeholder="Select state"
-                isDisabled={isReadOnly || !countryCode}
+                isDisabled={isReadOnly || !countryCode || isPincodeResolved}
                 isSearchable
                 classNamePrefix="form-control-select"
                 className={`${errors.state ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
@@ -281,7 +308,7 @@ export default function AddressForm({
               <Select
                 options={districtOptions}
                 placeholder="Select district"
-                isDisabled={isReadOnly || !stateCode}
+                isDisabled={isReadOnly || !stateCode || isPincodeResolved}
                 // isDisabled={true}
                 isSearchable
                 classNamePrefix="form-control-select"

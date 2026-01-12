@@ -32,16 +32,26 @@ const GeneralInfoForm = (function GeneralInfoForm(
   const isLocked = !isUnlocked;
   // const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
 
+  const fieldName =
+  flags.locationForm
+    ? "location"
+    : flags.companyForm
+    ? "company"
+    : flags.branchForm
+    ? "branch"
+    : "name";
+
+
   useEffect(() => {
     if (isLocked) {
       setTimeout(() => {
         nameInputRef.current?.focus();
         // setIsCompanyMenuOpen(true);
       }, 120);
-      console.log("Is Unlocked...!");
+      // console.log("Field Name :",fieldName);
       setFocus("name");
     }
-  }, [isUnlocked, isLocked, setFocus]);
+  }, [isUnlocked, isLocked, setFocus,fieldName]);
 
   // useImperativeHandle(ref, () => ({
   //   focusName() {
@@ -235,10 +245,10 @@ const GeneralInfoForm = (function GeneralInfoForm(
             <input
               type="text"
               // ref={nameInputRef}
-              className={`form-control ${errors.name ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+              className={`form-control ${errors[fieldName] ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
               placeholder="Enter name"
               disabled={isReadOnly}
-              {...register("name", {
+              {...register(fieldName, {
                 required: "Name is required",
                 pattern: {
                   value: /^[a-zA-Z\s-]+$/,
@@ -265,8 +275,8 @@ const GeneralInfoForm = (function GeneralInfoForm(
               })}
               
             />
-            {errors.name && (
-              <span className="error-message">{errors.name.message}</span>
+            {errors[fieldName] && (
+              <span className="error-message">{errors[fieldName].message}</span>
             )}
           </div>
 

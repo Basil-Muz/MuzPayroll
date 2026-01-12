@@ -93,8 +93,8 @@ export default function GenaralBranchForm() {
     //   id: 1,
     //   authorization: "VERIFIED",
     //   date: "2025-10-20",
-    //   name: "Demo",
-    //   company: "TCS",
+    //   shortName: "TCS",
+    //   company: "Tata Consultancy Services",
     //   status: "active",
     //   expiryDate: "2025-10-10",
     //   generatedBy: "Admin User",
@@ -149,7 +149,14 @@ export default function GenaralBranchForm() {
 
   //for smooth focus
   const smoothFocus = (fieldName) => {
-    const el = document.querySelector(`[name="name"]`);
+    const fieldNameFlage = formFlags.locationForm
+      ? "location"
+      : formFlags.companyForm
+        ? "company"
+        : formFlags.branchForm
+          ? "branch"
+          : fieldName;
+    const el = document.querySelector(`[name=${fieldNameFlage}]`);
     if (el) {
       el.scrollIntoView({
         behavior: "smooth",
@@ -158,7 +165,7 @@ export default function GenaralBranchForm() {
       console.log("sgvwrg");
     }
 
-    setFocus(fieldName); // RHF handles focus properly
+    setFocus(fieldNameFlage); // RHF handles focus properly
   };
 
   useEffect(() => {
@@ -188,8 +195,8 @@ export default function GenaralBranchForm() {
     //after doing the api call then you must add the field values i added name and company for demo
 
     if (!selectedAmendment) return;
-
-    setValue("name", selectedAmendment.name ?? "", {
+    //Amend Auto selection whille loading
+    setValue("shortName", selectedAmendment.shortName ?? "", {
       shouldDirty: false,
     });
 
@@ -203,10 +210,10 @@ export default function GenaralBranchForm() {
     });
   }, [selectedAmendment, setValue]);
 
-  const handleSelectAmendment = (id, index) => {
+  const handleSelectAmendment = (id, index) => { //User Selecetion - Assign the amend data to feild
     setSelectedAmendment(amendments[index]);
 
-    setValue("name", amendments[index].name);
+    setValue("shortName", amendments[index].shortName);
 
     setValue("company", amendments[index].company, {
       shouldDirty: true,

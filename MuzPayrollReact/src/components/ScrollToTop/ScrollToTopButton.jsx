@@ -7,7 +7,7 @@ const ScrollToTopButton = ({ showAfter = 100 }) => {
 
   const handleScroll = useCallback(() => {
     setVisible(window.scrollY > showAfter);
-    console.log("Window",window.scrollY)
+    // console.log("Window",window.scrollY)
   }, [showAfter]);
 
   useEffect(() => {
