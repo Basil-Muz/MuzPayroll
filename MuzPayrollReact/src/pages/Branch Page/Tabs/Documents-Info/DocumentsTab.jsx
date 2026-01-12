@@ -280,7 +280,7 @@ export default function DocumentsTab(
             {/* Actions */}
             <div className="card-footer">
               <button
-                className="btn btn-preview"
+                className="btn-preview"
               onClick={() => {
                 if (!file) return;
                 const url = URL.createObjectURL(file);

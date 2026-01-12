@@ -68,7 +68,7 @@ export default function ContactForm({
       </div>
       </div>
 
-      {!flags.branchForm && <div className="section-header">
+      {!flags.branchForm && <div className="form-section-header">
         {/* <span className="section-number">3</span> */}
         <h3 className="section-title">Employer Contact Information</h3>
         <span className="section-subtitle">Employer Communication details</span>

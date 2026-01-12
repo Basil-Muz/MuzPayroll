@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { useImperativeHandle, useRef } from "react";
+import { useRef} from "react";
 import Select from "react-select";
 import { Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ImageCropModal from "./ImageCropModal";
 
-export default function GeneralInfoForm(
+const GeneralInfoForm = (function GeneralInfoForm(
   {
     register,
     errors,
@@ -18,35 +18,35 @@ export default function GeneralInfoForm(
     setError,
     isReadOnly,
     isUnlocked,
-
+    setFocus
     // disabled = {false},
     // requiredMap = {},
-  },
-  ref
+  }
 ) {
   // const watchName = watch("name");
   // const [imageSrc,setImageSrc]=useState(null);
   const [rawImage, setRawImage] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
   const fileInputRef = useRef(null);
-  const firstFieldRef = useRef(null);
-  const companySelectRef = useRef(null);
-  const isLocked = isUnlocked;
-  const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
+  const nameInputRef = useRef(null);
+  const isLocked = !isUnlocked;
+  // const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!isUnlocked) {
+    if (isLocked) {
       setTimeout(() => {
-        companySelectRef.current?.focus();
-        setIsCompanyMenuOpen(true);
+        nameInputRef.current?.focus();
+        // setIsCompanyMenuOpen(true);
       }, 120);
+      console.log("Is Unlocked...!");
+      setFocus("name");
     }
-  }, [isUnlocked]);
+  }, [isUnlocked, isLocked, setFocus]);
 
   // useImperativeHandle(ref, () => ({
-  //   focusCompany() {
-  //     companySelectRef.current?.focus().setOpen(true);
-  //   },
+  //   focusName() {
+  //   nameInputRef.current?.focus();
+  // },
   // }));
   // const watchCompany = watch("company");
   // if(watchCompany){
@@ -140,7 +140,6 @@ export default function GeneralInfoForm(
               <Controller
                 name="company"
                 // ref={(!flags.companyForm)  ? firstFieldRef : null}
-
                 control={control}
                 disabled={isReadOnly}
                 rules={{ required: "Please select a company" }}
@@ -153,18 +152,19 @@ export default function GeneralInfoForm(
                     <Select
                       options={countries}
                       placeholder="Select company"
-                      ref={companySelectRef}
+                      // ref={!flags.companyForm ? nameInputRef : null}
                       isDisabled={isReadOnly}
                       isSearchable
-                      menuIsOpen={isCompanyMenuOpen? true : null}
-                      onMenuClose={() => setIsCompanyMenuOpen(false)}
+                      // menuIsOpen={isCompanyMenuOpen? true : null}
+                      // onMenuClose={() => setIsCompanyMenuOpen(false)}
                       classNamePrefix="form-control-select"
                       className={`${errors.company ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                       value={selectedOption || null} //                   label comes from options
                       onChange={(option) => {field.onChange(option.value)
-                        setIsCompanyMenuOpen(!isCompanyMenuOpen)}
+                        // setIsCompanyMenuOpen(!isCompanyMenuOpen)
                       }
-                      //                    store ONLY value
+                      }
+                      // store ONLY value
                     />
                   );
                 }}
@@ -234,7 +234,7 @@ export default function GeneralInfoForm(
             </label>
             <input
               type="text"
-              ref={flags.companyForm ? firstFieldRef : null}
+              // ref={nameInputRef}
               className={`form-control ${errors.name ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
               placeholder="Enter name"
               disabled={isReadOnly}
@@ -263,6 +263,7 @@ export default function GeneralInfoForm(
                   clearErrors("shortName");
                 },
               })}
+              
             />
             {errors.name && (
               <span className="error-message">{errors.name.message}</span>
@@ -314,6 +315,7 @@ export default function GeneralInfoForm(
               render={({ field }) => (
                 <DatePicker
                   placeholderText="Select date"
+                  disabled={isReadOnly}
                   className={`form-control datepicker-input ${
                     errors.activeDate ? "error" : ""
                   }`}
@@ -570,4 +572,5 @@ export default function GeneralInfoForm(
       </div>
     </>
   );
-}
+});
+export default GeneralInfoForm;

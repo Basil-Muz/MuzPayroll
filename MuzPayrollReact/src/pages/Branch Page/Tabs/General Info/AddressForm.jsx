@@ -34,12 +34,12 @@ export default function AddressForm({
   const [placeList, setPlaceList] = useState([]);
   const prevPincodeRef = useRef(null); // track the old pincode
   const pinCodeRegister = register("pinCode", {
-  required: "PinCode is required",
-  pattern: {
-    value: /^[0-9]{6}$/,
-    message: "Enter valid 6 digit pincode",
-  },
-});
+    required: "PinCode is required",
+    pattern: {
+      value: /^[0-9]{6}$/,
+      message: "Enter valid 6 digit pincode",
+    },
+  });
 
   // const pincodeSelection=(firstPlace)=>{
   // const place = watch("place");
@@ -121,7 +121,6 @@ export default function AddressForm({
 
   useEffect(() => {
     if (!watchedPincode || watchedPincode.length !== 6) return;
-
     fetchLocationByPincode(watchedPincode);
   }, [watchedPincode]);
 
@@ -174,16 +173,16 @@ export default function AddressForm({
             placeholder="Enter Pincode"
             maxLength={6}
             inputMode="numeric"
-  {...pinCodeRegister}
-  onChange={(e) => {
-    pinCodeRegister.onChange(e); //  let RHF handle validation first
+            {...pinCodeRegister}
+            onChange={(e) => {
+              pinCodeRegister.onChange(e); //  let RHF handle validation first
 
-    const value = e.target.value;
-    if (value.length === 6) {
-      fetchLocationByPincode(value);
-    }
-  }}
-/>
+              const value = e.target.value;
+              if (value.length === 6) {
+                fetchLocationByPincode(value);
+              }
+            }}
+          />
           {errors.pinCode && (
             <span className="error-message">{errors.pinCode.message}</span>
           )}

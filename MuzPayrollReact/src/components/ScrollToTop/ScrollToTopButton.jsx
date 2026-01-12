@@ -2,26 +2,25 @@ import React, { useEffect, useState, useCallback } from "react";
 import { FaArrowUp } from "react-icons/fa";
 import "./ScrollToTopButton.css";
 
-const ScrollToTopButton = ({ showAfter = 300 }) => {
+const ScrollToTopButton = ({ showAfter = 100 }) => {
   const [visible, setVisible] = useState(false);
 
   const handleScroll = useCallback(() => {
     setVisible(window.scrollY > showAfter);
+    console.log("Window",window.scrollY)
   }, [showAfter]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
-    
-    // Initial check
     handleScroll();
-    
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   const scrollToTop = () => {
-    window.scrollTo({ 
-      top: 0, 
-      behavior: "smooth" 
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
     });
   };
 
@@ -33,7 +32,7 @@ const ScrollToTopButton = ({ showAfter = 300 }) => {
       title="Scroll to top"
       tabIndex={visible ? 0 : -1}
     >
-      <FaArrowUp size={20} aria-hidden="true" />
+      <FaArrowUp size={20} />
     </button>
   );
 };
