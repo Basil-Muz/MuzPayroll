@@ -123,7 +123,7 @@ public class BranchLogService extends MuzirisAbstractService<BranchLogDTO, Branc
 
         BranchLogDTO dto = new BranchLogDTO();
 
-        dto.setBranch(entity.getCode());
+        dto.setBranch(entity.getBranch());
         dto.setCode(entity.getCode());
         dto.setCompanyEntity(entity.getCompanyEntity());
         dto.setShortName(entity.getShortName());
@@ -140,6 +140,8 @@ public class BranchLogService extends MuzirisAbstractService<BranchLogDTO, Branc
         dto.setMobileNumber(entity.getMobileNumber());
         dto.setEmail(entity.getEmail());
         dto.setWithaffectdate(entity.getWithaffectdate());
+        dto.setBranchLogPK(entity.getBranchLogPK());
+
         return dto;
     }
 

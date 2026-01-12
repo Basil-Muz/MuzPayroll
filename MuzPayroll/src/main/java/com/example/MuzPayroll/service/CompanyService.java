@@ -479,9 +479,14 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         dto.setLandlineNumber(entity.getLandlineNumber());
         dto.setMobileNumber(entity.getMobileNumber());
         dto.setEmail(entity.getEmail());
+        dto.setDesignation(entity.getDesignation());
+        dto.setEmployerName(entity.getEmployerName());
+        dto.setEmployerNumber(entity.getEmployerNumber());
+        dto.setEmployerEmail(entity.getEmployerEmail());
         dto.setCompanyImagePath(entity.getCompanyImage());
         dto.setWithaffectdate(entity.getWithaffectdate());
         dto.setAuthorization(entity.getAuthorization());
+
         return dto;
     }
 

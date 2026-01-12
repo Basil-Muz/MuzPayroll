@@ -60,13 +60,13 @@ public class LocationLog {
     private String place;
 
     @Column(nullable = false)
-    private Integer pincode;
+    private String pincode;
 
     @Column(nullable = false)
-    private Long landlineNumber;
+    private String landlineNumber;
 
     @Column(nullable = false)
-    private Long mobileNumber;
+    private String mobileNumber;
 
     @Column(nullable = false)
     private String email;
@@ -78,7 +78,7 @@ public class LocationLog {
     private String designation;
 
     @Column(nullable = false)
-    private Long employerNumber;
+    private String employerNumber;
 
     @Column(nullable = false)
     private String employerEmail;
@@ -215,27 +215,27 @@ public class LocationLog {
         this.place = place;
     }
 
-    public Integer getPincode() {
+    public String getPincode() {
         return pincode;
     }
 
-    public void setPincode(Integer pincode) {
+    public void setPincode(String pincode) {
         this.pincode = pincode;
     }
 
-    public Long getLandlineNumber() {
+    public String getLandlineNumber() {
         return landlineNumber;
     }
 
-    public void setLandlineNumber(Long landlineNumber) {
+    public void setLandlineNumber(String landlineNumber) {
         this.landlineNumber = landlineNumber;
     }
 
-    public Long getMobileNumber() {
+    public String getMobileNumber() {
         return mobileNumber;
     }
 
-    public void setMobileNumber(Long mobileNumber) {
+    public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
 
@@ -263,11 +263,11 @@ public class LocationLog {
         this.designation = designation;
     }
 
-    public Long getEmployerNumber() {
+    public String getEmployerNumber() {
         return employerNumber;
     }
 
-    public void setEmployerNumber(Long employerNumber) {
+    public void setEmployerNumber(String employerNumber) {
         this.employerNumber = employerNumber;
     }
 

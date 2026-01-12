@@ -208,7 +208,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      CompanyID: initialCompanyId,
+      companyEntity: initialCompanyId,
       branch: "",
       shortName: "",
       activeDate: new Date().toISOString().split("T")[0],
@@ -229,7 +229,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
       authorizationDate: new Date().toISOString().split("T")[0],
     },
     validationSchema: Yup.object({
-      company: Yup.string().required("Company is required"),
+      companyEntity: Yup.string().required("Company is required"),
       branch: Yup.string().required("Branch Name is required"),
       shortName: Yup.string().required("Short Name is required"),
       activeDate: Yup.string().required("Active Date is required"),
@@ -260,7 +260,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
         // IMPORTANT: Field names must match exactly with DTO field names
 
         // Basic fields
-        formData.append("CompanyID", values.company || "");
+        formData.append("companyEntity", values.company || "");
         formData.append("branch", values.branch || ""); // Not branchName
         formData.append("shortName", values.shortName || "");
 
@@ -309,7 +309,7 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
           console.log(key + ":", value);
         }
 
-        const response = await fetch("http://localhost:8087/Branch/save", {
+        const response = await fetch("http://localhost:8087/branch/save", {
           method: "POST",
           // Browser sets Content-Type automatically for FormData
           body: formData,
