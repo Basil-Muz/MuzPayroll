@@ -38,32 +38,32 @@ export default function ContactForm({
       <div className="branch-form-group">
         <label className="form-label required">Phone</label>
         <input
-        className={`form-control ${errors.phone ? "error" : ""}`}
-          // disabled={disabled.phone}
-          {...register('phone', { required: "Branch phone number required",
+        className={`form-control ${errors.mobileNumber ? "error" : ""}`}
+          // disabled={disabled.mobileNumber}
+          {...register('mobileNumber', { required: "Branch phone number required",
             pattern:{
               value: /^[0-9]{10}$/,
               message: "Please enter a valid phone number",
           }})}
         />
-        {errors.phone && (
-            <span className="error-message"> {errors.phone.message}</span>
+        {errors.mobileNumber && (
+            <span className="error-message"> {errors.mobileNumber.message}</span>
           )}
       </div>
 
       <div className="branch-form-group">
         <label className="form-label">Landline</label>
         <input
-        className={`form-control ${errors.landline ? "error" : ""}`}
-          // disabled={disabled.landline}
-          {...register('landline', { required: false ,
+        className={`form-control ${errors.landlineNumber ? "error" : ""}`}
+          // disabled={disabled.landlineNumber}
+          {...register('landlineNumber', { required: false ,
             pattern:{
               value: /^[0-9]{8}$/,
-              message: "Please enter a valid landline number",
+              message: "Please enter a valid landlineNumber number",
           }})}
         />
-        {errors.landline && (
-          <span className="error-message"> {errors.landline.message}</span>
+        {errors.landlineNumber && (
+          <span className="error-message"> {errors.landlineNumber.message}</span>
         )}
       </div>
       </div>
@@ -113,32 +113,32 @@ export default function ContactForm({
       <div className="branch-form-group">
         <label className="form-label">Phone</label>
         <input
-        className={`form-control ${errors.employerPhone ? "error" : ""}`}
+        className={`form-control ${errors.employerNumber ? "error" : ""}`}
           // disabled={disabled}
-          {...register('employerPhone', { required: false,
+          {...register('employerNumber', { required: false,
             pattern:{
               value: /^[0-9]{10}$/,
               message: "Please enter a valid phone number",
           }})}
         />
-        {errors.employerPhone && (
-            <span className="error-message"> {errors.employerPhone.message}</span>
+        {errors.employerNumber && (
+            <span className="error-message"> {errors.employerNumber.message}</span>
           )}
       </div>
 
       <div className="branch-form-group">
         <label className="form-label">Designation</label>
         <input
-        className={`form-control ${errors.employerDesignation ? "error" : ""}`}
+        className={`form-control ${errors.designation ? "error" : ""}`}
           // disabled={disabled}
-          {...register('employerDesignation', { required: false,
+          {...register('designation', { required: false,
             pattern:{
               value: /^[a-zA-Z\u00C0-\u01FF\s'-]+$/,
               message: "Please enter a valid designation",
           }})}
         />
-        {errors.employerDesignation && (
-          <span className="error-message">{errors.employerDesignation.message}</span>
+        {errors.designation && (
+          <span className="error-message">{errors.designation.message}</span>
         )}
       </div>
       </div>}

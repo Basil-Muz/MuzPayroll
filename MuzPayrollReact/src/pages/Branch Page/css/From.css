@@ -845,7 +845,7 @@ z-index:10 !important; */
 }
 
 .image-upload-area:hover {
-  border-color: var(--brand-dark);
+  border-color: var(--brand-border);
   background: rgba(210, 24, 216, 0.02);
 }
 
@@ -1020,8 +1020,7 @@ z-index:10 !important; */
 .btn-remove-image:hover {
   /* transform: scale(1.1); */
   background: var(--danger);
-
-  color: white;
+  color: var(--background);
   /* box-shadow: 0 4px 12px rgba(212, 66, 66, 0.3); */
 }
 

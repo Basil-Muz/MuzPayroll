@@ -1,28 +1,28 @@
 import { useState, useEffect } from "react";
-import { useRef} from "react";
+import { useRef } from "react";
 import Select from "react-select";
 import { Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ImageCropModal from "./ImageCropModal";
 
-const GeneralInfoForm = (function GeneralInfoForm(
-  {
-    register,
-    errors,
-    // watch,
-    setValue,
-    clearErrors,
-    control,
-    flags,
-    setError,
-    isReadOnly,
-    isUnlocked,
-    setFocus
-    // disabled = {false},
-    // requiredMap = {},
-  }
-) {
+const GeneralInfoForm = function GeneralInfoForm({
+  register,
+  errors,
+  // watch,
+  setValue,
+  clearErrors,
+  control,
+  flags,
+  setError,
+  isReadOnly,
+  isUnlocked,
+  setFocus,
+  companys,
+  branchList,
+  // disabled = {false},
+  // requiredMap = {},
+}) {
   // const watchName = watch("name");
   // const [imageSrc,setImageSrc]=useState(null);
   const [rawImage, setRawImage] = useState(null);
@@ -32,15 +32,13 @@ const GeneralInfoForm = (function GeneralInfoForm(
   const isLocked = !isUnlocked;
   // const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
 
-  const fieldName =
-  flags.locationForm
+  const fieldName = flags.locationForm
     ? "location"
     : flags.companyForm
-    ? "company"
-    : flags.branchForm
-    ? "branch"
-    : "name";
-
+      ? "company"
+      : flags.branchForm
+        ? "branch"
+        : "name";
 
   useEffect(() => {
     if (isLocked) {
@@ -51,7 +49,7 @@ const GeneralInfoForm = (function GeneralInfoForm(
       // console.log("Field Name :",fieldName);
       setFocus("name");
     }
-  }, [isUnlocked, isLocked, setFocus,fieldName]);
+  }, [isUnlocked, isLocked, setFocus, fieldName]);
 
   // useImperativeHandle(ref, () => ({
   //   focusName() {
@@ -62,18 +60,18 @@ const GeneralInfoForm = (function GeneralInfoForm(
   // if(watchCompany){
   //   console.log("Comapny: ",register.company);
   // }
-  const countries = [
-    { value: "TCS", label: "Tata Consultancy Services" },
-    { value: "NGI", label: "Nissan Digital India LLP" },
-    { value: "AT", label: "Accubits Technologies" },
-    { value: "UST", label: "UST Global" },
-  ];
+  // const companys = [
+  //   { value: "TCS", label: "Tata Consultancy Services" },
+  //   { value: "NGI", label: "Nissan Digital India LLP" },
+  //   { value: "AT", label: "Accubits Technologies" },
+  //   { value: "UST", label: "UST Global" },
+  // ];
 
-  const branches = [
-    { value: "IMC", label: "Infosys Mysore Campus" },
-    { value: "TPC", label: "Tidel Park Chennai" },
-    { value: "IK", label: "InfoPark Kochi" },
-  ];
+  // const branches = [
+  //   { value: "IMC", label: "Infosys Mysore Campus" },
+  //   { value: "TPC", label: "Tidel Park Chennai" },
+  //   { value: "IK", label: "InfoPark Kochi" },
+  // ];
 
   //   const locations = [
   //   { value: "Kochi", label: "Kochi" },
@@ -145,22 +143,22 @@ const GeneralInfoForm = (function GeneralInfoForm(
                         value:/^[a-zA-Z0-9\s-]*$/,
                         message:"Please enter valide company",
                       }
-                 })}
+                      })}
                   /> */}
               <Controller
-                name="company"
+                name="companyEntity"
                 // ref={(!flags.companyForm)  ? firstFieldRef : null}
                 control={control}
                 disabled={isReadOnly}
                 rules={{ required: "Please select a company" }}
                 render={({ field }) => {
-                  const selectedOption = countries.find(
+                  const selectedOption = companys.find(
                     (opt) => opt.value === field.value
                   );
                   // onchange={setIsCompanyMenuOpen(true)}
                   return (
                     <Select
-                      options={countries}
+                      options={companys}
                       placeholder="Select company"
                       // ref={!flags.companyForm ? nameInputRef : null}
                       isDisabled={isReadOnly}
@@ -168,20 +166,22 @@ const GeneralInfoForm = (function GeneralInfoForm(
                       // menuIsOpen={isCompanyMenuOpen? true : null}
                       // onMenuClose={() => setIsCompanyMenuOpen(false)}
                       classNamePrefix="form-control-select"
-                      className={`${errors.company ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                      className={`${errors.companyEntity ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                       value={selectedOption || null} //                   label comes from options
-                      onChange={(option) => {field.onChange(option.value)
+                      onChange={(option) => {
+                        field.onChange(option.value);
                         // setIsCompanyMenuOpen(!isCompanyMenuOpen)
-                      }
-                      }
+                      }}
                       // store ONLY value
                     />
                   );
                 }}
               />
 
-              {errors.company && (
-                <span className="error-message">{errors.company.message}</span>
+              {errors.companyEntity && (
+                <span className="error-message">
+                  {errors.companyEntity.message}
+                </span>
               )}
             </div>
           )}
@@ -195,7 +195,7 @@ const GeneralInfoForm = (function GeneralInfoForm(
                 rules={{ required: "Please select a branch" }}
                 render={({ field }) => (
                   <Select
-                    options={branches}
+                    options={branchList}
                     placeholder="Select branch"
                     isSearchable
                     isDisabled={isReadOnly}
@@ -273,7 +273,6 @@ const GeneralInfoForm = (function GeneralInfoForm(
                   clearErrors("shortName");
                 },
               })}
-              
             />
             {errors[fieldName] && (
               <span className="error-message">{errors[fieldName].message}</span>
@@ -582,5 +581,5 @@ const GeneralInfoForm = (function GeneralInfoForm(
       </div>
     </>
   );
-});
+};
 export default GeneralInfoForm;

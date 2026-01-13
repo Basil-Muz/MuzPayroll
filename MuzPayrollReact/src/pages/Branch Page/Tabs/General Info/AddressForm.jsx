@@ -1,7 +1,7 @@
 import { Country, State, City } from "country-state-city";
 import { Controller } from "react-hook-form";
 import Select from "react-select";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 export default function AddressForm({
   register,
@@ -34,8 +34,8 @@ export default function AddressForm({
   const prevPincodeRef = useRef(null); // track the old pincode
   const [isPincodeResolved, setIsPincodeResolved] = useState(false); // disable the selected boxs
 
-  const pinCodeRegister = register("pinCode", {
-    required: "PinCode is required",
+  const pinCodeRegister = register("pincode", {
+    required: "Pincode is required",
     pattern: {
       value: /^[0-9]{6}$/,
       message: "Enter valid 6 digit pincode",
@@ -67,7 +67,7 @@ export default function AddressForm({
       const data = await response.json();
 
       if (data[0]?.Status !== "Success") {
-        setError("pinCode", {
+        setError("pincode", {
           type: "manual",
           message: "Invalid Pincode",
         });
@@ -113,7 +113,7 @@ export default function AddressForm({
 
       prevPincodeRef.current = pincode;
     } catch (err) {
-      setError("pinCode", {
+      setError("pincode", {
         type: "manual",
         message: "Unable to fetch location details" + err,
       });
@@ -122,23 +122,23 @@ export default function AddressForm({
 
   const debounceRef = useRef(null);
 
-const handlePincodeChange = (value) => { // remove dobounding the api calls
-  // clear previous timer
-  if (debounceRef.current) {
-    clearTimeout(debounceRef.current);
-  }
+  const handlePincodeChange = (value) => {
+    // remove dobounding the api calls
+    // clear previous timer
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
 
-  // user editing → unlock fields
-  setIsPincodeResolved(false);
+    // user editing → unlock fields
+    setIsPincodeResolved(false);
 
-  if (value.length !== 6) return;
+    if (value.length !== 6) return;
 
-  // wait before calling API
-  debounceRef.current = setTimeout(() => {
-    fetchLocationByPincode(value);
-  }, 500); // ⏳ 500ms debounce
-};
-
+    // wait before calling API
+    debounceRef.current = setTimeout(() => {
+      fetchLocationByPincode(value);
+    }, 500); // ⏳ 500ms debounce
+  };
 
   // useEffect(() => {
   //   if (!watchedPincode || watchedPincode.length !== 6) return;
@@ -176,15 +176,12 @@ const handlePincodeChange = (value) => { // remove dobounding the api calls
         : [],
     [countryCode, stateCode]
   );
-    const pincode = watch("pinCode");
+  const pincode = watch("pincode");
   useEffect(() => {
-
-  if (pincode && pincode.length === 6) {
-    fetchLocationByPincode(pincode);
-  }
-
-}, [setCountryCode, setStateCode, pincode]);
-
+    if (pincode && pincode.length === 6) {
+      fetchLocationByPincode(pincode);
+    }
+  }, [pincode]);
 
   return (
     <>
@@ -199,19 +196,18 @@ const handlePincodeChange = (value) => { // remove dobounding the api calls
           <input
             type="text"
             disabled={isReadOnly}
-            className={`form-control ${errors.pinCode ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
-            placeholder="Enter Pincode"
+            className={`form-control ${errors.pincode ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+            placeholder="Enter pincode"
             maxLength={6}
             inputMode="numeric"
             {...pinCodeRegister}
             onChange={(e) => {
               pinCodeRegister.onChange(e); //  let RHF handle validation first
-
-handlePincodeChange(e.target.value);
+              handlePincodeChange(e.target.value);
             }}
           />
-          {errors.pinCode && (
-            <span className="error-message">{errors.pinCode.message}</span>
+          {errors.pincode && (
+            <span className="error-message">{errors.pincode.message}</span>
           )}
         </div>
 

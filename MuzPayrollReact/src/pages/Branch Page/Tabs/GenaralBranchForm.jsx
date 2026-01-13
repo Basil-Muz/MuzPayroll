@@ -1,27 +1,30 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Select from "react-select";
+import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import axios from "axios";
 
-import GeneralInfoForm from "./GeneralInfoForm";
-import AddressForm from "./AddressForm";
-import ContactForm from "./ContactForm";
-import DocumentsTab from "../Documents-Info/DocumentsTab";
+import GeneralInfoForm from "./General Info/GeneralInfoForm";
+import AddressForm from "./General Info/AddressForm";
+import ContactForm from "./General Info/ContactForm";
+import DocumentsTab from "./General Info/DocumentsTab";
 
-import StepProgress from "./StepProgress";
-import Header from "../../../../components/Header/Header";
-import FloatingActionBar from "../../../../components/demo_buttons/FloatingActionBar";
+import StepProgress from "./General Info/StepProgress";
+import Header from "../../../components/Header/Header";
+import FloatingActionBar from "../../../components/demo_buttons/FloatingActionBar";
 
-import "../../css/From.css";
-import ThemeToggle from "../../../../components/ThemeToggle/ThemeToggle";
-import ScrollToTopButton from "../../../../components/ScrollToTop/ScrollToTopButton";
+import "../css/From.css";
+import ThemeToggle from "../../../components/ThemeToggle/ThemeToggle";
+import ScrollToTopButton from "../../../components/ScrollToTop/ScrollToTopButton";
 
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
 export default function GenaralBranchForm() {
   const [step, setStep] = useState(0); //switch steps
+  const [companyList, setCompanyList] = useState([]);
 
   // const [backendErrors, setBackendErrors] = useState([]);
   //pass the back end error to front end
@@ -34,7 +37,45 @@ export default function GenaralBranchForm() {
   const datePickerRef = useRef(null);
   const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
+  const UserData = localStorage.getItem("loginData");
+  // console.log("User data",UserData);
+  const userObj = JSON.parse(UserData);
+  const [isReadOnly, setIsReadOnly] = useState();
 
+  //Convert the JSON string to objects
+  const userCode = userObj.userCode.split("@", 1)[0];
+  const companyId = userObj.companyId;
+  // console.log("Logeeded data company", companyId);
+
+  const amendments = [
+    // {
+    //   id: 1,
+    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
+    //   date: "2025-10-20",
+    //   shortName: "TCS",
+    //   company: "Tata Consultancy Services",
+    //   status: "active",
+    //   expiryDate: "2025-10-10",
+    //   generatedBy: "Admin User",
+    // },
+    // {
+    //   id: 2,
+    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
+    //   date: "2025-10-10",
+    //   status: "expired",
+    //   expiryDate: "2021-12-31",
+    //   generatedBy: "System",
+    // },
+    // {
+    //   id: 3,
+    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
+    //   date: "2025-01-01",
+    //   status: "inactive",
+    //   expiryDate: "",
+    //   generatedBy: "Manager",
+    // },
+  ];
+  const inputMode = amendments.length > 0 ? "INSERT" : "UPDATE";
   const {
     register,
     handleSubmit,
@@ -45,31 +86,37 @@ export default function GenaralBranchForm() {
     reset,
     setFocus,
     watch,
+    getValues,
     control,
     formState: { errors },
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      documents: [
-        {
-          type: "",
-          number: "",
-          expiryDate: "",
-          file: null,
-          remarks: "",
-        },
-      ],
+      //  mound with one document row default
+      // documents: [
+      //   {
+      //     type: "",
+      //     number: "",
+      //     expiryDate: "",
+      //     file: null,
+      //     remarks: "",
+      //   },
+      // ],
+      userCode: userCode, //User code from local storage
+      authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
+      authorizationStatus: "0", // ENTRY
+      mode: inputMode,
     },
   });
 
-  const authDate = watch("authorizationDate"); //workflow of amend date then name logic
+  const authDate = watch("withaffectdate"); //workflow of amend date then name logic
 
   const isUnlocked = !!authDate;
 
   // From content changes
   const [formFlags] = useState({
-    companyForm: true,
-    branchForm: false,
+    companyForm: false,
+    branchForm: true,
     locationForm: false,
   });
 
@@ -78,44 +125,39 @@ export default function GenaralBranchForm() {
     name: "documents",
   });
 
-  // const stored = localStorage.getItem("loginData");
-
   const watchedDocuments = watch("documents");
   // const watchedPincode = watch("branchPinCode");
 
-  const amendmentTypeOptions = [
-    { label: "ENTRY", value: "ENTRY" },
-    { label: "VERIFIED", value: "VERIFIED" },
+  const authorizationStatusOptions = [
+    { label: "ENTRY", value: "0" },
+    { label: "VERIFIED", value: "1" },
   ];
 
-  const amendments = [
-    // {
-    //   id: 1,
-    //   authorization: "VERIFIED",
-    //   date: "2025-10-20",
-    //   shortName: "TCS",
-    //   company: "Tata Consultancy Services",
-    //   status: "active",
-    //   expiryDate: "2025-10-10",
-    //   generatedBy: "Admin User",
-    // },
-    // {
-    //   id: 2,
-    //   authorization: "VERIFIED",
-    //   date: "2025-10-10",
-    //   status: "expired",
-    //   expiryDate: "2021-12-31",
-    //   generatedBy: "System",
-    // },
-    // {
-    //   id: 3,
-    //   authorization: "VERIFIED",
-    //   date: "2025-01-01",
-    //   status: "inactive",
-    //   expiryDate: "",
-    //   generatedBy: "Manager",
-    // },
-  ];
+  //  initialValues: {
+  //     company: "",
+  //     shortName: "",
+  //     activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
+  //     address: "",
+  //     address1: "",
+  //     address2: "",
+  //     country: "",
+  //     state: "",
+  //     district: "",
+  //     place: "",
+  //     pincode: "",
+  //     landlineNumber: "",
+  //     mobileNumber: "",
+  //     email: "",
+  //     employerName: "",
+  //     designation: "",
+  //     employerNumber: "",
+  //     employerEmail: "",
+  //     companyImage: null,
+  //     withaffectdate: "",
+  //     authorizationStatus: "0",
+  //     userCode: user_code,
+  //     withaffectdate: new Date().toISOString().split("T")[0],
+  //   },
 
   const latestAmendmentId = amendments.length
     ? amendments.reduce((latest, current) =>
@@ -156,17 +198,50 @@ export default function GenaralBranchForm() {
         : formFlags.branchForm
           ? "branch"
           : fieldName;
+
     const el = document.querySelector(`[name=${fieldNameFlage}]`);
     if (el) {
       el.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
-      console.log("sgvwrg");
     }
 
     setFocus(fieldNameFlage); // RHF handles focus properly
   };
+  // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
+  const formatDate = (date) => {
+    //datePicker bugg
+    return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
+  };
+
+  const loadCompanyAndBranches = async () => {
+    try {
+      const companyResponse = await axios.get(
+        `http://localhost:8087/company/${companyId}`
+      );
+      const company = companyResponse.data;
+
+      // console.log("Company Listdasfgwsdrg:", company.companyMstID);
+
+      const companyobj = {
+        value: company.companyMstID,
+        label: company.company,
+      };
+      setCompanyList([companyobj]);
+
+      // console.log("Company List: ",company);
+      // setCompanyList([company]);
+      // setInitialCompanyId(company.companyMstID); // ✅ store it
+    } catch (error) {
+      toast.error("Failed to load company:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadCompanyAndBranches();
+    // console.log("Company list response: ", companyList);
+  }, [companyId]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -200,7 +275,7 @@ export default function GenaralBranchForm() {
       shouldDirty: false,
     });
 
-    setValue("authorization", selectedAmendment.authorization, {
+    setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
       shouldDirty: false,
       shouldValidate: true,
     });
@@ -210,7 +285,8 @@ export default function GenaralBranchForm() {
     });
   }, [selectedAmendment, setValue]);
 
-  const handleSelectAmendment = (id, index) => { //User Selecetion - Assign the amend data to feild
+  const handleSelectAmendment = (id, index) => {
+    //User Selecetion - Assign the amend data to feild
     setSelectedAmendment(amendments[index]);
 
     setValue("shortName", amendments[index].shortName);
@@ -230,9 +306,69 @@ export default function GenaralBranchForm() {
 
   const onSubmit = async (data) => {
     try {
+      setValue("userCode", userCode);
+      setValue("authorizationDate", new Date());
+      // console.log("Submitting data", data);
       const formData = new FormData();
 
-      console.log("Submitting raw data:", data);
+      Object.keys(data).forEach((key) => {
+        if (key !== "companyImage") {
+          formData.append(key, data[key]);
+        }
+      });
+
+      if (data.companyImage) {
+        formData.append("companyImage", data.companyImage);
+      }
+
+      // console.log("FormData contents:");
+      // for (const [key, value] of formData.entries()) {
+      //   if (value instanceof File) {
+      //     console.log(key, {
+      //       name: value.name,
+      //       size: value.size,
+      //       type: value.type,
+      //     });
+      //   } else {
+      //     console.log(key, value);
+      //   }
+      // }
+
+      const response = await fetch("http://localhost:8087/branch/save", {
+        method: "POST",
+        body: formData,
+      });
+
+      let result;
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          console.log("response", responseText);
+          result = JSON.parse(responseText);
+        }
+      } catch (parseError) {
+        toast.error("Error parsing response:", parseError);
+      }
+
+      if (result && result.success === true) {
+        toast.success("Branch saved successfully!");
+        // SAVE → VIEW → GENERATE AMENDMENT → SAVE AMENDMENT → VERIFY
+        //  isVerifiedAmendment(true); //  lock
+        const status = getValues("authorizationStatus");
+        // console.log("Status ", status);
+        // const status1 = watch("authorizationStatus");
+        // console.log("Status1 ", status1);
+        if (status === 1) {
+          //activate amend mode
+          setIsReadOnly(true);
+          setAddingNewAmend(true);
+        } else {
+          setAddingNewAmend(false); // exit amend mode
+          //setMode("VIEW"); // optional state
+        }
+
+        return;
+      }
 
       /* -------------------------------
           Prepare documents JSON
@@ -365,9 +501,10 @@ export default function GenaralBranchForm() {
                       control={control}
                       setFocus={setFocus}
                       flags={formFlags}
-                      isReadOnly={isVerifiedAmendment}
+                      isReadOnly={isVerifiedAmendment || isReadOnly}
                       isUnlocked={isUnlocked}
                       ref={generalInfoRef}
+                      companys={companyList}
                     />
                   </div>
                 )}
@@ -383,7 +520,7 @@ export default function GenaralBranchForm() {
                       clearErrors={clearErrors}
                       control={control}
                       flags={formFlags}
-                      isReadOnly={isVerifiedAmendment}
+                      isReadOnly={isVerifiedAmendment || isReadOnly}
                     />
                   </div>
                 )}
@@ -432,22 +569,28 @@ export default function GenaralBranchForm() {
                         Authorization
                       </label>
                       <Controller
-                        name="amendmentType"
+                        name="authorizationStatus"
                         control={control}
                         // rules={{ required: "Please select amendment type" }}
                         render={({ field }) => {
-                          const selectedOption = amendmentTypeOptions.find(
-                            (opt) => opt.value === "ENTRY"
-                          );
+                          // const selectedOption =
+                          //   authorizationStatusOptions.find(
+                          //     (opt) => opt.value === "ENTRY"
+                          //   );
 
                           return (
                             <Select
-                              options={amendmentTypeOptions}
+                              options={authorizationStatusOptions}
                               placeholder="Select amendment type"
                               isSearchable={false}
+                              isDisabled={isReadOnly}
                               classNamePrefix="form-control-select"
-                              className={errors.amendmentType ? "error" : ""}
-                              value={selectedOption || null} //  label from options
+                              className={
+                                errors.authorizationStatus ? "error" : ""
+                              }
+                              value={authorizationStatusOptions.find(
+                                (opt) => opt.value === field.value
+                              )}
                               onChange={(option) =>
                                 field.onChange(option.value)
                               } //  store ONLY value
@@ -462,23 +605,22 @@ export default function GenaralBranchForm() {
                         Authorization date
                       </label>
                       <Controller
-                        name="authorizationDate"
+                        name="withaffectdate"
                         control={control}
                         rules={{ required: "Please select a date" }}
                         render={({ field }) => (
                           <DatePicker
                             ref={datePickerRef}
+                            isDisabled={isReadOnly}
                             placeholderText="Select date"
                             className={`form-control datepicker-input ${
-                              errors.authorizationDate ? "error" : ""
+                              errors.withaffectdate ? "error" : ""
                             }`}
                             selected={
                               field.value ? new Date(field.value) : null
                             }
                             onChange={(date) => {
-                              field.onChange(
-                                date ? date.toISOString().slice(0, 10) : null
-                              );
+                              field.onChange(date ? formatDate(date) : null);
 
                               setTimeout(() => {
                                 smoothFocus("name"); //  Focus to name after selecting the date
@@ -493,7 +635,7 @@ export default function GenaralBranchForm() {
                               <input
                                 ref={authDateInputRef}
                                 className={`form-control datepicker-input ${
-                                  errors.authorizationDate ? "error" : ""
+                                  errors.withaffectdate ? "error" : ""
                                 }`}
                               />
                             }
@@ -528,7 +670,7 @@ export default function GenaralBranchForm() {
                               options={amendmentAuthorizationOptions}
                               placeholder="Select authorization"
                               isSearchable={false}
-                              isDisabled={isVerifiedAmendment}
+                              isDisabled={isVerifiedAmendment || isReadOnly}
                               classNamePrefix="form-control-select"
                               className={errors.authorization ? "error" : ""}
                               value={selectedOption} //  label from options
@@ -539,8 +681,10 @@ export default function GenaralBranchForm() {
                           );
                         }}
                       />
+                      <input type="hidden" {...register("userCode")} />
+                      <input type="hidden" {...register("authorizationDate")} />
                     </div>
-                    {latestAmendmentId.authorization === "VERIFIED" &&
+                    {latestAmendmentId.authorizationStatus === 1 &&
                       !addingNewAmend && ( // Adding the new amend only if the latest amend is verified
                         <div
                           className="btn amend-generate"
@@ -548,6 +692,8 @@ export default function GenaralBranchForm() {
                             // setAddNewAmend(true);
                             setSelectedAmendment(null); // unselect the all pills
                             setAddingNewAmend(true);
+                            setAddingNewAmend(true);
+                            setIsReadOnly(false);
                             reset({
                               documents: [
                                 {
@@ -596,7 +742,7 @@ export default function GenaralBranchForm() {
                         <div
                           key={item.id}
                           className={`amend-pill 
-                            ${item.authorization === "ENTRY" ? "entry" : "verified"}
+                            ${item.authorizationStatus === 0 ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}
                           `}
                           onClick={() => {
@@ -609,7 +755,9 @@ export default function GenaralBranchForm() {
                             <span className="pill-index">{item.id}</span>
                             <div className="pill-info">
                               <span className="pill-type">
-                                {item.authorization}
+                                {item.authorizationStatus === 0
+                                  ? "ENTRY"
+                                  : "VERIFIED"}
                               </span>
                               <span className="pill-date">
                                 {new Date(item.date).toLocaleDateString(
@@ -625,13 +773,13 @@ export default function GenaralBranchForm() {
                                 latest
                               </span>
                             )}
-                            {item.authorization !== "ENTRY" &&
+                            {item.authorizationStatus !== 0 &&
                               item.id !== latestAmendmentId.id && (
                                 <span className="pill-badge verified">
                                   ✔ Verified
                                 </span>
                               )}
-                            {item.authorization == "ENTRY" &&
+                            {item.authorizationStatus == 0 &&
                               item.id !== latestAmendmentId.id && (
                                 <span className="pill-badge verified">
                                   Entry
@@ -722,7 +870,7 @@ export default function GenaralBranchForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: step < steps.length - 1,
+              disabled: (step < steps.length - 1),
             },
             search: {
               // onClick: handleSearch,

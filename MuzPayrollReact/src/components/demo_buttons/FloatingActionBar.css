@@ -27,7 +27,7 @@
   height: 46px;
   border-radius: 14px;
   border: 1px solid var(--brand-border);
-  background: var(--primary-light); inside india
+  background: var(--primary-light);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -87,7 +87,7 @@
   right: 58px;
   top:auto;
   background: var(--primary-hover);
-  color: #fff;
+  color: var(--background);
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 12px;

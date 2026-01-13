@@ -19,10 +19,14 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
-
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   overflow: hidden;
   animation: toastSlideIn 0.2s ease;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 /* =========================================================
@@ -47,12 +51,10 @@
 }
 
 .custom-toast.success .toast-progress {
-  background: linear-gradient(
-    90deg,
-    var(--success),
-    var(--brand-light)
-  );
+  background: linear-gradient(90deg, var(--success), var(--brand-light));
 }
+
+
 
 /* ERROR */
 .custom-toast.error {
@@ -89,11 +91,7 @@
 }
 
 .custom-toast.info .toast-progress {
-  background: linear-gradient(
-    90deg,
-    var(--brand),
-    var(--brand-light)
-  );
+  background: linear-gradient(90deg, var(--brand), var(--brand-light));
 }
 
 /* =========================================================
@@ -151,7 +149,9 @@
 
   color: var(--text-light);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .toast-close:hover {
