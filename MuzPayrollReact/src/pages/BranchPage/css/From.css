@@ -20,11 +20,13 @@
   --success-light: rgba(210, 24, 216, 0.08);
   --danger: #d44242ff;
   --danger-light: rgba(212, 69, 69, 0.12);
+  --danger-dark: #a32929ff;
   --warning: #f59e0b;
-  
+
+  --option-light:#ffefffff;
   /* Text Colors */
   --text: #2f2f2fff;
-  --text-dark: #222222ff;
+  --text-dark: #070606ff;
   --text-muted: #6f6f6f;
   --text-light: #b094b8ff;
   
@@ -35,10 +37,11 @@
   /* Background Colors */
   --background: #ffffffff;
   --dark-background: #381e3bff;
-  --background-alt: #fcf8fcff;
+  --background-alt: #ffefffff;
   --glass-bg: rgba(255, 255, 255, 0.88);
   
   /* Shadow Effects */
+  --shadow-sm :0 2px 8px rgba(224, 99, 241, 0.3);
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   
@@ -54,8 +57,62 @@
   --text-lg: 19px;
   --text-xl: 24px;
 
-  --header-padding:94px;//Header width 66px
+  --header-padding:94px;  // Header width 66px
+
 }
+
+[data-theme="dark"] {
+  /* Brand Colors - Purple Theme (Dark Mode) */
+  --brand: #d218d8ff;
+  --brand-light: #e86af0;
+  --brand-dark: #b012b8;
+  --brand-border: rgba(210, 24, 216, 0.45);
+  /* Primary Colors */
+  --primary: #c8a6d4;
+  --primary-hover: #e9b8f0;
+  --primary-light: #3a1f3f;
+  /* Button Colors */
+  --button-primary: #d218d8ff;
+  --button-primary-hover: #e525ebff;
+  /* Status Colors */
+  --success: #d218d8ff;
+  --success-light: rgba(210, 24, 216, 0.18);
+
+  --danger: #f87171;
+  --danger-light: rgba(248, 113, 113, 0.22);
+
+    --option-light: #3e2a42ff;
+
+  --warning: #fbbf24;
+  /* Text Colors */
+  --text: #f3e8ff;
+  --text-dark: #ffffff;
+  --text-muted: #b6a3c6;
+  --text-light: #9f8fb1;
+  /* Border Colors */
+  --border: rgba(255, 255, 255, 0.12);
+  --border-light: rgba(255, 255, 255, 0.08);
+  /* Background Colors */
+  --background: #140916;
+  --dark-background: #1c0d1f;
+  --background-alt: #241126;
+  --glass-bg: rgba(36, 17, 38, 0.85);
+  /* Shadow Effects */
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.7);
+  /* Border Radius */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  /* text sizes */
+  --text-sm: 13px;
+  --text-md: 16px;
+  --text-lg: 19px;
+  --text-xl: 24px;
+  --header-padding: 94px; /* Header width 66px */
+}
+
 
 /* ===== LAYOUT RESET ===== */
 * {
@@ -65,8 +122,8 @@
 }
 
 html, body, #root {
-  height: 100%;
-  min-height: 100vh;
+  height: auto;
+  min-height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -78,17 +135,24 @@ body {
   /* min-height: 100vh; */
   /* color: var(--text); */
  /* safety net */
+  /* background-color: #f2f2f2; */
+   overflow-x: hidden;
 }
-body > * {
+/* body > * {
   max-width: 100vw !important;
-  overflow-x: hidden !important;
-}
+  overflow-x: auto !important;
+} */
 /* ===== MAIN CONTAINER ===== */
 /* .branch-container-tab {
   max-width: 1000px;
   margin: 21px auto;
   padding: 0 20px;
 } */
+
+#root {
+  min-height: 100vh;
+  overflow-x: hidden; 
+}
 
 .branch-container-tab {
   /* min-height: 100vh; */
@@ -118,7 +182,7 @@ body > * {
   background: var(--background);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid var(--border);
 }
 
@@ -130,8 +194,8 @@ body > * {
 }
 
 .form-header h1 {
-  font-size: 24px;
-  font-weight: 400;
+  font-size: var(--text-lg);
+  font-weight: 600;
   color: var(--text);
   margin-bottom: 8px;
   background: linear-gradient(135deg, var(--text) 0%, var(--text-muted) 100%);
@@ -191,8 +255,8 @@ body > * {
 }
 
 .step-icon {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   background: var(--background);
   border: 2px solid var(--border);
@@ -258,7 +322,45 @@ body > * {
   border-bottom:1px solid var(--border);
 }
 
-.section-header {
+.gen-form.locked {
+  opacity: 0.55;
+  pointer-events: none;
+  filter: grayscale(0.2);
+  position: relative;
+}
+
+.gen-form.locked::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* background: linear-gradient(
+    180deg,
+    rgba(119, 98, 124, 0.07),
+    rgba(59, 59, 59, 0.33)
+  ); */
+  z-index: 1;
+}
+/* .gen-form.locked::after {
+  content: "Select Authorization Date to continue";
+  position: absolute;
+  bottom: 4rem; left: 23rem;
+
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--brand);
+
+  background: var(--background);
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+
+  z-index: 2;
+  pointer-events: none;
+} */
+
+
+
+.form-section-header {
   display: flex;
   align-items: center;
   margin-bottom: 24px;
@@ -343,10 +445,16 @@ body > * {
 .form-control.error{
   border-color: var(--danger);
 }
+
+input.form-control.read-only{
+  
+}
+
 .css-13cymwt-control{
   border-radius:0;
 }
 .form-control-select__control {
+  width:100% !important;
   /* padding: 4px 8px; */
   border: 1.5px solid var(--border) !important;
   border-radius: var(--radius-lg)!important;
@@ -358,7 +466,166 @@ body > * {
 
 .form-control-select__control--is-focused {
   border-color: var(--brand-border) !important;
-  box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(229, 99, 241, 0.1) !important;
+}
+
+[data-theme="dark"] .form-control-select__single-value {
+  color: #ffffff !important;
+}
+
+//reactEasyCrop_Container
+
+.datepicker-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #e9d5ff;
+  font-size: 14px;
+  color: #111827;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+.step-animate .datepicker-input{
+  width: 100%;
+}
+.datepicker-input:focus {
+  outline: none;
+  border-color: var(  --brand-border);
+  box-shadow: 0 0 0 3px rgba(199, 30, 190, 0.15);
+}
+
+.datepicker-input::placeholder {
+  color: #f18bfaff;
+}
+
+.datepicker-input.error {
+  border-color: #ef4444;
+}
+
+.custom-datepicker .react-datepicker__header {
+  background: #fbe9ffff;
+  border-bottom: none;
+  padding: 10px 0;
+}
+.react-datepicker__navigation--next {
+    right: 4px;
+    top: 9px;
+}
+.react-datepicker__navigation--previous {
+    left: 4px;
+    top: 9px;
+}
+.custom-datepicker .react-datepicker__current-month {
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 15px;
+  padding-bottom:6px;
+}
+.custom-datepicker {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 10px;
+  font-family: inherit;
+}
+.custom-datepicker select {
+  background: #fff;
+  border: 1px solid #e9d5ff;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 13px;
+  color: var(--brand-dark);
+}
+.custom-datepicker option:hover{
+  background:var(--background)
+}
+.custom-datepicker .react-datepicker__day-name {
+  color: var(--brand-dark);
+  font-weight: 500;
+  font-size: 12px;
+}
+.custom-datepicker .react-datepicker__day {
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+.custom-datepicker .react-datepicker__day:hover {
+  background: rgba(199, 30, 190, 0.12);
+}
+.custom-datepicker .react-datepicker__day--selected,
+.custom-datepicker .react-datepicker__day--keyboard-selected {
+  background: #c71ebeff;
+  color: #fff;
+  font-weight: 600;
+}
+.custom-datepicker .react-datepicker__day--disabled {
+  color: #d1d5db;
+}
+.custom-datepicker-popper {
+  z-index: 9999;
+}
+.custom-datepicker {
+  animation: scaleIn 0.15s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------- DatePicker Dark Mode ---------- */
+[data-theme="dark"] .custom-datepicker {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .custom-datepicker .react-datepicker__header {
+  background: var(--background-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .custom-datepicker .react-datepicker__current-month,
+[data-theme="dark"] .custom-datepicker .react-datepicker__day-name {
+  color: var(--text);
+}
+
+[data-theme="dark"] .custom-datepicker .react-datepicker__day {
+  color: var(--text);
+}
+
+[data-theme="dark"] .custom-datepicker .react-datepicker__day:hover {
+  background: rgba(210, 24, 216, 0.2);
+}
+
+[data-theme="dark"] .custom-datepicker .react-datepicker__day--selected {
+  background: var(--brand);
+  color: #fff;
+}
+
+[data-theme="dark"] .custom-datepicker select {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+/* ---------- DatePicker Disabled Days (Dark Mode) ---------- */
+[data-theme="dark"] .custom-datepicker .react-datepicker__day--disabled {
+  color: rgba(255, 255, 255, 0.25) !important;
+  background: transparent !important;
+  cursor: not-allowed;
+}
+
+/* Optional: prevent hover glow on disabled days */
+[data-theme="dark"]
+.custom-datepicker
+.react-datepicker__day--disabled:hover {
+  background: transparent !important;
 }
 
 /* Error state */
@@ -370,10 +637,10 @@ body > * {
   color: var(--text-light) !important;
 }
 
-.form-control-select__menu .css-lnmdiq5-menu {
+.form-control-select__menu {
   border-radius: var(--radius-lg);
   border: 1.5px solid var(--border);
-  background: var(--background);
+  background-color: var(--background) !important; 
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   z-index: 1000;
 }
@@ -383,18 +650,19 @@ body > * {
   padding: 10px 16px;
   font-size: 14px;
   color: var(--text) !important;
-  background-color: var(--background);
+  /* background-color: var(--background-alt) !important; */
   cursor: pointer;
 }
 
 .form-control-select__option--is-focused {
-  background-color: rgba(208, 99, 241, 0.1) !important;
+  /* color:black !important; */
+  background-color: var(--option-light) !important;
   /* color: var(--text); */
 }
 
 /* Selected option */
 .form-control-select__option--is-selected {
-  background-color: var(--brand-border) !important; // overriding style by default
+  background-color: var(--brand-border) !important; /* overriding style by default*\
   /* color: #fff; */
 }
 
@@ -466,17 +734,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  transition : all 0.3s ease;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(224, 99, 241, 0.3);
+
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(213, 99, 241, 0.4);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:active {
@@ -484,9 +753,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .btn-secondary {
-  background: white;
+  background: var(--background);
   color: var(--text);
   border: 1.5px solid var(--border);
+  transition : all 0.3s ease;
 }
 
 .btn-secondary:hover {
@@ -575,7 +845,7 @@ z-index:10 !important; */
 }
 
 .image-upload-area:hover {
-  border-color: var(--brand);
+  border-color: var(--brand-border);
   background: rgba(210, 24, 216, 0.02);
 }
 
@@ -738,7 +1008,7 @@ z-index:10 !important; */
   /* border-radius: 50%; */
   background: var(--background);
   border: 1px solid var(--danger);
-  color: black;
+  color: var(--text);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -750,8 +1020,7 @@ z-index:10 !important; */
 .btn-remove-image:hover {
   /* transform: scale(1.1); */
   background: var(--danger);
-
-  color: white;
+  color: var(--background);
   /* box-shadow: 0 4px 12px rgba(212, 66, 66, 0.3); */
 }
 
@@ -933,6 +1202,173 @@ z-index:10 !important; */
   color: #9ca3af;
 }
 
+/* ===============================
+   Amendment Section
+================================ */
+
+.amend-section {
+  margin: 20px 0;
+}
+
+/* Header Row */
+.amend-header-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.amend-field {
+  min-width: 260px;
+}
+
+.amend-generate {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+.amend-generate:hover{
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+/* ===============================
+   Amend Container
+================================ */
+
+.amend-container {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* ===============================
+  Amendment Pill (Base)
+================================ */
+
+.amend-pill {
+  width: 220px;
+  padding: 19px 15px;
+  border-radius: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: var(--background);
+  border: 1.5px solid var(--border-light);
+  box-shadow: var(--shadow);
+  transition: all 0.25s ease;
+}
+
+.amend-pill:hover {
+  /* transform: translateY(-2px); */
+}
+
+/* ===============================
+   Left Side
+================================ */
+
+.pill-left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.pill-index {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;onClick={toggleSidebar}
+  place-items: center;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--brand-light);
+  color: white;
+}
+
+.pill-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.pill-type {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.pill-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ===============================
+   Right Side Badges
+================================ */
+
+.pill-right {
+  display: flex;
+  gap: 6px;
+}
+
+.pill-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+/* ===============================
+   ENTRY
+================================ */
+
+.amend-pill.entry {
+  border-left: 4px solid var(--brand);
+}
+
+/* ===============================
+   VERIFIED
+================================ */
+
+.pill-badge.verified {
+  background: var(--success-light);
+  color: var(--brand);
+}
+
+/* ===============================
+   LATEST + SELECTED (SAME STYLE)
+================================ */
+
+.amend-pill.selected {
+  /* background: linear-gradient(
+    135deg,
+    var(--brand-light),
+    #f5c2ff
+  ); */
+  background: var(--background-alt);
+  border: 1.5px solid var(--brand);
+  /* box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1); */
+}
+
+.pill-badge.latest {
+  background: var(--brand);
+  color: #fff;
+}
+
+.amend-pill.selected .pill-index {
+  background: var(--brand);
+  color: #fff;
+}
+
+.amend-pill.selected .pill-type {
+  color: var(--brand);
+}
+
+
 /* Mobile */
 @media (max-width: 768px) {
   .amend-bar {
@@ -978,6 +1414,7 @@ z-index:10 !important; */
 
 /* Mobile (576px - 768px) */
 @media (max-width: 768px) {
+
   .branch-container-tab {
     padding: 16px 12px;
     padding-top:var(--header-padding);
@@ -1066,15 +1503,17 @@ z-index:10 !important; */
   }
 
   .branch-container-tab .floating-action-bar{
-    bottom:3rem;
+    bottom: 12rem;
   }
+
 }
 
 /* Small Mobile (up to 576px) */
 @media (max-width: 576px) {
   .branch-container-tab {
     padding: 12px 8px;
-    padding-top: var(--header-padding);
+    padding-top:18px;
+    /* padding-top: var(--header-padding); */
   }
   
   .form-card {
@@ -1088,6 +1527,10 @@ z-index:10 !important; */
   
   .form-header h1 {
     font-size: var(--text-md);
+  }
+
+  .section-title{
+    font-size: var(--text-sm);
   }
 
   .form-container h3{
@@ -1130,6 +1573,43 @@ z-index:10 !important; */
   .btn-add{
     width: 100%;
   }
+
+  .amend-header-row{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+    align-items: flex-end;
+    flex-direction: row;
+  }
+
+  .amend-field {
+        min-width: 213px;
+  }
+
+  .form-control-select__control{
+    width: 210px
+  }
+
+  .amend-pill{
+    min-width: 250px;
+    gap:12px;
+  }
+  .amend-generate{
+    width: 300px;
+  }
+  .branch-container-tab .floating-action-bar{
+    bottom: 6rem;
+    right: 25px;
+  }
+  .branch-form-actions {
+    padding: 16px;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    }
+    .branch-form-actions .btn{
+      width:150px;
+    }
 }
   /* Stack buttons vertically on very small screens */
   @media (max-width: 400px) {
@@ -1158,168 +1638,19 @@ z-index:10 !important; */
 .hidden {
   display: none;
 }
-/* ===============================
-   Amendment Section
-================================ */
 
-.amend-section {
-  margin: 20px 0;
-}
+/* [data-theme="dark"] {
+  --bg: #250f2aff;
+  --bg-card: #381e3bff;
 
-/* Header Row */
-.amend-header-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 16px;
-  margin-bottom: 16px;
-}
+  --text-dark-secondary: #b094b8ff;
 
-.amend-field {
-  min-width: 260px;
-}
+  --btn-bg: #381e3bff;
+  --btn-border: #4d3355ff;
+  --btn-hover: #4e2b52ff;
 
-.amend-generate {
-  height: 40px;
-  padding: 0 18px;
-  border-radius: var(--radius-sm);
-  background: var(--brand);
-  color: #fff;
-  font-weight: 600;
-}
+  --toggle-bg: #624769ff;
+  --toggle-ball: #fff;
+} */
 
-.amend-generate:hover{
-  transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(224, 99, 241, 0.3);
-}
-/* ===============================
-   Amend Container
-================================ */
-
-.amend-container {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-/* ===============================
-   Amendment Pill (Base)
-================================ */
-
-.amend-pill {
-  min-width: 220px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  background: var(--background);
-  border: 1.5px solid var(--border-light);
-  box-shadow: var(--shadow);
-  transition: all 0.25s ease;
-}
-
-.amend-pill:hover {
-  /* transform: translateY(-2px); */
-}
-
-/* ===============================
-   Left Side
-================================ */
-
-.pill-left {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.pill-index {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 14px;
-  background: var(--brand-light);
-  color: white;
-}
-
-.pill-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.pill-type {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.pill-date {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-/* ===============================
-   Right Side Badges
-================================ */
-
-.pill-right {
-  display: flex;
-  gap: 6px;
-}
-
-.pill-badge {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 10px;
-  text-transform: uppercase;
-}
-
-/* ===============================
-   ENTRY
-================================ */
-
-.amend-pill.entry {
-  border-left: 4px solid var(--brand);
-}
-
-/* ===============================
-   VERIFIED
-================================ */
-
-.pill-badge.verified {
-  background: var(--success-light);
-  color: var(--brand);
-}
-
-/* ===============================
-   LATEST + SELECTED (SAME STYLE)
-================================ */
-
-.amend-pill.selected {
-  /* background: linear-gradient(
-    135deg,
-    var(--brand-light),
-    #f5c2ff
-  ); */
-  border: 1.5px solid var(--brand);
-  box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1);
-}
-
-.pill-badge.latest {
-  background: var(--brand);
-  color: #fff;
-}
-
-.amend-pill.selected .pill-index {
-  background: var(--brand);
-  color: #fff;
-}
-
-.amend-pill.selected .pill-type {
-  color: var(--brand);
-}
-
+/* ===== DARK MODE SUPPORT ===== */

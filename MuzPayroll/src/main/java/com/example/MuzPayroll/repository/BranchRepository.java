@@ -34,7 +34,7 @@ public interface BranchRepository extends JpaRepository<BranchMst, Long> {
     Optional<BranchMst> findLatestById(@Param("branchMstID") Long branchMstID);
 
     // Find maximum ID
-    @Query("SELECT MAX(c.branchMstID) FROM BranchMst c WHERE c.branchMstID >= 100000")
+    @Query("SELECT MAX(c.branchMstID) FROM BranchMst c WHERE c.branchMstID >= 200000")
     Long findMaxBranchMstID();
 
 }

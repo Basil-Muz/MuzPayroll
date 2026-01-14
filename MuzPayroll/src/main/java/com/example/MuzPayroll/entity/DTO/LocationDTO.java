@@ -1,23 +1,27 @@
-package com.example.MuzPayroll.entity;
+package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.BranchMst;
+import com.example.MuzPayroll.entity.CompanyMst;
+import com.example.MuzPayroll.entity.LocationLogPK;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
-@Entity
-public class LocationMst {
-
+public class LocationDTO {
     @Transient
-    private List<LocationLog> LocationLogs;
+    private List<LocationLogDTO> locationDtoLogs;
 
     @Transient
     private Authorization authorization;
+
+    private LocationLogPK locationLogPK;
 
     @Id
     @Column(name = "LocationMstID", unique = true, nullable = false)
@@ -91,14 +95,24 @@ public class LocationMst {
     @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    private Long authId;
+
     // Getters and setters
 
-    public List<LocationLog> getLocationLogs() {
-        return LocationLogs;
+    public Long getAuthId() {
+        return authId;
     }
 
-    public void setLocationLogs(List<LocationLog> locationLogs) {
-        LocationLogs = locationLogs;
+    public void setAuthId(Long authId) {
+        this.authId = authId;
+    }
+
+    public List<LocationLogDTO> getLocationDtoLogs() {
+        return locationDtoLogs;
+    }
+
+    public void setLocationDtoLogs(List<LocationLogDTO> locationDtoLogs) {
+        this.locationDtoLogs = locationDtoLogs;
     }
 
     public Authorization getAuthorization() {
@@ -107,6 +121,14 @@ public class LocationMst {
 
     public void setAuthorization(Authorization authorization) {
         this.authorization = authorization;
+    }
+
+    public LocationLogPK getLocationLogPK() {
+        return locationLogPK;
+    }
+
+    public void setLocationLogPK(LocationLogPK locationLogPK) {
+        this.locationLogPK = locationLogPK;
     }
 
     public Long getLocationMstID() {
@@ -299,5 +321,51 @@ public class LocationMst {
 
     public void setWithaffectdate(LocalDate withaffectdate) {
         this.withaffectdate = withaffectdate;
+    }
+
+    // Authorization
+
+    @Column
+    private Long mstId;
+
+    @Column(nullable = false)
+    private String userCode;
+
+    @Column(nullable = false)
+    private LocalDate authorizationDate;
+
+    public LocalDate getAuthorizationDate() {
+        return authorizationDate;
+    }
+
+    public void setAuthorizationDate(LocalDate authorizationDate) {
+        this.authorizationDate = authorizationDate;
+    }
+
+    @Column(nullable = false)
+    private Boolean authorizationStatus;
+
+    public Boolean getAuthorizationStatus() {
+        return authorizationStatus;
+    }
+
+    public void setAuthorizationStatus(Boolean authorizationStatus) {
+        this.authorizationStatus = authorizationStatus;
+    }
+
+    public Long getMstId() {
+        return mstId;
+    }
+
+    public void setMstId(Long mstId) {
+        this.mstId = mstId;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 }

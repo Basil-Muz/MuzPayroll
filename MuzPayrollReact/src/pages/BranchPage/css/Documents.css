@@ -6,13 +6,14 @@
 }
 
 .documents-header {
-    display: flex;
-    align-items: center;
-    justify-content:space-between;
-    gap: 10px;
-    margin-bottom: 24px;
-    background: #f5f5f5;
-    padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 24px;
+  /* background: #f5f5f5; */
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .documents-header h3 {
@@ -35,7 +36,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
-  margin-top:4px;
+  margin-top: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.25s ease;
   position: relative;
@@ -211,8 +212,8 @@
   height: 16px;
 }
 
-input #file{
-  display:none
+input #file {
+  display: none;
 }
 
 .doc-file-name {
@@ -262,38 +263,19 @@ input #file{
   gap: 6px;
 }
 
-.btn-preview {
-  background: white;
-  color: var(--brand);
-  border: 1.5px solid var(--brand) !important;
-}
-
-.btn-preview:hover:not(:disabled) {
-  background: var(--brand);
-  color: white;
-  transform: translateY(-1px);
-}
-
-.btn-preview:disabled,
-.btn-remove-file:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  border-color: var(--border) !important;
-  color: var(--text-light);
-}
-
 .doc-btn-remove {
-  padding: 8px 16px;
+  padding: 2px 7px;
+  padding-top: 5px;
   background: var(--danger-light);
+  border: 1px solid var(--danger);
   color: var(--danger);
+  transition: all 0.3s ease;
 }
 
-.doc-btn-remove:hover {
-  background: var(--danger);
-  color: white;
-}
-
-
+/* .doc-btn-remove:hover {
+  background: var(--background); */
+  /* color: white; */
+/* } */
 
 /* Remarks Section */
 .card-remarks {
@@ -327,7 +309,7 @@ input #file{
   outline: none;
   border-color: var(--brand-border);
   box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1);
-} 
+}
 
 /* Error input border */
 .document-card .doc-error {
@@ -343,7 +325,6 @@ input #file{
   color: var(--text-light);
 }
 
-
 /* Add Document Button */
 .btn-add {
   display: inline-flex;
@@ -354,7 +335,7 @@ input #file{
   color: var(--brand);
   border: none;
   border-radius: var(--radius-sm);
-  border:1px solid var(--brand);
+  border: 1px solid var(--brand);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -363,7 +344,7 @@ input #file{
 
 .btn-add:hover {
   background: var(--brand-dark);
-  color:var(--background);
+  color: var(--background);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(210, 24, 216, 0.2);
 }
@@ -379,25 +360,53 @@ input #file{
   border-color: var(--border);
 } */
 
+.btn-preview {
+  background: var(--backround);
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  gap: 6px;
+  color: var(--brand);
+  border: 1.5px solid var(--brand) !important;
+  transition: all 0.2s ease;
+}
+
+.btn-preview:hover:not(:disabled) {
+  background: var(--brand);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-preview:disabled,
+.btn-remove-file:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--border) !important;
+  color: var(--text-light);
+}
+
 /* Remove File Button */
 .btn-remove-file {
   background: none;
   border: none;
   color: var(--danger);
-  font-size: 12px;
+  font-size: var(--text-sm);
   cursor: pointer;
   padding: 8px 16px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  border:thin solid var(--danger);
+  border: thin solid var(--danger);
   border-radius: var(--radius-sm);
   transition: all 0.2s ease;
 }
 
 .btn-remove-file:hover:not(:disabled) {
   background: var(--danger);
-  color:var(--background)
+  color: var(--background);
 }
 
 /* Responsive Design */
@@ -407,12 +416,12 @@ input #file{
   .documents-section {
     padding: 20px;
   }
-  
+
   .document-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
   }
-  
+
   .document-card {
     padding: 16px;
   }
@@ -423,34 +432,34 @@ input #file{
   .documents-section {
     padding: 16px;
   }
-  
+
   .documents-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
     margin-bottom: 20px;
   }
-  
+
   .documents-header h3 {
     font-size: 18px;
   }
-  
+
   .document-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .card-footer {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
   }
-  
+
   .card-footer .btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .btn-add {
     width: 100%;
     justify-content: center;
@@ -462,31 +471,31 @@ input #file{
   .documents-section {
     padding: 12px;
   }
-  
+
   .document-card {
     padding: 16px 12px;
   }
-  
+
   .card-upload {
     padding: 12px;
   }
-  
+
   .file-upload-wrapper {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  
+
   .file-name {
     max-width: 100%;
     text-align: center;
   }
-  
+
   .field input,
   .field select {
     padding: 10px;
   }
-  
+
   .btn-upload {
     width: 100%;
     justify-content: center;
@@ -500,7 +509,7 @@ input #file{
 }
 
 .document-card.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

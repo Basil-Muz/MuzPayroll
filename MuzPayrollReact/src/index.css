@@ -4,13 +4,28 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(189, 33, 33, 0.87);
-  background-color: #242424;
-
+  /* color: rgba(189, 33, 33, 0.87); */
+  /* background-color: #242424;
+  --dark-background: #381e3bff; */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+:root,
+[data-theme="light"] {
+  --bg: #f5f5f5;
+  --bg-card: #ffffff;
+
+  --text: #2f2f2f;
+  --text-muted: #6f6f6f;
+}
+[data-theme="dark"] {
+  --bg: #250f2a;
+  --bg-card: #381e3b;
+
+  --text: #f7f1f9;
+  --text-muted: #b094b8;
 }
 
 a {
@@ -36,7 +51,9 @@ body {
   /* display: flex; */
   /* place-items: center; */
   width: 100%;
-  background-color:#f2f2f2;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
   height: 100%;
 }
 
@@ -73,7 +90,7 @@ input:-webkit-autofill {
 
 
 
-@media (prefers-color-scheme: light) {
+/* @media (prefers-color-scheme: light) {
   :root {
     color: #422147ff;
     background-color: #ffffff;
@@ -84,7 +101,7 @@ input:-webkit-autofill {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
 
 /* ---------- LIGHT THEME ---------- */
 /* :root,
@@ -102,20 +119,6 @@ input:-webkit-autofill {
   --toggle-ball: #fff;
 } */
 
-/* ---------- DARK THEME ---------- */
-/* [data-theme="dark"] {
-  --bg: #250f2aff;
-  --bg-card: #381e3bff;
-  --text: #f7f1f9ff;
-  --text-secondary: #b094b8ff;
-
-  --btn-bg: #381e3bff;
-  --btn-border: #4d3355ff;
-  --btn-hover: #4e2b52ff;
-
-  --toggle-bg: #624769ff;
-  --toggle-ball: #fff;
-} */
 
 /* Global apply */
 body {

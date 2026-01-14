@@ -17,7 +17,7 @@ import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.service.BranchService;
 
 @RestController
-@RequestMapping("/Branch")
+@RequestMapping("/branch")
 @CrossOrigin(origins = "*")
 public class BranchController {
 
@@ -29,7 +29,7 @@ public class BranchController {
         return branchService.saveWrapper(dto);
     }
 
-    @GetMapping("/{companyId}/branches")
+    @GetMapping("/{companyId}")
     public List<BranchMst> getAllBranch(@PathVariable Long companyId) {
         return branchService.getAllBranchByCompanyId(companyId);
     }

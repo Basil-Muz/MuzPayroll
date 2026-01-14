@@ -29,7 +29,7 @@ export default function BranchTabs() {
 
       {/* Tabs Content */}
       <div className="tabs-content glass">
-         <GeneralTab />
+        <GeneralTab />
         {/* {activeTab === "documents" && <DocumentsTab />} */}
       </div>
     </div>

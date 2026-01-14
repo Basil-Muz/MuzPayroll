@@ -213,7 +213,7 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
         List<String> errors = new ArrayList<>();
 
         if (dtos == null || dtos.isEmpty()) {
-            return Response.error("No company data provided");
+            return Response.error("No branch data provided");
         }
 
         try {
@@ -249,14 +249,14 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
                     Long maxId = branchRepository.findMaxBranchMstID();
 
                     if (maxId == null) {
-                        // No data in DB - start from 100000
-                        generatedId = 100000L;
+                        // No data in DB - start from 200000
+                        generatedId = 200000L;
                     } else {
                         // Data exists - get latest data and increment
                         generatedId = maxId + 1;
 
-                        if (generatedId > 999999L) {
-                            errors.add("Cannot generate ID. Maximum limit (999999) reached for company: " +
+                        if (generatedId > 299999L) {
+                            errors.add("Cannot generate ID. Maximum limit (299999L) reached for company: " +
                                     (dto.getBranch() != null ? dto.getBranch() : "Unknown"));
                             continue;
                         }
