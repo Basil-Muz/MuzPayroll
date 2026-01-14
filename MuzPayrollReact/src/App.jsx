@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 
 import { Toaster, toast } from "react-hot-toast";
 import "./ToastStyles.css";
+import "./Common-form.css"
 
 import Companyform from "./pages/company/Companyform.jsx";
 import BranchForm from "./pages/Branch/BranchForm.jsx";
