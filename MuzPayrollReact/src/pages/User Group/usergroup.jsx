@@ -136,7 +136,7 @@ function UserGroup() {
     return (
         <>
             <Header backendError={headerError} />
-            <div className="designation-page">
+            <div className="usergroup-page">
                 <div className="header-section">
                     <h2 className="page-title">User Group</h2>
 
@@ -240,7 +240,7 @@ function UserGroup() {
                             disabled: true,
                         },
                         new: {
-                            onClick: toggleForm,  //to toggle the designation form
+                            onClick: toggleForm,  //to toggle the usergroup form
                         },
                         // refresh: {
                         //   onClick: () => window.location.reload(),  // Refresh the page

@@ -1,4 +1,4 @@
-/* DesignationForm.css */
+/* locationgroupForm.css */
 :root {
     /* Brand Colors - Purple Theme */
     --brand: #d218d8ff;
@@ -50,7 +50,7 @@
     --radius-xl: 24px;
 }
 
-.modal-designation-form {
+.modal-locationgroup-form {
     position: fixed;
     top: 0;
     left: 0;
@@ -146,7 +146,7 @@
     align-items: center;
 }
 
-.modal-designation-form .close {
+.modal-locationgroup-form .close {
     font-size: 21px;
     color: rgba(212, 11, 219, 0.93);
     transition: all 0.3s ease;
@@ -156,7 +156,7 @@
     cursor: pointer;
 }
 
-.modal-designation-form .close:hover {
+.modal-locationgroup-form .close:hover {
     background-color: none;
 }
 
@@ -166,7 +166,7 @@ height: 20px;
 margin-top: 5px;
 } */
 
-/* .modal-designation-form .close{
+/* .modal-locationgroup-form .close{
     position: absolute;
     top: 10px;
     right: 10px;
@@ -204,7 +204,7 @@ margin-top: 5px;
 }
 
 
-.modal-designation-form .notifications-dropdown {
+.modal-locationgroup-form .notifications-dropdown {
     position: absolute;
     top: 9%;
     right: 70px;
@@ -266,18 +266,18 @@ margin-top: 5px;
     align-items: flex-start;
     padding-left: 15px;
 } */
-.modal-designation-form .form-row {
+.modal-locationgroup-form .form-row {
     display: flex;
     /* grid-template-columns: 150px 1fr; */
     align-items: center;
     justify-content: space-between;
 }
 
-.modal-designation-form .full-content {
+.modal-locationgroup-form .full-content {
     padding-bottom: 6px;
 }
 
-.modal-designation-form .input {
+.modal-locationgroup-form .input {
     width: 381px;
     padding-right: 0.7rem;
     border: none;
@@ -285,24 +285,24 @@ margin-top: 5px;
     outline: none;
 }
 
-.modal-designation-form label {
+.modal-locationgroup-form label {
     display: block;
     padding-left: 0.7rem;
 }
 
-.modal-designation-form label.active-date {
+.modal-locationgroup-form label.active-date {
     margin-top: -11px;
 }
 
-.modal-designation-form label span.required {
+.modal-locationgroup-form label span.required {
     color: var(--brand);
     font-weight: bold;
     /* margin-right: 5px; */
 }
 
-.modal-designation-form input,
-.modal-designation-form select,
-.modal-designation-form textarea {
+.modal-locationgroup-form input,
+.modal-locationgroup-form select,
+.modal-locationgroup-form textarea {
     width: 100%;
     padding: 8px 10px;
     box-sizing: border-box;
@@ -316,23 +316,23 @@ margin-top: 5px;
     outline: none;
 }
 
-.modal-designation-form select {
+.modal-locationgroup-form select {
     height: 35px;
 }
 
-.modal-designation-form textarea {
+.modal-locationgroup-form textarea {
     resize: horizontal;
     min-height: 33px;
 }
 
-.modal-designation-form input[type="date onClick={(e) => e.stopPropagation()} // ⬅ prevent close"] {
+.modal-locationgroup-form input[type="date onClick={(e) => e.stopPropagation()} // ⬅ prevent close"] {
     /* margin-top: -5px; */
     margin-bottom: 0.4rem;
 }
 
-.modal-designation-form input:focus,
-.modal-designation-form select:focus,
-.modal-designation-form textarea:focus {
+.modal-locationgroup-form input:focus,
+.modal-locationgroup-form select:focus,
+.modal-locationgroup-form textarea:focus {
     border-color: var(--primary);
 }
 
@@ -344,7 +344,7 @@ select#status {
     height: max-content;
 }
 
-.modal-designation-form .form-buttons {
+.modal-locationgroup-form .form-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -384,8 +384,8 @@ select#status {
  background-color: var(--brand-danger-bg);
 } */
 
-.modal-designation-form .save-btn,
-.modal-designation-form .cancel-btn {
+.modal-locationgroup-form .save-btn,
+.modal-locationgroup-form .cancel-btn {
     padding: 9px 31px;
     border-radius: 999px;
     background: rgba(210, 24, 216, 0.08);
@@ -395,28 +395,28 @@ select#status {
     transition: all 0.25s ease;
 }
 
-.modal-designation-form .save-btn {
+.modal-locationgroup-form .save-btn {
     color: #409e4cff;
 }
 
-.modal-designation-form .save-btn:hover {
+.modal-locationgroup-form .save-btn:hover {
     color: #33793aff;
     background: rgba(210, 24, 216, 0.16);
 }
 
-.modal-designation-form .cancel-btn {
+.modal-locationgroup-form .cancel-btn {
     color: #d44242ff;
 }
 
-.modelal-designation-form .cancel-btn:hover {
+.modelal-locationgroup-form .cancel-btn:hover {
     color: #833c3cff;
 }
 
 /* --primary: #7d6b80ff;
   --primary-hover: #251127ff; */
 
-.modal-designation-form .save-btn:hover,
-.modal-designation-form .cancel-btn:hover {
+.modal-locationgroup-form .save-btn:hover,
+.modal-locationgroup-form .cancel-btn:hover {
     /* color:var(--primary-hover); */
     background: rgba(210, 24, 216, 0.16);
 }
@@ -430,7 +430,7 @@ select#status {
     font-size: 12.5px;
 }
 
-.modal-designation-form .cancel-btn:disabled {
+.modal-locationgroup-form .cancel-btn:disabled {
     background-color: rgba(212, 69, 69, 0.925);
     cursor: not-allowed;
 }
@@ -446,7 +446,7 @@ select#status {
         height: fit-content;
     }
 
-    .modal-designation-form input,
+    .modal-locationgroup-form input,
     select,
     textarea {
         width: 100%;
@@ -457,12 +457,12 @@ select#status {
 
     }
 
-    .modal-designation-form .form-row {
+    .modal-locationgroup-form .form-row {
         width: 100%;
     }
 
-    .modal-designation-form .save-btn,
-    .modal-designation-form .cancel-btn {
+    .modal-locationgroup-form .save-btn,
+    .modal-locationgroup-form .cancel-btn {
         padding: 12px 37px;
         margin-bottom: 10px;
     }
@@ -479,7 +479,7 @@ select#status {
     flex-direction: column;
     gap: 11px;
     }
-.modal-designation-form .form-row {
+.modal-locationgroup-form .form-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -492,7 +492,7 @@ select#status {
         max-width: 680px;
     }
 
-    .modal-designation-form .input {
+    .modal-locationgroup-form .input {
         width: 100%;
     }
 }
@@ -500,16 +500,16 @@ select#status {
 @media (max-width: 768px) {
 
     /* Modal wrapper */
-    .modal-designation-form {}
+    .modal-locationgroup-form {}
 
-    .modal-designation-form .form-row {
+    .modal-locationgroup-form .form-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 2px;
     }
 
-    .modal-designation-form .notifications-dropdown {
+    .modal-locationgroup-form .notifications-dropdown {
         position: absolute;
         bottom: 0;
         top: 10%;
@@ -541,42 +541,42 @@ select#status {
     }
 
 
-    .modal-designation-form .notifications-dropdown {
+    .modal-locationgroup-form .notifications-dropdown {
         position: absolute;
         top: 7.3%;
     }
 
     /* Stack form rows */
-    .modal-designation-form .form-row {
+    .modal-locationgroup-form .form-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 2px;
     }
 
-    .modal-designation-form label {
+    .modal-locationgroup-form label {
         padding-left: 0;
         font-size: 13px;
     }
 
-    .modal-designation-form .input {
+    .modal-locationgroup-form .input {
         width: 100%;
         padding-right: 0;
     }
 
-    .modal-designation-form input,
-    .modal-designation-form select,
-    .modal-designation-form textarea {
+    .modal-locationgroup-form input,
+    .modal-locationgroup-form select,
+    .modal-locationgroup-form textarea {
         font-size: 14px;
     }
 
     /* Buttons full width */
-    .modal-designation-form .form-buttons {
+    .modal-locationgroup-form .form-buttons {
         flex-direction: column;
         gap: 11px;
     }
 
-    .modal-designation-form .save-btn,
-    .modal-designation-form .cancel-btn {
+    .modal-locationgroup-form .save-btn,
+    .modal-locationgroup-form .cancel-btn {
         width: 100%;
         justify-content: center;
     }
@@ -598,7 +598,7 @@ select#status {
         font-size: 14.5px;
     }
 
-    .modal-designation-form textarea {
+    .modal-locationgroup-form textarea {
         min-height: 60px;
     }
 }

@@ -76,7 +76,7 @@ const handleSelect = (item) => {
     
       <Header backendError={headerError} />
 
-      <div className="payroll-group-page">
+      <div className="shift-group-page">
             
               {/* ================= HEADER (ONLY WHEN DATA SHOWN) ================= */}
              
@@ -111,7 +111,7 @@ const handleSelect = (item) => {
                 <IoIosSearch size={18} />
                 <input
                   type="text"
-                  placeholder="Search payroll group…"
+                  placeholder="Search here…"
                   value={searchText}
                   onChange={handleSearchInput}
                 />

@@ -32,8 +32,10 @@ import LocationGroupForm from "./pages/Location Group/locationgroupform.jsx";
 import ShiftGroup from "./pages/Shift Group/shiftgroup.jsx";
 import ShiftGroupSearch from "./pages/Shift Group/shiftgroupsearch.jsx";
 import ShiftGroupList from "./pages/Shift Group/shiftgrouplist.jsx";  
+import { AuthProvider } from "./context/AuthProvider.jsx";
 function App() {
   return (
+    <AuthProvider>
     <Routes>
       {/* <Route path="/" element={<Page />} /> */}
       <Route path="/" element={<LoginPage />} />
@@ -65,7 +67,9 @@ function App() {
       <Route path="/shiftgroup" element={<ShiftGroup/>} />
       <Route path="/shiftgroupsearch" element={<ShiftGroupSearch/>} />
       <Route path="/shiftgrouplist" element={<ShiftGroupList/>} />
+    
     </Routes>
+   </AuthProvider>
   );
 }
 

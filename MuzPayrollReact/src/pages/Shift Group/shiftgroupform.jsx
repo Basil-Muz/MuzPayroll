@@ -238,7 +238,7 @@ const handleMouseUp = () => {
 };
 
   return (
-  <div className="modal-designation-form"  onClick={toggleForm}   // ⬅ click outside closes
+  <div className="modal-shift-form"  onClick={toggleForm}   // ⬅ click outside closes
   > 
     <div className="modal-content"
       onClick={(e) => e.stopPropagation()} // ⬅ prevent closing when clicking inside

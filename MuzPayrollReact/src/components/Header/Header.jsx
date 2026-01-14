@@ -36,7 +36,7 @@ const Header = ({ backendError = [] }) => {
     }
   };
   const loginData = getLoginData();
-  const locationName = loginData.locationName || "Kochi_Kakkanad";
+  const locationName = loginData.locationName || "";
   const currentPath = location.pathname;
   const date = new Date().toLocaleDateString();
 

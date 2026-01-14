@@ -1,6 +1,6 @@
 /* ================= CONTAINER ================= */
 
-.payroll-group-container {
+.shift-group-container {
   padding-left: 15px;      /* ✅ LEFT spacing (THIS was missing) */
   padding-right: 100px;    /* space for floating bar */
   max-width: calc(100% - 90px);
@@ -10,7 +10,7 @@
 
 /* ================= TILE VIEW ================= */
 
-.payroll-group-container.tile {
+.shift-group-container.tile {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
@@ -18,7 +18,7 @@
 
 /* ================= LIST VIEW ================= */
 
-.payroll-group-container.list {
+.shift-group-container.list {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -27,7 +27,7 @@
 
 /* ================= CARD BASE ================= */
 
-.payroll-group-card {
+.shift-group-card {
   position: relative;
   padding: 14px;
   border: 1px solid #ddd;
@@ -46,7 +46,7 @@
 
 /* ================= LIST CARD LAYOUT ================= */
 
-.payroll-group-container.list .payroll-group-card {
+.shift-group-container.list .shift-group-card {
   display: flex;
   flex-direction: column;     /* 🔑 stack vertically */
   align-items: flex-start;    /* 🔑 align to left */
@@ -56,16 +56,16 @@
 
 /* ================= VIEW ANIMATIONS ================= */
 
-.payroll-group-container.tile .payroll-group-card {
+.shift-group-container.tile .shift-group-card {
   animation-name: tileEnter;
 }
 
-.payroll-group-container.list .payroll-group-card {
+.shift-group-container.list .shift-group-card {
   animation-name: listEnter;
 }
 
 /* stagger animation */
-.payroll-group-card {
+.shift-group-card {
   animation-delay: calc(var(--i) * 45ms);
 }
 
@@ -91,13 +91,13 @@
 
 /* ================= HOVER EFFECT ================= */
 
-.payroll-group-container.tile .payroll-group-card:hover {
+.shift-group-container.tile .shift-group-card:hover {
   transform: scale(1.03);
   border-color: var(--brand-border);
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.08);
 }
 
-.payroll-group-container.list .payroll-group-card:hover {
+.shift-group-container.list .shift-group-card:hover {
   transform: scale(0.993);
   border-color: var(--brand-border);
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.08);
@@ -106,24 +106,24 @@
 /* ================= RESPONSIVE ================= */
 
 @media (max-width: 1024px) {
-  .payroll-group-container {
+  .shift-group-container {
     padding-right: 70px;
     max-width: calc(100% - 60px);
   }
 }
 
 @media (max-width: 768px) {
-  .payroll-group-container {
+  .shift-group-container {
     padding-right: 0;
     max-width: 100%;
   }
 
-  .payroll-group-container.list {
+  .shift-group-container.list {
     width: 100%;
     
   }
 
-  .payroll-group-container.tile {
+  .shift-group-container.tile {
     grid-template-columns: 1fr;
   }
 }

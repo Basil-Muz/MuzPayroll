@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginpage.css";
 import muzLogo from "../../assets/muzlogo_transparent.png";
+import {useAuth} from "../../context/AuthProvider.jsx";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [userCode, setUserCode] = useState("");
   const [password, setPassword] = useState("");
@@ -78,8 +80,9 @@ function LoginPage() {
       
       };
 
-      localStorage.setItem("loginData", JSON.stringify(loginData));
-      navigate("/home");
+     login(loginData);
+    navigate("/home");
+
     } catch (error) {
       setPasswordError("Server error.");
       console.error("Login error:", error);

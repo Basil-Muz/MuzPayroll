@@ -7,11 +7,11 @@ const ShiftGroupList = ({ data, view, searchText, onSelect }) => {
   );
 
   return (
-    <div className={`payroll-group-container ${view}`}>
+    <div className={`shift-group-container ${view}`}>
       {filteredData.map(item => (
         <div
           key={item.code}
-          className="payroll-group-card"
+          className="shift-group-card"
           onClick={() => onSelect(item)}
         >
           <div className="code">{item.code}</div>

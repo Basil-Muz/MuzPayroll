@@ -135,7 +135,7 @@ function LocationGroup() {
     return (
         <>
             <Header backendError={headerError} />
-            <div className="designation-page">
+            <div className="locationgroup-page">
                 <div className="header-section">
                     <h2 className="page-title">Location Group</h2>
 
@@ -239,7 +239,7 @@ function LocationGroup() {
                         //     disabled: true,
                         // },
                         new: {
-                            onClick: toggleForm,  //to toggle the designation form
+                            onClick: toggleForm,  //to toggle the locationgroup form
                         },
                         // refresh: {
                         //   onClick: () => window.location.reload(),  // Refresh the page
@@ -248,10 +248,10 @@ function LocationGroup() {
 
                 {showForm && selectedItem && loading && <Loading />}
                 {showForm && !loading && selectedItem && (
-                    <UserGroupForm data={selectedItem} toggleForm={toggleForm} />
+                    <LocationGroupForm data={selectedItem} toggleForm={toggleForm} />
                 )}
                 {showForm && !selectedItem && (
-                    <UserGroupForm data={selectedItem} toggleForm={toggleForm} />
+                    <LocationGroupForm data={selectedItem} toggleForm={toggleForm} />
                 )}
                 {flag && <Loading />}
                 <BackToTop />

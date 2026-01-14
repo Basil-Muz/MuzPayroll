@@ -225,7 +225,7 @@ function LocationGroupForm({ toggleForm, data }) {
     };
 
     return (
-        <div className="modal-designation-form" onClick={toggleForm} >  // ⬅ click outside closes
+        <div className="modal-locationgroup-form" onClick={toggleForm} >  // ⬅ click outside closes
         
             <div className="modal-content"
                 onClick={(e) => e.stopPropagation()} // ⬅ prevent closing when clicking inside
@@ -249,7 +249,7 @@ function LocationGroupForm({ toggleForm, data }) {
       <Search/>
         
         </div> */}
-                    <div className="h3">User Group</div>
+                    <div className="h3">Location Group</div>
                     <div className="header-icons">
                         <div className="notifications"
                             onMouseEnter={handleNotifEnter}
