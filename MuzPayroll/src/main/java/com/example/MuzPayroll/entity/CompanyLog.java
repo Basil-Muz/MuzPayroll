@@ -2,6 +2,9 @@ package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
 
+import org.antlr.v4.runtime.misc.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -37,6 +40,7 @@ public class CompanyLog {
     }
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "AuthID", nullable = false)
     private Authorization authorization;
 
@@ -48,7 +52,7 @@ public class CompanyLog {
         this.authorization = authorization;
     }
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String code;
 
     @Column(nullable = false)
@@ -81,31 +85,42 @@ public class CompanyLog {
     @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String landlineNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String mobileNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String designation;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerEmail;
 
     @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    @Column(nullable = false, name = "AmendNo")
+    private String amendNo;
+
     // Getters and setters
+
+    public String getAmendNo() {
+        return amendNo;
+    }
+
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
 
     public String getCode() {
         return code;

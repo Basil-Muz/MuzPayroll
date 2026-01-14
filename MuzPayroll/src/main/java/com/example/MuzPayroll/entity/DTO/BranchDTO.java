@@ -51,8 +51,7 @@ public class BranchDTO {
     @Column(name = "BranchMstID", unique = true, nullable = false)
     private Long branchMstID;
 
-    @ManyToOne
-    @JoinColumn(name = "CompanyID", nullable = false)
+    @Column(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
     @Column(nullable = false, unique = true)

@@ -10,8 +10,69 @@ import jakarta.persistence.Column;
 
 public class CompanyLogDTO {
 
+    @Column(name = "CompanyMstID")
+    private Long companyMstID;
 
     private CompanyLogPK companyLogPK;
+
+    private String company;
+
+    private String code;
+
+    private String shortName;
+
+    @Column(name = "ActiveDate")
+    private LocalDate activeDate;
+
+    private MultipartFile companyImage;
+
+    private String companyImagePath;
+
+    private String address;
+
+    private String address1;
+    private String address2;
+
+    private String country;
+
+    private String state;
+
+    private String district;
+
+    private String place;
+
+    private String pincode;
+
+    private String landlineNumber;
+
+    private String mobileNumber;
+
+    private String email;
+
+    private String employerName;
+
+    private String designation;
+
+    private String employerNumber;
+
+    private String employerEmail;
+
+    private LocalDate withaffectdate;
+
+    private Long authId;
+
+    @Column(name = "AmendNo")
+    private String amendNo;
+
+    // Getters and setters
+
+    public Long getCompanyMstID() {
+        return companyMstID;
+    }
+
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
+    }
 
     public CompanyLogPK getCompanyLogPK() {
         return companyLogPK;
@@ -21,9 +82,6 @@ public class CompanyLogDTO {
         this.companyLogPK = companyLogPK;
     }
 
-    @Column(nullable = false)
-    private String company;
-
     public String getCompany() {
         return company;
     }
@@ -32,69 +90,13 @@ public class CompanyLogDTO {
         this.company = company;
     }
 
-    @Column(nullable = false, unique = true)
-    private String code;
+    public String getAmendNo() {
+        return amendNo;
+    }
 
-    @Column(nullable = false)
-    private String shortName;
-
-    @Column(name = "ActiveDate", nullable = false)
-    private LocalDate activeDate;
-
-    @Column(nullable = true)
-    private MultipartFile companyImage;
-
-    @Column(nullable = true)
-    private String companyImagePath;
-
-    @Column(nullable = false)
-    private String address;
-
-    private String address1;
-    private String address2;
-
-    @Column(nullable = false)
-    private String country;
-
-    @Column(nullable = false)
-    private String state;
-
-    @Column(nullable = false)
-    private String district;
-
-    @Column(nullable = false)
-    private String place;
-
-    @Column(nullable = false)
-    private String pincode;
-
-    @Column(nullable = false)
-    private String landlineNumber;
-
-    @Column(nullable = false)
-    private String mobileNumber;
-
-    @Column(nullable = false)
-    private String email;
-
-    @Column(nullable = false)
-    private String employerName;
-
-    @Column(nullable = false)
-    private String designation;
-
-    @Column(nullable = false)
-    private String employerNumber;
-
-    @Column(nullable = false)
-    private String employerEmail;
-
-    @Column(nullable = false)
-    private LocalDate withaffectdate;
-
-    private Long authId;
-
-    // Getters and setters
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
 
     public Long getAuthId() {
         return authId;

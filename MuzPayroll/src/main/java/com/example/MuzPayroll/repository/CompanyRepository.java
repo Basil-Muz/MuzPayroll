@@ -14,6 +14,8 @@ public interface CompanyRepository extends JpaRepository<CompanyMst, Long> {
 
     boolean existsByCode(String code);
 
+    Optional<CompanyMst> findByCode(String code);
+
     /**
      * Get the LATEST company with CM prefix using Pageable
      * Pageable allows us to get only ONE record (LIMIT 1 equivalent)
@@ -32,5 +34,8 @@ public interface CompanyRepository extends JpaRepository<CompanyMst, Long> {
     // Find maximum ID
     @Query("SELECT MAX(c.companyMstID) FROM CompanyMst c WHERE c.companyMstID >= 100000")
     Long findMaxCompanyMstID();
+
+    @Query("SELECT a.code FROM CompanyMst a WHERE a.companyMstID = :companyMstID")
+    Optional<String> findCodeByMstId(@Param("companyMstID") Long companyMstID);
 
 }

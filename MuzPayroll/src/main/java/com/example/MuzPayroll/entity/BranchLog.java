@@ -2,6 +2,8 @@ package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -15,10 +17,12 @@ public class BranchLog {
     private BranchLogPK branchLogPK;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "AuthID", nullable = false)
     private Authorization authorization;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
@@ -55,7 +59,7 @@ public class BranchLog {
     @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String landlineNumber;
 
     @Column(nullable = false)
