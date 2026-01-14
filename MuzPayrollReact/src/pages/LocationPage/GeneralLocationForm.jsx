@@ -5,24 +5,27 @@ import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import axios from "axios";
 
-import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
-import AddressForm from "../Branch Page/Tabs/General Info/AddressForm";
-import ContactForm from "../Branch Page/Tabs/General Info/ContactForm";
-import DocumentsTab from "../Branch Page/Tabs/General Info/DocumentsTab";
+import GeneralInfoForm from "../BranchPage/Tabs/General Info/GeneralInfoForm";
+import AddressForm from "../BranchPage/Tabs/General Info/AddressForm";
+import ContactForm from "../BranchPage/Tabs/General Info/ContactForm";
+import DocumentsTab from "../BranchPage/Tabs/General Info/DocumentsTab";
 
 // import StepProgress from "./General Info/StepProgress";
 // import Header from "../../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
-
+import "../BranchPage/css/From.css";
 import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
-export default function GenaralCompanyForm() {
+export default function GenaralLocationForm() {
   const [step, setStep] = useState(0); //switch steps
+  const [companyList, setCompanyList] = useState([]);
+  const [branchList, setBranchList] = useState([]);
 
   // const [backendErrors, setBackendErrors] = useState([]);
   //pass the back end error to front end
@@ -40,39 +43,37 @@ export default function GenaralCompanyForm() {
 
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
+  const companyId = userObj.companyId;
+
   // console.log("Logeeded data", userCode);
 
-//  (authorizationStatus===0)? "ENTRY" :
-// (authorizationStatus===0)? "ENTRY" :
-// (authorizationStatus===0)? "ENTRY" :
-
   const amendments = [
-    {
-      id: 3,
-      authorizationStatus: 1,
-      date: "2025-10-20",
-      shortName: "TCS",
-      company: "Tata Consultancy Services",
-      status: "active",
-      expiryDate: "2025-10-10",
-      generatedBy: "Admin User",
-    },
-    {
-      id: 2,
-      authorizationStatus: 1,
-      date: "2025-10-10",
-      status: "expired",
-      expiryDate: "2021-12-31",
-      generatedBy: "System",
-    },
-    {
-      id: 1,
-      authorizationStatus: 1,
-      date: "2025-01-01",
-      status: "inactive",
-      expiryDate: "",
-      generatedBy: "Manager",
-    },
+    // {
+    //   id: 1,
+    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
+    //   date: "2025-10-20",
+    //   shortName: "TCS",
+    //   company: "Tata Consultancy Services",
+    //   status: "active",
+    //   expiryDate: "2025-10-10",
+    //   generatedBy: "Admin User",
+    // },
+    // {
+    //   id: 2,
+    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
+    //   date: "2025-10-10",
+    //   status: "expired",
+    //   expiryDate: "2021-12-31",
+    //   generatedBy: "System",
+    // },
+    // {
+    //   id: 3,
+    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
+    //   date: "2025-01-01",
+    //   status: "inactive",
+    //   expiryDate: "",
+    //   generatedBy: "Manager",
+    // },
   ];
   const inputMode = amendments.length > 0 ? "INSERT" : "UPDATE";
   const {
@@ -113,9 +114,9 @@ export default function GenaralCompanyForm() {
 
   // From content changes
   const [formFlags] = useState({
-    companyForm: true,
+    companyForm: false,
     branchForm: false,
-    locationForm: false,
+    locationForm: true,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -170,14 +171,14 @@ export default function GenaralCompanyForm() {
   const amendmentAuthorizationOptions = [
     {
       label:
-        selectedAmendment?.authorizationStatus === 0
+        selectedAmendment?.authorization === "ENTRY"
           ? `ENTRY : ${selectedAmendment.date}`
           : "ENTRY",
       value: "ENTRY",
     },
     {
       label:
-        selectedAmendment?.authorizationStatus === 1
+        selectedAmendment?.authorization === "VERIFIED"
           ? `VERIFIED : ${selectedAmendment.date}`
           : "VERIFIED",
       value: "VERIFIED",
@@ -185,7 +186,7 @@ export default function GenaralCompanyForm() {
   ];
 
   const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorizationStatus === 1 && !addingNewAmend;
+    selectedAmendment?.authorization === "VERIFIED" && !addingNewAmend;
 
   //for smooth focus
   const smoothFocus = (fieldName) => {
@@ -212,6 +213,47 @@ export default function GenaralCompanyForm() {
     //datePicker bugg
     return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
   };
+
+  const loadCompanyAndBranches = async () => {
+    try {
+      const companyResponse = await axios.get(
+        `http://localhost:8087/company/${companyId}`
+      );
+      const branchResponse = await axios.get(
+        `http://localhost:8087/branch/${companyId}`
+      );
+      const company = companyResponse.data;
+      const branches = branchResponse.data;
+
+      console.log("Company Listdasfgwsdrg:", companyResponse.data);
+      console.log("Branch Listdasfgwsdrg:", branchResponse.data);
+
+      const companyobj = {
+        value: company.companyMstID,
+        label: company.company,
+      };
+      const branchobj =
+        branches?.map((branch) => ({
+          value: branch.branchMstID,
+          label: branch.branch,
+        })) || [];
+
+      setCompanyList([companyobj]);
+      setBranchList([branchobj]);
+
+      // console.log("Company List: ",company);
+      // setCompanyList([company]);
+      // setInitialCompanyId(company.companyMstID); // store it
+    } catch (error) {
+      console.error("Failed to load company:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadCompanyAndBranches();
+    console.log("Company list response: ", companyList);
+    console.log("Branch list response: ", branchList);
+  }, [companyId]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -245,7 +287,7 @@ export default function GenaralCompanyForm() {
       shouldDirty: false,
     });
 
-    setValue("authorizationStatus", selectedAmendment.authorization, {
+    setValue("authorization", selectedAmendment.authorization, {
       shouldDirty: false,
       shouldValidate: true,
     });
@@ -279,18 +321,29 @@ export default function GenaralCompanyForm() {
       setValue("userCode", userCode);
       setValue("authorizationDate", new Date());
       // console.log("Submitting data", data);
-      const formData = new FormData();
+      //   const formData = new FormData();
 
-      Object.keys(data).forEach((key) => {
-        if (key !== "companyImage") {
-          formData.append(key, data[key]);
-        }
+      //   Object.keys(data).forEach((key) => {
+      //     if (key !== "companyImage") {
+      //       formData.append(key, data[key]);
+      //     }
+      //   });
+
+      //   if (data.companyImage) {
+      //     formData.append("companyImage", data.companyImage);
+      //   }
+      const formattedValues = {
+        ...data,
+        activeDate: data.activeDate.split("T")[0], // Only date
+        companyEntity: { id: data.company }, // 👈 nested objects
+        branchEntity: { id: data.branch },
+      };
+
+      const response = await fetch("http://localhost:8087/location/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedValues),
       });
-
-      if (data.companyImage) {
-        formData.append("companyImage", data.companyImage);
-      }
-
       // console.log("FormData contents:");
       // for (const [key, value] of formData.entries()) {
       //   if (value instanceof File) {
@@ -303,11 +356,6 @@ export default function GenaralCompanyForm() {
       //     console.log(key, value);
       //   }
       // }
-
-      const response = await fetch("http://localhost:8087/company/save", {
-        method: "POST",
-        body: formData,
-      });
 
       let result;
       try {
@@ -325,57 +373,57 @@ export default function GenaralCompanyForm() {
       }
 
       /* -------------------------------
-          Prepare documents JSON
-        (NO FileList inside JSON)
-      -------------------------------- */
-      const documentsPayload = data.documents.map((doc) => {
-        // Append file separately
-        if (doc.file && doc.file.length > 0) {
-          formData.append("files", doc.file[0]); //  backend handles array
-        }
+                Prepare documents JSON
+              (NO FileList inside JSON)
+            -------------------------------- */
+      // const documentsPayload = data.documents.map((doc) => {
+      //   // Append file separately
+      //   if (doc.file && doc.file.length > 0) {
+      //     formData.append("files", doc.file[0]); //  backend handles array
+      //   }
 
-        return {
-          type: doc.type,
-          number: doc.number,
-          expiryDate: doc.expiryDate,
-          remarks: doc.remarks || "",
-        };
-      });
+      //   return {
+      //     type: doc.type,
+      //     number: doc.number,
+      //     expiryDate: doc.expiryDate,
+      //     remarks: doc.remarks || "",
+      //   };
+      // });
 
       /* -------------------------------
-          Prepare final JSON payload
-      -------------------------------- */
-      const payload = {
-        ...data,
-        documents: documentsPayload,
-      };
+                Prepare final JSON payload
+            -------------------------------- */
+      // const payload = {
+      //   ...data,
+      //   documents: documentsPayload,
+      // };
 
       // console.log("payload:", payload);
 
       //  VERY IMPORTANT: remove FileList from payload
-      delete payload.documents?.file;
+      // delete payload.documents?.file;
 
       /* -------------------------------
-          Append JSON as Blob
-      -------------------------------- */
-      formData.append(
-        "data",
-        new Blob([JSON.stringify(payload)], {
-          type: "application/json",
-        })
-      );
+                Append JSON as Blob
+            -------------------------------- */
+      // formData.append(
+      //   "data",
+      //   new Blob([JSON.stringify(payload)], {
+      //     type: "application/json",
+      //   })
+      // );
 
       /* -------------------------------
-          Debug FormData (correct way)
-      -------------------------------- */
+                Debug FormData (correct way)
+            -------------------------------- */
       // console.log("FormData entries:");
       // for (const [key, value] of formData.entries()) {
       //   console.log(key, value instanceof File ? "FILE" : value);
       // }
 
       /* -------------------------------
-          API CALL (example)
-      -------------------------------- */
+                API CALL (example)
+            -------------------------------- */
       // await fetch("/api/branch/save", {
       //   method: "POST",
       //   body: formData
@@ -458,6 +506,8 @@ export default function GenaralCompanyForm() {
                       isReadOnly={isVerifiedAmendment}
                       isUnlocked={isUnlocked}
                       ref={generalInfoRef}
+                      companys={companyList}
+                      branchList={branchList}
                     />
                   </div>
                 )}
@@ -607,7 +657,7 @@ export default function GenaralCompanyForm() {
                         Authorization
                       </label>
                       <Controller
-                        name="authorizationStatus"
+                        name="authorization"
                         control={control}
                         rules={{ required: "Please select authorization" }}
                         render={({ field }) => {
@@ -623,7 +673,7 @@ export default function GenaralCompanyForm() {
                               isSearchable={false}
                               isDisabled={isVerifiedAmendment}
                               classNamePrefix="form-control-select"
-                              className={errors.authorizationStatus ? "error" : ""}
+                              className={errors.authorization ? "error" : ""}
                               value={selectedOption} //  label from options
                               onChange={(option) =>
                                 field.onChange(option.value)
@@ -635,7 +685,7 @@ export default function GenaralCompanyForm() {
                       <input type="hidden" {...register("userCode")} />
                       <input type="hidden" {...register("authorizationDate")} />
                     </div>
-                    {latestAmendmentId.authorizationStatus === 1 &&
+                    {latestAmendmentId.authorization === "VERIFIED" &&
                       !addingNewAmend && ( // Adding the new amend only if the latest amend is verified
                         <div
                           className="btn amend-generate"
@@ -653,7 +703,7 @@ export default function GenaralCompanyForm() {
                                   remarks: "",
                                 },
                               ],
-                              authorizationStatus: "",
+                              authorization: "",
                               name: "",
                               company: "",
                               shortName: "",
@@ -691,7 +741,7 @@ export default function GenaralCompanyForm() {
                         <div
                           key={item.id}
                           className={`amend-pill 
-                            ${item.authorizationStatus === 0 ? "Entry" : "Verified"}
+                            ${item.authorization === "ENTRY" ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}
                           `}
                           onClick={() => {
@@ -704,7 +754,7 @@ export default function GenaralCompanyForm() {
                             <span className="pill-index">{item.id}</span>
                             <div className="pill-info">
                               <span className="pill-type">
-                                {item.authorizationStatus === 0 ? "ENTRY" : "VERIFIED"}
+                                {item.authorization}
                               </span>
                               <span className="pill-date">
                                 {new Date(item.date).toLocaleDateString(
@@ -720,13 +770,13 @@ export default function GenaralCompanyForm() {
                                 latest
                               </span>
                             )}
-                            {item.authorizationStatus !== 0 &&
+                            {item.authorization !== "ENTRY" &&
                               item.id !== latestAmendmentId.id && (
                                 <span className="pill-badge verified">
                                   ✔ Verified
                                 </span>
                               )}
-                            {item.authorizationStatus == 0 &&
+                            {item.authorization == "ENTRY" &&
                               item.id !== latestAmendmentId.id && (
                                 <span className="pill-badge verified">
                                   Entry

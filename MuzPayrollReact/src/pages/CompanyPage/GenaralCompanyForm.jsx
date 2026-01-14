@@ -5,27 +5,23 @@ import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import axios from "axios";
 
-import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
-import AddressForm from "../Branch Page/Tabs/General Info/AddressForm";
-import ContactForm from "../Branch Page/Tabs/General Info/ContactForm";
-import DocumentsTab from "../Branch Page/Tabs/General Info/DocumentsTab";
+import GeneralInfoForm from "../BranchPage/Tabs/General Info/GeneralInfoForm";
+import AddressForm from "../BranchPage/Tabs/General Info/AddressForm";
+import ContactForm from "../BranchPage/Tabs/General Info/ContactForm";
+import DocumentsTab from "../BranchPage/Tabs/General Info/DocumentsTab";
 
 // import StepProgress from "./General Info/StepProgress";
 // import Header from "../../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
-import "../Branch Page/css/From.css";
 import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
-export default function GenaralLocationForm() {
+export default function GenaralCompanyForm() {
   const [step, setStep] = useState(0); //switch steps
-  const [companyList, setCompanyList] = useState([]);
-  const [branchList, setBranchList] = useState([]);
 
   // const [backendErrors, setBackendErrors] = useState([]);
   //pass the back end error to front end
@@ -43,37 +39,39 @@ export default function GenaralLocationForm() {
 
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
-  const companyId = userObj.companyId;
-
   // console.log("Logeeded data", userCode);
 
+  //  (authorizationStatus===0)? "ENTRY" :
+  // (authorizationStatus===0)? "ENTRY" :
+  // (authorizationStatus===0)? "ENTRY" :
+
   const amendments = [
-    // {
-    //   id: 1,
-    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
-    //   date: "2025-10-20",
-    //   shortName: "TCS",
-    //   company: "Tata Consultancy Services",
-    //   status: "active",
-    //   expiryDate: "2025-10-10",
-    //   generatedBy: "Admin User",
-    // },
-    // {
-    //   id: 2,
-    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
-    //   date: "2025-10-10",
-    //   status: "expired",
-    //   expiryDate: "2021-12-31",
-    //   generatedBy: "System",
-    // },
-    // {
-    //   id: 3,
-    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
-    //   date: "2025-01-01",
-    //   status: "inactive",
-    //   expiryDate: "",
-    //   generatedBy: "Manager",
-    // },
+    {
+      id: 3,
+      authorizationStatus: 0,
+      date: "2025-10-20",
+      shortName: "TCS",
+      company: "Tata Consultancy Services",
+      status: "active",
+      expiryDate: "2025-10-10",
+      generatedBy: "Admin User",
+    },
+    {
+      id: 2,
+      authorizationStatus: 1,
+      date: "2025-10-10",
+      status: "expired",
+      expiryDate: "2021-12-31",
+      generatedBy: "System",
+    },
+    {
+      id: 1,
+      authorizationStatus: 1,
+      date: "2025-01-01",
+      status: "inactive",
+      expiryDate: "",
+      generatedBy: "Manager",
+    },
   ];
   const inputMode = amendments.length > 0 ? "INSERT" : "UPDATE";
   const {
@@ -103,7 +101,7 @@ export default function GenaralLocationForm() {
       // ],
       userCode: userCode, //User code from local storage
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
-      authorizationStatus: "0", // ENTRY
+      authorizationStatus: 0, // ENTRY
       mode: inputMode,
     },
   });
@@ -114,9 +112,9 @@ export default function GenaralLocationForm() {
 
   // From content changes
   const [formFlags] = useState({
-    companyForm: false,
+    companyForm: true,
     branchForm: false,
-    locationForm: true,
+    locationForm: false,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -128,8 +126,8 @@ export default function GenaralLocationForm() {
   // const watchedPincode = watch("branchPinCode");
 
   const authorizationStatusOptions = [
-    { label: "ENTRY", value: "0" },
-    { label: "VERIFIED", value: "1" },
+    { label: "ENTRY", value: 0 },
+    { label: "VERIFIED", value: 1 },
   ];
 
   //  initialValues: {
@@ -166,27 +164,55 @@ export default function GenaralLocationForm() {
 
   const [selectedAmendment, setSelectedAmendment] = useState(latestAmendmentId);
 
-  // console.log("Selected item:", selectedAmendment);
+  console.log("Selected item:", selectedAmendment?.authorizationStatus);
 
+  // const amendmentAuthorizationOptions = [];
+
+  // if (selectedAmendment?.authorizationStatus === 0) {
+  //   amendmentAuthorizationOptions.push(
+  //     {
+  //       label: `ENTRY : ${selectedAmendment.date}`,
+  //       value: 0,
+  //     },
+  //     {
+  //       label: `VERIFIED `,
+  //       value: 1,
+  //     }
+  //   );
+  // }
+
+  // if (selectedAmendment?.authorizationStatus === 1) {
+  //   amendmentAuthorizationOptions.push(
+  //     {
+  //       label: `ENTRY : ${selectedAmendment.date}`,
+  //       value: 0,
+  //     },
+  //     {
+  //       label: `VERIFIED : ${selectedAmendment.date}`,
+  //       value: 1,
+  //     }
+  //   );
+  // }
   const amendmentAuthorizationOptions = [
     {
       label:
-        selectedAmendment?.authorization === "ENTRY"
+        selectedAmendment?.authorizationStatus === 0
           ? `ENTRY : ${selectedAmendment.date}`
           : "ENTRY",
-      value: "ENTRY",
+      value: 0,
     },
     {
       label:
-        selectedAmendment?.authorization === "VERIFIED"
+        selectedAmendment?.authorizationStatus === 1
           ? `VERIFIED : ${selectedAmendment.date}`
           : "VERIFIED",
-      value: "VERIFIED",
+      value: 1,
     },
   ];
 
+  console.log("Selected List:", amendmentAuthorizationOptions);
   const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorization === "VERIFIED" && !addingNewAmend;
+    selectedAmendment?.authorizationStatus === 1 && !addingNewAmend;
 
   //for smooth focus
   const smoothFocus = (fieldName) => {
@@ -213,47 +239,6 @@ export default function GenaralLocationForm() {
     //datePicker bugg
     return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
   };
-
-  const loadCompanyAndBranches = async () => {
-    try {
-      const companyResponse = await axios.get(
-        `http://localhost:8087/company/${companyId}`
-      );
-      const branchResponse = await axios.get(
-        `http://localhost:8087/branch/${companyId}`
-      );
-      const company = companyResponse.data;
-      const branches = branchResponse.data;
-
-      console.log("Company Listdasfgwsdrg:", companyResponse.data);
-      console.log("Branch Listdasfgwsdrg:", branchResponse.data);
-
-      const companyobj = {
-        value: company.companyMstID,
-        label: company.company,
-      };
-      const branchobj =
-        branches?.map((branch) => ({
-          value: branch.branchMstID,
-          label: branch.branch,
-        })) || [];
-
-      setCompanyList([companyobj]);
-      setBranchList([branchobj]);
-
-      // console.log("Company List: ",company);
-      // setCompanyList([company]);
-      // setInitialCompanyId(company.companyMstID); // store it
-    } catch (error) {
-      console.error("Failed to load company:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadCompanyAndBranches();
-    console.log("Company list response: ", companyList);
-    console.log("Branch list response: ", branchList);
-  }, [companyId]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -287,7 +272,7 @@ export default function GenaralLocationForm() {
       shouldDirty: false,
     });
 
-    setValue("authorization", selectedAmendment.authorization, {
+    setValue("authorizationStatus", selectedAmendment.authorization, {
       shouldDirty: false,
       shouldValidate: true,
     });
@@ -321,29 +306,18 @@ export default function GenaralLocationForm() {
       setValue("userCode", userCode);
       setValue("authorizationDate", new Date());
       // console.log("Submitting data", data);
-      //   const formData = new FormData();
+      const formData = new FormData();
 
-      //   Object.keys(data).forEach((key) => {
-      //     if (key !== "companyImage") {
-      //       formData.append(key, data[key]);
-      //     }
-      //   });
-
-      //   if (data.companyImage) {
-      //     formData.append("companyImage", data.companyImage);
-      //   }
-      const formattedValues = {
-        ...data,
-        activeDate: data.activeDate.split("T")[0], // Only date
-        companyEntity: { id: data.company }, // 👈 nested objects
-        branchEntity: { id: data.branch },
-      };
-
-      const response = await fetch("http://localhost:8087/location/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formattedValues),
+      Object.keys(data).forEach((key) => {
+        if (key !== "companyImage") {
+          formData.append(key, data[key]);
+        }
       });
+
+      if (data.companyImage) {
+        formData.append("companyImage", data.companyImage);
+      }
+
       // console.log("FormData contents:");
       // for (const [key, value] of formData.entries()) {
       //   if (value instanceof File) {
@@ -356,6 +330,11 @@ export default function GenaralLocationForm() {
       //     console.log(key, value);
       //   }
       // }
+
+      const response = await fetch("http://localhost:8087/company/save", {
+        method: "POST",
+        body: formData,
+      });
 
       let result;
       try {
@@ -373,57 +352,57 @@ export default function GenaralLocationForm() {
       }
 
       /* -------------------------------
-                Prepare documents JSON
-              (NO FileList inside JSON)
-            -------------------------------- */
-      // const documentsPayload = data.documents.map((doc) => {
-      //   // Append file separately
-      //   if (doc.file && doc.file.length > 0) {
-      //     formData.append("files", doc.file[0]); //  backend handles array
-      //   }
+          Prepare documents JSON
+        (NO FileList inside JSON)
+      -------------------------------- */
+      const documentsPayload = data.documents.map((doc) => {
+        // Append file separately
+        if (doc.file && doc.file.length > 0) {
+          formData.append("files", doc.file[0]); //  backend handles array
+        }
 
-      //   return {
-      //     type: doc.type,
-      //     number: doc.number,
-      //     expiryDate: doc.expiryDate,
-      //     remarks: doc.remarks || "",
-      //   };
-      // });
+        return {
+          type: doc.type,
+          number: doc.number,
+          expiryDate: doc.expiryDate,
+          remarks: doc.remarks || "",
+        };
+      });
 
       /* -------------------------------
-                Prepare final JSON payload
-            -------------------------------- */
-      // const payload = {
-      //   ...data,
-      //   documents: documentsPayload,
-      // };
+          Prepare final JSON payload
+      -------------------------------- */
+      const payload = {
+        ...data,
+        documents: documentsPayload,
+      };
 
       // console.log("payload:", payload);
 
       //  VERY IMPORTANT: remove FileList from payload
-      // delete payload.documents?.file;
+      delete payload.documents?.file;
 
       /* -------------------------------
-                Append JSON as Blob
-            -------------------------------- */
-      // formData.append(
-      //   "data",
-      //   new Blob([JSON.stringify(payload)], {
-      //     type: "application/json",
-      //   })
-      // );
+          Append JSON as Blob
+      -------------------------------- */
+      formData.append(
+        "data",
+        new Blob([JSON.stringify(payload)], {
+          type: "application/json",
+        })
+      );
 
       /* -------------------------------
-                Debug FormData (correct way)
-            -------------------------------- */
+          Debug FormData (correct way)
+      -------------------------------- */
       // console.log("FormData entries:");
       // for (const [key, value] of formData.entries()) {
       //   console.log(key, value instanceof File ? "FILE" : value);
       // }
 
       /* -------------------------------
-                API CALL (example)
-            -------------------------------- */
+          API CALL (example)
+      -------------------------------- */
       // await fetch("/api/branch/save", {
       //   method: "POST",
       //   body: formData
@@ -506,8 +485,6 @@ export default function GenaralLocationForm() {
                       isReadOnly={isVerifiedAmendment}
                       isUnlocked={isUnlocked}
                       ref={generalInfoRef}
-                      companys={companyList}
-                      branchList={branchList}
                     />
                   </div>
                 )}
@@ -578,7 +555,7 @@ export default function GenaralLocationForm() {
                         render={({ field }) => {
                           // const selectedOption =
                           //   authorizationStatusOptions.find(
-                          //     (opt) => opt.value === "ENTRY"
+                          //     (opt) => opt.value === 1
                           //   );
 
                           return (
@@ -591,7 +568,7 @@ export default function GenaralLocationForm() {
                                 errors.authorizationStatus ? "error" : ""
                               }
                               value={authorizationStatusOptions.find(
-                                (opt) => opt.value === field.value
+                                (opt) => opt.value === 0
                               )}
                               onChange={(option) =>
                                 field.onChange(option.value)
@@ -657,35 +634,30 @@ export default function GenaralLocationForm() {
                         Authorization
                       </label>
                       <Controller
-                        name="authorization"
+                        name="authorizationStatus"
                         control={control}
                         rules={{ required: "Please select authorization" }}
-                        render={({ field }) => {
-                          const selectedOption =
-                            amendmentAuthorizationOptions.find(
+                        render={({ field }) => (
+                          <Select
+                            options={amendmentAuthorizationOptions}
+                            isSearchable={false}
+                            classNamePrefix="form-control-select"
+                            className={
+                              errors.authorizationStatus ? "error" : ""
+                            }
+                            value={amendmentAuthorizationOptions.find(
                               (opt) => opt.value === field.value
-                            );
-
-                          return (
-                            <Select
-                              options={amendmentAuthorizationOptions}
-                              placeholder="Select authorization"
-                              isSearchable={false}
-                              isDisabled={isVerifiedAmendment}
-                              classNamePrefix="form-control-select"
-                              className={errors.authorization ? "error" : ""}
-                              value={selectedOption} //  label from options
-                              onChange={(option) =>
-                                field.onChange(option.value)
-                              } //  store ONLY value
-                            />
-                          );
-                        }}
+                            )}
+                            onChange={(option) => field.onChange(option.value)}
+                          />
+                        )}
                       />
+
+                      {console.log("asfafasdf")}
                       <input type="hidden" {...register("userCode")} />
                       <input type="hidden" {...register("authorizationDate")} />
                     </div>
-                    {latestAmendmentId.authorization === "VERIFIED" &&
+                    {latestAmendmentId.authorizationStatus === 1 &&
                       !addingNewAmend && ( // Adding the new amend only if the latest amend is verified
                         <div
                           className="btn amend-generate"
@@ -703,7 +675,7 @@ export default function GenaralLocationForm() {
                                   remarks: "",
                                 },
                               ],
-                              authorization: "",
+                              authorizationStatus: "",
                               name: "",
                               company: "",
                               shortName: "",
@@ -741,7 +713,7 @@ export default function GenaralLocationForm() {
                         <div
                           key={item.id}
                           className={`amend-pill 
-                            ${item.authorization === "ENTRY" ? "entry" : "verified"}
+                            ${item.authorizationStatus === 0 ? "Entry" : "Verified"}
                             ${isSelected ? "selected" : ""}
                           `}
                           onClick={() => {
@@ -754,7 +726,9 @@ export default function GenaralLocationForm() {
                             <span className="pill-index">{item.id}</span>
                             <div className="pill-info">
                               <span className="pill-type">
-                                {item.authorization}
+                                {item.authorizationStatus === 0
+                                  ? "ENTRY"
+                                  : "VERIFIED"}
                               </span>
                               <span className="pill-date">
                                 {new Date(item.date).toLocaleDateString(
@@ -770,13 +744,13 @@ export default function GenaralLocationForm() {
                                 latest
                               </span>
                             )}
-                            {item.authorization !== "ENTRY" &&
+                            {item.authorizationStatus !== 0 &&
                               item.id !== latestAmendmentId.id && (
                                 <span className="pill-badge verified">
                                   ✔ Verified
                                 </span>
                               )}
-                            {item.authorization == "ENTRY" &&
+                            {item.authorizationStatus == 0 &&
                               item.id !== latestAmendmentId.id && (
                                 <span className="pill-badge verified">
                                   Entry

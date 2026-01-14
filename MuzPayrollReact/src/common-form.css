@@ -1,0 +1,255 @@
+/* ======================================================
+   GLOBAL VARIABLES (Shared Across All Pages)
+====================================================== */
+:root {
+  --brand: #d218d8ff;
+  --brand-light: #e525ebff;
+  --brand-dark: #c31ed2ff;
+  --brand-border: rgba(210, 24, 216, 0.35);
+
+  --success: #d218d8ff;
+  --success-light: rgba(210, 24, 216, 0.08);
+
+  --danger: #d44242ff;
+  --danger-light: rgba(212, 69, 69, 0.12);
+
+  --warning: #f59e0b;
+
+  --text: #2f2f2f;
+  --text-muted: #6f6f6f;
+  --text-light: #b094b8ff;
+
+  --border: rgba(0, 0, 0, 0.08);
+  --background: #ffffff;
+  --background-alt: #ffefff;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 2px 8px rgba(224, 99, 241, 0.3);
+}
+
+/* ======================================================
+   DARK MODE VARIABLES
+====================================================== */
+[data-theme="dark"] {
+  --text: #f3e8ff;
+  --text-muted: #b6a3c6;
+  --text-light: #9f8fb1;
+
+  --border: rgba(255, 255, 255, 0.12);
+  --background: #140916;
+  --background-alt: #241126;
+}
+
+/* ======================================================
+   FORM LABELS
+====================================================== */
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.required::after {
+  content: "*";
+  color: var(--danger);
+  margin-left: 4px;
+}
+
+/* ======================================================
+   INPUT / TEXTAREA
+====================================================== */
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--background);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all 0.25s ease;
+}
+
+.form-control::placeholder {
+  color: var(--text-light);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px rgba(210, 24, 216, 0.12);
+}
+
+.form-control.error {
+  border-color: var(--danger);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ======================================================
+   NATIVE SELECT
+====================================================== */
+select.form-control {
+  cursor: pointer;
+  background: var(--background);
+}
+
+/* ======================================================
+   REACT-SELECT
+====================================================== */
+.form-control-select__control {
+  width: 100%;
+  min-height: 44px;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--background) !important;
+  font-size: 14px !important;
+  transition: all 0.25s ease !important;
+}
+
+.form-control-select__control--is-focused {
+  border-color: var(--brand-border) !important;
+  box-shadow: 0 0 0 3px rgba(210, 24, 216, 0.12) !important;
+}
+
+.form-control-select__single-value {
+  color: var(--text) !important;
+}
+
+.form-control-select__placeholder {
+  color: var(--text-light) !important;
+}
+
+.form-control-select__menu {
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  background: var(--background) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 1000;
+}
+
+.form-control-select__option {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--text) !important;
+}
+
+.form-control-select__option--is-focused {
+  background: var(--background-alt) !important;
+}
+
+.form-control-select__option--is-selected {
+  background: var(--brand-border) !important;
+}
+
+/* Error */
+.error .form-control-select__control {
+  border-color: var(--danger) !important;
+}
+
+/* ======================================================
+   DATE PICKER (React-Datepicker)
+====================================================== */
+.datepicker-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--background);
+  color: var(--text);
+}
+
+.datepicker-input:focus {
+  outline: none;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px rgba(210, 24, 216, 0.12);
+}
+
+.datepicker-input.error {
+  border-color: var(--danger);
+}
+
+.custom-datepicker {
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  animation: scaleIn 0.15s ease-out;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ======================================================
+   ERROR MESSAGE
+====================================================== */
+.error-message {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ======================================================
+   BUTTONS
+====================================================== */
+.btn {
+  padding: 10px 28px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+  color: #fff;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+  background: var(--background);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--background-alt);
+}
+
+/* ======================================================
+   UTILITIES
+====================================================== */
+.text-hint {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+.hidden {
+  display: none;
+}
+
+.loading {
+  opacity: 0.65;
+  pointer-events: none;
+}

@@ -662,7 +662,7 @@ input.form-control.read-only{
 
 /* Selected option */
 .form-control-select__option--is-selected {
-  background-color: var(--brand-border) !important; // overriding style by default
+  background-color: var(--brand-border) !important; /* overriding style by default*\
   /* color: #fff; */
 }
 

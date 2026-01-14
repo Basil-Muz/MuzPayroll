@@ -27,9 +27,9 @@ import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import Designation from "./pages/designation/designation.jsx";
 
-import BranchPageForm from "./pages/Branch Page/Tabs/GenaralBranchForm.jsx";
-import CompanyPageForm from "./pages/company page/GenaralCompanyForm.jsx";
-import LocationPageForm from "./pages/location page/GeneralLocationForm.jsx";
+import BranchPageForm from "./pages/BranchPage/Tabs/GenaralBranchForm.jsx";
+import CompanyPageForm from "./pages/CompanyPage/GenaralCompanyForm.jsx";
+import LocationPageForm from "./pages/LocationPage/GeneralLocationForm.jsx";
 function App() {
   return (
     <>
