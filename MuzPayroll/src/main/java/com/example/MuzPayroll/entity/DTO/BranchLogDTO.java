@@ -17,8 +17,7 @@ public class BranchLogDTO {
     @JoinColumn(name = "AuthID", nullable = false)
     private Authorization authorization;
 
-    @ManyToOne
-    @JoinColumn(name = "CompanyID", nullable = false)
+    @Column(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
     @Column(nullable = false, unique = true)
