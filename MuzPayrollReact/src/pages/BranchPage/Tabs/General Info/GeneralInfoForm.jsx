@@ -40,6 +40,23 @@ const GeneralInfoForm = function GeneralInfoForm({
         ? "branch"
         : "name";
 
+  const UserData = localStorage.getItem("loginData");
+  const userObj = JSON.parse(UserData);
+
+  const branchId = userObj.branchId;
+
+  // console.log("Branch sgsg", UserData);
+  useEffect(() => {
+    if (companys?.length > 0) {
+      setValue("companyEntity", companys[0].value);
+    }
+
+    if (branchList?.length > 0) {
+      setValue("branchEntity", branchId);
+    }
+    console.log("General info branch :", branchList);
+  }, [companys, setValue, branchList, branchId]);
+
   useEffect(() => {
     if (isLocked) {
       setTimeout(() => {
@@ -190,24 +207,29 @@ const GeneralInfoForm = function GeneralInfoForm({
             <div className="branch-form-group">
               <label className="form-label required">Branch</label>
               <Controller
-                name="branch"
+                name="branchEntity"
                 control={control}
                 rules={{ required: "Please select a branch" }}
-                render={({ field }) => (
-                  <Select
-                    options={branchList}
-                    placeholder="Select branch"
-                    isSearchable
-                    isDisabled={isReadOnly}
-                    classNamePrefix="form-control-select"
-                    className={`${errors.branch ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
-                    value={field.value} // important
-                    onChange={(option) => field.onChange(option)} // store full object
-                  />
-                )}
+                render={({ field }) => {
+                  const selectedOption = branchList.find(
+                    (opt) => opt.value === field.value
+                  );
+                  return (
+                    <Select
+                      options={branchList}
+                      placeholder="Select branch"
+                      isSearchable
+                      isDisabled={isReadOnly}
+                      classNamePrefix="form-control-select"
+                      className={`${errors.branchEntity ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                      value={selectedOption || null} // important
+                      onChange={(option) => field.onChange(option)} // store full object
+                    />
+                  );
+                }}
               />
-              {errors.branch && (
-                <span className="error-message">{errors.branch.message}</span>
+              {errors.branchEntity && (
+                <span className="error-message">{errors.branchEntity.message}</span>
               )}
             </div>
           )}
@@ -249,7 +271,7 @@ const GeneralInfoForm = function GeneralInfoForm({
               placeholder="Enter name"
               disabled={isReadOnly}
               {...register(fieldName, {
-                required: "Name is required",
+                required: `Name is required ${fieldName}`,
                 pattern: {
                   value: /^[a-zA-Z\s-]+$/,
                   message: "Please enter valide name",
@@ -265,7 +287,6 @@ const GeneralInfoForm = function GeneralInfoForm({
                     .map((w) => w[0])
                     .join("")
                     .toUpperCase();
-
                   setValue("shortName", short, {
                     shouldDirty: true,
                     shouldValidate: false,
@@ -355,9 +376,9 @@ const GeneralInfoForm = function GeneralInfoForm({
               <input
                 type="text"
                 disabled={isReadOnly}
-                className={`form-control ${errors.esiReagion ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                className={`form-control ${errors.esiRegion ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                 placeholder="Enter ESI Reagion"
-                {...register("esiReagion", {
+                {...register("esiRegion", {
                   required: "ESI Reagion is required",
                   pattern: {
                     value: /^[a-zA-Z\s-]+$/,
@@ -365,9 +386,9 @@ const GeneralInfoForm = function GeneralInfoForm({
                   },
                 })}
               />
-              {errors.esiReagion && (
+              {errors.esiRegion && (
                 <span className="error-message">
-                  {errors.esiReagion.message}
+                  {errors.esiRegion.message}
                 </span>
               )}
             </div>

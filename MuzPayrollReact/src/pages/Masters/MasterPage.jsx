@@ -31,9 +31,9 @@ export default function HomePage() {
     subtitle: "Organisation",
     rows: [
       [
-        { title: "Company", subtitle: "Company", link:"/company" },
-        { title: "Branch", subtitle: "Branch", link:"/branch" },
-        { title: "Location", subtitle: "Location", link:"/location" },
+        { title: "Company", subtitle: "Company", link:"/companyform" },
+        { title: "Branch", subtitle: "Branch", link:"/branchform" },
+        { title: "Location", subtitle: "Location", link:"/locationform" },
       ],
       [
         { title: "Company List", subtitle: "Company List",link:"/organisation/company-list" },

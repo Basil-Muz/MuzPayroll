@@ -48,32 +48,34 @@ export default function GenaralBranchForm() {
   // console.log("Logeeded data company", companyId);
 
   const amendments = [
-    // {
-    //   id: 1,
-    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
-    //   date: "2025-10-20",
-    //   shortName: "TCS",
-    //   company: "Tata Consultancy Services",
-    //   status: "active",
-    //   expiryDate: "2025-10-10",
-    //   generatedBy: "Admin User",
-    // },
-    // {
-    //   id: 2,
-    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
-    //   date: "2025-10-10",
-    //   status: "expired",
-    //   expiryDate: "2021-12-31",
-    //   generatedBy: "System",
-    // },
-    // {
-    //   id: 3,
-    //   authorizationStatus: (authorizationStatus===0)? "ENTRY" : "VERIFIED",
-    //   date: "2025-01-01",
-    //   status: "inactive",
-    //   expiryDate: "",
-    //   generatedBy: "Manager",
-    // },
+    {
+      id: 3,
+      authorizationStatus: 1,
+      date: "2025-10-20",
+      shortName: "TCS",
+      pincode: 680732,
+      branch: "Tata Consultancy Services",
+      status: "active",
+      activeDate: "2025-10-10",
+      generatedBy: "Admin User",
+    },
+    {
+      id: 2,
+      authorizationStatus: 1,
+      date: "2025-10-10",
+      branch: "Tata Consultancy Services",
+      status: "expired",
+      activeDate: "2021-12-31",
+      generatedBy: "System",
+    },
+    {
+      id: 1,
+      authorizationStatus: 1,
+      date: "2025-01-01",
+      status: "inactive",
+      activeDate: "",
+      generatedBy: "Manager",
+    },
   ];
   const inputMode = amendments.length > 0 ? "INSERT" : "UPDATE";
   const {
@@ -129,35 +131,9 @@ export default function GenaralBranchForm() {
   // const watchedPincode = watch("branchPinCode");
 
   const authorizationStatusOptions = [
-    { label: "ENTRY", value: "0" },
-    { label: "VERIFIED", value: "1" },
+    { label: "ENTRY", value: 0 },
+    { label: "VERIFIED", value: 1 },
   ];
-
-  //  initialValues: {
-  //     company: "",
-  //     shortName: "",
-  //     activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
-  //     address: "",
-  //     address1: "",
-  //     address2: "",
-  //     country: "",
-  //     state: "",
-  //     district: "",
-  //     place: "",
-  //     pincode: "",
-  //     landlineNumber: "",
-  //     mobileNumber: "",
-  //     email: "",
-  //     employerName: "",
-  //     designation: "",
-  //     employerNumber: "",
-  //     employerEmail: "",
-  //     companyImage: null,
-  //     withaffectdate: "",
-  //     authorizationStatus: "0",
-  //     userCode: user_code,
-  //     withaffectdate: new Date().toISOString().split("T")[0],
-  //   },
 
   const latestAmendmentId = amendments.length
     ? amendments.reduce((latest, current) =>
@@ -169,26 +145,38 @@ export default function GenaralBranchForm() {
 
   // console.log("Selected item:", selectedAmendment);
 
-  const amendmentAuthorizationOptions = [
-    {
-      label:
-        selectedAmendment?.authorization === "ENTRY"
-          ? `ENTRY : ${selectedAmendment.date}`
-          : "ENTRY",
-      value: "ENTRY",
-    },
-    {
-      label:
-        selectedAmendment?.authorization === "VERIFIED"
-          ? `VERIFIED : ${selectedAmendment.date}`
-          : "VERIFIED",
-      value: "VERIFIED",
-    },
-  ];
+  const amendmentAuthorizationOptions = [];
+
+  if (selectedAmendment?.authorizationStatus === 0) {
+    amendmentAuthorizationOptions.push(
+      {
+        label: `ENTRY : ${selectedAmendment.date}`,
+        value: 0,
+      },
+      {
+        label: `VERIFIED :`,
+        value: 1,
+      }
+    );
+  }
+
+  if (selectedAmendment?.authorizationStatus === 1) {
+    amendmentAuthorizationOptions.push(
+      {
+        label: `ENTRY : ${selectedAmendment.date}`,
+        value: 0,
+      },
+      {
+        label: `VERIFIED : ${selectedAmendment.date}`,
+        value: 1,
+      }
+    );
+  }
 
   const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorization === "VERIFIED" && !addingNewAmend;
+    selectedAmendment?.authorizationStatus === 1 && !addingNewAmend;
 
+  // console.log("Locaked ", isUnlocked || isVerifiedAmendment); //true
   //for smooth focus
   const smoothFocus = (fieldName) => {
     const fieldNameFlage = formFlags.locationForm
@@ -238,6 +226,29 @@ export default function GenaralBranchForm() {
     }
   };
 
+  const handleGenerateAmendment = () => {
+    setSelectedAmendment(null);
+    setAddingNewAmend(true);
+    setIsReadOnly(false);
+
+    reset({
+      ...getValues(), //  keep base data
+      authorizationStatus: 0, // ENTRY
+      withaffectdate: "",
+      // documents: [
+      //   {
+      //     type: "",
+      //     number: "",
+      //     expiryDate: "",
+      //     file: null,
+      //     remarks: "",
+      //   },
+      // ],
+    });
+
+    clearErrors();
+  };
+
   useEffect(() => {
     loadCompanyAndBranches();
     // console.log("Company list response: ", companyList);
@@ -254,10 +265,10 @@ export default function GenaralBranchForm() {
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
 
-  useEffect(() => {
-    console.log("Input ref:", authDateInputRef.current);
-    console.log("DatePicker ref:", datePickerRef.current);
-  }, []);
+  // useEffect(() => {
+  //   console.log("Input ref:", authDateInputRef.current);
+  //   console.log("DatePicker ref:", datePickerRef.current);
+  // }, []);
 
   useEffect(() => {
     const date = new Date(); // current date
@@ -265,14 +276,10 @@ export default function GenaralBranchForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  useEffect(() => {
-    //Api call should bo here
-    //after doing the api call then you must add the field values i added name and company for demo
-
-    if (!selectedAmendment) return;
-    //Amend Auto selection whille loading
+  const setingData = (selectedAmendment) => {
     setValue("shortName", selectedAmendment.shortName ?? "", {
       shouldDirty: false,
+      shouldValidate: true,
     });
 
     setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
@@ -282,19 +289,87 @@ export default function GenaralBranchForm() {
 
     setValue("company", selectedAmendment.company ?? "", {
       shouldDirty: false,
+      shouldValidate: true,
     });
+
+    setValue("companyImage", selectedAmendment.companyImage ?? "");
+
+    setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    setValue("pincode", selectedAmendment.pincode ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    setValue("address", selectedAmendment.address ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    setValue("country", selectedAmendment.country ?? "IN", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    setValue("state", selectedAmendment.state ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("district", selectedAmendment.district ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("place", selectedAmendment.place ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("email", selectedAmendment.email ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("employerName", selectedAmendment.employerName ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("designation", selectedAmendment.designation ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+  };
+
+  useEffect(() => {
+    //Api call should bo here
+    //after doing the api call then you must add the field values i added name and company for demo
+
+    if (!selectedAmendment) return;
+    //Amend Auto selection whille loading
+    setingData(selectedAmendment);
   }, [selectedAmendment, setValue]);
 
   const handleSelectAmendment = (id, index) => {
     //User Selecetion - Assign the amend data to feild
     setSelectedAmendment(amendments[index]);
 
-    setValue("shortName", amendments[index].shortName);
-
-    setValue("company", amendments[index].company, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
+    setingData(amendments[index]);
   };
 
   const nextStep = async () => {
@@ -502,7 +577,7 @@ export default function GenaralBranchForm() {
                       setFocus={setFocus}
                       flags={formFlags}
                       isReadOnly={isVerifiedAmendment || isReadOnly}
-                      isUnlocked={isUnlocked}
+                      isUnlocked={isUnlocked || isVerifiedAmendment}
                       ref={generalInfoRef}
                       companys={companyList}
                     />
@@ -656,30 +731,24 @@ export default function GenaralBranchForm() {
                         Authorization
                       </label>
                       <Controller
-                        name="authorization"
+                        name="authorizationStatus"
                         control={control}
                         rules={{ required: "Please select authorization" }}
-                        render={({ field }) => {
-                          const selectedOption =
-                            amendmentAuthorizationOptions.find(
+                        render={({ field }) => (
+                          <Select
+                            options={amendmentAuthorizationOptions}
+                            isSearchable={false}
+                            isDisabled={isVerifiedAmendment}
+                            classNamePrefix="form-control-select"
+                            className={
+                              errors.authorizationStatus ? "error" : ""
+                            }
+                            value={amendmentAuthorizationOptions.find(
                               (opt) => opt.value === field.value
-                            );
-
-                          return (
-                            <Select
-                              options={amendmentAuthorizationOptions}
-                              placeholder="Select authorization"
-                              isSearchable={false}
-                              isDisabled={isVerifiedAmendment || isReadOnly}
-                              classNamePrefix="form-control-select"
-                              className={errors.authorization ? "error" : ""}
-                              value={selectedOption} //  label from options
-                              onChange={(option) =>
-                                field.onChange(option.value)
-                              } //  store ONLY value
-                            />
-                          );
-                        }}
+                            )}
+                            onChange={(option) => field.onChange(option.value)}
+                          />
+                        )}
                       />
                       <input type="hidden" {...register("userCode")} />
                       <input type="hidden" {...register("authorizationDate")} />
@@ -688,43 +757,7 @@ export default function GenaralBranchForm() {
                       !addingNewAmend && ( // Adding the new amend only if the latest amend is verified
                         <div
                           className="btn amend-generate"
-                          onClick={() => {
-                            // setAddNewAmend(true);
-                            setSelectedAmendment(null); // unselect the all pills
-                            setAddingNewAmend(true);
-                            setAddingNewAmend(true);
-                            setIsReadOnly(false);
-                            reset({
-                              documents: [
-                                {
-                                  type: "",
-                                  number: "",
-                                  expiryDate: "",
-                                  file: null,
-                                  remarks: "",
-                                },
-                              ],
-                              authorization: "",
-                              name: "",
-                              company: "",
-                              shortName: "",
-                              activeDate: new Date(),
-                              pinCode: "",
-                              address: "",
-                              country: "",
-                              state: "",
-                              district: "",
-                              place: "",
-                              employerDesignation: "",
-                              employerPhone: "",
-                              employerEmail: "",
-                              employerName: "",
-                              landline: "",
-                              phone: "",
-                              email: "",
-                            });
-                            clearErrors();
-                          }}
+                          onClick={handleGenerateAmendment}
                         >
                           Generate Amendment
                         </div>
@@ -742,7 +775,7 @@ export default function GenaralBranchForm() {
                         <div
                           key={item.id}
                           className={`amend-pill 
-                            ${item.authorizationStatus === 0 ? "entry" : "verified"}
+                            ${item.id === latestAmendmentId.id ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}
                           `}
                           onClick={() => {
@@ -870,7 +903,7 @@ export default function GenaralBranchForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: (step < steps.length - 1),
+              disabled: step < steps.length - 1,
             },
             search: {
               // onClick: handleSearch,

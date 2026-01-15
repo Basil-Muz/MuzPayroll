@@ -662,7 +662,7 @@ input.form-control.read-only{
 
 /* Selected option */
 .form-control-select__option--is-selected {
-  background-color: var(--brand-border) !important; /* overriding style by default*\
+  background-color: var(--brand-border) !important; /* overriding style by default*/
   /* color: #fff; */
 }
 
@@ -1281,7 +1281,7 @@ z-index:10 !important; */
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  display: grid;onClick={toggleSidebar}
+  display: grid;
   place-items: center;
   font-weight: 700;
   font-size: 14px;

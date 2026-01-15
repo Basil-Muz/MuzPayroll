@@ -36,7 +36,7 @@ export default function GenaralCompanyForm() {
   const generalInfoRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
   const userObj = JSON.parse(UserData);
-
+  // const [isReadOnly, setIsReadOnly] = useState();
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
   // console.log("Logeeded data", userCode);
@@ -48,7 +48,7 @@ export default function GenaralCompanyForm() {
   const amendments = [
     {
       id: 3,
-      authorizationStatus: 0,
+      authorizationStatus: 1,
       date: "2025-10-20",
       shortName: "TCS",
       company: "Tata Consultancy Services",
@@ -62,6 +62,8 @@ export default function GenaralCompanyForm() {
       date: "2025-10-10",
       status: "expired",
       expiryDate: "2021-12-31",
+      company: "International Business Machines",
+      shortName: "IBM",
       generatedBy: "System",
     },
     {
@@ -82,6 +84,7 @@ export default function GenaralCompanyForm() {
     clearErrors,
     setValue,
     reset,
+    getValues,
     setFocus,
     watch,
     control,
@@ -193,27 +196,39 @@ export default function GenaralCompanyForm() {
   //     }
   //   );
   // }
-  const amendmentAuthorizationOptions = [
-    {
-      label:
-        selectedAmendment?.authorizationStatus === 0
-          ? `ENTRY : ${selectedAmendment.date}`
-          : "ENTRY",
-      value: 0,
-    },
-    {
-      label:
-        selectedAmendment?.authorizationStatus === 1
-          ? `VERIFIED : ${selectedAmendment.date}`
-          : "VERIFIED",
-      value: 1,
-    },
-  ];
+  const amendmentAuthorizationOptions = [];
+
+  if (selectedAmendment?.authorizationStatus === 0) {
+    amendmentAuthorizationOptions.push(
+      {
+        label: `ENTRY : ${selectedAmendment.date}`,
+        value: 0,
+      },
+      {
+        label: `VERIFIED :`,
+        value: 1,
+      }
+    );
+  }
+
+  if (selectedAmendment?.authorizationStatus === 1) {
+    amendmentAuthorizationOptions.push(
+      {
+        label: `ENTRY : ${selectedAmendment.date}`,
+        value: 0,
+      },
+      {
+        label: `VERIFIED : ${selectedAmendment.date}`,
+        value: 1,
+      }
+    );
+  }
 
   console.log("Selected List:", amendmentAuthorizationOptions);
   const isVerifiedAmendment = // Read-only VERIFIED mode
     selectedAmendment?.authorizationStatus === 1 && !addingNewAmend;
 
+  console.log("Verified mde: ", isVerifiedAmendment);
   //for smooth focus
   const smoothFocus = (fieldName) => {
     const fieldNameFlage = formFlags.locationForm
@@ -240,6 +255,29 @@ export default function GenaralCompanyForm() {
     return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
   };
 
+  const handleGenerateAmendment = () => {
+    setSelectedAmendment(null);
+    setAddingNewAmend(true);
+    // setIsReadOnly(false);
+
+    reset({
+      ...getValues(), // 👈 keep base data
+      authorizationStatus: 0, // ENTRY
+      withaffectdate: "",
+      // documents: [
+      //   {
+      //     type: "",
+      //     number: "",
+      //     expiryDate: "",
+      //     file: null,
+      //     remarks: "",
+      //   },
+      // ],
+    });
+
+    clearErrors();
+  };
+
   useEffect(() => {
     if (isVerifiedAmendment) return;
 
@@ -251,10 +289,10 @@ export default function GenaralCompanyForm() {
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
 
-  useEffect(() => {
-    console.log("Input ref:", authDateInputRef.current);
-    console.log("DatePicker ref:", datePickerRef.current);
-  }, []);
+  // useEffect(() => {
+  //   console.log("Input ref:", authDateInputRef.current);
+  //   console.log("DatePicker ref:", datePickerRef.current);
+  // }, []);
 
   useEffect(() => {
     const date = new Date(); // current date
@@ -262,36 +300,106 @@ export default function GenaralCompanyForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  useEffect(() => {
-    //Api call should bo here
-    //after doing the api call then you must add the field values i added name and company for demo
-
-    if (!selectedAmendment) return;
-    //Amend Auto selection whille loading
+  const setingData = (selectedAmendment) => {
     setValue("shortName", selectedAmendment.shortName ?? "", {
       shouldDirty: false,
+      shouldValidate: true,
     });
 
-    setValue("authorizationStatus", selectedAmendment.authorization, {
+    setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
       shouldDirty: false,
       shouldValidate: true,
     });
 
     setValue("company", selectedAmendment.company ?? "", {
       shouldDirty: false,
+      shouldValidate: true,
     });
+
+    setValue("companyImage", selectedAmendment.companyImage ?? "");
+
+    setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    setValue("pincode", selectedAmendment.pincode ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    setValue("address", selectedAmendment.address ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    setValue("country", selectedAmendment.country ?? "IN", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+
+    setValue("state", selectedAmendment.state ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("district", selectedAmendment.district ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("place", selectedAmendment.place ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("email", selectedAmendment.email ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("employerName", selectedAmendment.employerName ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    setValue("designation", selectedAmendment.designation ?? "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+  };
+
+  useEffect(() => {
+    //Api call should bo here
+    //after doing the api call then you must add the field values i added name and company for demo
+
+    if (!selectedAmendment) return;
+    //Amend Auto selection whille loading
+    setingData(selectedAmendment);
   }, [selectedAmendment, setValue]);
 
   const handleSelectAmendment = (id, index) => {
-    //User Selecetion - Assign the amend data to feild
+    // User Selecetion - Assign the amend data to feild
     setSelectedAmendment(amendments[index]);
 
-    setValue("shortName", amendments[index].shortName);
+    setingData(amendments[index]);
+    // setValue("shortName", amendments[index].shortName);
 
-    setValue("company", amendments[index].company, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
+    // setValue("company", amendments[index].company, {
+    //   shouldDirty: true,
+    //   shouldValidate: true,
+    // });
   };
 
   const nextStep = async () => {
@@ -483,7 +591,7 @@ export default function GenaralCompanyForm() {
                       setFocus={setFocus}
                       flags={formFlags}
                       isReadOnly={isVerifiedAmendment}
-                      isUnlocked={isUnlocked}
+                      isUnlocked={isUnlocked || isVerifiedAmendment}
                       ref={generalInfoRef}
                     />
                   </div>
@@ -501,6 +609,7 @@ export default function GenaralCompanyForm() {
                       control={control}
                       flags={formFlags}
                       isReadOnly={isVerifiedAmendment}
+                      isUnlocked={isUnlocked || isVerifiedAmendment}
                     />
                   </div>
                 )}
@@ -515,6 +624,7 @@ export default function GenaralCompanyForm() {
                       setValue={setValue}
                       setError={setError}
                       flags={formFlags}
+                      isUnlocked={isUnlocked || isVerifiedAmendment}
                     />
                   </div>
                 )}
@@ -532,6 +642,7 @@ export default function GenaralCompanyForm() {
                       remove={remove}
                       trigger={trigger} // validate the documents while adding new document
                       watchDocuments={watchedDocuments}
+                      isUnlocked={isUnlocked || isVerifiedAmendment}
                     />
                   </div>
                 )}
@@ -641,6 +752,7 @@ export default function GenaralCompanyForm() {
                           <Select
                             options={amendmentAuthorizationOptions}
                             isSearchable={false}
+                            isDisabled={isVerifiedAmendment}
                             classNamePrefix="form-control-select"
                             className={
                               errors.authorizationStatus ? "error" : ""
@@ -661,41 +773,7 @@ export default function GenaralCompanyForm() {
                       !addingNewAmend && ( // Adding the new amend only if the latest amend is verified
                         <div
                           className="btn amend-generate"
-                          onClick={() => {
-                            // setAddNewAmend(true);
-                            setSelectedAmendment(null); // unselect the all pills
-                            setAddingNewAmend(true);
-                            reset({
-                              documents: [
-                                {
-                                  type: "",
-                                  number: "",
-                                  expiryDate: "",
-                                  file: null,
-                                  remarks: "",
-                                },
-                              ],
-                              authorizationStatus: "",
-                              name: "",
-                              company: "",
-                              shortName: "",
-                              activeDate: new Date(),
-                              pinCode: "",
-                              address: "",
-                              country: "",
-                              state: "",
-                              district: "",
-                              place: "",
-                              employerDesignation: "",
-                              employerPhone: "",
-                              employerEmail: "",
-                              employerName: "",
-                              landline: "",
-                              phone: "",
-                              email: "",
-                            });
-                            clearErrors();
-                          }}
+                          onClick={handleGenerateAmendment}
                         >
                           Generate Amendment
                         </div>
@@ -713,7 +791,7 @@ export default function GenaralCompanyForm() {
                         <div
                           key={item.id}
                           className={`amend-pill 
-                            ${item.authorizationStatus === 0 ? "Entry" : "Verified"}
+                            ${item.id === latestAmendmentId.id ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}
                           `}
                           onClick={() => {
