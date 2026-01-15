@@ -10,8 +10,7 @@ import com.example.MuzPayroll.entity.LocationLogPK;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+
 import jakarta.persistence.Transient;
 
 public class LocationDTO {
@@ -24,80 +23,86 @@ public class LocationDTO {
     private LocationLogPK locationLogPK;
 
     @Id
-    @Column(name = "LocationMstID", unique = true, nullable = false)
     private Long locationMstID;
 
-    @ManyToOne
-    @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
-    @ManyToOne
-    @JoinColumn(name = "BranchID", nullable = false)
     private BranchMst branchEntity;
 
-    @Column(nullable = false, unique = true)
     private String code;
 
-    @Column(nullable = false)
     private String location;
 
-    @Column(nullable = false)
     private String shortName;
 
-    @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
 
-    @Column(nullable = false)
     private String esiRegion;
 
-    @Column(nullable = false)
     private String address;
 
     private String address1;
     private String address2;
 
-    @Column(nullable = false)
     private String country;
 
-    @Column(nullable = false)
     private String state;
 
-    @Column(nullable = false)
     private String district;
 
-    @Column(nullable = false)
     private String place;
 
-    @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
     private String landlineNumber;
 
-    @Column(nullable = false)
     private String mobileNumber;
 
-    @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String employerName;
 
-    @Column(nullable = false)
     private String designation;
 
-    @Column(nullable = false)
     private String employerNumber;
 
-    @Column(nullable = false)
     private String employerEmail;
 
-    @Column(nullable = false)
     private LocalDate withaffectdate;
 
     private Long authId;
 
+    private String amendNo;
+
+    private LocalDate InactiveDate;
+
+    private Boolean activeStatusYN;
+
     // Getters and setters
+
+    public Boolean getActiveStatusYN() {
+        return activeStatusYN;
+    }
+
+    public void setActiveStatusYN(Boolean activeStatusYN) {
+        this.activeStatusYN = activeStatusYN;
+    }
+
+    public LocalDate getInactiveDate() {
+        return InactiveDate;
+    }
+
+    public void setInactiveDate(LocalDate inactiveDate) {
+        InactiveDate = inactiveDate;
+    }
+
+    public String getAmendNo() {
+        return amendNo;
+    }
+
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
 
     public Long getAuthId() {
         return authId;

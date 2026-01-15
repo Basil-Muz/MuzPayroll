@@ -14,6 +14,7 @@ import com.example.MuzPayroll.entity.LocationMst;
 @Repository
 public interface LocationRepository extends JpaRepository<LocationMst, Long> {
 
+    Optional<LocationMst> findByCode(String code);
 
     /**
      * Get the LATEST Location with LO prefix using Pageable
@@ -33,4 +34,11 @@ public interface LocationRepository extends JpaRepository<LocationMst, Long> {
     // Find maximum ID
     @Query("SELECT MAX(c.locationMstID) FROM LocationMst c WHERE c.locationMstID >= 300000")
     Long findMaxLocationMstID();
+
+    @Query("SELECT a.code FROM LocationMst a WHERE a.locationMstID = :locationMstID")
+    Optional<String> findCodeByMstId(@Param("locationMstID") Long locationMstID);
+
+    @Query("SELECT c FROM LocationMst c")
+    List<LocationMst> findAllLocation();
+
 }

@@ -9,8 +9,6 @@ import com.example.MuzPayroll.entity.CompanyMst;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
 public class BranchDTO {
@@ -51,55 +49,62 @@ public class BranchDTO {
     @Column(name = "BranchMstID", unique = true, nullable = false)
     private Long branchMstID;
 
-    @Column(name = "CompanyID", nullable = false)
+    @Column(name = "CompanyID")
     private CompanyMst companyEntity;
 
-    @Column(nullable = false, unique = true)
     private String code;
 
-    @Column(nullable = false)
     private String branch;
 
-    @Column(nullable = false)
     private String shortName;
 
-    @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
 
-    @Column(nullable = false)
     private String address;
 
     private String address1;
     private String address2;
 
-    @Column(nullable = false)
     private String country;
 
-    @Column(nullable = false)
     private String state;
 
-    @Column(nullable = false)
     private String district;
 
-    @Column(nullable = false)
     private String place;
 
-    @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
     private String landlineNumber;
 
-    @Column(nullable = false)
     private String mobileNumber;
 
-    @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private LocalDate withaffectdate;
 
     private Long authId;
+
+    private LocalDate InactiveDate;
+
+    private Boolean activeStatusYN;
+    // Getters and setters
+
+    public Boolean getActiveStatusYN() {
+        return activeStatusYN;
+    }
+
+    public void setActiveStatusYN(Boolean activeStatusYN) {
+        this.activeStatusYN = activeStatusYN;
+    }
+
+    public LocalDate getInactiveDate() {
+        return InactiveDate;
+    }
+
+    public void setInactiveDate(LocalDate inactiveDate) {
+        InactiveDate = inactiveDate;
+    }
 
     public Long getAuthId() {
         return authId;
@@ -109,7 +114,19 @@ public class BranchDTO {
         this.authId = authId;
     }
 
+    @Column(name = "AmendNo")
+    private String amendNo;
+
     // Getters and setters
+
+    public String getAmendNo() {
+        return amendNo;
+    }
+
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
+
     public Long getBranchMstID() {
         return branchMstID;
     }

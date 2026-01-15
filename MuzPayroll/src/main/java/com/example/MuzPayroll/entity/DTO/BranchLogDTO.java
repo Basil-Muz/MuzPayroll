@@ -7,65 +7,68 @@ import com.example.MuzPayroll.entity.BranchLogPK;
 import com.example.MuzPayroll.entity.CompanyMst;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 public class BranchLogDTO {
     private BranchLogPK branchLogPK;
 
-    @ManyToOne
-    @JoinColumn(name = "AuthID", nullable = false)
     private Authorization authorization;
 
-    @Column(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
-    @Column(nullable = false, unique = true)
     private String code;
 
-    @Column(nullable = false)
     private String branch;
 
-    @Column(nullable = false)
     private String shortName;
 
-    @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
 
-    @Column(nullable = false)
     private String address;
 
     private String address1;
     private String address2;
 
-    @Column(nullable = false)
     private String country;
 
-    @Column(nullable = false)
     private String state;
 
-    @Column(nullable = false)
     private String district;
 
-    @Column(nullable = false)
     private String place;
 
-    @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
     private String landlineNumber;
 
-    @Column(nullable = false)
     private String mobileNumber;
 
-    @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    private String amendNo;
+
+    private Long branchMstID;
+
+
     // Getters and setters
+
+    public Long getBranchMstID() {
+        return branchMstID;
+    }
+
+    public void setBranchMstID(Long branchMstID) {
+        this.branchMstID = branchMstID;
+    }
+
+    public String getAmendNo() {
+        return amendNo;
+    }
+
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
+
     public BranchLogPK getBranchLogPK() {
         return branchLogPK;
     }

@@ -13,43 +13,30 @@ import com.example.MuzPayroll.entity.CompanyLogPK;
 
 @Repository
 public interface CompanyLogRepository extends JpaRepository<CompanyLog, CompanyLogPK> {
-    long count();
+        long count();
 
-    Optional<CompanyLog> findById(CompanyLogPK id);
+        @Query("""
+                            SELECT MAX(c.companyLogPK.rowNo)
+                            FROM CompanyLog c
+                            WHERE c.companyLogPK.companyMstID = :companyMstID
+                        """)
+        Long findMaxRowNo(@Param("companyMstID") Long companyMstID);
 
-    @Query("""
-                SELECT MAX(c.companyLogPK.rowNo)
-                FROM CompanyLog c
-                WHERE c.companyLogPK.companyMstID = :companyMstID
-            """)
-    Long findMaxRowNo(@Param("companyMstID") Long companyMstID);
+        @Query(value = """
+                        SELECT MAX(CAST(amend_no AS INTEGER))
+                        FROM company_log
+                        WHERE company_mstid = :companyMstID
+                        AND amend_no ~ '^[0-9]+$'
+                        """, nativeQuery = true)
+        Optional<Long> findLatestAmendNoByMstId(@Param("companyMstID") Long companyMstID);
 
-    @Query(value = """
-            SELECT MAX(CAST(amend_no AS INTEGER))
-            FROM company_log
-            WHERE company_mstid = :companyMstID
-            AND amend_no ~ '^[0-9]+$'
-            """, nativeQuery = true)
-    Optional<Long> findLatestAmendNoByMstId(@Param("companyMstID") Long companyMstID);
-
-    @Query(value = """
-            SELECT *
-            FROM company_log
-            WHERE company_mstid = :companyMstID
-            AND amend_no ~ '^[0-9]+$'
-            ORDER BY CAST(amend_no AS INTEGER) DESC
-            LIMIT 1
-            """, nativeQuery = true)
-    Optional<CompanyLog> findLatestByCompanyMstID(
-            @Param("companyMstID") Long companyMstID);
-
-    @Query(value = """
-            SELECT *
-            FROM company_log
-            WHERE company_mstid = :companyMstID
-            AND amend_no ~ '^[0-9]+$'
-            ORDER BY CAST(amend_no AS INTEGER) DESC
-            """, nativeQuery = true)
-    List<CompanyLog> findAllLogsByCompanyMstID(@Param("companyMstID") Long companyMstID);
+        @Query(value = """
+                        SELECT *
+                        FROM company_log
+                        WHERE company_mstid = :companyMstID
+                        AND amend_no ~ '^[0-9]+$'
+                        ORDER BY CAST(amend_no AS INTEGER) DESC
+                        """, nativeQuery = true)
+        List<CompanyLog> findAllLogsByCompanyMstID(@Param("companyMstID") Long companyMstID);
 
 }

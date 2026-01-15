@@ -31,7 +31,7 @@ public class LocationLog {
     @JoinColumn(name = "BranchID", nullable = false)
     private BranchMst branchEntity;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String code;
 
     @Column(nullable = false)
@@ -91,7 +91,19 @@ public class LocationLog {
     @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    @Column(nullable = false, name = "AmendNo")
+    private String amendNo;
+
     // Getters and setters
+
+    public String getAmendNo() {
+        return amendNo;
+    }
+
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
+
     public LocationLogPK getLocationLogPK() {
         return locationLogPK;
     }

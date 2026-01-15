@@ -2,8 +2,6 @@ package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

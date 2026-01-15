@@ -38,4 +38,7 @@ public interface CompanyRepository extends JpaRepository<CompanyMst, Long> {
     @Query("SELECT a.code FROM CompanyMst a WHERE a.companyMstID = :companyMstID")
     Optional<String> findCodeByMstId(@Param("companyMstID") Long companyMstID);
 
+    @Query("SELECT c FROM CompanyMst c")
+    List<CompanyMst> findAllCompany();
+
 }

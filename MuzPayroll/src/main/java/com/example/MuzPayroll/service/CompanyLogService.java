@@ -134,16 +134,15 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
             generatedAmendNo = 1L;
         } else {
 
-            Long companyMstID = dto.getCompanyMstID();
+            Long MstID = dto.getCompanyMstID();
 
             Long latestAmendNo = companyLogRepository
-                    .findLatestAmendNoByMstId(companyMstID)
+                    .findLatestAmendNoByMstId(MstID)
                     .orElse(0L);
-            Long mstId = dto.getCompanyMstID();
 
             Long authId = authorizationRepository
-                    .findLatestAuthIdByMstId(mstId)
-                    .orElseThrow(() -> new IllegalStateException("AuthId not found for mstId " + mstId));
+                    .findLatestAuthIdByMstId(MstID)
+                    .orElseThrow(() -> new IllegalStateException("AuthId not found for mstId " + MstID));
 
             Optional<Boolean> status = authorizationRepository.findStatusByAuthId(authId);
 
@@ -245,7 +244,7 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         CompanyLogDTO dto = dtos.get(0);
         CompanyLog savedLog = null;
 
-        if ("INSERT".equalsIgnoreCase(mode)) {
+        if ("INSERT".equalsIgnoreCase(mode) || "UPDATE".equalsIgnoreCase(mode)) {
 
             log.setCompany(dto.getCompany());
             log.setCode(dto.getCode());
@@ -283,47 +282,6 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
             // SAVE TO DATABASE
             savedLog = companyLogRepository.save(log);
 
-        } else if ("UPDATE".equalsIgnoreCase(mode)) {
-
-            log.setCompanyLogPK(dto.getCompanyLogPK());
-            log.setCompany(dto.getCompany());
-            log.setCode(dto.getCode());
-            log.setShortName(dto.getShortName());
-            log.setActiveDate(dto.getActiveDate());
-            log.setWithaffectdate(dto.getWithaffectdate());
-            log.setAddress(dto.getAddress());
-            log.setAddress1(dto.getAddress1());
-            log.setAddress2(dto.getAddress2());
-            log.setCountry(dto.getCountry());
-            log.setState(dto.getState());
-            log.setDistrict(dto.getDistrict());
-            log.setPlace(dto.getPlace());
-            log.setPincode(dto.getPincode());
-            log.setLandlineNumber(dto.getLandlineNumber());
-            log.setMobileNumber(dto.getMobileNumber());
-            log.setEmail(dto.getEmail());
-            log.setEmployerName(dto.getEmployerName());
-            log.setDesignation(dto.getDesignation());
-            log.setEmployerNumber(dto.getEmployerNumber());
-            log.setEmployerEmail(dto.getEmployerEmail());
-            log.setCompanyImage(dto.getCompanyImagePath());
-            log.setCompanyLogPK(dto.getCompanyLogPK());
-            log.setAmendNo(dto.getAmendNo());
-
-            // SET AUTHORIZATION
-            if (dto.getAuthId() != null) {
-                Authorization auth = new Authorization();
-                auth.setAuthId(dto.getAuthId());
-                log.setAuthorization(auth);
-            } else {
-                throw new RuntimeException("Authorization ID is required for CompanyLog");
-            }
-
-            // SAVE TO DATABASE
-            savedLog = companyLogRepository.save(log);
-
-        } else {
-            throw new IllegalArgumentException("Invalid mode: " + mode);
         }
 
         return savedLog;

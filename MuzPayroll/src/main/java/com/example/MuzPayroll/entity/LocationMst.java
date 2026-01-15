@@ -95,7 +95,28 @@ public class LocationMst {
     @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    @Column(name = "InActiveDate", nullable = true)
+    private LocalDate InactiveDate;
+
+    @Column(nullable = false)
+    private Boolean activeStatusYN;
     // Getters and setters
+
+    public Boolean getActiveStatusYN() {
+        return activeStatusYN;
+    }
+
+    public void setActiveStatusYN(Boolean activeStatusYN) {
+        this.activeStatusYN = activeStatusYN;
+    }
+
+    public LocalDate getInactiveDate() {
+        return InactiveDate;
+    }
+
+    public void setInactiveDate(LocalDate inactiveDate) {
+        InactiveDate = inactiveDate;
+    }
 
     public List<LocationLog> getLocationLogs() {
         return LocationLogs;
