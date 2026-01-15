@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback} from "react";
-import { useForm, useFieldArray, Controller, useWatch} from "react-hook-form";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
@@ -107,14 +107,15 @@ export default function GenaralLocationForm() {
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
       authorizationStatus: 0, // ENTRY
       mode: inputMode,
+      activeStatusYN: 1,
     },
   });
 
   const authDate = useWatch({
-  control,
-  name: "withaffectdate",
-});
- //workflow of amend date then name logic
+    control,
+    name: "withaffectdate",
+  });
+  //workflow of amend date then name logic
 
   const isUnlocked = !!authDate;
 
@@ -131,9 +132,9 @@ export default function GenaralLocationForm() {
   });
 
   const watchedDocuments = useWatch({
-  control,
-  name: "documents",
-});
+    control,
+    name: "documents",
+  });
 
   // const watchedPincode = watch("branchPinCode");
 
@@ -258,43 +259,42 @@ export default function GenaralLocationForm() {
     clearErrors();
   };
 
-useEffect(() => {
-  let cancelled = false;
+  useEffect(() => {
+    let cancelled = false;
 
-  const load = async () => {
-    try {
-      const [companyRes, branchRes] = await Promise.all([
-        axios.get(`http://localhost:8087/company/${companyId}`),
-        axios.get(`http://localhost:8087/branch/${companyId}`),
-      ]);
+    const load = async () => {
+      try {
+        const [companyRes, branchRes] = await Promise.all([
+          axios.get(`http://localhost:8087/company/${companyId}`),
+          axios.get(`http://localhost:8087/branch/${companyId}`),
+        ]);
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      setCompanyList([
-        {
-          value: companyRes.data.companyMstID,
-          label: companyRes.data.company,
-        },
-      ]);
+        setCompanyList([
+          {
+            value: companyRes.data.companyMstID,
+            label: companyRes.data.company,
+          },
+        ]);
 
-      setBranchList(
-        branchRes.data.map(branch => ({
-          value: branch.branchMstID,
-          label: branch.branch,
-        }))
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
+        setBranchList(
+          branchRes.data.map((branch) => ({
+            value: branch.branchMstID,
+            label: branch.branch,
+          }))
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  load();
+    load();
 
-  return () => {
-    cancelled = true;
-  };
-}, [companyId]);
-
+    return () => {
+      cancelled = true;
+    };
+  }, [companyId]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -318,90 +318,93 @@ useEffect(() => {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  const setingData = useCallback((selectedAmendment) => {
-    setValue("location", selectedAmendment.location ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+  const setingData = useCallback(
+    (selectedAmendment) => {
+      setValue("location", selectedAmendment.location ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("shortName", selectedAmendment.shortName ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("shortName", selectedAmendment.shortName ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("company", selectedAmendment.company ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("company", selectedAmendment.company ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("companyImage", selectedAmendment.companyImage ?? "");
+      setValue("companyImage", selectedAmendment.companyImage ?? "");
 
-    setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("pincode", selectedAmendment.pincode ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("pincode", selectedAmendment.pincode ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("address", selectedAmendment.address ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("address", selectedAmendment.address ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("country", selectedAmendment.country ?? "IN", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("country", selectedAmendment.country ?? "IN", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("state", selectedAmendment.state ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("district", selectedAmendment.district ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("place", selectedAmendment.place ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("email", selectedAmendment.email ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerName", selectedAmendment.employerName ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("designation", selectedAmendment.designation ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-  },[setValue]);
+      setValue("state", selectedAmendment.state ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("district", selectedAmendment.district ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("place", selectedAmendment.place ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("email", selectedAmendment.email ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerName", selectedAmendment.employerName ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("designation", selectedAmendment.designation ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+    },
+    [setValue]
+  );
 
   useEffect(() => {
     //Api call should bo here

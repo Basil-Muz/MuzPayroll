@@ -106,6 +106,7 @@ export default function GenaralCompanyForm() {
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
       authorizationStatus: 0, // ENTRY
       mode: inputMode,
+      activeStatusYN: 1,
     },
   });
 

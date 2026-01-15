@@ -108,6 +108,7 @@ export default function GenaralBranchForm() {
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
       authorizationStatus: 0, // ENTRY
       mode: inputMode,
+      activeStatusYN: 1,
     },
   });
 
@@ -224,7 +225,7 @@ export default function GenaralBranchForm() {
     } catch (error) {
       toast.error("Failed to load company:", error);
     }
-  },[companyId]);
+  }, [companyId]);
 
   const handleGenerateAmendment = () => {
     setSelectedAmendment(null);
@@ -276,85 +277,88 @@ export default function GenaralBranchForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  const setingData = useCallback((selectedAmendment) => {
-    setValue("shortName", selectedAmendment.shortName ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+  const setingData = useCallback(
+    (selectedAmendment) => {
+      setValue("shortName", selectedAmendment.shortName ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("company", selectedAmendment.company ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("company", selectedAmendment.company ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("companyImage", selectedAmendment.companyImage ?? "");
+      setValue("companyImage", selectedAmendment.companyImage ?? "");
 
-    setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("pincode", selectedAmendment.pincode ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("pincode", selectedAmendment.pincode ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("address", selectedAmendment.address ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("address", selectedAmendment.address ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("country", selectedAmendment.country ?? "IN", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("country", selectedAmendment.country ?? "IN", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("state", selectedAmendment.state ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("district", selectedAmendment.district ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("place", selectedAmendment.place ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("email", selectedAmendment.email ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerName", selectedAmendment.employerName ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("designation", selectedAmendment.designation ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-  },[setValue]);
+      setValue("state", selectedAmendment.state ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("district", selectedAmendment.district ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("place", selectedAmendment.place ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("email", selectedAmendment.email ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerName", selectedAmendment.employerName ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("designation", selectedAmendment.designation ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+    },
+    [setValue]
+  );
 
   useEffect(() => {
     //Api call should bo here

@@ -114,7 +114,10 @@ export default function Sidebar({ forceOpen }) {
     left: 0,
     position: "absolute"
   });
-  const [sidebarEnabled, setSidebarEnabled] = useState(forceOpen); //opens navigation
+
+  const stored = JSON.parse(localStorage.getItem("loginData"));
+
+  const sidebarEnabled = stored.sidebarOpen || forceOpen; //opens navigation
   const [active, setActive] = useState(localStorage.getItem("activeMenu") || "");
 
 
@@ -147,18 +150,18 @@ export default function Sidebar({ forceOpen }) {
   const userName = loginData.userName || "User";
 
   /*  Sync sidebar enable */
-useEffect(() => {
-  if (!isMobile) {
-    const stored = localStorage.getItem("loginData");
-    if (stored) {
-      const data = JSON.parse(stored);
-      if (typeof data.sidebarOpen === "boolean") {
-        setSidebarOpen(data.sidebarOpen);
-        setSidebarEnabled(data.sidebarOpen);
-      }
-    }
-  }
-}, [isMobile]);
+// useEffect(() => {
+//   if (!isMobile) {
+//     const stored = localStorage.getItem("loginData");
+//     // if (stored) {
+//     //   const data = JSON.parse(stored);
+//     //   if (typeof data.sidebarOpen === "boolean") {
+//     //     setSidebarOpen(data.sidebarOpen);
+//     //     // setSidebarEnabled(data.sidebarOpen);
+//     //   }
+//     // }
+//   }
+// }, [isMobile]);
 
 
   // Auto-close sidebar on mobile when clicking outside
@@ -185,9 +188,6 @@ useEffect(() => {
       document.removeEventListener("touchstart", handleClickOutside);
     };
   }, [isMobile, sidebarOpen]);
-
-
-
 
   /* Menu handlers */
   const handleNav = (item) => {
@@ -282,40 +282,40 @@ const toggleSidebar = () => {
     }
     return !prev;
   });
-  setSidebarEnabled(prev => {
-    if (!isMobile) {
-      const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
-      localStorage.setItem(
-        "loginData",
-        JSON.stringify({ ...stored, sidebarOpen: !prev })
-      );
-    }
-    return !prev;
-  });
+  // setSidebarEnabled(prev => {
+  //   if (!isMobile) {
+  //     const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+  //     localStorage.setItem(
+  //       "loginData",
+  //       JSON.stringify({ ...stored, sidebarOpen: !prev })
+  //     );
+  //   }
+  //   return !prev;
+  // });
   setOpenSubmenu(null);
 };
 
 
   // Close submenu when sidebar collapses
-  useEffect(() => {
-    if (!sidebarOpen) {
-      setOpenSubmenu(null);
-    }
-  }, [sidebarOpen]);
+  // useEffect(() => {
+  //   if (!sidebarOpen) {
+  //     setOpenSubmenu(null);
+  //   }
+  // }, [sidebarOpen]);
 
   // Initialize sidebar state
-  useEffect(() => {
-    if (!isMobile) {
-      const stored = localStorage.getItem("loginData");
-      if (stored) {
-        const data = JSON.parse(stored);
-        if (typeof data.sidebarOpen === 'boolean') {
-          setSidebarOpen(data.sidebarOpen);
-          setSidebarEnabled(data.sidebarOpen);
-        }
-      }
-    }
-  }, [isMobile, sidebarOpen]);
+  // useEffect(() => {
+  //   if (!isMobile) {
+  //     const stored = localStorage.getItem("loginData");
+  //     if (stored) {
+  //       const data = JSON.parse(stored);
+  //       if (typeof data.sidebarOpen === 'boolean') {
+  //         setSidebarOpen(data.sidebarOpen);
+  //         // setSidebarEnabled(data.sidebarOpen);
+  //       }
+  //     }
+  //   }
+  // }, [isMobile, sidebarOpen]);
 
   // Handle window resize to reposition submenu
   useEffect(() => {
