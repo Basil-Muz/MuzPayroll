@@ -172,7 +172,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                         field.onChange(option.value);
                         // setIsCompanyMenuOpen(!isCompanyMenuOpen)
                       }}
-                      // store ONLY value
+                    // store ONLY value
                     />
                   );
                 }}
@@ -325,9 +325,8 @@ const GeneralInfoForm = function GeneralInfoForm({
                 <DatePicker
                   placeholderText="Select date"
                   disabled={isReadOnly}
-                  className={`form-control datepicker-input ${
-                    errors.activeDate ? "error" : ""
-                  }`}
+                  className={`form-control datepicker-input ${errors.activeDate ? "error" : ""
+                    }`}
                   selected={field.value ? new Date(field.value) : null}
                   onChange={(date) =>
                     field.onChange(

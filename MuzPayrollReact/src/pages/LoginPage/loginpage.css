@@ -9,7 +9,12 @@
   justify-content: center;
   align-items: center;
 
-  background: url("../../assets/bgpic.webp") center/cover no-repeat;
+  background: linear-gradient(
+         135deg,
+        #f5f3f7 0%,
+        #f7e1fa 40%,
+        #f8b4fe 100%
+    );
   position: relative;
 }
 
@@ -21,7 +26,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  background: rgba(0, 0, 0, 0.45);
+ 
   backdrop-filter: blur(1px);
   z-index: 1;
 }
@@ -34,7 +39,7 @@
   width: 350px;
   padding: 40px 35px;
 
-  background: rgba(214, 209, 209, 0.12);
+  background:rgb(246, 193, 250);
   border-radius: 18px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);

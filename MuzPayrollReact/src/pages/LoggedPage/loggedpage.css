@@ -14,57 +14,64 @@
 
 .logo-homesection {
     display: flex;
+    flex: 1;
+    width: 100%;
+    min-height: calc(100vh - 66px);
+    padding: 0;
+    background: linear-gradient(
+         135deg,
+        #f5f3f7 0%,
+        #f7e1fa 40%,
+        #f8b4fe 100%
+    );
+}
+.left-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex: 1;
-    gap: 125px;
-    width: 100%;
-    min-height: calc(100vh - 160px);
-    background-color: var(--background);
-    box-sizing: border-box;
-    padding: 20px 40px 20px 17px;
-    /* padding-left: 339px;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    padding-right: 25rem;
-    margin-left: 7px; */
-    /* height: 100vh; */
-
+    color: #ffffff;
+    padding: 40px;
 }
 
-.left-section,
-.logged-container {
-  flex: 1;                     /* <--- THIS FIXES CENTERING */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.left-section::after {
+    margin-top: 18px;
+    font-size: 14px;
+    opacity: 0.85;
+    letter-spacing: 0.5px;
 }
+
 
 /* HOME LOGO */
 .home-logo {
-  max-width: 200px;
-  height: auto;
+    max-width: 250px;
+    height: auto;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.25));
+    
 }
+
 
 /* LOGIN BOX */
 .logged-box {
-  width: 100%;
-  width: 650px;
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #dedede;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.10);
+    
+    width: 700px;
+    justify-content: center;   /* horizontal center */
+    align-items: center;       /* vertical center */
+    padding: 40px;
+    background: transparent;
+  
 }
+
 
 /* ---------- HEADING ---------- */
 .logged-heading {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 18px;
-  font-weight: 600;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 24px;
 }
+
 
 /* ---------- INPUT ROWS ---------- */
 .logged-details {
@@ -94,20 +101,26 @@
 }
 
 /* ---------- BUTTONS ---------- */
+
+.button-group {
+   display: flex;
+    justify-content: flex-start;
+    gap: 12px;          /* 👈 proper spacing */
+    margin-top: 20px;
+}
 .logged-btn {
-  padding: 8px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  margin-right: 8px;
-  background: var(--button-primary);
-  color: #fff;
-  font-size: 14px;
-  transition: 0.25s ease;
+    padding: 9px 26px;
+    border-radius: var(--radius-lg);
+    background:var(--brand);
+    color:white;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    
 }
 
+
+
 .logged-btn:hover {
-  background: var(--button-primary-hover);
+  background: #e766f5;
 }
 
 /* ---------- SIDEBAR OVERLAY ---------- */
@@ -144,6 +157,17 @@
   pointer-events: none;
 }
 /* ---------- RESPONSIVE ENHANCEMENTS ---------- */
+
+@media (max-width: 800px) {
+  .logo-homesection {
+    flex-direction: column;
+  }
+
+  .left-section {
+    min-height: 220px;
+  }
+}
+
 
 /* Tablets & small laptops */
 @media (max-width: 1024px) {

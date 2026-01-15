@@ -72,30 +72,30 @@ const menuItems = [
   },
 
   /* Administration */
-{
-  id: "administration",
-  label: "Administration",
-  icon: <FaGears size={18} />,
-  children: [
-    { label: "Masters", link: "/masters" },
-    { label: "Settings", link: "/settings" },
-    { label: "Database Backup", link: "/database-backup" },
-    { label: "Employee Reminders", link: "/other/employee-reminder-register" },
-  ],
-},
+  {
+    id: "administration",
+    label: "Administration",
+    icon: <FaGears size={18} />,
+    children: [
+      { label: "Masters", link: "/masters" },
+      { label: "Settings", link: "/settings" },
+      { label: "Database Backup", link: "/database-backup" },
+      { label: "Employee Reminders", link: "/other/employee-reminder-register" },
+    ],
+  },
 
   /* COMPLIANCE */
   {
-  id: "compliance",
-  label: "Compliance",
-  icon: <FaScaleBalanced size={18} />,
-  children: [
-    { label: "Compliance Letters", link: "/statutary/complients-letter" },
-    { label: "Statutory Reports", link: "/statutary/report" },
-    { label: "Final Settlement", link: "/other/employee-final-settlement" },
-  ],
-},
-  
+    id: "compliance",
+    label: "Compliance",
+    icon: <FaScaleBalanced size={18} />,
+    children: [
+      { label: "Compliance Letters", link: "/statutary/complients-letter" },
+      { label: "Statutory Reports", link: "/statutary/report" },
+      { label: "Final Settlement", link: "/other/employee-final-settlement" },
+    ],
+  },
+
 ];
 
 
@@ -107,13 +107,13 @@ export default function Sidebar({ forceOpen }) {
 
   const isMobile = useIsMobile();
   // const isTab = useIsTab();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [closingSubmenu, setClosingSubmenu] = useState(null);
-  const [submenuStyle, setSubmenuStyle] = useState({ 
-    top: 0, 
+  const [submenuStyle, setSubmenuStyle] = useState({
+    top: 0,
     left: 0,
-    position: "absolute" 
+    position: "absolute"
   });
   const [sidebarEnabled, setSidebarEnabled] = useState(false);
   const [active, setActive] = useState(localStorage.getItem("activeMenu") || "");
@@ -128,8 +128,9 @@ export default function Sidebar({ forceOpen }) {
     }
   };
 
+  const sidebarClass = getSidebarClass();
 
-    // 🔹 LIVE loginData (for username, location, etc.)
+  // 🔹 LIVE loginData (for username, location, etc.)
   const [loginData, setLoginData] = useState(() =>
     JSON.parse(localStorage.getItem("loginData") || "{}")
   );
@@ -162,29 +163,29 @@ export default function Sidebar({ forceOpen }) {
   }, [forceOpen]);
 
   // Auto-close sidebar on mobile when clicking outside
- useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (
-      isMobile &&
-      sidebarOpen &&
-      sidebarRef.current &&
-      !sidebarRef.current.contains(event.target) &&
-      !event.target.closest(".submenu") &&
-      !event.target.closest(".collapse-btn1")
-    ) {
-      setSidebarOpen(false);
-     closeSubmenu();
-    }
-  };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isMobile &&
+        sidebarOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.closest(".submenu") &&
+        !event.target.closest(".collapse-btn1")
+      ) {
+        setSidebarOpen(false);
+        closeSubmenu();
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
-  document.addEventListener("touchstart", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
 
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-    document.removeEventListener("touchstart", handleClickOutside);
-  };
-}, [isMobile, sidebarOpen]);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isMobile, sidebarOpen]);
 
 
 
@@ -194,7 +195,7 @@ export default function Sidebar({ forceOpen }) {
     setActive(item.id);
     localStorage.setItem("activeMenu", item.id);
     if (item.link) navigate(item.link);
-    
+
     if (isMobile) {
       setSidebarOpen(false);
     }
@@ -205,47 +206,47 @@ export default function Sidebar({ forceOpen }) {
     localStorage.setItem("activeMenu", child.id);
     navigate(child.link);
     setOpenSubmenu(null);
-    
+
     if (isMobile) {
       setSidebarOpen(false);
     }
   };
 
   // Calculate submenu position with viewport boundary check
-const calculateSubmenuPosition = useCallback(
-  (itemRect, sidebarRect, submenuHeight = 320) => {
-    const viewportHeight = window.innerHeight;
+  const calculateSubmenuPosition = useCallback(
+    (itemRect, sidebarRect, submenuHeight = 320) => {
+      const viewportHeight = window.innerHeight;
 
-    // Center submenu vertically near clicked item
-    let top =
-      itemRect.top -
-      submenuHeight / 2 +
-      itemRect.height / 2;
+      // Center submenu vertically near clicked item
+      let top =
+        itemRect.top -
+        submenuHeight / 2 +
+        itemRect.height / 2;
 
-    top = Math.max(20, Math.min(top, viewportHeight - submenuHeight ));
+      top = Math.max(20, Math.min(top, viewportHeight - submenuHeight));
 
-    let left;
+      let left;
 
-    if (isMobile) {
-      left = sidebarRect.left + 0; //  near sidebar
-    } else if (!sidebarOpen) {
-      left = sidebarRect.width + 8;
-    } else {
-      left = sidebarRect.width + 12;
-    }
+      if (isMobile) {
+        left = sidebarRect.left + 0; //  near sidebar
+      } else if (!sidebarOpen) {
+        left = sidebarRect.width + 8;
+      } else {
+        left = sidebarRect.width + 12;
+      }
 
-    return {
-      position: "fixed",
-      top: `${top}px`,
-      left: `${left}px`,
-      minWidth: "280px",
-      maxHeight: "70vh",
-      overflowY: "auto",
-      zIndex: 1000,
-    };
-  },
-  [isMobile, sidebarOpen]
-);
+      return {
+        position: "fixed",
+        top: `${top}px`,
+        left: `${left}px`,
+        minWidth: "280px",
+        maxHeight: "70vh",
+        overflowY: "auto",
+        zIndex: 1000,
+      };
+    },
+    [isMobile, sidebarOpen]
+  );
 
 
   const openSubmenuFor = useCallback((e, item) => {
@@ -258,10 +259,10 @@ const calculateSubmenuPosition = useCallback(
 
     const sidebarRect = sidebarRef.current.getBoundingClientRect();
     const itemRect = e.currentTarget.getBoundingClientRect();
-    
+
     // Calculate submenu position with boundary checking
     const position = calculateSubmenuPosition(itemRect, sidebarRect);
-    
+
     setSubmenuStyle(position);
     setOpenSubmenu(item.id);
   }, [calculateSubmenuPosition]);
@@ -274,7 +275,7 @@ const calculateSubmenuPosition = useCallback(
   const toggleSidebar = () => {
     setSidebarOpen(prev => !prev);
     setOpenSubmenu(null); // Close any open submenus
-    
+
     if (!isMobile) {
       const stored = localStorage.getItem("loginData");
       if (stored) {
@@ -303,7 +304,7 @@ const calculateSubmenuPosition = useCallback(
         }
       }
     }
-  }, [isMobile,sidebarOpen]);
+  }, [isMobile, sidebarOpen]);
 
   // Handle window resize to reposition submenu
   useEffect(() => {
@@ -349,7 +350,7 @@ const calculateSubmenuPosition = useCallback(
         )}
 
         {/* Brand/User Area */}
-        <div 
+        <div
           className="sidebar-top"
           style={{
             justifyContent: isMobile || sidebarOpen ? "space-between" : "center",
@@ -365,14 +366,14 @@ const calculateSubmenuPosition = useCallback(
               <div className="user-avatar">
                 {userName ? userName.charAt(0).toUpperCase() : "U"}
               </div>
-              
+
               {(isMobile || sidebarOpen) && (
                 <div className="user-meta show">
                   <div className="user-name">{userName}</div>
                   <div className="user-role">Admin</div>
                 </div>
               )}
-              
+
               {(isMobile || sidebarOpen) && (
                 <button className="user-action" aria-label="User actions">
                   <IoIosArrowForward size={14} />
@@ -380,74 +381,74 @@ const calculateSubmenuPosition = useCallback(
               )}
             </div>
           </div>
-           <button
-              className="collapse-btn"
-              
-              aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              <div className={`sidebar-icon-transition ${!sidebarOpen ? "rotated" : ""}`}
+          <button
+            className="collapse-btn"
+
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <div className={`sidebar-icon-transition ${!sidebarOpen ? "rotated" : ""}`}
               onClick={toggleSidebar}
-              >
-                {sidebarOpen ? (
-                  <IoMdArrowDropleft size={20} className="toggle-icon" />
-                ) : (
-                  <IoMdArrowDropright size={20} className="toggle-icon" />
-                )}
-              </div>
-            </button>
+            >
+              {sidebarOpen ? (
+                <IoMdArrowDropleft size={20} className="toggle-icon" />
+              ) : (
+                <IoMdArrowDropright size={20} className="toggle-icon" />
+              )}
+            </div>
+          </button>
         </div>
 
         {/* Navigation */}
         {sidebarEnabled && (
           <nav
-  className="sidebar-nav"
-  aria-label="Main navigation"
-  onMouseLeave={() => {
-    if (!isMobile) scheduleCloseSubmenu();
-  }}
->
+            className="sidebar-nav"
+            aria-label="Main navigation"
+            onMouseLeave={() => {
+              if (!isMobile) scheduleCloseSubmenu();
+            }}
+          >
 
             {menuItems.map((item) => {
               const hasChildren = !!item.children && item.children.length > 0;
               return (
                 <div
-  key={item.id}
-  className="nav-item-wrapper"
-  data-item-id={item.id}
-  onMouseEnter={(e) => {
-    if (!isMobile && hasChildren) {
-      openSubmenuFor(e, item);
-    }
-  }}
-  onMouseLeave={() => {
-    if (!isMobile && hasChildren) {
-      scheduleCloseSubmenu();
-    }
-  }}
->
+                  key={item.id}
+                  className="nav-item-wrapper"
+                  data-item-id={item.id}
+                  onMouseEnter={(e) => {
+                    if (!isMobile && hasChildren) {
+                      openSubmenuFor(e, item);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (!isMobile && hasChildren) {
+                      scheduleCloseSubmenu();
+                    }
+                  }}
+                >
 
                   <button
                     className={`nav-item ${active === item.id ? "active" : ""}`}
-onClick={(e) => {
-  if (item.link) {
-    handleNav(item);
-    return;
-  }
+                    onClick={(e) => {
+                      if (item.link) {
+                        handleNav(item);
+                        return;
+                      }
 
-  if (hasChildren) {
-    if (isMobile) {
-      setOpenSubmenu(prev =>
-        prev === item.id ? null : item.id
-      );
-    } else {
-      if (openSubmenu === item.id) {
-        setOpenSubmenu(null);
-      } else {
-        openSubmenuFor(e, item);
-      }
-    }
-  }
-}}
+                      if (hasChildren) {
+                        if (isMobile) {
+                          setOpenSubmenu(prev =>
+                            prev === item.id ? null : item.id
+                          );
+                        } else {
+                          if (openSubmenu === item.id) {
+                            setOpenSubmenu(null);
+                          } else {
+                            openSubmenuFor(e, item);
+                          }
+                        }
+                      }
+                    }}
 
 
                     title={!sidebarOpen && !isMobile ? item.label : undefined}
@@ -464,11 +465,11 @@ onClick={(e) => {
 
                     {hasChildren && (isMobile || sidebarOpen) && (
                       <div className="nav-chevron" aria-hidden="true">
-                        <IoIosArrowForward size={14} 
-                          style={{ 
+                        <IoIosArrowForward size={14}
+                          style={{
                             transform: openSubmenu === item.id ? 'rotate(90deg)' : 'none',
                             transition: 'transform 0.2s ease'
-                          }} 
+                          }}
                         />
                       </div>
                     )}
@@ -479,80 +480,79 @@ onClick={(e) => {
                   </button>
 
                   {/* Submenu */}
- {hasChildren && openSubmenu === item.id && (
-  <div
-    className={`submenu floating ${
-    closingSubmenu === item.id ? "closing" : ""
-  }`}
-    style={submenuStyle}   // USE SAME STYLE EVERYWHERE
-    onClick={(e) => e.stopPropagation()} // prevent sidebar close
-  >
+                  {hasChildren && openSubmenu === item.id && (
+                    <div
+                      className={`submenu floating ${closingSubmenu === item.id ? "closing" : ""
+                        }`}
+                      style={submenuStyle}   // USE SAME STYLE EVERYWHERE
+                      onClick={(e) => e.stopPropagation()} // prevent sidebar close
+                    >
 
-                  <div
-                    style={{
-                      background: "#c71ebeff",
-                      borderRadius: "8px 8px 0 0",
-                      color: "#fff",
-                      padding: "12px 16px",
-                      fontWeight: 600,
-                      fontSize: "15px",
-                    }}
-                  >
-                    {item.label}
-                  </div>
-
-                  <div style={{ background: "#fff", color: "#111", padding: 8 }}>
-                    {item.children.map((child) => (
-                      <button
-                        key={child.id}
-                        onClick={() => handleSubNav(child)}
-                        className="submenu-item"
+                      <div
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: 6,
-                          border: "none",
-                          background: "transparent",
-                          textAlign: "left",
-                          cursor: "pointer",
-                          transition: "background 0.2s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "rgba(199, 30, 190, 0.06)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = "transparent";
+                          background: "#c71ebeff",
+                          borderRadius: "8px 8px 0 0",
+                          color: "#fff",
+                          padding: "12px 16px",
+                          fontWeight: 600,
+                          fontSize: "15px",
                         }}
                       >
-                        <span
-                          style={{
-                            width: 20,
-                            height: 20,
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#c71ebeff",
-                          }}
-                        >
-                          <VscActivateBreakpoints size={16} />
-                        </span>
-                        <span style={{ flex: 1, color: "#111827", fontSize: "14px" }}>
-                          {child.label}
-                        </span>
-                        <span style={{ color: "#9ca3af", fontSize: 12 }}>&gt;</span>
-                      </button>
-                    ))}
-                  </div>
+                        {item.label}
+                      </div>
+
+                      <div style={{ background: "#fff", color: "#111", padding: 8 }}>
+                        {item.children.map((child) => (
+                          <button
+                            key={child.id}
+                            onClick={() => handleSubNav(child)}
+                            className="submenu-item"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 10,
+                              width: "100%",
+                              padding: "10px 12px",
+                              borderRadius: 6,
+                              border: "none",
+                              background: "transparent",
+                              textAlign: "left",
+                              cursor: "pointer",
+                              transition: "background 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = "rgba(199, 30, 190, 0.06)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = "transparent";
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: 20,
+                                height: 20,
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "#c71ebeff",
+                              }}
+                            >
+                              <VscActivateBreakpoints size={16} />
+                            </span>
+                            <span style={{ flex: 1, color: "#111827", fontSize: "14px" }}>
+                              {child.label}
+                            </span>
+                            <span style={{ color: "#9ca3af", fontSize: 12 }}>&gt;</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
-    )}
+              );
+            })}
+          </nav>
+        )}
 
         {/* Mobile backdrop */}
         {isMobile && sidebarOpen && (
