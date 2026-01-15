@@ -97,7 +97,6 @@ const menuItems = [
 
 ];
 
-
 export default function Sidebar({ forceOpen }) {
   const navigate = useNavigate();
   const sidebarRef = useRef(null);
@@ -153,13 +152,13 @@ export default function Sidebar({ forceOpen }) {
 // useEffect(() => {
 //   if (!isMobile) {
 //     const stored = localStorage.getItem("loginData");
-//     // if (stored) {
-//     //   const data = JSON.parse(stored);
-//     //   if (typeof data.sidebarOpen === "boolean") {
-//     //     setSidebarOpen(data.sidebarOpen);
-//     //     // setSidebarEnabled(data.sidebarOpen);
-//     //   }
-//     // }
+//     if (stored) {
+//       const data = JSON.parse(stored);
+//       if (typeof data.sidebarOpen === "boolean") {
+//         // setSidebarOpen(data.sidebarOpen);
+//         setSidebarEnabled(data.sidebarOpen);
+//       }
+//     }
 //   }
 // }, [isMobile]);
 
@@ -227,7 +226,7 @@ export default function Sidebar({ forceOpen }) {
       let left;
 
       if (isMobile) {
-        left = sidebarRect.left + 0; //  near sidebar
+        left = sidebarRect.left + 12; //  near sidebar
       } else if (!sidebarOpen) {
         left = sidebarRect.width + 8;
       } else {
@@ -273,13 +272,13 @@ export default function Sidebar({ forceOpen }) {
 
 const toggleSidebar = () => {
   setSidebarOpen(prev => {
-    if (!isMobile) {
-      const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
-      localStorage.setItem(
-        "loginData",
-        JSON.stringify({ ...stored, sidebarOpen: !prev })
-      );
-    }
+    // if (!isMobile) {
+    //   const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+    //   localStorage.setItem(
+    //     "loginData",
+    //     JSON.stringify({ ...stored, sidebarOpen: !prev })
+    //   );
+    // }
     return !prev;
   });
   // setSidebarEnabled(prev => {
