@@ -48,34 +48,34 @@ export default function GenaralBranchForm() {
   // console.log("Logeeded data company", companyId);
 
   const amendments = [
-    {
-      id: 3,
-      authorizationStatus: 1,
-      date: "2025-10-20",
-      shortName: "TCS",
-      pincode: 680732,
-      branch: "Tata Consultancy Services",
-      status: "active",
-      activeDate: "2025-10-10",
-      generatedBy: "Admin User",
-    },
-    {
-      id: 2,
-      authorizationStatus: 1,
-      date: "2025-10-10",
-      branch: "Tata Consultancy Services",
-      status: "expired",
-      activeDate: "2021-12-31",
-      generatedBy: "System",
-    },
-    {
-      id: 1,
-      authorizationStatus: 1,
-      date: "2025-01-01",
-      status: "inactive",
-      activeDate: "",
-      generatedBy: "Manager",
-    },
+    // {
+    //   id: 3,
+    //   authorizationStatus: 1,
+    //   date: "2025-10-20",
+    //   shortName: "TCS",
+    //   pincode: 680732,
+    //   branch: "Tata Consultancy Services",
+    //   status: "active",
+    //   activeDate: "2025-10-10",
+    //   generatedBy: "Admin User",
+    // },
+    // {
+    //   id: 2,
+    //   authorizationStatus: 1,
+    //   date: "2025-10-10",
+    //   branch: "Tata Consultancy Services",
+    //   status: "expired",
+    //   activeDate: "2021-12-31",
+    //   generatedBy: "System",
+    // },
+    // {
+    //   id: 1,
+    //   authorizationStatus: 1,
+    //   date: "2025-01-01",
+    //   status: "inactive",
+    //   activeDate: "",
+    //   generatedBy: "Manager",
+    // },
   ];
   const inputMode = amendments.length > 0 ? "INSERT" : "UPDATE";
   const {
