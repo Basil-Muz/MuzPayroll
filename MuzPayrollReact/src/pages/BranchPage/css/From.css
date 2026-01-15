@@ -57,7 +57,7 @@
   --text-lg: 19px;
   --text-xl: 24px;
 
-  --header-padding:94px;  // Header width 66px
+  --header-padding:94px;  /* Header width 66px */
 
 }
 
@@ -446,9 +446,9 @@ body {
   border-color: var(--danger);
 }
 
-input.form-control.read-only{
+/* input.form-control.read-only{
   
-}
+} */
 
 .css-13cymwt-control{
   border-radius:0;
@@ -473,7 +473,7 @@ input.form-control.read-only{
   color: #ffffff !important;
 }
 
-//reactEasyCrop_Container
+/* reactEasyCrop_Container */
 
 .datepicker-input {
   width: 100%;

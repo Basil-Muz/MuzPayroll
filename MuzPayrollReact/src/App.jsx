@@ -208,27 +208,27 @@ const CloseIcon = () => (
 );
 
 // Custom toast functions to match your color scheme
-export const showSuccessToast = (message) => {
-  return toast.success(message, {
-    style: {
-      borderLeft: "4px solid #10B981",
-    },
-  });
-};
+// export const showSuccessToast = (message) => {
+//   return toast.success(message, {
+//     style: {
+//       borderLeft: "4px solid #10B981",
+//     },
+//   });
+// };
 
-export const showErrorToast = (message) => {
-  return toast.error(message, {
-    style: {
-      borderLeft: "4px solid #EF4444",
-    },
-  });
-};
+// export const showErrorToast = (message) => {
+//   return toast.error(message, {
+//     style: {
+//       borderLeft: "4px solid #EF4444",
+//     },
+//   });
+// };
 
-export const showInfoToast = (message) => {
-  return toast(message, {
-    style: {
-      borderLeft: "4px solid #3B82F6",
-    },
-  });
-};
+// export const showInfoToast = (message) => {
+//   return toast(message, {
+//     style: {
+//       borderLeft: "4px solid #3B82F6",
+//     },
+//   });
+// };
 export default App;

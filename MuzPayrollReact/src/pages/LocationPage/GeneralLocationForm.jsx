@@ -426,18 +426,18 @@ export default function GenaralLocationForm() {
       setValue("userCode", userCode);
       setValue("authorizationDate", new Date());
       console.log("Submitting data", data);
-      
-        const formData = new FormData();
 
-        Object.keys(data).forEach((key) => {
-          if (key !== "companyImage") {
-            formData.append(key, data[key]);
-          }
-        });
+      const formData = new FormData();
 
-        if (data.companyImage) {
-          formData.append("companyImage", data.companyImage);
+      Object.keys(data).forEach((key) => {
+        if (key !== "companyImage") {
+          formData.append(key, data[key]);
         }
+      });
+
+      if (data.companyImage) {
+        formData.append("companyImage", data.companyImage);
+      }
 
       // company: initialCompanyId,
       //     branch: initialBranchId,
