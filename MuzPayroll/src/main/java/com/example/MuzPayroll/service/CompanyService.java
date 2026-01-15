@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,10 @@ import com.example.MuzPayroll.repository.UserRepository;
 @Service
 public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMst> {
 
-    private static final String UPLOAD_DIR = "/home/basilraju/Documents/MUZ Payroll/MuzPayroll/Uploads/Company/";
+    // private static final String UPLOAD_DIR =
+    // "/src/main/java/com/example/MuzPayroll/Uploads/Company/";
+
+    private static final String UPLOAD_DIR = "Uploads://company";
 
     // Image validation constants
     private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -53,92 +57,170 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
     // ================= FINAL SAVE WRAPPER =================
     @Transactional
-    public Response<CompanyDTO> saveWrapper(CompanyDTO dto) {
+    public Response<CompanyDTO> saveWrapper(CompanyDTO dto, String mode) {
         List<CompanyDTO> dtos = new ArrayList<>();
         dtos.add(dto);
-        return save(dtos);
+        return save(dtos, mode);
     }
 
     // =================== 1️⃣ ENTITY VALIDATION ===================
     @Override
-    public Response<Boolean> entityValidate(List<CompanyDTO> dtos) {
+    public Response<Boolean> entityValidate(List<CompanyDTO> dtos, String mode) {
 
-        if (dtos == null || dtos.isEmpty()) {
-            return Response.error("DTO cannot be null or empty");
-        }
+        if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {
 
-        List<String> errors = new ArrayList<>();
-        boolean hasAnyError = false;
-
-        for (int rowIndex = 0; rowIndex < dtos.size(); rowIndex++) {
-            CompanyDTO dto = dtos.get(rowIndex);
-            int rowNumber = rowIndex + 1;
-
-            List<String> rowErrors = new ArrayList<>();
-
-            // Check if this row (DTO) is null
-            if (dto == null) {
-                errors.add("Row " + rowNumber + ": DTO object is null");
-                hasAnyError = true;
-                continue; // Skip to next row
+            if (dtos == null || dtos.isEmpty()) {
+                return Response.error("DTO cannot be null or empty");
             }
 
-            // Collect ALL errors
-            if (isEmpty(dto.getCompany()))
-                rowErrors.add("Company name is required");
-            if (isEmpty(dto.getShortName()))
-                rowErrors.add("Short name is required");
-            if (dto.getActiveDate() == null)
-                rowErrors.add("Active date is required");
-            if (isEmpty(dto.getAddress()))
-                rowErrors.add("Address is required");
-            if (isEmpty(dto.getCountry()))
-                rowErrors.add("Country is required");
-            if (isEmpty(dto.getState()))
-                rowErrors.add("State is required");
-            if (isEmpty(dto.getDistrict()))
-                rowErrors.add("District is required");
-            if (isEmpty(dto.getPlace()))
-                rowErrors.add("Place is required");
-            if (isEmpty(dto.getPincode()))
-                rowErrors.add("Pincode is required");
-            if (isEmpty(dto.getMobileNumber()))
-                rowErrors.add("Mobile number is required");
-            if (isEmpty(dto.getEmail()))
-                rowErrors.add("Email is required");
-            if (dto.getWithaffectdate() == null)
-                rowErrors.add("With affect date is required");
-            if (dto.getAuthorizationDate() == null)
-                rowErrors.add("Authorization date is required");
-            if (dto.getAuthorizationStatus() == null)
-                rowErrors.add("Authorization status is required");
-            if (isEmpty(dto.getUserCode()))
-                rowErrors.add("User code is required");
+            List<String> errors = new ArrayList<>();
+            boolean hasAnyError = false;
 
-            // Add row errors to main error list with row number
-            if (!rowErrors.isEmpty()) {
-                hasAnyError = true;
+            if ("INSERT".equals(mode)) {
 
-                // Create a prefix for this row's errors
-                String rowPrefix = "Row " + rowNumber;
-                if (!isEmpty(dto.getCompany())) {
-                    rowPrefix += " (Company: " + dto.getCompany() + ")";
+                for (int rowIndex = 0; rowIndex < dtos.size(); rowIndex++) {
+                    CompanyDTO dto = dtos.get(rowIndex);
+                    int rowNumber = rowIndex + 1;
+
+                    List<String> rowErrors = new ArrayList<>();
+
+                    // Check if this row (DTO) is null
+                    if (dto == null) {
+                        errors.add("Row " + rowNumber + ": DTO object is null");
+                        hasAnyError = true;
+                        continue; // Skip to next row
+                    }
+
+                    // Collect ALL errors
+                    if (isEmpty(dto.getCompany()))
+                        rowErrors.add("Company name is required");
+                    if (isEmpty(dto.getShortName()))
+                        rowErrors.add("Short name is required");
+                    if (dto.getActiveDate() == null)
+                        rowErrors.add("Active date is required");
+                    if (isEmpty(dto.getAddress()))
+                        rowErrors.add("Address is required");
+                    if (isEmpty(dto.getCountry()))
+                        rowErrors.add("Country is required");
+                    if (isEmpty(dto.getState()))
+                        rowErrors.add("State is required");
+                    if (isEmpty(dto.getDistrict()))
+                        rowErrors.add("District is required");
+                    if (isEmpty(dto.getPlace()))
+                        rowErrors.add("Place is required");
+                    if (isEmpty(dto.getPincode()))
+                        rowErrors.add("Pincode is required");
+                    if (isEmpty(dto.getMobileNumber()))
+                        rowErrors.add("Mobile number is required");
+                    if (isEmpty(dto.getEmail()))
+                        rowErrors.add("Email is required");
+                    if (dto.getWithaffectdate() == null)
+                        rowErrors.add("With affect date is required");
+                    if (dto.getAuthorizationDate() == null)
+                        rowErrors.add("Authorization date is required");
+                    if (dto.getAuthorizationStatus() == null)
+                        rowErrors.add("Authorization status is required");
+                    if (isEmpty(dto.getUserCode()))
+                        rowErrors.add("User code is required");
+
+                    // Add row errors to main error list with row number
+                    if (!rowErrors.isEmpty()) {
+                        hasAnyError = true;
+
+                        // Create a prefix for this row's errors
+                        String rowPrefix = "Row " + rowNumber;
+                        if (!isEmpty(dto.getCompany())) {
+                            rowPrefix += " (Company: " + dto.getCompany() + ")";
+                        }
+
+                        for (String error : rowErrors) {
+                            errors.add(rowPrefix + ": " + error);
+                        }
+                    }
+
+                    // Return result
+                    if (hasAnyError) {
+                        return Response.error(errors);
+                    }
                 }
+            }
 
-                for (String error : rowErrors) {
-                    errors.add(rowPrefix + ": " + error);
+            if ("UPDATE".equals(mode)) {
+
+                for (int rowIndex = 0; rowIndex < dtos.size(); rowIndex++) {
+                    CompanyDTO dto = dtos.get(rowIndex);
+                    int rowNumber = rowIndex + 1;
+
+                    List<String> rowErrors = new ArrayList<>();
+
+                    // Check if this row (DTO) is null
+                    if (dto == null) {
+                        errors.add("Row " + rowNumber + ": DTO object is null");
+                        hasAnyError = true;
+                        continue; // Skip to next row
+                    }
+
+                    // Collect ALL errors
+                    if (dto.getCompanyMstID() == null)
+                        rowErrors.add("Company ID is required");
+                    if (isEmpty(dto.getCompany()))
+                        rowErrors.add("Company name is required");
+                    if (isEmpty(dto.getShortName()))
+                        rowErrors.add("Short name is required");
+                    if (dto.getActiveDate() == null)
+                        rowErrors.add("Active date is required");
+                    if (isEmpty(dto.getAddress()))
+                        rowErrors.add("Address is required");
+                    if (isEmpty(dto.getCountry()))
+                        rowErrors.add("Country is required");
+                    if (isEmpty(dto.getState()))
+                        rowErrors.add("State is required");
+                    if (isEmpty(dto.getDistrict()))
+                        rowErrors.add("District is required");
+                    if (isEmpty(dto.getPlace()))
+                        rowErrors.add("Place is required");
+                    if (isEmpty(dto.getPincode()))
+                        rowErrors.add("Pincode is required");
+                    if (isEmpty(dto.getMobileNumber()))
+                        rowErrors.add("Mobile number is required");
+                    if (isEmpty(dto.getEmail()))
+                        rowErrors.add("Email is required");
+                    if (dto.getWithaffectdate() == null)
+                        rowErrors.add("With affect date is required");
+                    if (dto.getAuthorizationDate() == null)
+                        rowErrors.add("Authorization date is required");
+                    if (dto.getAuthorizationStatus() == null)
+                        rowErrors.add("Authorization status is required");
+                    if (isEmpty(dto.getUserCode()))
+                        rowErrors.add("User code is required");
+
+                    // Add row errors to main error list with row number
+                    if (!rowErrors.isEmpty()) {
+                        hasAnyError = true;
+
+                        // Create a prefix for this row's errors
+                        String rowPrefix = "Row " + rowNumber;
+                        if (!isEmpty(dto.getCompany())) {
+                            rowPrefix += " (Company: " + dto.getCompany() + ")";
+                        }
+
+                        for (String error : rowErrors) {
+                            errors.add(rowPrefix + ": " + error);
+                        }
+                    }
+
+                    // Return result
+                    if (hasAnyError) {
+                        return Response.error(errors);
+                    }
                 }
             }
 
-            // Return result
-            if (hasAnyError) {
-                return Response.error(errors);
-            }
         }
 
         // if log table present ---->
         List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
-        Response<Boolean> logEntityValidate = companyLogService.entityValidate(logDtos);
+        Response<Boolean> logEntityValidate = companyLogService.entityValidate(logDtos, mode);
 
         // If log validation fails, return those errors
         if (!logEntityValidate.isSuccess()) {
@@ -151,7 +233,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
     // =================== 2️⃣ ENTITY POPULATE ===================
     @Override
-    public Response<Boolean> entityPopulate(List<CompanyDTO> dtos) {
+    public Response<Boolean> entityPopulate(List<CompanyDTO> dtos, String mode) {
+
         List<String> errors = new ArrayList<>();
         CompanyDTO dto = dtos.get(0);
 
@@ -163,14 +246,46 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             return Response.error(errors);
         }
 
-        // ===== CREATE AUTHORIZATION =====
-        Authorization auth = new Authorization();
-        auth.setAuthorizationDate(dto.getAuthorizationDate());
-        auth.setAuthorizationStatus(dto.getAuthorizationStatus());
-        auth.setUserMst(user);
+        if ("INSERT".equals(mode)) {
 
-        // Store authorization temporarily
-        dto.setAuthorization(auth);
+            // ===== CREATE AUTHORIZATION =====
+            Authorization auth = new Authorization();
+            auth.setAuthorizationDate(dto.getAuthorizationDate());
+            auth.setAuthorizationStatus(dto.getAuthorizationStatus());
+            auth.setUserMst(user);
+            // Store authorization temporarily
+            dto.setAuthorization(auth);
+        }
+
+        if ("UPDATE".equals(mode)) {
+
+            Long mstId = dto.getCompanyMstID();
+
+            // Get the latest authId for the mstId
+
+            Long authId = authorizationRepository
+                    .findLatestAuthIdByMstId(mstId)
+                    .orElseThrow(() -> new IllegalStateException("AuthId not found for mstId " + mstId));
+
+            Optional<Boolean> status = authorizationRepository.findStatusByAuthId(authId);
+
+            // ===== CREATE AUTHORIZATION =====
+            Authorization auth = new Authorization();
+
+            if (!status.orElse(false)) {
+                // status is FALSE or NOT PRESENT → reuse existing authId
+                auth.setAuthId(authId);
+            }
+
+            // common fields
+            auth.setAuthorizationDate(dto.getAuthorizationDate());
+            auth.setAuthorizationStatus(dto.getAuthorizationStatus());
+            auth.setUserMst(user);
+
+            // Store authorization temporarily
+            dto.setAuthorization(auth);
+
+        }
 
         // if log table present ---->
         // ******* Populate Log Entity *********************
@@ -179,7 +294,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
         // CALL CompanyLogService entityValidate
         List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
-        Response<Boolean> logEntityPopulate = companyLogService.entityPopulate(logDtos);
+        Response<Boolean> logEntityPopulate = companyLogService.entityPopulate(logDtos, mode);
 
         // If log entityPopulate fails, return errors
         if (!logEntityPopulate.isSuccess()) {
@@ -188,51 +303,54 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         // <-----
 
         return Response.success(true);
+
     }
 
     // =================== 3️⃣ BUSINESS VALIDATION ===================
     @Override
-    public Response<Boolean> businessValidate(List<CompanyDTO> dtos) {
-        CompanyDTO dto = dtos.get(0);
+    public Response<Boolean> businessValidate(List<CompanyDTO> dtos, String mode) {
 
-        List<String> errors = new ArrayList<>();
+        if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {
+            CompanyDTO dto = dtos.get(0);
 
-        // ===== IMAGE VALIDATION AND PROCESSING =====
-        Response<String> imageValidationResult = validateAndProcessImage(dto);
-        if (!imageValidationResult.isSuccess()) {
-            errors.addAll(imageValidationResult.getErrors());
+            List<String> errors = new ArrayList<>();
+
+            // ===== IMAGE VALIDATION AND PROCESSING =====
+            Response<String> imageValidationResult = validateAndProcessImage(dto);
+            if (!imageValidationResult.isSuccess()) {
+                errors.addAll(imageValidationResult.getErrors());
+            }
+
+            // If image was successfully processed, set it in both DTO and entity
+            if (imageValidationResult.isSuccess() && imageValidationResult.getData() != null) {
+                String imagePath = imageValidationResult.getData();
+
+                // Set in DTO
+                dto.setCompanyImagePath(imagePath);
+            }
+
+            if (!errors.isEmpty()) {
+                return Response.error(errors);
+            }
+
+            // if log table present ---->
+
+            List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
+            Response<Boolean> logbusinessValidate = companyLogService.businessValidate(logDtos, mode);
+
+            // If log businessValidate fails, return errors
+            if (!logbusinessValidate.isSuccess()) {
+                return Response.error(logbusinessValidate.getErrors());
+            }
+
+            // <-----
         }
-
-        // If image was successfully processed, set it in both DTO and entity
-        if (imageValidationResult.isSuccess() && imageValidationResult.getData() != null) {
-            String imagePath = imageValidationResult.getData();
-
-            // Set in DTO
-            dto.setCompanyImagePath(imagePath);
-        }
-
-        if (!errors.isEmpty()) {
-            return Response.error(errors);
-        }
-
-        // if log table present ---->
-
-        List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
-        Response<Boolean> logbusinessValidate = companyLogService.businessValidate(logDtos);
-
-        // If log businessValidate fails, return errors
-        if (!logbusinessValidate.isSuccess()) {
-            return Response.error(logbusinessValidate.getErrors());
-        }
-
-        // <-----
-
         return Response.success(true);
     }
 
     // =================== 4️⃣ GENERATE PK ===================
     @Override
-    public Response<Object> generatePK(List<CompanyDTO> dtos) {
+    public Response<Object> generatePK(List<CompanyDTO> dtos, String mode) {
         List<String> errors = new ArrayList<>();
 
         if (dtos == null || dtos.isEmpty()) {
@@ -240,68 +358,131 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         }
 
         try {
-            // Process each DTO in the list
-            for (CompanyDTO dto : dtos) {
-                if (dto == null) {
-                    errors.add("Null DTO found in list");
-                    continue;
-                }
 
-                Long companyMstID = dto.getCompanyMstID();
-                Long generatedId = null;
+            if ("INSERT".equals(mode)) {
 
-                // ID IS PROVIDED IN DTO
-                if (companyMstID != null) {
-                    // Check if this ID exists in database
-                    boolean existsInDB = companyRepository.existsById(companyMstID);
-
-                    if (existsInDB) {
-                        // ID is present in DB
-                        generatedId = companyMstID;
-                    } else {
-                        // ID provided but NOT in DB - RETURN ERROR
-                        errors.add("Company ID " + companyMstID + " does not exist in database");
+                // Process each DTO in the list
+                for (CompanyDTO dto : dtos) {
+                    if (dto == null) {
+                        errors.add("Null DTO found in list");
                         continue;
                     }
 
-                }
-                // ID IS NOT PROVIDED IN DTO (null)
-                else {
-                    // Find maximum ID from database
-                    Long maxId = companyRepository.findMaxCompanyMstID();
+                    Long companyMstID = dto.getCompanyMstID();
+                    Long generatedId = null;
 
-                    if (maxId == null) {
-                        // No data in DB - start from 100000
-                        generatedId = 100000L;
-                    } else {
-                        // Data exists - get latest data and increment
-                        generatedId = maxId + 1;
+                    // ID IS PROVIDED IN DTO
+                    if (companyMstID != null) {
+                        // Check if this ID exists in database
+                        boolean existsInDB = companyRepository.existsById(companyMstID);
 
-                        if (generatedId > 999999L) {
-                            errors.add("Cannot generate ID. Maximum limit (999999) reached for company: " +
-                                    (dto.getCompany() != null ? dto.getCompany() : "Unknown"));
+                        if (existsInDB) {
+                            // ID is present in DB
+                            generatedId = companyMstID;
+                        } else {
+                            // ID provided but NOT in DB - RETURN ERROR
+                            errors.add("Company ID " + companyMstID + " does not exist in database");
                             continue;
                         }
+
+                    }
+                    // ID IS NOT PROVIDED IN DTO (null)
+                    else {
+                        // Find maximum ID from database
+                        Long maxId = companyRepository.findMaxCompanyMstID();
+
+                        if (maxId == null) {
+                            // No data in DB - start from 100000
+                            generatedId = 100000L;
+                        } else {
+                            // Data exists - get latest data and increment
+                            generatedId = maxId + 1;
+
+                            if (generatedId > 999999L) {
+                                errors.add("Cannot generate ID. Maximum limit (999999) reached for company: " +
+                                        (dto.getCompany() != null ? dto.getCompany() : "Unknown"));
+                                continue;
+                            }
+                        }
+
+                        dto.setCompanyMstID(generatedId);
                     }
 
-                    dto.setCompanyMstID(generatedId);
+                    // Process log rows for this DTO
+                    if (generatedId != null) {
+                        Long transID = generatedId;
+                        Long logRowNo = 1L; // Default to 1
+
+                        // Get max row number for this transaction
+                        Response<Long> responseLogMaxRowNo = companyLogService.getMaxRowNo(transID);
+
+                        if (responseLogMaxRowNo.isSuccess() && responseLogMaxRowNo.getData() != null) {
+                            logRowNo = responseLogMaxRowNo.getData() + 1;
+                        }
+                        // Populate log entity PK
+                        populateLogEntityPKfromEntity(transID, logRowNo, dto);
+                    }
                 }
+            }
 
-                // Process log rows for this DTO
-                if (generatedId != null) {
-                    Long transID = generatedId;
-                    Long logRowNo = 1L; // Default to 1
+            if ("UPDATE".equals(mode)) {
 
-                    // Get max row number for this transaction
-                    Response<Long> responseLogMaxRowNo = companyLogService.getMaxRowNo(transID);
-
-                    if (responseLogMaxRowNo.isSuccess() && responseLogMaxRowNo.getData() != null) {
-                        logRowNo = responseLogMaxRowNo.getData() + 1;
+                // Process each DTO in the list
+                for (CompanyDTO dto : dtos) {
+                    if (dto == null) {
+                        errors.add("Null DTO found in list");
+                        continue;
                     }
 
-                    // Populate log entity PK
-                    populateLogEntityPKfromEntity(transID, logRowNo, dto);
+                    Long companyMstID = dto.getCompanyMstID();
+                    Long generatedId = null;
+
+                    // ID IS PROVIDED IN DTO
+                    if (companyMstID != null) {
+                        // Check if this ID exists in database
+                        boolean existsInDB = companyRepository.existsById(companyMstID);
+
+                        if (existsInDB) {
+                            // ID is present in DB
+                            generatedId = companyMstID;
+                        } else {
+                            // ID provided but NOT in DB - RETURN ERROR
+                            errors.add("Company ID " + companyMstID + " does not exist in database");
+                            continue;
+                        }
+
+                    }
+
+                    // Process log rows for this DTO
+                    if (generatedId != null) {
+                        Long transID = generatedId;
+                        Long logRowNo = 1L; // Default to 1
+
+                        // Get max row number for this transaction
+                        Response<Long> responseLogMaxRowNo = companyLogService.getMaxRowNo(transID);
+                        Long mstId = dto.getCompanyMstID();
+
+                        Long authId = authorizationRepository
+                                .findLatestAuthIdByMstId(mstId)
+                                .orElseThrow(() -> new IllegalStateException("AuthId not found for mstId " + mstId));
+
+                        Optional<Boolean> status = authorizationRepository.findStatusByAuthId(authId);
+
+                        if (!status.orElse(false)) {
+                            if (responseLogMaxRowNo.isSuccess() && responseLogMaxRowNo.getData() != null) {
+                                logRowNo = responseLogMaxRowNo.getData();
+                            }
+                        } else {
+                            if (responseLogMaxRowNo.isSuccess() && responseLogMaxRowNo.getData() != null) {
+                                logRowNo = responseLogMaxRowNo.getData() + 1;
+                            }
+                        }
+
+                        // Populate log entity PK
+                        populateLogEntityPKfromEntity(transID, logRowNo, dto);
+                    }
                 }
+
             }
 
             // If any errors occurred, return them
@@ -311,7 +492,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
             // Process all log DTOs together
             List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
-            Response<Object> logGeneratePK = companyLogService.generatePK(logDtos);
+            Response<Object> logGeneratePK = companyLogService.generatePK(logDtos, mode);
 
             if (!logGeneratePK.isSuccess()) {
                 return logGeneratePK;
@@ -327,48 +508,75 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
     // =================== 5️⃣ GENERATE SERIAL NO ===================
     @Override
-    public Response<String> generateSerialNo(List<CompanyDTO> dtos) {
+    public Response<String> generateSerialNo(List<CompanyDTO> dtos, String mode) {
 
         List<String> errors = new ArrayList<>();
         CompanyDTO dto = dtos.get(0);
 
         try {
+            if ("INSERT".equals(mode)) {
 
-            String prefix = "CM";
+                String prefix = "CM";
 
-            // Generate new code
-            Pageable pageable = PageRequest.of(0, 1);
-            List<CompanyMst> companies = companyRepository.findLatestCompanyWithCMPrefix(pageable);
+                // Generate new code
+                Pageable pageable = PageRequest.of(0, 1);
+                List<CompanyMst> companies = companyRepository.findLatestCompanyWithCMPrefix(pageable);
 
-            String generatedCode;
+                String generatedCode;
 
-            if (companies == null || companies.isEmpty()) {
-                generatedCode = prefix + "01";
-            } else {
-                CompanyMst latestCompany = companies.get(0);
-                String latestCode = latestCompany.getCode();
+                if (companies == null || companies.isEmpty()) {
+                    generatedCode = prefix + "01";
+                } else {
+                    CompanyMst latestCompany = companies.get(0);
+                    String latestCode = latestCompany.getCode();
 
-                // Extract and increment
-                String numberPart = latestCode.substring(prefix.length());
-                String digits = numberPart.replaceAll("[^0-9]", "");
-                int latestNumber = Integer.parseInt(digits);
-                int nextNumber = latestNumber + 1;
+                    // Extract and increment
+                    String numberPart = latestCode.substring(prefix.length());
+                    String digits = numberPart.replaceAll("[^0-9]", "");
+                    int latestNumber = Integer.parseInt(digits);
+                    int nextNumber = latestNumber + 1;
 
-                // Check limit
-                if (nextNumber > 99) {
-                    errors.add("Company code limit reached (max: CM99)");
+                    // Check limit
+                    if (nextNumber > 99) {
+                        errors.add("Company code limit reached (max: CM99)");
+                    }
+
+                    generatedCode = prefix + String.format("%02d", nextNumber);
                 }
 
-                generatedCode = prefix + String.format("%02d", nextNumber);
+                // SET CODE IN BOTH DTO AND ENTITY
+                dto.setCode(generatedCode);
             }
 
-            // SET CODE IN BOTH DTO AND ENTITY
-            dto.setCode(generatedCode);
+            // For UPDATE mode
+            else if ("UPDATE".equals(mode)) {
 
+                Long companyMstID = dto.getCompanyMstID();
+
+                String code = companyRepository
+                        .findCodeByMstId(companyMstID)
+                        .orElseThrow(
+                                () -> new IllegalStateException("code not found for companyMstID " + companyMstID));
+
+                // Check format
+                if (!code.startsWith("CM")) {
+                    errors.add("Invalid company code format. Must start with 'CM'");
+                }
+
+                // Check if code already exists
+                Optional<CompanyMst> exists = companyRepository.findByCode(code);
+                if (exists.isEmpty() || exists == null) {
+                    errors.add("Company code '" + code + "' not exists");
+                }
+
+                // SET CODE IN DTO
+                dto.setCode(code);
+            }
             // if log table present ---->
 
             List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
-            Response<String> loggenerateSerialNo = companyLogService.generateSerialNo(logDtos);
+            Response<String> loggenerateSerialNo = companyLogService.generateSerialNo(logDtos, mode);
+            dto.setAmendNo(loggenerateSerialNo.getData());
 
             if (!loggenerateSerialNo.isSuccess()) {
                 // Return log service's error
@@ -379,7 +587,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             if (!errors.isEmpty()) {
                 return Response.error(errors);
             }
-            return Response.success(generatedCode);
+
+            return Response.success(dto.getCode());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -493,45 +702,59 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     // =================== 8️⃣ SAVE ENTITY IN SERVICE ===================
     @Override
     @Transactional(rollbackFor = Exception.class)
-    protected CompanyMst saveEntity(CompanyMst company, List<CompanyDTO> dtos) {
+    protected CompanyMst saveEntity(CompanyMst company, List<CompanyDTO> dtos, String mode) {
+
         CompanyDTO dto = dtos.get(0);
+        CompanyMst savedCompany = null;
 
-        try {
-            // ===== SAVE MAIN COMPANY FIRST =====
-            CompanyMst savedCompany = companyRepository.save(company);
+        if ("INSERT".equalsIgnoreCase(mode)) {
 
-            // ===== SAVE AUTHORIZATION WITH COMPANY ID =====
-            // Get the authorization created in entityPopulate
+            // ===== SAVE COMPANY =====
+            savedCompany = companyRepository.save(company);
+
+            // ===== SAVE AUTHORIZATION =====
             Authorization auth = company.getAuthorization();
-
-            // Set the company ID
             auth.setMstId(savedCompany.getCompanyMstID());
 
-            // Save the authorization
             Authorization savedAuth = authorizationRepository.save(auth);
-
-            // if log table present --->
-            // ===== SAVE COMPANY LOG =====
-
-            // Create a CompanyLog entity first
-            CompanyLog logEntity = new CompanyLog();
-
-            // Set authId in DTO before passing to log service
             dto.setAuthId(savedAuth.getAuthId());
 
-            // Now call saveEntity with the created entity
-            List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
-            CompanyLog savedLog = companyLogService.saveEntity(logEntity, logDtos);
+        } else if ("UPDATE".equalsIgnoreCase(mode)) {
 
-            // <------
+            if (Boolean.TRUE.equals(dto.getAuthorizationStatus())) {
 
-            return savedCompany;
+                // ===== SAVE COMPANY =====
+                savedCompany = companyRepository.save(company);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error saving company and related entities: " + e.getMessage(), e);
+                // ===== SAVE AUTHORIZATION =====
+                Authorization auth = company.getAuthorization();
+                auth.setMstId(savedCompany.getCompanyMstID());
+                authorizationRepository.save(auth);
+                Authorization savedAuth = authorizationRepository.save(auth);
+                dto.setAuthId(savedAuth.getAuthId());
+
+            } else {
+                // No save, return existing entity
+                savedCompany = company;
+                // ===== SAVE AUTHORIZATION =====
+                Authorization auth = company.getAuthorization();
+                auth.setMstId(savedCompany.getCompanyMstID());
+                authorizationRepository.save(auth);
+                Authorization savedAuth = authorizationRepository.save(auth);
+                dto.setAuthId(savedAuth.getAuthId());
+
+            }
+
+        } else {
+            throw new IllegalArgumentException("Invalid mode: " + mode);
         }
 
+        // ===== SAVE COMPANY LOG =====
+        CompanyLog logEntity = new CompanyLog();
+        List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
+        companyLogService.saveEntity(logEntity, logDtos, mode);
+
+        return savedCompany;
     }
 
     // =================== 9️⃣ UTILITY METHODS ===================
@@ -544,6 +767,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         List<CompanyLogDTO> CompanyDtoLogs = new ArrayList<>();
         CompanyLogDTO companyDtoLog = new CompanyLogDTO();
 
+        companyDtoLog.setCompanyMstID(dto.getCompanyMstID());
         companyDtoLog.setCompany(dto.getCompany());
         companyDtoLog.setCode(dto.getCode());
         companyDtoLog.setShortName(dto.getShortName());
@@ -565,6 +789,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         companyDtoLog.setEmployerNumber(dto.getEmployerNumber());
         companyDtoLog.setEmployerEmail(dto.getEmployerEmail());
         companyDtoLog.setCompanyImage(dto.getCompanyImage());
+        companyDtoLog.setAmendNo(dto.getAmendNo());
 
         CompanyDtoLogs.add(companyDtoLog);
         return CompanyDtoLogs;
@@ -584,6 +809,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
             CompanyLogDTO logDto = new CompanyLogDTO();
 
+            logDto.setCompanyMstID(dto.getCompanyMstID());
             logDto.setAuthId(dto.getAuthId());
             logDto.setCode(dto.getCode());
             logDto.setCompany(dto.getCompany());
@@ -610,6 +836,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
             logDto.setUserCode(dto.getUserCode());
             logDto.setCompanyImagePath(dto.getCompanyImagePath());
             logDto.setCompanyLogPK(dto.getCompanyLogPK());
+            logDto.setAmendNo(dto.getAmendNo());
             logDtos.add(logDto);
         }
         return logDtos;
@@ -739,6 +966,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     }
 
     private void populateLogEntityPKfromEntity(Long logPk, Long logRowNo, CompanyDTO entity) {
+
         for (CompanyLogDTO entityLog : entity.getCompanyDtoLogs()) {
             CompanyLogPK companyLogPK = new CompanyLogPK();
             companyLogPK.setCompanyMstID(logPk);

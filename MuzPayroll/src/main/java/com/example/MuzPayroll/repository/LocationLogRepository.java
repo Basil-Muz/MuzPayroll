@@ -18,4 +18,6 @@ public interface LocationLogRepository extends JpaRepository<LocationLog, Locati
                 WHERE c.locationLogPK.locationMstID = :locationMstID
             """)
     Long findMaxRowNo(@Param("locationMstID") Long locationMstID);
+
+    
 }

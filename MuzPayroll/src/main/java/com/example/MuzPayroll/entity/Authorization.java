@@ -2,6 +2,8 @@ package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +18,7 @@ public class Authorization {
     private Long mstId;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_code", referencedColumnName = "userCode", nullable = false)
     private UserMst userMst;
 

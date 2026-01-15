@@ -3,6 +3,8 @@ package com.example.MuzPayroll.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -40,6 +42,7 @@ public class BranchMst {
     private Long branchMstID;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
@@ -76,7 +79,7 @@ public class BranchMst {
     @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String landlineNumber;
 
     @Column(nullable = false)

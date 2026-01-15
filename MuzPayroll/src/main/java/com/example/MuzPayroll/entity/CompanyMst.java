@@ -3,6 +3,7 @@ package com.example.MuzPayroll.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -18,6 +19,7 @@ public class CompanyMst {
     private List<CompanyLog> CompanyLogs;
 
     @Transient
+    @JsonIgnore
     private Authorization authorization;
 
     @Id
@@ -26,14 +28,6 @@ public class CompanyMst {
 
     @Column(nullable = false)
     private String company;
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
 
     @Column(nullable = false, unique = true)
     private String code;
@@ -68,7 +62,7 @@ public class CompanyMst {
     @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String landlineNumber;
 
     @Column(nullable = false)
@@ -77,16 +71,16 @@ public class CompanyMst {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String designation;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerEmail;
 
     @Column(nullable = false)
@@ -99,6 +93,14 @@ public class CompanyMst {
 
     public void setCompanyMstID(Long companyMstID) {
         this.companyMstID = companyMstID;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public String getCode() {

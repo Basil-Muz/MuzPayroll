@@ -3,6 +3,8 @@ package com.example.MuzPayroll.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -24,10 +26,12 @@ public class LocationMst {
     private Long locationMstID;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "BranchID", nullable = false)
     private BranchMst branchEntity;
 
@@ -67,7 +71,7 @@ public class LocationMst {
     @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String landlineNumber;
 
     @Column(nullable = false)
@@ -76,16 +80,16 @@ public class LocationMst {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String designation;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String employerEmail;
 
     @Column(nullable = false)

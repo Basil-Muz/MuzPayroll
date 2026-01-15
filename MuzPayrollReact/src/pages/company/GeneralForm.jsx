@@ -262,14 +262,15 @@ const GeneralForm = forwardRef(({ onFormChange, onBackendError }, ref) => {
           if (key !== "companyImage") {
             formData.append(key, values[key]);
           }
-          console.log("formData1", formData);
         });
 
         if (values.companyImage) {
           formData.append("companyImage", values.companyImage);
         }
+        const mode = "INSERT";
+        formData.append("mode", mode);
 
-        const response = await fetch("http://localhost:8087/company/save", {
+        const response = await fetch(`http://localhost:8087/company/save`, {
           method: "POST",
           body: formData,
         });
