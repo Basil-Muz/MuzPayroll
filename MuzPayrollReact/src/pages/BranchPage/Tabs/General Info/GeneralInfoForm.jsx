@@ -356,7 +356,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                     )
                   }
                   dateFormat="dd/MM/yyyy"
-                  minDate={new Date()}
+                  // minDate={new Date()}
                   showMonthDropdown
                   showYearDropdown
                   dropdownMode="select"
@@ -404,7 +404,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                 <Controller
                   name="companyImage"
                   control={control}
-                  rules={{ required: "Company image is required" }}
+                  // rules={{ required: "Company image is required" }}
                   render={({ field }) => (
                     <div className="image-upload-wrapper">
                       {/* Upload Area */}
@@ -419,23 +419,23 @@ const GeneralInfoForm = function GeneralInfoForm({
                             if (!file) return;
 
                             // Validate file type
-                            if (!file.type.match("image/(png|jpeg|jpg)")) {
-                              setError("companyImage", {
-                                type: "manual",
-                                message:
-                                  "Only PNG, JPG and JPEG files are allowed",
-                              });
-                              return;
-                            }
+                            // if (!file.type.match("image/(png|jpeg|jpg)")) {
+                            //   setError("companyImage", {
+                            //     type: "manual",
+                            //     message:
+                            //       "Only PNG, JPG and JPEG files are allowed",
+                            //   });
+                            //   return;
+                            // }
 
                             // Validate file size (5MB max)
-                            if (file.size > 5 * 1024 * 1024) {
-                              setError("companyImage", {
-                                type: "manual",
-                                message: "File size must be less than 5MB",
-                              });
-                              return;
-                            }
+                            // if (file.size > 5 * 1024 * 1024) {
+                            //   setError("companyImage", {
+                            //     type: "manual",
+                            //     message: "File size must be less than 5MB",
+                            //   });
+                            //   return;
+                            // }
 
                             setRawImage(file);
                             setShowCropper(true);

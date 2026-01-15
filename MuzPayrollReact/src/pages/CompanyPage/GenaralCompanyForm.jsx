@@ -75,7 +75,7 @@ export default function GenaralCompanyForm() {
     //   generatedBy: "Manager",
     // },
   ];
-  const inputMode = amendments.length > 0 ? "INSERT" : "UPDATE";
+  const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
   const {
     register,
     handleSubmit,
@@ -167,7 +167,7 @@ export default function GenaralCompanyForm() {
 
   const [selectedAmendment, setSelectedAmendment] = useState(latestAmendmentId);
 
-  console.log("Selected item:", selectedAmendment?.authorizationStatus);
+  // console.log("Selected item:", selectedAmendment?.authorizationStatus);
 
   // const amendmentAuthorizationOptions = [];
 
@@ -224,11 +224,11 @@ export default function GenaralCompanyForm() {
     );
   }
 
-  console.log("Selected List:", amendmentAuthorizationOptions);
+  // console.log("Selected List:", amendmentAuthorizationOptions);
   const isVerifiedAmendment = // Read-only VERIFIED mode
     selectedAmendment?.authorizationStatus === 1 && !addingNewAmend;
 
-  console.log("Verified mde: ", isVerifiedAmendment);
+  // console.log("Verified mde: ", isVerifiedAmendment);
   //for smooth focus
   const smoothFocus = (fieldName) => {
     const fieldNameFlage = formFlags.locationForm
@@ -244,7 +244,7 @@ export default function GenaralCompanyForm() {
         behavior: "smooth",
         block: "center",
       });
-      console.log("sgvwrg");
+      // console.log("sgvwrg");
     }
 
     setFocus(fieldNameFlage); // RHF handles focus properly
@@ -252,7 +252,7 @@ export default function GenaralCompanyForm() {
   // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
   const formatDate = (date) => {
     //datePicker bugg
-    return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
+    return date.toISOString().split("T")[0]; // yyyy-mm-dd
   };
 
   const handleGenerateAmendment = () => {
@@ -409,21 +409,109 @@ export default function GenaralCompanyForm() {
 
   const prevStep = () => setStep((s) => s - 1);
 
+  const handleApiError = (error) => {
+    console.error("API Error:", error);
+
+    // Network / connection issue
+    if (error instanceof TypeError) {
+      toast.error("Unable to connect to server. Please check your network.");
+      return;
+    }
+
+    // HTTP errors
+    // if (error.type === "HTTP_ERROR") {
+    //   switch (error.status) {
+    //     case 400:
+    //       toast.error("Invalid request.");
+    //       break;
+    //     case 401:
+    //       toast.error("Session expired. Please login again.");
+    //       break;
+    //     case 403:
+    //       toast.error("You do not have permission.");
+    //       break;
+    //     case 409:
+    //       toast.error("Duplicate record exists.");
+    //       break;
+    //     case 500:
+    //       toast.error("Server error. Please try again later.");
+    //       break;
+    //     default:
+    //       toast.error("Unexpected error occurred.");
+    //   }
+    //   return;
+    // }
+
+    //  Backend validation / business errors
+    if (error.type === "BUSINESS_ERROR") {
+      const { message, errors } = error.result;
+
+      if (message) {
+        toast.error(message);
+      }
+
+      // Map backend errors to form fields
+      if (errors) {
+        Object.entries(errors).forEach(([field, msg]) => {
+          setError(field, {
+            type: "server",
+            message: msg,
+          });
+        });
+      }
+      return;
+    }
+
+    //  Fallback
+    toast.error("Something went wrong. Please try again.");
+  };
+
+  const saveCompany = async (formData) => {
+    const response = await fetch("http://localhost:8087/company/save", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw {
+        type: "HTTP_ERROR",
+        status: response.status,
+        body: text,
+      };
+    }
+
+    const text = await response.text();
+    const result = text ? JSON.parse(text) : null;
+
+    if (!result?.success) {
+      throw {
+        type: "BUSINESS_ERROR",
+        result,
+      };
+    }
+
+    return result;
+  };
+
   const onSubmit = async (data) => {
     try {
-      setValue("userCode", userCode);
-      setValue("authorizationDate", new Date());
+      const payload = {
+        ...data,
+        userCode,
+        authorizationDate: new Date().toISOString().split("T")[0],
+      };
       // console.log("Submitting data", data);
       const formData = new FormData();
 
-      Object.keys(data).forEach((key) => {
+      Object.entries(payload).forEach(([key, value]) => {
         if (key !== "companyImage") {
-          formData.append(key, data[key]);
+          formData.append(key, value);
         }
       });
 
-      if (data.companyImage) {
-        formData.append("companyImage", data.companyImage);
+      if (payload.companyImage) {
+        formData.append("companyImage", payload.companyImage);
       }
 
       // console.log("FormData contents:");
@@ -438,67 +526,65 @@ export default function GenaralCompanyForm() {
       //     console.log(key, value);
       //   }
       // }
+      await saveCompany(formData);
+      toast.success("Company saved successfully!");
+      //     try {
+      //
+      //       // const responseText = await response.text();
+      //       // if (responseText) {
+      //       //   result = JSON.parse(responseText);
+      //       // }
+      //     } catch (error) {
+      //   handleApiError(error);
+      // }
+      //       console.error("Error parsing response:", parseError);
+      //     }
 
-      const response = await fetch("http://localhost:8087/company/save", {
-        method: "POST",
-        body: formData,
-      });
-
-      let result;
-      try {
-        const responseText = await response.text();
-        if (responseText) {
-          result = JSON.parse(responseText);
-        }
-      } catch (parseError) {
-        console.error("Error parsing response:", parseError);
-      }
-
-      if (result && result.success === true) {
-        toast.success("Company saved successfully!");
-        return;
-      }
+      // if (result && result.success === true) {
+      //   toast.success("Company saved successfully!");
+      //   return;
+      // }
 
       /* -------------------------------
           Prepare documents JSON
         (NO FileList inside JSON)
       -------------------------------- */
-      const documentsPayload = data.documents.map((doc) => {
-        // Append file separately
-        if (doc.file && doc.file.length > 0) {
-          formData.append("files", doc.file[0]); //  backend handles array
-        }
+      // const documentsPayload = data.documents.map((doc) => {
+      //   // Append file separately
+      //   if (doc.file && doc.file.length > 0) {
+      //     formData.append("files", doc.file[0]); //  backend handles array
+      //   }
 
-        return {
-          type: doc.type,
-          number: doc.number,
-          expiryDate: doc.expiryDate,
-          remarks: doc.remarks || "",
-        };
-      });
+      //   return {
+      //     type: doc.type,
+      //     number: doc.number,
+      //     expiryDate: doc.expiryDate,
+      //     remarks: doc.remarks || "",
+      //   };
+      // });
 
       /* -------------------------------
           Prepare final JSON payload
       -------------------------------- */
-      const payload = {
-        ...data,
-        documents: documentsPayload,
-      };
+      // const payload = {
+      //   ...data,
+      //   documents: documentsPayload,
+      // };
 
       // console.log("payload:", payload);
 
       //  VERY IMPORTANT: remove FileList from payload
-      delete payload.documents?.file;
+      // delete payload.documents?.file;
 
       /* -------------------------------
           Append JSON as Blob
       -------------------------------- */
-      formData.append(
-        "data",
-        new Blob([JSON.stringify(payload)], {
-          type: "application/json",
-        })
-      );
+      // formData.append(
+      //   "data",
+      //   new Blob([JSON.stringify(payload)], {
+      //     type: "application/json",
+      //   })
+      // );
 
       /* -------------------------------
           Debug FormData (correct way)
@@ -516,12 +602,15 @@ export default function GenaralCompanyForm() {
       //   body: formData
       // });
     } catch (err) {
-      const apiErrors = err.response?.data?.errors;
-      if (apiErrors) {
-        Object.entries(apiErrors).forEach(([field, message]) => {
-          setError(field, { type: "server", message });
-        });
-      }
+      // const apiErrors = err.response?.data?.errors;
+      // if (apiErrors) {
+      //   Object.entries(apiErrors).forEach(([field, message]) => {
+      //     setError(field, { type: "server", message });
+      //   });
+      // }
+      console.error("Submit failed:", err);
+
+      handleApiError(err);
     }
   };
 
@@ -679,7 +768,7 @@ export default function GenaralCompanyForm() {
                                 errors.authorizationStatus ? "error" : ""
                               }
                               value={authorizationStatusOptions.find(
-                                (opt) => opt.value === 0
+                                (opt) => opt.value === field.value
                               )}
                               onChange={(option) =>
                                 field.onChange(option.value)
@@ -716,7 +805,7 @@ export default function GenaralCompanyForm() {
                               }, 0);
                             }}
                             dateFormat="dd/MM/yyyy"
-                            minDate={new Date()}
+                            // minDate={new Date()}
                             showMonthDropdown
                             onFocus={() => datePickerRef.current?.setOpen(true)}
                             showYearDropdown
