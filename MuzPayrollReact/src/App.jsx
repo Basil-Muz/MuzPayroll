@@ -27,42 +27,52 @@ import Logout from "./components/logout/logout.jsx";
 import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import Designation from "./pages/designation/designation.jsx";
+
+import BranchPageForm from "./pages/BranchPage/Tabs/GenaralBranchForm.jsx";
+import CompanyPageForm from "./pages/CompanyPage/GenaralCompanyForm.jsx";
+import LocationPageForm from "./pages/LocationPage/GeneralLocationForm.jsx";
+import { AuthProvider } from "./context/AuthProvider.jsx";
+
 import PayrollGroup from "./pages/payrollgroup/payrollgroup.jsx";
 import PayrollGroupList from "./pages/payrollgroup/payrollgrouplist.jsx";
 import PayrollGroupSearch from "./pages/payrollgroup/payrollgroupsearch.jsx";
-import UserGroup from "./pages/User Group/usergroup.jsx";
-import UserGroupForm from "./pages/User Group/usergroupform.jsx";
-import LocationGroup from "./pages/Location Group/locationgroup.jsx";
-import LocationGroupForm from "./pages/Location Group/locationgroupform.jsx"; 
-import ShiftGroup from "./pages/Shift Group/shiftgroup.jsx";
-import ShiftGroupSearch from "./pages/Shift Group/shiftgroupsearch.jsx";
-import ShiftGroupList from "./pages/Shift Group/shiftgrouplist.jsx";  
-import { AuthProvider } from "./context/AuthProvider.jsx";
+// import UserGroup from "./pages/User Group/usergroup.jsx";
+// import UserGroupForm from "./pages/User Group/usergroupform.jsx";
+// import LocationGroup from "./pages/Location Group/locationgroup.jsx";
+// import LocationGroupForm from "./pages/Location Group/locationgroupform.jsx"; 
+// import ShiftGroup from "./pages/Shift Group/shiftgroup.jsx";
+// import ShiftGroupSearch from "./pages/Shift Group/shiftgroupsearch.jsx";
+// import ShiftGroupList from "./pages/Shift Group/shiftgrouplist.jsx";  
 function App() {
   return (
-    <AuthProvider>
-    <Routes>
-      {/* <Route path="/" element={<Page />} /> */}
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/home" element={<LoggedPage />} />
-      <Route path="/company" element={<Companyform />} />
-      <Route path="/generalform" element={<GeneralForm />} />
-      <Route path="/documentsinfo" element={<DocumentsInfo />} />
-      <Route path="/masters" element={<MasterPage />} />
-      <Route path="/changepassword" element={<ChangePassword />} />
-      <Route path="/logout" element={<Logout />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/settings" element={<Settings />} />
+    <>
+        <AuthProvider>
+      <Routes>
+        {/* <Route path="/" element={<Page />} /> */}
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/home" element={<LoggedPage />} />
+        <Route path="/company" element={<Companyform />} />
+        <Route path="/generalform" element={<GeneralForm />} />
+        <Route path="/documentsinfo" element={<DocumentsInfo />} />
+        <Route path="/masters" element={<MasterPage />} />
+        <Route path="/changepassword" element={<ChangePassword />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/settings" element={<Settings />} />
 
         <Route path="/branch" element={<BranchForm />} />
         <Route path="/generalform" element={<BranchGeneralForm />} />
         <Route path="/documentsinfo" element={<BranchDocumentsInfo />} />
 
-      <Route path="/location" element={<LocationForm />} />
-      <Route path="/generalform" element={<LocationGeneralForm />} />
-      <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
-      <Route path="/designation" element={<Designation/>} />
-      <Route path="/payrollgroup" element={<PayrollGroup/>} />
+        <Route path="/location" element={<LocationForm />} />
+        <Route path="/generalform" element={<LocationGeneralForm />} />
+        <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
+        <Route path="/designation" element={<Designation />} />
+        <Route path="/branchform" element={<BranchPageForm />} />
+        <Route path="/companyform" element={<CompanyPageForm />} />
+        <Route path="/locationform" element={<LocationPageForm />} />
+{/* 
+        <Route path="/payrollgroup" element={<PayrollGroup/>} />
       <Route path="/payrollgroupsearch" element={<PayrollGroupSearch/>} />
       <Route path="/payrollgrouplist" element={<PayrollGroupList/>} />
       <Route path="/usergroupform" element={<UserGroupForm/>} />
@@ -71,10 +81,64 @@ function App() {
       <Route path="/locationgroupform" element={<LocationGroupForm/>} />
       <Route path="/shiftgroup" element={<ShiftGroup/>} />
       <Route path="/shiftgroupsearch" element={<ShiftGroupSearch/>} />
-      <Route path="/shiftgrouplist" element={<ShiftGroupList/>} />
-    
-    </Routes>
-   </AuthProvider>
+      <Route path="/shiftgrouplist" element={<ShiftGroupList/>} /> */}
+      </Routes>
+      </AuthProvider>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 1000,
+          style: {
+            background: "var(--background)",
+            color: "var(--text)",
+            border: "1px solid var(--border)",
+            boxShadow: "var(--shadow-lg)",
+            borderRadius: "12px",
+            padding: "0",
+            maxWidth: "420px",
+            fontSize: "var(--text-sm)",
+          },
+        }}
+      >
+        {(t) => (
+          <div
+            className={`custom-toast ${t.type} ${
+              t.visible ? "toast-enter" : "toast-exit"
+            }`}
+          >
+            <div className="toast-content">
+              <div className="toast-icon">
+                {t.type === "success" ? (
+                  <SuccessIcon />
+                ) : t.type === "error" ? (
+                  <ErrorIcon />
+                ) : (
+                  <InfoIcon />
+                )}
+              </div>
+              <div className="toast-message">
+                <span className="toast-title">
+                  {t.type === "success"
+                    ? "Success"
+                    : t.type === "error"
+                      ? "Error"
+                      : "Information"}
+                </span>
+                <p>{t.message}</p>
+              </div>
+              <button
+                className="toast-close"
+                onClick={() => toast.dismiss(t.id)}
+                aria-label="Close notification"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <div className={`toast-progress ${t.visible ? "animate" : ""}`} />
+          </div>
+        )}
+      </Toaster>
+    </>
   );
 }
 // Icons

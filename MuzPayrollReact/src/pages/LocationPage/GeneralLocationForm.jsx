@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useState, useEffect, useRef, useCallback} from "react";
+import { useForm, useFieldArray, Controller, useWatch} from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
@@ -76,7 +76,7 @@ export default function GenaralLocationForm() {
     //   generatedBy: "Manager",
     // },
   ];
-  const inputMode = amendments.length > 0 ? "INSERT" : "UPDATE";
+  const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
   const {
     register,
     handleSubmit,
@@ -110,7 +110,11 @@ export default function GenaralLocationForm() {
     },
   });
 
-  const authDate = watch("withaffectdate"); //workflow of amend date then name logic
+  const authDate = useWatch({
+  control,
+  name: "withaffectdate",
+});
+ //workflow of amend date then name logic
 
   const isUnlocked = !!authDate;
 
@@ -126,7 +130,11 @@ export default function GenaralLocationForm() {
     name: "documents",
   });
 
-  const watchedDocuments = watch("documents");
+  const watchedDocuments = useWatch({
+  control,
+  name: "documents",
+});
+
   // const watchedPincode = watch("branchPinCode");
 
   const authorizationStatusOptions = [
@@ -227,41 +235,6 @@ export default function GenaralLocationForm() {
     return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
   };
 
-  const loadCompanyAndBranches = async () => {
-    try {
-      const companyResponse = await axios.get(
-        `http://localhost:8087/company/${companyId}`
-      );
-      const branchResponse = await axios.get(
-        `http://localhost:8087/branch/${companyId}`
-      );
-      const company = companyResponse.data;
-      const branches = branchResponse.data;
-
-      console.log("Company Listdasfgwsdrg:", companyResponse.data);
-      console.log("Branch Listdasfgwsdrg:", branchResponse.data);
-
-      const companyobj = {
-        value: company.companyMstID,
-        label: company.company,
-      };
-      const branchobj = branches.map((branch) => ({
-        value: branch.branchMstID,
-        label: branch.branch,
-      }));
-
-      setCompanyList([companyobj]);
-
-      setBranchList(branchobj);
-
-      // console.log("Company List: ",company);
-      // setCompanyList([company]);
-      // setInitialCompanyId(company.companyMstID); // store it
-    } catch (error) {
-      console.error("Failed to load company:", error);
-    }
-  };
-
   const handleGenerateAmendment = () => {
     setSelectedAmendment(null);
     setAddingNewAmend(true);
@@ -285,11 +258,43 @@ export default function GenaralLocationForm() {
     clearErrors();
   };
 
-  useEffect(() => {
-    loadCompanyAndBranches();
-    // console.log("Company list response: ", companyList);
-    // console.log("Branch list response: ", branchList);
-  }, [companyId]);
+useEffect(() => {
+  let cancelled = false;
+
+  const load = async () => {
+    try {
+      const [companyRes, branchRes] = await Promise.all([
+        axios.get(`http://localhost:8087/company/${companyId}`),
+        axios.get(`http://localhost:8087/branch/${companyId}`),
+      ]);
+
+      if (cancelled) return;
+
+      setCompanyList([
+        {
+          value: companyRes.data.companyMstID,
+          label: companyRes.data.company,
+        },
+      ]);
+
+      setBranchList(
+        branchRes.data.map(branch => ({
+          value: branch.branchMstID,
+          label: branch.branch,
+        }))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  load();
+
+  return () => {
+    cancelled = true;
+  };
+}, [companyId]);
+
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -313,7 +318,7 @@ export default function GenaralLocationForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  const setingData = (selectedAmendment) => {
+  const setingData = useCallback((selectedAmendment) => {
     setValue("location", selectedAmendment.location ?? "", {
       shouldDirty: false,
       shouldValidate: true,
@@ -396,7 +401,7 @@ export default function GenaralLocationForm() {
       shouldDirty: false,
       shouldValidate: true,
     });
-  };
+  },[setValue]);
 
   useEffect(() => {
     //Api call should bo here
@@ -405,7 +410,7 @@ export default function GenaralLocationForm() {
     if (!selectedAmendment) return;
     //Amend Auto selection whille loading
     setingData(selectedAmendment);
-  }, [selectedAmendment, setValue]);
+  }, [selectedAmendment, setingData]);
 
   const handleSelectAmendment = (id, index) => {
     //User Selecetion - Assign the amend data to feild

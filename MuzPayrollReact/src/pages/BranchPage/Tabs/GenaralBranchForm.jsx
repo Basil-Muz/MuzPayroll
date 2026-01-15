@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
@@ -77,7 +77,7 @@ export default function GenaralBranchForm() {
     //   generatedBy: "Manager",
     // },
   ];
-  const inputMode = amendments.length > 0 ? "INSERT" : "UPDATE";
+  const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
   const {
     register,
     handleSubmit,
@@ -106,7 +106,7 @@ export default function GenaralBranchForm() {
       // ],
       userCode: userCode, //User code from local storage
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
-      authorizationStatus: "0", // ENTRY
+      authorizationStatus: 0, // ENTRY
       mode: inputMode,
     },
   });
@@ -203,7 +203,7 @@ export default function GenaralBranchForm() {
     return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
   };
 
-  const loadCompanyAndBranches = async () => {
+  const loadCompanyAndBranches = useCallback(async () => {
     try {
       const companyResponse = await axios.get(
         `http://localhost:8087/company/${companyId}`
@@ -224,7 +224,7 @@ export default function GenaralBranchForm() {
     } catch (error) {
       toast.error("Failed to load company:", error);
     }
-  };
+  },[companyId]);
 
   const handleGenerateAmendment = () => {
     setSelectedAmendment(null);
@@ -252,7 +252,7 @@ export default function GenaralBranchForm() {
   useEffect(() => {
     loadCompanyAndBranches();
     // console.log("Company list response: ", companyList);
-  }, [companyId]);
+  }, [loadCompanyAndBranches]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -276,7 +276,7 @@ export default function GenaralBranchForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  const setingData = (selectedAmendment) => {
+  const setingData = useCallback((selectedAmendment) => {
     setValue("shortName", selectedAmendment.shortName ?? "", {
       shouldDirty: false,
       shouldValidate: true,
@@ -354,7 +354,7 @@ export default function GenaralBranchForm() {
       shouldDirty: false,
       shouldValidate: true,
     });
-  };
+  },[setValue]);
 
   useEffect(() => {
     //Api call should bo here
@@ -363,7 +363,7 @@ export default function GenaralBranchForm() {
     if (!selectedAmendment) return;
     //Amend Auto selection whille loading
     setingData(selectedAmendment);
-  }, [selectedAmendment, setValue]);
+  }, [selectedAmendment, setingData]);
 
   const handleSelectAmendment = (id, index) => {
     //User Selecetion - Assign the amend data to feild

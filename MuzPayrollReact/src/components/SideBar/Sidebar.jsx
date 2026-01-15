@@ -10,7 +10,6 @@ import { FaUserTie } from "react-icons/fa";
 import { IoMdArrowDropleft } from "react-icons/io";
 import { IoMdArrowDropright } from "react-icons/io";
 import "./sidebar.css";
-import axios from "axios";
 import useIsMobile from "../../hook/useIsMobile";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaGears } from "react-icons/fa6";
@@ -107,17 +106,16 @@ export default function Sidebar({ forceOpen }) {
 
   const isMobile = useIsMobile();
   // const isTab = useIsTab();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);//side bar expand or collapsed
   const [openSubmenu, setOpenSubmenu] = useState(null);
-  const [closingSubmenu, setClosingSubmenu] = useState(null);
+  // const [closingSubmenu, setClosingSubmenu] = useState(null);
   const [submenuStyle, setSubmenuStyle] = useState({
     top: 0,
     left: 0,
     position: "absolute"
   });
-  const [sidebarEnabled, setSidebarEnabled] = useState(false);
+  const [sidebarEnabled, setSidebarEnabled] = useState(forceOpen); //opens navigation
   const [active, setActive] = useState(localStorage.getItem("activeMenu") || "");
-
 
 
   const getSidebarClass = () => {
@@ -130,7 +128,7 @@ export default function Sidebar({ forceOpen }) {
 
   const sidebarClass = getSidebarClass();
 
-  // 🔹 LIVE loginData (for username, location, etc.)
+  //  LIVE loginData (for username, location, etc.)
   const [loginData, setLoginData] = useState(() =>
     JSON.parse(localStorage.getItem("loginData") || "{}")
   );
@@ -148,19 +146,20 @@ export default function Sidebar({ forceOpen }) {
   }, []);
   const userName = loginData.userName || "User";
 
-  /* 🔁 Sync sidebar enable */
-  useEffect(() => {
-    if (typeof forceOpen === "boolean") {
-      setSidebarEnabled(forceOpen);
-      return;
-    }
-
+  /*  Sync sidebar enable */
+useEffect(() => {
+  if (!isMobile) {
     const stored = localStorage.getItem("loginData");
     if (stored) {
       const data = JSON.parse(stored);
-      setSidebarEnabled(data.sidebarOpen === true);
+      if (typeof data.sidebarOpen === "boolean") {
+        setSidebarOpen(data.sidebarOpen);
+        setSidebarEnabled(data.sidebarOpen);
+      }
     }
-  }, [forceOpen]);
+  }
+}, [isMobile]);
+
 
   // Auto-close sidebar on mobile when clicking outside
   useEffect(() => {
@@ -174,7 +173,7 @@ export default function Sidebar({ forceOpen }) {
         !event.target.closest(".collapse-btn1")
       ) {
         setSidebarOpen(false);
-        closeSubmenu();
+        setOpenSubmenu(null);
       }
     };
 
@@ -272,19 +271,30 @@ export default function Sidebar({ forceOpen }) {
     closeTimer.current = setTimeout(() => setOpenSubmenu(null), 200);
   };
 
-  const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev);
-    setOpenSubmenu(null); // Close any open submenus
-
+const toggleSidebar = () => {
+  setSidebarOpen(prev => {
     if (!isMobile) {
-      const stored = localStorage.getItem("loginData");
-      if (stored) {
-        const data = JSON.parse(stored);
-        data.sidebarOpen = !sidebarOpen;
-        localStorage.setItem("loginData", JSON.stringify(data));
-      }
+      const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+      localStorage.setItem(
+        "loginData",
+        JSON.stringify({ ...stored, sidebarOpen: !prev })
+      );
     }
-  };
+    return !prev;
+  });
+  setSidebarEnabled(prev => {
+    if (!isMobile) {
+      const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+      localStorage.setItem(
+        "loginData",
+        JSON.stringify({ ...stored, sidebarOpen: !prev })
+      );
+    }
+    return !prev;
+  });
+  setOpenSubmenu(null);
+};
+
 
   // Close submenu when sidebar collapses
   useEffect(() => {
@@ -301,6 +311,7 @@ export default function Sidebar({ forceOpen }) {
         const data = JSON.parse(stored);
         if (typeof data.sidebarOpen === 'boolean') {
           setSidebarOpen(data.sidebarOpen);
+          setSidebarEnabled(data.sidebarOpen);
         }
       }
     }
@@ -482,7 +493,7 @@ export default function Sidebar({ forceOpen }) {
                   {/* Submenu */}
                   {hasChildren && openSubmenu === item.id && (
                     <div
-                      className={`submenu floating ${closingSubmenu === item.id ? "closing" : ""
+                      className={`submenu floating 
                         }`}
                       style={submenuStyle}   // USE SAME STYLE EVERYWHERE
                       onClick={(e) => e.stopPropagation()} // prevent sidebar close

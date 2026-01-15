@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
@@ -109,7 +109,11 @@ export default function GenaralCompanyForm() {
     },
   });
 
-  const authDate = watch("withaffectdate"); //workflow of amend date then name logic
+  const authDate = useWatch({
+    control,
+    name: "withaffectdate",
+  });
+  //workflow of amend date then name logic
 
   const isUnlocked = !!authDate;
 
@@ -125,7 +129,11 @@ export default function GenaralCompanyForm() {
     name: "documents",
   });
 
-  const watchedDocuments = watch("documents");
+  const watchedDocuments = useWatch({
+    control,
+    name: "documents",
+  });
+
   // const watchedPincode = watch("branchPinCode");
 
   const authorizationStatusOptions = [
@@ -261,7 +269,7 @@ export default function GenaralCompanyForm() {
     // setIsReadOnly(false);
 
     reset({
-      ...getValues(), // 👈 keep base data
+      ...getValues(), //  keep base data
       authorizationStatus: 0, // ENTRY
       withaffectdate: "",
       // documents: [
@@ -300,85 +308,88 @@ export default function GenaralCompanyForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  const setingData = (selectedAmendment) => {
-    setValue("shortName", selectedAmendment.shortName ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+  const setingData = useCallback(
+    (selectedAmendment) => {
+      setValue("shortName", selectedAmendment.shortName ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("company", selectedAmendment.company ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("company", selectedAmendment.company ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("companyImage", selectedAmendment.companyImage ?? "");
+      setValue("companyImage", selectedAmendment.companyImage ?? "");
 
-    setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("pincode", selectedAmendment.pincode ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("pincode", selectedAmendment.pincode ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("address", selectedAmendment.address ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("address", selectedAmendment.address ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("country", selectedAmendment.country ?? "IN", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
+      setValue("country", selectedAmendment.country ?? "IN", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
 
-    setValue("state", selectedAmendment.state ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("district", selectedAmendment.district ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("place", selectedAmendment.place ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("email", selectedAmendment.email ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerName", selectedAmendment.employerName ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-    setValue("designation", selectedAmendment.designation ?? "", {
-      shouldDirty: false,
-      shouldValidate: true,
-    });
-  };
+      setValue("state", selectedAmendment.state ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("district", selectedAmendment.district ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("place", selectedAmendment.place ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("email", selectedAmendment.email ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerName", selectedAmendment.employerName ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+      setValue("designation", selectedAmendment.designation ?? "", {
+        shouldDirty: false,
+        shouldValidate: true,
+      });
+    },
+    [setValue]
+  );
 
   useEffect(() => {
     //Api call should bo here
@@ -387,7 +398,7 @@ export default function GenaralCompanyForm() {
     if (!selectedAmendment) return;
     //Amend Auto selection whille loading
     setingData(selectedAmendment);
-  }, [selectedAmendment, setValue]);
+  }, [selectedAmendment, setingData]);
 
   const handleSelectAmendment = (id, index) => {
     // User Selecetion - Assign the amend data to feild
