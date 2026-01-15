@@ -8,22 +8,14 @@ import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.LocationLogPK;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 public class LocationLogDTO {
     private LocationLogPK locatioinLogPK;
 
-    @ManyToOne
-    @JoinColumn(name = "AuthID", nullable = false)
     private Authorization authorization;
 
-    @ManyToOne
-    @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
-    @ManyToOne
-    @JoinColumn(name = "BranchID", nullable = false)
     private BranchMst branchEntity;
 
     public BranchMst getBranchEntity() {
@@ -58,67 +50,68 @@ public class LocationLogDTO {
         this.locatioinLogPK = locatioinLogPK;
     }
 
-    @Column(nullable = false, unique = true)
     private String code;
 
-    @Column(nullable = false)
     private String location;
 
-    @Column(nullable = false)
     private String shortName;
 
-    @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
 
-    @Column(nullable = false)
     private String esiRegion;
 
-    @Column(nullable = false)
     private String address;
 
     private String address1;
     private String address2;
 
-    @Column(nullable = false)
     private String country;
 
-    @Column(nullable = false)
     private String state;
 
-    @Column(nullable = false)
     private String district;
 
-    @Column(nullable = false)
     private String place;
 
-    @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false)
     private String landlineNumber;
 
-    @Column(nullable = false)
     private String mobileNumber;
 
-    @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String employerName;
 
-    @Column(nullable = false)
     private String designation;
 
-    @Column(nullable = false)
     private String employerNumber;
 
-    @Column(nullable = false)
     private String employerEmail;
 
-    @Column(nullable = false)
     private LocalDate withaffectdate;
 
+    private String amendNo;
+
+    private Long locationMstID;
+
     // Getters and setters
+
+    public Long getLocationMstID() {
+        return locationMstID;
+    }
+
+    public void setLocationMstID(Long locationMstID) {
+        this.locationMstID = locationMstID;
+    }
+
+    public String getAmendNo() {
+        return amendNo;
+    }
+
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
 
     public String getCode() {
         return code;

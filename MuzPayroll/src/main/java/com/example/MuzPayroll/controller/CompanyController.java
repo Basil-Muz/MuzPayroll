@@ -21,6 +21,7 @@ import com.example.MuzPayroll.entity.CompanyLogPK;
 import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.DTO.AmendListDTO;
 import com.example.MuzPayroll.entity.DTO.CompanyDTO;
+import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.CompanyLogRepository;
 import com.example.MuzPayroll.repository.CompanyRepository;
@@ -56,7 +57,7 @@ public class CompanyController {
         }
     }
 
-    // TO get the companyMst by giving MstID
+    // TO get the company from companyMst by giving MstID
     @GetMapping("{companyMstID}")
     public ResponseEntity<CompanyMst> getCompanyById(
             @PathVariable @NonNull Long companyMstID) {
@@ -100,6 +101,33 @@ public class CompanyController {
                     dto.setAmendNo(log.getAmendNo());
                     dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
                     dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // To get the Company list from the MST table
+    @GetMapping("/companyList")
+    public ResponseEntity<List<FormListDTO>> getCompanyList() {
+
+        List<CompanyMst> list = companyRepository.findAllCompany();
+
+        if (list.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<FormListDTO> response = list.stream()
+                .map(entity -> {
+                    FormListDTO dto = new FormListDTO();
+                    dto.setMstID(entity.getCompanyMstID());
+                    dto.setCode(entity.getCode());
+                    dto.setName(entity.getCompany());
+                    dto.setShortName(entity.getShortName());
+                    dto.setActiveDate(entity.getActiveDate());
+                    dto.setStatus(entity.getActiveStatusYN());
+                    dto.setInactiveDate(entity.getInactiveDate());
                     return dto;
                 })
                 .toList();

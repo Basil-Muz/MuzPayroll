@@ -70,10 +70,36 @@ public class CompanyDTO {
 
     private Long authId;
 
-    @Column(name = "AmendNo")
     private String amendNo;
 
+    private LocalDate InactiveDate;
+
+    private Boolean activeStatusYN;
     // Getters and setters
+
+    public Boolean getActiveStatusYN() {
+        return activeStatusYN;
+    }
+
+    public void setActiveStatusYN(Boolean activeStatusYN) {
+        this.activeStatusYN = activeStatusYN;
+    }
+
+    public LocalDate getInactiveDate() {
+        return InactiveDate;
+    }
+
+    public void setInactiveDate(LocalDate inactiveDate) {
+        InactiveDate = inactiveDate;
+    }
+
+    public String getAmendNo() {
+        return amendNo;
+    }
+
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
 
     public Authorization getAuthorization() {
         return authorization;
@@ -105,14 +131,6 @@ public class CompanyDTO {
 
     public void setCompanyMstID(Long companyMstID) {
         this.companyMstID = companyMstID;
-    }
-
-    public String getAmendNo() {
-        return amendNo;
-    }
-
-    public void setAmendNo(String amendNo) {
-        this.amendNo = amendNo;
     }
 
     public String getCompany() {

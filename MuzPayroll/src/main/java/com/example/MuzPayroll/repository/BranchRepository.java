@@ -18,6 +18,8 @@ public interface BranchRepository extends JpaRepository<BranchMst, Long> {
 
     boolean existsByCode(String code);
 
+    Optional<BranchMst> findByCode(String code);
+
     /**
      * Get the LATEST company with BR prefix using Pageable
      * Pageable allows us to get only ONE record (LIMIT 1 equivalent)
@@ -36,5 +38,11 @@ public interface BranchRepository extends JpaRepository<BranchMst, Long> {
     // Find maximum ID
     @Query("SELECT MAX(c.branchMstID) FROM BranchMst c WHERE c.branchMstID >= 200000")
     Long findMaxBranchMstID();
+
+    @Query("SELECT a.code FROM BranchMst a WHERE a.branchMstID = :branchMstID")
+    Optional<String> findCodeByMstId(@Param("branchMstID") Long branchMstID);
+
+    @Query("SELECT c FROM BranchMst c")
+    List<BranchMst> findAllBranch();
 
 }

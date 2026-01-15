@@ -122,6 +122,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
                         rowErrors.add("Authorization status is required");
                     if (isEmpty(dto.getUserCode()))
                         rowErrors.add("User code is required");
+                    if (dto.getActiveStatusYN() == null)
+                        rowErrors.add("Active StatusYN is required");
 
                     // Add row errors to main error list with row number
                     if (!rowErrors.isEmpty()) {
@@ -193,6 +195,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
                         rowErrors.add("Authorization status is required");
                     if (isEmpty(dto.getUserCode()))
                         rowErrors.add("User code is required");
+                    if (dto.getActiveStatusYN() == null)
+                        rowErrors.add("Active StatusYN is required");
 
                     // Add row errors to main error list with row number
                     if (!rowErrors.isEmpty()) {
@@ -460,6 +464,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
                         // Get max row number for this transaction
                         Response<Long> responseLogMaxRowNo = companyLogService.getMaxRowNo(transID);
+
                         Long mstId = dto.getCompanyMstID();
 
                         Long authId = authorizationRepository
@@ -653,6 +658,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         company.setEmployerNumber(dto.getEmployerNumber());
         company.setEmployerEmail(dto.getEmployerEmail());
         company.setWithaffectdate(dto.getWithaffectdate());
+        company.setActiveDate(dto.getActiveDate());
+        company.setActiveStatusYN(dto.getActiveStatusYN());
 
         // Set image path if already available in DTO
         if (dto.getCompanyImagePath() != null) {
@@ -695,6 +702,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         dto.setCompanyImagePath(entity.getCompanyImage());
         dto.setWithaffectdate(entity.getWithaffectdate());
         dto.setAuthorization(entity.getAuthorization());
+        dto.setActiveDate(entity.getActiveDate());
+        dto.setActiveStatusYN(entity.getActiveStatusYN());
 
         return dto;
     }

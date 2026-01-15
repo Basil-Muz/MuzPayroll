@@ -266,7 +266,7 @@ export default function GenaralLocationForm() {
       try {
         const [companyRes, branchRes] = await Promise.all([
           axios.get(`http://localhost:8087/company/${companyId}`),
-          axios.get(`http://localhost:8087/branch/${companyId}`),
+          axios.get(`http://localhost:8087/branch/company/${companyId}`),
         ]);
 
         if (cancelled) return;
