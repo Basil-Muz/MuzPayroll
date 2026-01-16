@@ -47,12 +47,12 @@ export default function DocumentsTab({
       file: null,
       remarks: "",
     });
-    toast.success("New document row added");
+    // toast.success("New document row added");
   };
 
-    const removeDocumentRow = (index) => {
+  const removeDocumentRow = (index) => {
     remove(index);
-    toast.success("Document row removed");
+    // toast.success("Document row removed");
   };
 
   //   const handleDocumentChange = (id, updates) => {
@@ -180,15 +180,6 @@ export default function DocumentsTab({
                     </span>
                   )}
                 </div>
-
-                {/* className={`form-control ${errors.branchName ? "error" : ""}`}
-                    placeholder="Enter branch name"
-                    {...register('branchName', { required: "Branch name is required",
-                      pattern:{
-                        value: /^[a-zA-Z\s-]+$/,
-                        message:"Please enter valide branch name",
-                      }
-                    })} */}
 
                 <div className="field">
                   <label className="required">Document Number</label>

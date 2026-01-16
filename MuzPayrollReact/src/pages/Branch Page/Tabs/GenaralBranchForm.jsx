@@ -23,8 +23,8 @@ import ScrollToTopButton from "../../../components/ScrollToTop/ScrollToTopButton
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
 export default function GenaralBranchForm() {
-  const [step, setStep] = useState(0); //switch steps
-  const [companyList, setCompanyList] = useState([]);
+  const [step, setStep] = useState(0); // switch steps
+  const [companyList, setCompanyList] = useState([]); //fetch companys
 
   // const [backendErrors, setBackendErrors] = useState([]);
   //pass the back end error to front end
@@ -34,8 +34,9 @@ export default function GenaralBranchForm() {
 
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
 
-  const datePickerRef = useRef(null);
+  const datePickerRef = useRef(null); //To focus the date picker
   const authDateInputRef = useRef(null);
+  const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
   const generalInfoRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
   // console.log("User data",UserData);
@@ -131,6 +132,13 @@ export default function GenaralBranchForm() {
   const watchedDocuments = watch("documents");
   // const watchedPincode = watch("branchPinCode");
 
+  let submitStatus = 1;
+  console.log("Submit status: ", step < steps.length - 1 && submitStatus===1);
+  
+  if (watchedDocuments)
+    submitStatus =
+      (watchedDocuments.length > 0 && watchedDocuments[0].file === null)? 1 : 0;
+
   const authorizationStatusOptions = [
     { label: "ENTRY", value: 0 },
     { label: "VERIFIED", value: 1 },
@@ -204,6 +212,41 @@ export default function GenaralBranchForm() {
     return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
   };
 
+  const handleApiError = (error) => {
+    // console.error("API Error:", error);
+
+    // Network error (no response from server)
+    if (!error.body) {
+      toast.error("Unable to connect to server. Please check your network.");
+      return;
+    }
+    console.log("Error", error);
+    const status = error.status;
+
+    switch (status) {
+      case 400:
+        toast.error("Invalid request.");
+        break;
+      case 401:
+        toast.error("Session expired. Please login again.");
+        break;
+      case 403:
+        toast.error("You do not have permission.");
+        break;
+      case 404:
+        toast.error("Resource not found.");
+        break;
+      case 409:
+        toast.error("Duplicate record exists.");
+        break;
+      case 500:
+        toast.error("Server error. Please try again later.");
+        break;
+      default:
+        toast.error("Unexpected error occurred.");
+    }
+  };
+
   const loadCompanyAndBranches = useCallback(async () => {
     try {
       const companyResponse = await axios.get(
@@ -221,9 +264,10 @@ export default function GenaralBranchForm() {
 
       // console.log("Company List: ",company);
       // setCompanyList([company]);
-      // setInitialCompanyId(company.companyMstID); // ✅ store it
+      // setInitialCompanyId(company.companyMstID); // store it
     } catch (error) {
-      toast.error("Failed to load company:", error);
+      // toast.error("Failed to load company:", error);
+      handleApiError(error);
     }
   }, [companyId]);
 
@@ -260,6 +304,10 @@ export default function GenaralBranchForm() {
 
     const timer = setTimeout(() => {
       authDateInputRef.current?.focus();
+      dateWrapperRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       datePickerRef.current?.setOpen(true);
     }, 200);
 
@@ -383,8 +431,42 @@ export default function GenaralBranchForm() {
 
   const prevStep = () => setStep((s) => s - 1);
 
+  const saveBranch = async (formData) => {
+    const response = await fetch("http://localhost:8087/branch/save", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw {
+        type: "HTTP_ERROR",
+        status: response.status,
+        body: text,
+      };
+    }
+
+    const text = await response.text();
+    const result = text ? JSON.parse(text) : null;
+
+    if (!result?.success) {
+      throw {
+        type: "BUSINESS_ERROR",
+        result,
+      };
+    }
+
+    return result;
+  };
+
   const onSubmit = async (data) => {
     try {
+      await trigger("documents"); //  validate all docs
+      if (errors?.documents) {
+        toast.error("Please complete the document details");
+        return;
+      }
+
       setValue("userCode", userCode);
       setValue("authorizationDate", new Date());
       // console.log("Submitting data", data);
@@ -413,22 +495,22 @@ export default function GenaralBranchForm() {
       //   }
       // }
 
-      const response = await fetch("http://localhost:8087/branch/save", {
-        method: "POST",
-        body: formData,
-      });
+      // const response = await fetch("http://localhost:8087/branch/save", {
+      //   method: "POST",
+      //   body: formData,
+      // });
 
-      let result;
-      try {
-        const responseText = await response.text();
-        if (responseText) {
-          console.log("response", responseText);
-          result = JSON.parse(responseText);
-        }
-      } catch (parseError) {
-        toast.error("Error parsing response:", parseError);
-      }
-
+      // let result;
+      // try {
+      //   const responseText = await response.text();
+      //   if (responseText) {
+      //     console.log("response", responseText);
+      //     result = JSON.parse(responseText);
+      //   }
+      // } catch (parseError) {
+      //   toast.error("Error parsing response:", parseError);
+      // }
+      const result = await saveBranch(formData);
       if (result && result.success === true) {
         toast.success("Branch saved successfully!");
         // SAVE → VIEW → GENERATE AMENDMENT → SAVE AMENDMENT → VERIFY
@@ -506,12 +588,13 @@ export default function GenaralBranchForm() {
       //   body: formData
       // });
     } catch (err) {
-      const apiErrors = err.response?.data?.errors;
-      if (apiErrors) {
-        Object.entries(apiErrors).forEach(([field, message]) => {
-          setError(field, { type: "server", message });
-        });
-      }
+      // const apiErrors = err.response?.data?.errors;
+      // if (apiErrors) {
+      //   Object.entries(apiErrors).forEach(([field, message]) => {
+      //     setError(field, { type: "server", message });
+      //   });
+      // }
+      handleApiError(err);
     }
   };
 
@@ -566,7 +649,17 @@ export default function GenaralBranchForm() {
 
           {/* Form Content */}
           <div className="form-content">
-            <form className="form-container" onSubmit={handleSubmit(onSubmit)}>
+            <form
+              className="form-container"
+              onSubmit={() => {
+                // await trigger("documents"); //  validate all docs
+                if (errors?.documents) {
+                  toast.error("Please complete the document details");
+                  return;
+                }
+                handleSubmit(onSubmit);
+              }}
+            >
               <div className="step-animate">
                 {step === 0 && (
                   <div className="form-section">
@@ -598,6 +691,7 @@ export default function GenaralBranchForm() {
                       setError={setError}
                       clearErrors={clearErrors}
                       control={control}
+                      setFocus={setFocus}
                       flags={formFlags}
                       isReadOnly={isVerifiedAmendment || isReadOnly}
                     />
@@ -611,6 +705,7 @@ export default function GenaralBranchForm() {
                       register={register}
                       errors={errors}
                       watch={watch}
+                      setFocus={setFocus}
                       setValue={setValue}
                       setError={setError}
                       flags={formFlags}
@@ -680,7 +775,10 @@ export default function GenaralBranchForm() {
                     </div>
 
                     <div className="amend-field">
-                      <label className="form-label required">
+                      <label
+                        className="form-label required"
+                        ref={dateWrapperRef}
+                      >
                         Authorization date
                       </label>
                       <Controller
@@ -706,7 +804,7 @@ export default function GenaralBranchForm() {
                               }, 0);
                             }}
                             dateFormat="dd/MM/yyyy"
-                            minDate={new Date()}
+                            // minDate={new Date()}
                             showMonthDropdown
                             onFocus={() => datePickerRef.current?.setOpen(true)}
                             showYearDropdown
@@ -907,7 +1005,7 @@ export default function GenaralBranchForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: step < steps.length - 1,
+              disabled: step < steps.length - 1 && submitStatus===1 ,
             },
             search: {
               // onClick: handleSearch,

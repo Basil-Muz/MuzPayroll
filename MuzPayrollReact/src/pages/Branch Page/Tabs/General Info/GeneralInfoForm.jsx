@@ -14,7 +14,7 @@ const GeneralInfoForm = function GeneralInfoForm({
   clearErrors,
   control,
   flags,
-  setError,
+  // setError,
   isReadOnly,
   isUnlocked,
   setFocus,
@@ -44,16 +44,21 @@ const GeneralInfoForm = function GeneralInfoForm({
   const userObj = JSON.parse(UserData);
 
   const branchId = userObj.branchId;
-
+  console.log("Branches:",branchId)
   // console.log("Branch sgsg", UserData);
   useEffect(() => {
     if (companys?.length > 0) {
       setValue("companyEntity", companys[0].value);
     }
 
-    if (branchList?.length > 0) {
-      setValue("branchEntity", branchId);
-    }
+  if (branchList?.length > 0) {
+    // The branchId is string but in branchList it is integer
+    setValue("branchEntity", parseInt(branchId), {
+      shouldDirty: false,
+      shouldTouch: false,
+      shouldValidate: false,
+    });
+  }
     console.log("General info branch :", branchList);
   }, [companys, setValue, branchList, branchId]);
 
@@ -77,18 +82,6 @@ const GeneralInfoForm = function GeneralInfoForm({
   // if(watchCompany){
   //   console.log("Comapny: ",register.company);
   // }
-  // const companys = [
-  //   { value: "TCS", label: "Tata Consultancy Services" },
-  //   { value: "NGI", label: "Nissan Digital India LLP" },
-  //   { value: "AT", label: "Accubits Technologies" },
-  //   { value: "UST", label: "UST Global" },
-  // ];
-
-  // const branches = [
-  //   { value: "IMC", label: "Infosys Mysore Campus" },
-  //   { value: "TPC", label: "Tidel Park Chennai" },
-  //   { value: "IK", label: "InfoPark Kochi" },
-  // ];
 
   //   const locations = [
   //   { value: "Kochi", label: "Kochi" },
@@ -223,7 +216,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                       classNamePrefix="form-control-select"
                       className={`${errors.branchEntity ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                       value={selectedOption || null} // important
-                      onChange={(option) => field.onChange(option)} // store full object
+                     onChange={(option) => field.onChange(option.value)}  // store full object
                     />
                   );
                 }}

@@ -6,10 +6,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
-import GeneralInfoForm from "../BranchPage/Tabs/General Info/GeneralInfoForm";
-import AddressForm from "../BranchPage/Tabs/General Info/AddressForm";
-import ContactForm from "../BranchPage/Tabs/General Info/ContactForm";
-import DocumentsTab from "../BranchPage/Tabs/General Info/DocumentsTab";
+import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
+import AddressForm from "../Branch Page/Tabs/General Info/AddressForm";
+import ContactForm from "../Branch Page/Tabs/General Info/ContactForm";
+import DocumentsTab from "../Branch Page/Tabs/General Info/DocumentsTab";
 
 // import StepProgress from "./General Info/StepProgress";
 // import Header from "../../../components/Header/Header";
@@ -239,14 +239,14 @@ export default function GenaralCompanyForm() {
 
   // console.log("Verified mde: ", isVerifiedAmendment);
   //for smooth focus
-  const smoothFocus = (fieldName) => {
+  const smoothFocus = () => {
     const fieldNameFlage = formFlags.locationForm
       ? "location"
       : formFlags.companyForm
         ? "company"
         : formFlags.branchForm
           ? "branch"
-          : fieldName;
+          : "";
     const el = document.querySelector(`[name=${fieldNameFlage}]`);
     if (el) {
       el.scrollIntoView({
@@ -422,37 +422,37 @@ export default function GenaralCompanyForm() {
   const prevStep = () => setStep((s) => s - 1);
 
   const handleApiError = (error) => {
-    console.error("API Error:", error);
+    // console.error("API Error:", error);
 
     // Network / connection issue
-    if (error instanceof TypeError) {
+    if (!error.response) {
       toast.error("Unable to connect to server. Please check your network.");
       return;
     }
 
     // HTTP errors
-    // if (error.type === "HTTP_ERROR") {
-    //   switch (error.status) {
-    //     case 400:
-    //       toast.error("Invalid request.");
-    //       break;
-    //     case 401:
-    //       toast.error("Session expired. Please login again.");
-    //       break;
-    //     case 403:
-    //       toast.error("You do not have permission.");
-    //       break;
-    //     case 409:
-    //       toast.error("Duplicate record exists.");
-    //       break;
-    //     case 500:
-    //       toast.error("Server error. Please try again later.");
-    //       break;
-    //     default:
-    //       toast.error("Unexpected error occurred.");
-    //   }
-    //   return;
-    // }
+    if (error.type === "HTTP_ERROR") {
+      switch (error.status) {
+        case 400:
+          toast.error("Invalid request.");
+          break;
+        case 401:
+          toast.error("Session expired. Please login again.");
+          break;
+        case 403:
+          toast.error("You do not have permission.");
+          break;
+        case 409:
+          toast.error("Duplicate record exists.");
+          break;
+        case 500:
+          toast.error("Server error. Please try again later.");
+          break;
+        default:
+          toast.error("Unexpected error occurred.");
+      }
+      return;
+    }
 
     //  Backend validation / business errors
     if (error.type === "BUSINESS_ERROR") {
@@ -707,6 +707,7 @@ export default function GenaralCompanyForm() {
                       setValue={setValue}
                       setError={setError}
                       clearErrors={clearErrors}
+                      setFocus={setFocus}
                       control={control}
                       flags={formFlags}
                       isReadOnly={isVerifiedAmendment}
@@ -723,6 +724,7 @@ export default function GenaralCompanyForm() {
                       errors={errors}
                       watch={watch}
                       setValue={setValue}
+                      setFocus={setFocus}
                       setError={setError}
                       flags={formFlags}
                       isUnlocked={isUnlocked || isVerifiedAmendment}
@@ -813,7 +815,7 @@ export default function GenaralCompanyForm() {
                               field.onChange(date ? formatDate(date) : null);
 
                               setTimeout(() => {
-                                smoothFocus("name"); //  Focus to name after selecting the date
+                                smoothFocus(); //  Focus to name after selecting the date
                               }, 0);
                             }}
                             dateFormat="dd/MM/yyyy"
@@ -1020,7 +1022,7 @@ export default function GenaralCompanyForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: step < steps.length - 1,
+              disabled: step < steps.length - 1 && errors.length !== 0,
             },
             search: {
               // onClick: handleSearch,

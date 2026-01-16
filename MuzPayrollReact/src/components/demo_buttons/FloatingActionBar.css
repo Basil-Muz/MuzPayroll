@@ -47,11 +47,7 @@
 
 /* PRIMARY — Save */
 .fab-btn.primary {
-  background: linear-gradient(
-    135deg,
-    var(--brand),
-    #b017b5
-  );
+  background: linear-gradient(135deg, var(--brand), #b017b5);
   color: #fff;
   border: none;
 }
@@ -85,7 +81,7 @@
 .tooltip {
   position: absolute;
   right: 58px;
-  top:auto;
+  top: auto;
   background: var(--primary-hover);
   color: var(--background);
   padding: 6px 10px;
@@ -130,7 +126,6 @@
 }
 
 @media (max-width: 1023px) {
-
   .floating-action-bar {
     right: 25px;
     bottom: 6rem;
@@ -145,19 +140,19 @@
 
   /* Toggle button */
   .fab-toggle {
-  width: 56px;
-  height: 56px;
-  display: flex;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--brand), #b017b5);
-  color: #fff;
-  border: none;
-  font-size: 22px;
-  cursor: pointer;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
-  align-content: center;
-  justify-content: center;
-  align-items: center;
+    width: clamp(48px, 5vw, 56px);
+    height: clamp(48px, 5vw, 56px);
+    display: flex;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand), #b017b5);
+    color: #fff;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    align-content: center;
+    justify-content: center;
+    align-items: center;
   }
 
   /* Hide actions by default */

@@ -2,9 +2,9 @@ import "./App.css";
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import { Toaster, toast } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import "./ToastStyles.css";
-import "./Common-form.css"
+import "./common-form.css";
 
 import Companyform from "./pages/company/Companyform.jsx";
 import BranchForm from "./pages/Branch/BranchForm.jsx";
@@ -28,7 +28,7 @@ import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import Designation from "./pages/designation/designation.jsx";
 
-import BranchPageForm from "./pages/BranchPage/Tabs/GenaralBranchForm.jsx";
+import BranchPageForm from "./pages/Branch Page/Tabs/GenaralBranchForm.jsx";
 import CompanyPageForm from "./pages/CompanyPage/GenaralCompanyForm.jsx";
 import LocationPageForm from "./pages/LocationPage/GeneralLocationForm.jsx";
 import { AuthProvider } from "./context/AuthProvider.jsx";
@@ -39,39 +39,39 @@ import PayrollGroupSearch from "./pages/payrollgroup/payrollgroupsearch.jsx";
 // import UserGroup from "./pages/User Group/usergroup.jsx";
 // import UserGroupForm from "./pages/User Group/usergroupform.jsx";
 // import LocationGroup from "./pages/Location Group/locationgroup.jsx";
-// import LocationGroupForm from "./pages/Location Group/locationgroupform.jsx"; 
+// import LocationGroupForm from "./pages/Location Group/locationgroupform.jsx";
 // import ShiftGroup from "./pages/Shift Group/shiftgroup.jsx";
 // import ShiftGroupSearch from "./pages/Shift Group/shiftgroupsearch.jsx";
-// import ShiftGroupList from "./pages/Shift Group/shiftgrouplist.jsx";  
+// import ShiftGroupList from "./pages/Shift Group/shiftgrouplist.jsx";
 function App() {
   return (
     <>
-        <AuthProvider>
-      <Routes>
-        {/* <Route path="/" element={<Page />} /> */}
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/home" element={<LoggedPage />} />
-        <Route path="/company" element={<Companyform />} />
-        <Route path="/generalform" element={<GeneralForm />} />
-        <Route path="/documentsinfo" element={<DocumentsInfo />} />
-        <Route path="/masters" element={<MasterPage />} />
-        <Route path="/changepassword" element={<ChangePassword />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/settings" element={<Settings />} />
+      <AuthProvider>
+        <Routes>
+          {/* <Route path="/" element={<Page />} /> */}
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/home" element={<LoggedPage />} />
+          <Route path="/company" element={<Companyform />} />
+          <Route path="/generalform" element={<GeneralForm />} />
+          <Route path="/documentsinfo" element={<DocumentsInfo />} />
+          <Route path="/masters" element={<MasterPage />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/settings" element={<Settings />} />
 
-        <Route path="/branch" element={<BranchForm />} />
-        <Route path="/generalform" element={<BranchGeneralForm />} />
-        <Route path="/documentsinfo" element={<BranchDocumentsInfo />} />
+          <Route path="/branch" element={<BranchForm />} />
+          <Route path="/generalform" element={<BranchGeneralForm />} />
+          <Route path="/documentsinfo" element={<BranchDocumentsInfo />} />
 
-        <Route path="/location" element={<LocationForm />} />
-        <Route path="/generalform" element={<LocationGeneralForm />} />
-        <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
-        <Route path="/designation" element={<Designation />} />
-        <Route path="/branchform" element={<BranchPageForm />} />
-        <Route path="/companyform" element={<CompanyPageForm />} />
-        <Route path="/locationform" element={<LocationPageForm />} />
-{/* 
+          <Route path="/location" element={<LocationForm />} />
+          <Route path="/generalform" element={<LocationGeneralForm />} />
+          <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
+          <Route path="/designation" element={<Designation />} />
+          <Route path="/branchform" element={<BranchPageForm />} />
+          <Route path="/companyform" element={<CompanyPageForm />} />
+          <Route path="/locationform" element={<LocationPageForm />} />
+          {/* 
         <Route path="/payrollgroup" element={<PayrollGroup/>} />
       <Route path="/payrollgroupsearch" element={<PayrollGroupSearch/>} />
       <Route path="/payrollgrouplist" element={<PayrollGroupList/>} />
@@ -82,62 +82,56 @@ function App() {
       <Route path="/shiftgroup" element={<ShiftGroup/>} />
       <Route path="/shiftgroupsearch" element={<ShiftGroupSearch/>} />
       <Route path="/shiftgrouplist" element={<ShiftGroupList/>} /> */}
-      </Routes>
+        </Routes>
       </AuthProvider>
       <Toaster
         position="top-right"
+        gutter={10}
         toastOptions={{
-          duration: 1000,
+          duration: 2800,
           style: {
-            background: "var(--background)",
+            background: "var(--glass-bg)",
             color: "var(--text)",
             border: "1px solid var(--border)",
             boxShadow: "var(--shadow-lg)",
-            borderRadius: "12px",
-            padding: "0",
+            borderRadius: "var(--radius-lg)",
+            padding: "14px 16px",
             maxWidth: "420px",
             fontSize: "var(--text-sm)",
+            backdropFilter: "blur(10px)",
+          },
+
+          // Default icon theme
+          iconTheme: {
+            primary: "var(--brand)",
+            secondary: "var(--background)",
+          },
+
+          success: {
+            style: {
+              borderLeft: "3px solid var(--success)",
+              background:
+                "linear-gradient(135deg, var(--success-light), var(--glass-bg))",
+            },
+          },
+
+          error: {
+            style: {
+              borderLeft: "4px solid var(--danger)",
+              background:
+                "linear-gradient(135deg, var(--danger-light), var(--glass-bg))",
+            },
+          },
+
+          loading: {
+            style: {
+              borderLeft: "4px solid var(--brand)",
+              background:
+                "linear-gradient(135deg, var(--primary-light), var(--glass-bg))",
+            },
           },
         }}
-      >
-        {(t) => (
-          <div
-            className={`custom-toast ${t.type} ${
-              t.visible ? "toast-enter" : "toast-exit"
-            }`}
-          >
-            <div className="toast-content">
-              <div className="toast-icon">
-                {t.type === "success" ? (
-                  <SuccessIcon />
-                ) : t.type === "error" ? (
-                  <ErrorIcon />
-                ) : (
-                  <InfoIcon />
-                )}
-              </div>
-              <div className="toast-message">
-                <span className="toast-title">
-                  {t.type === "success"
-                    ? "Success"
-                    : t.type === "error"
-                      ? "Error"
-                      : "Information"}
-                </span>
-                <p>{t.message}</p>
-              </div>
-              <button
-                className="toast-close"
-                onClick={() => toast.dismiss(t.id)}
-                aria-label="Close notification"
-              >
-                <CloseIcon />
-              </button>
-            </div>
-            <div className={`toast-progress ${t.visible ? "animate" : ""}`} />
-          </div>
-        )}
-      </Toaster>
+      />
     </>
   );
 }
