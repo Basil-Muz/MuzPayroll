@@ -2,7 +2,7 @@ import "./App.css";
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import { Toaster } from "react-hot-toast";
+import { Toaster,toast } from "react-hot-toast";
 import "./ToastStyles.css";
 import "./common-form.css";
 
@@ -134,7 +134,46 @@ function App() {
             },
           },
         }}
-      />
+
+      >
+        {(t) => (
+          <div
+            className={`custom-toast ${t.type} ${t.visible ? "toast-enter" : "toast-exit"
+              }`}
+          >
+            <div className="toast-content">
+              <div className="toast-icon">
+                {t.type === "success" ? (
+                  <SuccessIcon />
+                ) : t.type === "error" ? (
+                  <ErrorIcon />
+                ) : (
+                  <InfoIcon />
+                )}
+              </div>
+              <div className="toast-message">
+                <span className="toast-title">
+                  {t.type === "success"
+                    ? "Success"
+                    : t.type === "error"
+                      ? "Error"
+                      : "Information"}
+                </span>
+                <p>{t.message}</p>
+              </div>
+              <button
+                className="toast-close"
+                onClick={() => toast.dismiss(t.id)}
+                aria-label="Close notification"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+            <div className={`toast-progress ${t.visible ? "animate" : ""}`} />
+          </div>
+        )}
+      </Toaster>
+
     </>
   );
 }
