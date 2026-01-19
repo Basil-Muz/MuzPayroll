@@ -21,11 +21,14 @@ import ThemeToggle from "../../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../../components/ScrollToTop/ScrollToTopButton";
 
 const steps = ["General Info", "Address", "Contact", "Document Into"];
+// let submitStatus = 0; //Toggle the submit or save button
 
 export default function GenaralBranchForm() {
   const [step, setStep] = useState(0); // switch steps
   const [companyList, setCompanyList] = useState([]); //fetch companys
+  const [submitStatus, setSubmitStatus] = useState(1);
 
+ //changes when the file attached
   // const [backendErrors, setBackendErrors] = useState([]);
   //pass the back end error to front end
 
@@ -132,13 +135,7 @@ export default function GenaralBranchForm() {
   const watchedDocuments = watch("documents");
   // const watchedPincode = watch("branchPinCode");
 
-  let submitStatus = 1;
-  console.log("Submit status: ", step < steps.length - 1 && submitStatus===1);
-  
-  if (watchedDocuments)
-    submitStatus =
-      (watchedDocuments.length > 0 && watchedDocuments[0].file === null)? 1 : 0;
-
+  console.log("Submit status: ", step < steps.length - 1 && submitStatus == 1);
   const authorizationStatusOptions = [
     { label: "ENTRY", value: 0 },
     { label: "VERIFIED", value: 1 },
@@ -225,7 +222,7 @@ export default function GenaralBranchForm() {
 
     switch (status) {
       case 400:
-        toast.error("Invalid request.");
+        toast.error(error.errors[0]);
         break;
       case 401:
         toast.error("Session expired. Please login again.");
@@ -293,6 +290,28 @@ export default function GenaralBranchForm() {
 
     clearErrors();
   };
+
+  // useEffect(() => {
+  //   if (watchedDocuments && watchedDocuments.length > 0) {
+  //     const emptyDoc = watchedDocuments.find((doc) => doc.file == null);
+  //     submitStatus = emptyDoc ? 1 : 0;
+  //     // console.log("Empty document flage", emptyDoc);
+  //     // console.log("Watch documnest", watchedDocuments);
+  //     // console.log("Submit status1 ", submitStatus);
+  //   }
+  // }, [watchedDocuments, file]);
+  useEffect(() => {
+    if (!watchedDocuments?.length) {
+      setSubmitStatus(1);
+      return;
+    }
+
+    const hasEmptyFile = watchedDocuments.some(
+      (doc) => !doc?.file || doc.file.length === 0
+    );
+
+    setSubmitStatus(hasEmptyFile ? 1 : 0);
+  }, [watchedDocuments]);
 
   useEffect(() => {
     loadCompanyAndBranches();
@@ -726,6 +745,7 @@ export default function GenaralBranchForm() {
                       remove={remove}
                       trigger={trigger} // validate the documents while adding new document
                       watchDocuments={watchedDocuments}
+                      // onFileSelect={file} //Toggle the save when file selected
                     />
                   </div>
                 )}
@@ -1005,7 +1025,7 @@ export default function GenaralBranchForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: step < steps.length - 1 && submitStatus===1 ,
+              disabled: step < steps.length - 1 || submitStatus == 1,
             },
             search: {
               // onClick: handleSearch,

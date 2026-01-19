@@ -36,13 +36,15 @@ import { AuthProvider } from "./context/AuthProvider.jsx";
 import PayrollGroup from "./pages/payrollgroup/payrollgroup.jsx";
 import PayrollGroupList from "./pages/payrollgroup/payrollgrouplist.jsx";
 import PayrollGroupSearch from "./pages/payrollgroup/payrollgroupsearch.jsx";
-// import UserGroup from "./pages/User Group/usergroup.jsx";
-// import UserGroupForm from "./pages/User Group/usergroupform.jsx";
-// import LocationGroup from "./pages/Location Group/locationgroup.jsx";
-// import LocationGroupForm from "./pages/Location Group/locationgroupform.jsx";
-// import ShiftGroup from "./pages/Shift Group/shiftgroup.jsx";
-// import ShiftGroupSearch from "./pages/Shift Group/shiftgroupsearch.jsx";
-// import ShiftGroupList from "./pages/Shift Group/shiftgrouplist.jsx";
+
+import UserGroup from "./pages/UserGroup/usergroup.jsx";
+import UserGroupForm from "./pages/UserGroup/usergroupform.jsx";
+import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
+import LocationGroupForm from "./pages/LocationGroup/locationgroupform.jsx";
+import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
+import ShiftGroupSearch from "./pages/ShiftGroup/shiftgroupsearch.jsx";
+import ShiftGroupList from "./pages/ShiftGroup/shiftgrouplist.jsx";
+
 function App() {
   return (
     <>
@@ -71,17 +73,18 @@ function App() {
           <Route path="/branchform" element={<BranchPageForm />} />
           <Route path="/companyform" element={<CompanyPageForm />} />
           <Route path="/locationform" element={<LocationPageForm />} />
-          {/* 
-        <Route path="/payrollgroup" element={<PayrollGroup/>} />
-      <Route path="/payrollgroupsearch" element={<PayrollGroupSearch/>} />
-      <Route path="/payrollgrouplist" element={<PayrollGroupList/>} />
-      <Route path="/usergroupform" element={<UserGroupForm/>} />
-      <Route path="/usergroup" element={<UserGroup/>} />
-      <Route path="/locationgroup" element={<LocationGroup/>} />
-      <Route path="/locationgroupform" element={<LocationGroupForm/>} />
-      <Route path="/shiftgroup" element={<ShiftGroup/>} />
-      <Route path="/shiftgroupsearch" element={<ShiftGroupSearch/>} />
-      <Route path="/shiftgrouplist" element={<ShiftGroupList/>} /> */}
+
+          <Route path="/payrollgroup" element={<PayrollGroup />} />
+          <Route path="/payrollgroupsearch" element={<PayrollGroupSearch />} />
+          <Route path="/payrollgrouplist" element={<PayrollGroupList />} />
+          <Route path="/usergroupform" element={<UserGroupForm />} />
+          <Route path="/usergroup" element={<UserGroup />} />
+          <Route path="/locationgroup" element={<LocationGroup />} />
+          <Route path="/locationgroupform" element={<LocationGroupForm />} />
+          <Route path="/shiftgroup" element={<ShiftGroup />} />
+          <Route path="/shiftgroupsearch" element={<ShiftGroupSearch />} />
+          <Route path="/shiftgrouplist" element={<ShiftGroupList />} />
+
         </Routes>
       </AuthProvider>
       <Toaster
