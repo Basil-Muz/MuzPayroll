@@ -17,7 +17,7 @@ public class LoginResponse {
     private String userName;
     private String locationName;
 
-    private List<CompanyMst> companyList;
+    private CompanyMst companyList;
     private List<BranchMst> branchList;
     private List<LocationMst> locationList;
 
@@ -70,10 +70,10 @@ public class LoginResponse {
     }
 
 
-    public List<CompanyMst> getCompanyList() {
+    public CompanyMst getCompany() {
     return companyList;
 }
-public void setCompanyList(List<CompanyMst> companyList) {
+public void setCompany(CompanyMst companyList) {
     this.companyList = companyList;
 }
 
