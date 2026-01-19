@@ -22,7 +22,6 @@ public class CompanyDTO {
     private CompanyLogPK companyLogPK;
 
     // CompanyMst
-    @Column(name = "CompanyMstID")
     private Long companyMstID;
 
     private String company;
@@ -75,6 +74,7 @@ public class CompanyDTO {
     private LocalDate InactiveDate;
 
     private Boolean activeStatusYN;
+  
     // Getters and setters
 
     public Boolean getActiveStatusYN() {
@@ -319,8 +319,8 @@ public class CompanyDTO {
 
     // Authorization
 
-    @Column
-    private Long mstId;
+    // @Column
+    // private Long mstId;
 
     @Column(nullable = false)
     private String userCode;
@@ -347,13 +347,13 @@ public class CompanyDTO {
         this.authorizationStatus = authorizationStatus;
     }
 
-    public Long getMstId() {
-        return mstId;
-    }
+    // public Long getMstId() {
+    // return mstId;
+    // }
 
-    public void setMstId(Long mstId) {
-        this.mstId = mstId;
-    }
+    // public void setMstId(Long mstId) {
+    // this.mstId = mstId;
+    // }
 
     public String getUserCode() {
         return userCode;

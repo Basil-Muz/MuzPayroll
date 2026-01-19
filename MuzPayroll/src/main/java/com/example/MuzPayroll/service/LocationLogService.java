@@ -193,6 +193,8 @@ public class LocationLogService extends MuzirisAbstractService<LocationLogDTO, L
 
         LocationLogDTO dto = new LocationLogDTO();
 
+        dto.setLocation(entity.getLocation());
+        dto.setLocationMstID(entity.getLocationLogPK().getLocationMstID());
         dto.setBranchEntity(entity.getBranchEntity());
         dto.setCode(entity.getCode());
         dto.setCompanyEntity(entity.getCompanyEntity());
@@ -217,6 +219,16 @@ public class LocationLogService extends MuzirisAbstractService<LocationLogDTO, L
         dto.setEsiRegion(entity.getEsiRegion());
         dto.setLocatioinLogPK(entity.getLocationLogPK());
         dto.setAmendNo(entity.getAmendNo());
+
+        if (entity.getAuthorization() != null) {
+            dto.setAuthId(entity.getAuthorization().getAuthId());
+            dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
+            dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
+
+            if (entity.getAuthorization().getUserMst() != null) {
+                dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
+            }
+        }
 
         return dto;
     }

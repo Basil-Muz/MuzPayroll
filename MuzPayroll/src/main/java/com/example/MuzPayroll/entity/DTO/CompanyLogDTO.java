@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.CompanyLogPK;
 
 import jakarta.persistence.Column;
@@ -276,8 +277,18 @@ public class CompanyLogDTO {
 
     // Authorization
 
-    @Column
-    private Long mstId;
+    // private Authorization authorization;
+
+    // public Authorization getAuthorization() {
+    // return authorization;
+    // }
+
+    // public void setAuthorization(Authorization authorization) {
+    // this.authorization = authorization;
+    // }
+
+    // @Column
+    // private Long mstId;
 
     @Column(nullable = false)
     private String userCode;
@@ -304,13 +315,13 @@ public class CompanyLogDTO {
         this.authorizationStatus = authorizationStatus;
     }
 
-    public Long getMstId() {
-        return mstId;
-    }
+    // public Long getMstId() {
+    // return mstId;
+    // }
 
-    public void setMstId(Long mstId) {
-        this.mstId = mstId;
-    }
+    // public void setMstId(Long mstId) {
+    // this.mstId = mstId;
+    // }
 
     public String getUserCode() {
         return userCode;

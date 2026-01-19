@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.MuzPayroll.entity.CompanyLog;
-import com.example.MuzPayroll.entity.CompanyLogPK;
 import com.example.MuzPayroll.entity.CompanyMst;
-import com.example.MuzPayroll.entity.DTO.AmendListDTO;
 import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
@@ -59,7 +56,7 @@ public class CompanyController {
 
     // TO get the company from companyMst by giving MstID
     @GetMapping("{companyMstID}")
-    public ResponseEntity<CompanyMst> getCompanyById(
+    public ResponseEntity<CompanyMst> getCompanyByMstId(
             @PathVariable @NonNull Long companyMstID) {
 
         return companyRepository.findById(companyMstID)
@@ -67,52 +64,19 @@ public class CompanyController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // TO get the company data from companyLog by giving MstID and rowno
-    @GetMapping("/amend/{companyMstID}/{rowNo}")
-    public ResponseEntity<CompanyLog> getCompanyLogById(
-            @PathVariable Long companyMstID,
-            @PathVariable Long rowNo) {
+    // TO get the companyMst and the List of Logs y using MstID
+    @GetMapping("/getamendlist/{companyMstID}")
+    public ResponseEntity<CompanyDTO> getCompanyById(@PathVariable Long companyMstID) {
 
-        CompanyLogPK pk = new CompanyLogPK();
-        pk.setCompanyMstID(companyMstID);
-        pk.setRowNo(rowNo);
-
-        return companyLogRepository.findById(pk)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // To get the amend list
-    @GetMapping("amend/{companyMstID}")
-    public ResponseEntity<List<AmendListDTO>> getCompanyLogs(
-            @PathVariable Long companyMstID) {
-
-        List<CompanyLog> logs = companyLogRepository.findAllLogsByCompanyMstID(companyMstID);
-
-        if (logs.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<AmendListDTO> response = logs.stream()
-                .map(log -> {
-                    AmendListDTO dto = new AmendListDTO();
-                    dto.setMstID(log.getCompanyLogPK().getCompanyMstID());
-                    dto.setRowNo(log.getCompanyLogPK().getRowNo());
-                    dto.setAmendNo(log.getAmendNo());
-                    dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
-                    dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
-                    return dto;
-                })
-                .toList();
-
-        return ResponseEntity.ok(response);
+        CompanyDTO dto = companyService.getCompanyWithLogs(companyMstID);
+        return ResponseEntity.ok(dto);
     }
 
     // To get the Company list from the MST table
-    @GetMapping("/companyList")
+    @GetMapping("/companylist")
     public ResponseEntity<List<FormListDTO>> getCompanyList() {
 
-        List<CompanyMst> list = companyRepository.findAllCompany();
+        List<CompanyMst> list = companyRepository.findAllActiveCompanies();
 
         if (list.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -128,11 +92,82 @@ public class CompanyController {
                     dto.setActiveDate(entity.getActiveDate());
                     dto.setStatus(entity.getActiveStatusYN());
                     dto.setInactiveDate(entity.getInactiveDate());
+                    dto.setActiveStatusYN(entity.getActiveStatusYN());
                     return dto;
                 })
                 .toList();
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/inactivecompanylist")
+    public ResponseEntity<List<FormListDTO>> getInactiveCompanyList() {
+
+        List<CompanyMst> list = companyRepository.findAllInActiveCompanies();
+
+        if (list.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<FormListDTO> response = list.stream()
+                .map(entity -> {
+                    FormListDTO dto = new FormListDTO();
+                    dto.setMstID(entity.getCompanyMstID());
+                    dto.setCode(entity.getCode());
+                    dto.setName(entity.getCompany());
+                    dto.setShortName(entity.getShortName());
+                    dto.setActiveDate(entity.getActiveDate());
+                    dto.setStatus(entity.getActiveStatusYN());
+                    dto.setInactiveDate(entity.getInactiveDate());
+                    dto.setActiveStatusYN(entity.getActiveStatusYN());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    // // TO get the company data from companyLog by giving MstID and rowno
+    // @GetMapping("/amend/{companyMstID}/{rowNo}")
+    // public ResponseEntity<CompanyLog> getCompanyLogById(
+    // @PathVariable Long companyMstID,
+    // @PathVariable Long rowNo) {
+
+    // CompanyLogPK pk = new CompanyLogPK();
+    // pk.setCompanyMstID(companyMstID);
+    // pk.setRowNo(rowNo);
+
+    // return companyLogRepository.findById(pk)
+    // .map(ResponseEntity::ok)
+    // .orElse(ResponseEntity.notFound().build());
+    // }
+
+    // // To get the amend list
+    // @GetMapping("amend/{companyMstID}")
+    // public ResponseEntity<List<AmendListDTO>> getCompanyLogs(
+    // @PathVariable Long companyMstID) {
+
+    // List<CompanyLog> logs =
+    // companyLogRepository.findAllLogsByCompanyMstID(companyMstID);
+
+    // if (logs.isEmpty()) {
+    // return ResponseEntity.notFound().build();
+    // }
+
+    // List<AmendListDTO> response = logs.stream()
+    // .map(log -> {
+    // AmendListDTO dto = new AmendListDTO();
+    // dto.setMstID(log.getCompanyLogPK().getCompanyMstID());
+    // dto.setRowNo(log.getCompanyLogPK().getRowNo());
+    // dto.setAmendNo(log.getAmendNo());
+    // dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
+    // dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+    // return dto;
+    // })
+    // .toList();
+
+    // return ResponseEntity.ok(response);
+    // }
 
 }

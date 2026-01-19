@@ -18,5 +18,12 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
     @Query("SELECT MAX(a.authId) FROM Authorization a WHERE a.mstId = :mstId")
     Optional<Long> findLatestAuthIdByMstId(@Param("mstId") Long mstId);
 
+    @Query("""
+                SELECT MAX(a.authId)
+                FROM Authorization a
+                WHERE a.mstId = :mstId
+                  AND a.authorizationStatus = true
+            """)
+    Optional<Long> findLatestAuthorizedAuthIdByMstId(@Param("mstId") Long mstId);
 
 }

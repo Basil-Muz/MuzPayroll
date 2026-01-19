@@ -14,12 +14,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.BranchLog;
 import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.LocationLog;
 import com.example.MuzPayroll.entity.LocationLogPK;
 import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.UserMst;
+import com.example.MuzPayroll.entity.DTO.BranchDTO;
+import com.example.MuzPayroll.entity.DTO.BranchLogDTO;
 import com.example.MuzPayroll.entity.DTO.LocationDTO;
 import com.example.MuzPayroll.entity.DTO.LocationLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
@@ -43,6 +46,9 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LocationLogRepository locationLogRepository;
 
     // ================= FINAL SAVE WRAPPER =================
     @Transactional
@@ -673,6 +679,18 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
         dto.setAuthorization(entity.getAuthorization());
         dto.setActiveDate(entity.getActiveDate());
         dto.setActiveStatusYN(entity.getActiveStatusYN());
+        // ===== AUTHORIZATION MAPPING =====
+        if (entity.getAuthorization() != null) {
+
+            dto.setAuthId(entity.getAuthorization().getAuthId());
+            dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
+            dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
+
+            if (entity.getAuthorization().getUserMst() != null) {
+                dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
+            }
+        }
+
         return dto;
     }
 
@@ -795,7 +813,9 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
         DtoLog.setEmployerEmail(dto.getEmployerEmail());
         DtoLog.setEsiRegion(dto.getEsiRegion());
         DtoLog.setAmendNo(dto.getAmendNo());
-
+        DtoLog.setAmendNo(dto.getAmendNo());
+        DtoLog.setAuthorizationDate(dto.getAuthorizationDate());
+        DtoLog.setAuthorizationStatus(dto.getAuthorizationStatus());
         DtoLogs.add(DtoLog);
         return DtoLogs;
     }
@@ -859,6 +879,51 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
             logRowNo++;
         }
 
+    }
+
+    // To set the Log list in the entity to retrun to ui
+    @Transactional(readOnly = true)
+    public LocationDTO getLocationWithLogs(Long locationMstID) {
+
+        // Fetch MST row
+        LocationMst entity = locationRepository.findById(locationMstID)
+                .orElseThrow(() -> new RuntimeException("Location not found"));
+
+        // Convert MST → DTO
+        LocationDTO dto = entityToDto(entity);
+
+        // Fetch ALL logs related to this MST
+        List<LocationLog> Logs = locationLogRepository
+                .findByLocationLogPK_LocationMstIDOrderByLocationLogPK_RowNoDesc(
+                        locationMstID);
+
+        // OPTIONAL: Set MST-level audit info
+        Logs.stream()
+                .filter(log -> log.getAuthorization() != null
+                        && Boolean.TRUE.equals(
+                                log.getAuthorization().getAuthorizationStatus()))
+                .findFirst()
+                .ifPresent(log -> {
+                    dto.setAmendNo(log.getAmendNo());
+                    dto.setAuthId(log.getAuthorization().getAuthId());
+                    dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
+                    dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+
+                    if (log.getAuthorization().getUserMst() != null) {
+                        dto.setUserCode(
+                                log.getAuthorization().getUserMst().getUserCode());
+                    }
+                });
+
+        // Convert ALL logs → DTO list
+        List<LocationLogDTO> logDtos = Logs.stream()
+                .map(locationLogService::entityToDto)
+                .toList();
+
+        // Attach list to MST DTO
+        dto.setLocationDtoLogs(logDtos);
+
+        return dto;
     }
 
 }

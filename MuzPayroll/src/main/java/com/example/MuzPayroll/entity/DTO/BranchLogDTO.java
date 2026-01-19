@@ -5,14 +5,17 @@ import java.time.LocalDate;
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.BranchLogPK;
 import com.example.MuzPayroll.entity.CompanyMst;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 
 public class BranchLogDTO {
     private BranchLogPK branchLogPK;
 
+    @JsonIgnore
     private Authorization authorization;
 
+    @JsonIgnore
     private CompanyMst companyEntity;
 
     private String code;
@@ -49,7 +52,6 @@ public class BranchLogDTO {
     private String amendNo;
 
     private Long branchMstID;
-
 
     // Getters and setters
 
@@ -233,9 +235,6 @@ public class BranchLogDTO {
 
     // Authorization
 
-    @Column
-    private Long mstId;
-
     @Column(nullable = false)
     private String userCode;
 
@@ -259,14 +258,6 @@ public class BranchLogDTO {
 
     public void setAuthorizationStatus(Boolean authorizationStatus) {
         this.authorizationStatus = authorizationStatus;
-    }
-
-    public Long getMstId() {
-        return mstId;
-    }
-
-    public void setMstId(Long mstId) {
-        this.mstId = mstId;
     }
 
     public String getUserCode() {

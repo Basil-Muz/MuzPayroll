@@ -27,8 +27,11 @@ import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.CompanyLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
+import com.example.MuzPayroll.repository.CompanyLogRepository;
 import com.example.MuzPayroll.repository.CompanyRepository;
 import com.example.MuzPayroll.repository.UserRepository;
+
+import io.micrometer.common.lang.NonNull;
 
 @Service
 public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMst> {
@@ -54,6 +57,9 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
     @Autowired
     private CompanyLogService companyLogService;
+
+    @Autowired
+    private CompanyLogRepository companyLogRepository;
 
     // ================= FINAL SAVE WRAPPER =================
     @Transactional
@@ -293,8 +299,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
         // if log table present ---->
         // ******* Populate Log Entity *********************
-        List<CompanyLogDTO> CompanyDtoLogs = populateLogEntityfromEntity(dto);
-        dto.setCompanyDtoLogs(CompanyDtoLogs);
+        List<CompanyLogDTO> companyDtoLogs = populateLogEntityfromEntity(dto);
+        dto.setCompanyDtoLogs(companyDtoLogs);
 
         // CALL CompanyLogService entityValidate
         List<CompanyLogDTO> logDtos = convertToLogDTO(dtos);
@@ -658,8 +664,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         company.setEmployerNumber(dto.getEmployerNumber());
         company.setEmployerEmail(dto.getEmployerEmail());
         company.setWithaffectdate(dto.getWithaffectdate());
-        company.setActiveDate(dto.getActiveDate());
         company.setActiveStatusYN(dto.getActiveStatusYN());
+        company.setAmendNo(dto.getAmendNo());
 
         // Set image path if already available in DTO
         if (dto.getCompanyImagePath() != null) {
@@ -675,8 +681,10 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     }
 
     // =================== ENTITY → DTO ===================
+
     @Override
     public CompanyDTO entityToDto(CompanyMst entity) {
+
         CompanyDTO dto = new CompanyDTO();
 
         dto.setCompanyMstID(entity.getCompanyMstID());
@@ -701,9 +709,20 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         dto.setEmployerEmail(entity.getEmployerEmail());
         dto.setCompanyImagePath(entity.getCompanyImage());
         dto.setWithaffectdate(entity.getWithaffectdate());
-        dto.setAuthorization(entity.getAuthorization());
-        dto.setActiveDate(entity.getActiveDate());
         dto.setActiveStatusYN(entity.getActiveStatusYN());
+        dto.setAmendNo(entity.getAmendNo());
+
+        // ===== AUTHORIZATION MAPPING =====
+        if (entity.getAuthorization() != null) {
+
+            dto.setAuthId(entity.getAuthorization().getAuthId());
+            dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
+            dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
+
+            if (entity.getAuthorization().getUserMst() != null) {
+                dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
+            }
+        }
 
         return dto;
     }
@@ -773,7 +792,8 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     }
 
     private List<CompanyLogDTO> populateLogEntityfromEntity(CompanyDTO dto) {
-        List<CompanyLogDTO> CompanyDtoLogs = new ArrayList<>();
+
+        List<CompanyLogDTO> companyDtoLogs = new ArrayList<>();
         CompanyLogDTO companyDtoLog = new CompanyLogDTO();
 
         companyDtoLog.setCompanyMstID(dto.getCompanyMstID());
@@ -799,9 +819,11 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         companyDtoLog.setEmployerEmail(dto.getEmployerEmail());
         companyDtoLog.setCompanyImage(dto.getCompanyImage());
         companyDtoLog.setAmendNo(dto.getAmendNo());
+        companyDtoLog.setAuthorizationDate(dto.getAuthorizationDate());
+        companyDtoLog.setAuthorizationStatus(dto.getAuthorizationStatus());
 
-        CompanyDtoLogs.add(companyDtoLog);
-        return CompanyDtoLogs;
+        companyDtoLogs.add(companyDtoLog);
+        return companyDtoLogs;
     }
 
     private List<CompanyLogDTO> convertToLogDTO(List<CompanyDTO> dtos) {
@@ -974,6 +996,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         }
     }
 
+    // To set LogEntityPK from Entity
     private void populateLogEntityPKfromEntity(Long logPk, Long logRowNo, CompanyDTO entity) {
 
         for (CompanyLogDTO entityLog : entity.getCompanyDtoLogs()) {
@@ -986,4 +1009,50 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         }
 
     }
+
+    // To set the Log list in the entity to retrun to ui
+    @Transactional(readOnly = true)
+    public CompanyDTO getCompanyWithLogs(Long companyMstID) {
+
+        // Fetch MST row
+        CompanyMst entity = companyRepository.findById(companyMstID)
+                .orElseThrow(() -> new RuntimeException("Company not found"));
+
+        // Convert MST → DTO
+        CompanyDTO dto = entityToDto(entity);
+
+        // Fetch ALL logs related to this MST
+        List<CompanyLog> companyLogs = companyLogRepository
+                .findByCompanyLogPK_CompanyMstIDOrderByCompanyLogPK_RowNoDesc(
+                        companyMstID);
+
+        // OPTIONAL: Set MST-level audit info
+        companyLogs.stream()
+                .filter(log -> log.getAuthorization() != null
+                        && Boolean.TRUE.equals(
+                                log.getAuthorization().getAuthorizationStatus()))
+                .findFirst()
+                .ifPresent(log -> {
+                    dto.setAmendNo(log.getAmendNo());
+                    dto.setAuthId(log.getAuthorization().getAuthId());
+                    dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
+                    dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+
+                    if (log.getAuthorization().getUserMst() != null) {
+                        dto.setUserCode(
+                                log.getAuthorization().getUserMst().getUserCode());
+                    }
+                });
+
+        // Convert ALL logs → DTO list
+        List<CompanyLogDTO> logDtos = companyLogs.stream()
+                .map(companyLogService::entityToDto)
+                .toList();
+
+        // Attach list to MST DTO
+        dto.setCompanyDtoLogs(logDtos);
+
+        return dto;
+    }
+
 }

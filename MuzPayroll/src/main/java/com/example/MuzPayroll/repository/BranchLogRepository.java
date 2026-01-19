@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.MuzPayroll.entity.BranchLog;
 import com.example.MuzPayroll.entity.BranchLogPK;
+import com.example.MuzPayroll.entity.CompanyLog;
 
 @Repository
 public interface BranchLogRepository extends JpaRepository<BranchLog, BranchLogPK> {
@@ -37,5 +38,7 @@ public interface BranchLogRepository extends JpaRepository<BranchLog, BranchLogP
                         ORDER BY CAST(amend_no AS INTEGER) DESC
                         """, nativeQuery = true)
         List<BranchLog> findAllLogsByBranchMstID(@Param("branchMstID") Long branchMstID);
+
+        List<BranchLog> findByBranchLogPK_BranchMstIDOrderByBranchLogPK_RowNoDesc(Long branchMstID);
 
 }

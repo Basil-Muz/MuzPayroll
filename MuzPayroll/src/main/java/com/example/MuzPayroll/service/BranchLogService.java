@@ -120,13 +120,11 @@ public class BranchLogService extends MuzirisAbstractService<BranchLogDTO, Branc
                     .findLatestAmendNoByMstId(MstID)
                     .orElse(0L);
 
-
             Long authId = authorizationRepository
                     .findLatestAuthIdByMstId(MstID)
                     .orElseThrow(() -> new IllegalStateException("AuthId not found for mstId " + MstID));
 
             Optional<Boolean> status = authorizationRepository.findStatusByAuthId(authId);
-
 
             if (!status.orElse(false)) {
                 generatedAmendNo = latestAmendNo;
@@ -189,6 +187,7 @@ public class BranchLogService extends MuzirisAbstractService<BranchLogDTO, Branc
         BranchLogDTO dto = new BranchLogDTO();
 
         dto.setBranch(entity.getBranch());
+        dto.setBranchMstID(entity.getBranchLogPK().getBranchMstID());
         dto.setCode(entity.getCode());
         dto.setCompanyEntity(entity.getCompanyEntity());
         dto.setShortName(entity.getShortName());
@@ -207,6 +206,15 @@ public class BranchLogService extends MuzirisAbstractService<BranchLogDTO, Branc
         dto.setWithaffectdate(entity.getWithaffectdate());
         dto.setBranchLogPK(entity.getBranchLogPK());
         dto.setAmendNo(entity.getAmendNo());
+        if (entity.getAuthorization() != null) {
+            dto.setAuthId(entity.getAuthorization().getAuthId());
+            dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
+            dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
+
+            if (entity.getAuthorization().getUserMst() != null) {
+                dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
+            }
+        }
 
         return dto;
     }

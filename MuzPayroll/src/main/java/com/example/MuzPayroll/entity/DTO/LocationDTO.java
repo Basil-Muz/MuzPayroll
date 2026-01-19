@@ -7,6 +7,7 @@ import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.LocationLogPK;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
@@ -18,15 +19,19 @@ public class LocationDTO {
     private List<LocationLogDTO> locationDtoLogs;
 
     @Transient
+    @JsonIgnore
     private Authorization authorization;
 
+    @JsonIgnore
     private LocationLogPK locationLogPK;
 
     @Id
     private Long locationMstID;
 
+    @JsonIgnore
     private CompanyMst companyEntity;
 
+    @JsonIgnore
     private BranchMst branchEntity;
 
     private String code;
@@ -330,8 +335,6 @@ public class LocationDTO {
 
     // Authorization
 
-    @Column
-    private Long mstId;
 
     @Column(nullable = false)
     private String userCode;
@@ -356,14 +359,6 @@ public class LocationDTO {
 
     public void setAuthorizationStatus(Boolean authorizationStatus) {
         this.authorizationStatus = authorizationStatus;
-    }
-
-    public Long getMstId() {
-        return mstId;
-    }
-
-    public void setMstId(Long mstId) {
-        this.mstId = mstId;
     }
 
     public String getUserCode() {

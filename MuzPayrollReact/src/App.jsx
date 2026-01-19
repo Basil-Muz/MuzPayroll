@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 
 import { Toaster, toast } from "react-hot-toast";
 import "./ToastStyles.css";
-import "./Common-form.css"
+import "./Common-form.css";
 
 import Companyform from "./pages/company/Companyform.jsx";
 import BranchForm from "./pages/Branch/BranchForm.jsx";
@@ -39,39 +39,45 @@ import PayrollGroupSearch from "./pages/payrollgroup/payrollgroupsearch.jsx";
 // import UserGroup from "./pages/User Group/usergroup.jsx";
 // import UserGroupForm from "./pages/User Group/usergroupform.jsx";
 // import LocationGroup from "./pages/Location Group/locationgroup.jsx";
-// import LocationGroupForm from "./pages/Location Group/locationgroupform.jsx"; 
+// import LocationGroupForm from "./pages/Location Group/locationgroupform.jsx";
 // import ShiftGroup from "./pages/Shift Group/shiftgroup.jsx";
 // import ShiftGroupSearch from "./pages/Shift Group/shiftgroupsearch.jsx";
-// import ShiftGroupList from "./pages/Shift Group/shiftgrouplist.jsx";  
+// import ShiftGroupList from "./pages/Shift Group/shiftgrouplist.jsx";
+
+import CompanyList from "./pages/company/CompanyList.jsx";
+
 function App() {
   return (
     <>
-        <AuthProvider>
-      <Routes>
-        {/* <Route path="/" element={<Page />} /> */}
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/home" element={<LoggedPage />} />
-        <Route path="/company" element={<Companyform />} />
-        <Route path="/generalform" element={<GeneralForm />} />
-        <Route path="/documentsinfo" element={<DocumentsInfo />} />
-        <Route path="/masters" element={<MasterPage />} />
-        <Route path="/changepassword" element={<ChangePassword />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/settings" element={<Settings />} />
+      <AuthProvider>
+        <Routes>
+          {/* <Route path="/" element={<Page />} /> */}
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/home" element={<LoggedPage />} />
+          <Route path="/company" element={<Companyform />} />
+          <Route path="/generalform" element={<GeneralForm />} />
+          <Route path="/documentsinfo" element={<DocumentsInfo />} />
+          <Route path="/masters" element={<MasterPage />} />
+          <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/settings" element={<Settings />} />
 
-        <Route path="/branch" element={<BranchForm />} />
-        <Route path="/generalform" element={<BranchGeneralForm />} />
-        <Route path="/documentsinfo" element={<BranchDocumentsInfo />} />
+          <Route path="/branch" element={<BranchForm />} />
+          <Route path="/generalform" element={<BranchGeneralForm />} />
+          <Route path="/documentsinfo" element={<BranchDocumentsInfo />} />
 
-        <Route path="/location" element={<LocationForm />} />
-        <Route path="/generalform" element={<LocationGeneralForm />} />
-        <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
-        <Route path="/designation" element={<Designation />} />
-        <Route path="/branchform" element={<BranchPageForm />} />
-        <Route path="/companyform" element={<CompanyPageForm />} />
-        <Route path="/locationform" element={<LocationPageForm />} />
-{/* 
+          <Route path="/location" element={<LocationForm />} />
+          <Route path="/generalform" element={<LocationGeneralForm />} />
+          <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
+          <Route path="/designation" element={<Designation />} />
+          <Route path="/branchform" element={<BranchPageForm />} />
+          <Route path="/companyform" element={<CompanyPageForm />} />
+          <Route path="/locationform" element={<LocationPageForm />} />
+
+          <Route path="companylist" element={<CompanyList />} />
+          <Route path="/company/:companyId" element={<CompanyPageForm />} />
+          {/* 
         <Route path="/payrollgroup" element={<PayrollGroup/>} />
       <Route path="/payrollgroupsearch" element={<PayrollGroupSearch/>} />
       <Route path="/payrollgrouplist" element={<PayrollGroupList/>} />
@@ -82,7 +88,7 @@ function App() {
       <Route path="/shiftgroup" element={<ShiftGroup/>} />
       <Route path="/shiftgroupsearch" element={<ShiftGroupSearch/>} />
       <Route path="/shiftgrouplist" element={<ShiftGroupList/>} /> */}
-      </Routes>
+        </Routes>
       </AuthProvider>
       <Toaster
         position="top-right"

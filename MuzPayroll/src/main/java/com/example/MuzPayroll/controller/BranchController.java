@@ -19,6 +19,7 @@ import com.example.MuzPayroll.entity.BranchLogPK;
 import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.DTO.AmendListDTO;
 import com.example.MuzPayroll.entity.DTO.BranchDTO;
+import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.BranchLogRepository;
@@ -59,6 +60,41 @@ public class BranchController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // TO get the companyMst and the List of Logs y using MstID
+    @GetMapping("/getamendlist/{branchMstID}")
+    public ResponseEntity<BranchDTO> getBranchByMstId(@PathVariable Long branchMstID) {
+
+        BranchDTO dto = branchService.getBranchWithLogs(branchMstID);
+        return ResponseEntity.ok(dto);
+    }
+
+    // To get the Company list from the MST table
+    @GetMapping("/branchList")
+    public ResponseEntity<List<FormListDTO>> getBranchList() {
+
+        List<BranchMst> list = branchRepository.findAllBranch();
+
+        if (list.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<FormListDTO> response = list.stream()
+                .map(entity -> {
+                    FormListDTO dto = new FormListDTO();
+                    dto.setMstID(entity.getBranchMstID());
+                    dto.setCode(entity.getCode());
+                    dto.setName(entity.getBranch());
+                    dto.setShortName(entity.getShortName());
+                    dto.setActiveDate(entity.getActiveDate());
+                    // dto.setStatus();
+                    // dto.setInactiveDate();
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
     // TO get the Branch data from branchLog by giving MstID and rowno
     @GetMapping("/amend/{branchMstID}/{rowNo}")
     public ResponseEntity<BranchLog> getBranchLogById(
@@ -93,33 +129,6 @@ public class BranchController {
                     dto.setAmendNo(log.getAmendNo());
                     dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
                     dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
-                    return dto;
-                })
-                .toList();
-
-        return ResponseEntity.ok(response);
-    }
-
-    // To get the Company list from the MST table
-    @GetMapping("/branchList")
-    public ResponseEntity<List<FormListDTO>> getBranchList() {
-
-        List<BranchMst> list = branchRepository.findAllBranch();
-
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<FormListDTO> response = list.stream()
-                .map(entity -> {
-                    FormListDTO dto = new FormListDTO();
-                    dto.setMstID(entity.getBranchMstID());
-                    dto.setCode(entity.getCode());
-                    dto.setName(entity.getBranch());
-                    dto.setShortName(entity.getShortName());
-                    dto.setActiveDate(entity.getActiveDate());
-                    // dto.setStatus();
-                    // dto.setInactiveDate();
                     return dto;
                 })
                 .toList();

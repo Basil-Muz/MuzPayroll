@@ -18,6 +18,7 @@ import com.example.MuzPayroll.entity.LocationLog;
 import com.example.MuzPayroll.entity.LocationLogPK;
 import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.DTO.AmendListDTO;
+import com.example.MuzPayroll.entity.DTO.BranchDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.LocationDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
@@ -54,6 +55,41 @@ public class LocationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // TO get the companyMst and the List of Logs y using MstID
+    @GetMapping("/getamendlist/{locationMstID}")
+    public ResponseEntity<LocationDTO> getLocationByMstId(@PathVariable Long locationMstID) {
+
+        LocationDTO dto = locationService.getLocationWithLogs(locationMstID);
+        return ResponseEntity.ok(dto);
+    }
+
+    // To get the Company list from the MST table
+    @GetMapping("/locationList")
+    public ResponseEntity<List<FormListDTO>> getLocationList() {
+
+        List<LocationMst> list = locationRepository.findAllLocation();
+
+        if (list.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<FormListDTO> response = list.stream()
+                .map(entity -> {
+                    FormListDTO dto = new FormListDTO();
+                    dto.setMstID(entity.getLocationMstID());
+                    dto.setCode(entity.getCode());
+                    dto.setName(entity.getLocation());
+                    dto.setShortName(entity.getShortName());
+                    dto.setActiveDate(entity.getActiveDate());
+                    // dto.setStatus();
+                    // dto.setInactiveDate();
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
     // TO get the Location data from LocationLog by giving MstID and rowno
     @GetMapping("/amend/{locationMstID}/{rowNo}")
     public ResponseEntity<LocationLog> getLocationLogById(
@@ -88,33 +124,6 @@ public class LocationController {
                     dto.setAmendNo(log.getAmendNo());
                     dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
                     dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
-                    return dto;
-                })
-                .toList();
-
-        return ResponseEntity.ok(response);
-    }
-
-    // To get the Company list from the MST table
-    @GetMapping("/branchList")
-    public ResponseEntity<List<FormListDTO>> getLocationList() {
-
-        List<LocationMst> list = locationRepository.findAllLocation();
-
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<FormListDTO> response = list.stream()
-                .map(entity -> {
-                    FormListDTO dto = new FormListDTO();
-                    dto.setMstID(entity.getLocationMstID());
-                    dto.setCode(entity.getCode());
-                    dto.setName(entity.getLocation());
-                    dto.setShortName(entity.getShortName());
-                    dto.setActiveDate(entity.getActiveDate());
-                    // dto.setStatus();
-                    // dto.setInactiveDate();
                     return dto;
                 })
                 .toList();

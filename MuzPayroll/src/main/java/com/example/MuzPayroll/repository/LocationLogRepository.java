@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.example.MuzPayroll.entity.BranchLog;
 import com.example.MuzPayroll.entity.LocationLog;
 import com.example.MuzPayroll.entity.LocationLogPK;
 
@@ -38,5 +37,7 @@ public interface LocationLogRepository extends JpaRepository<LocationLog, Locati
                         ORDER BY CAST(amend_no AS INTEGER) DESC
                         """, nativeQuery = true)
         List<LocationLog> findAllLogsByLocationMstID(@Param("locationMstID") Long locationMstID);
+
+        List<LocationLog> findByLocationLogPK_LocationMstIDOrderByLocationLogPK_RowNoDesc(Long locationMstID);
 
 }

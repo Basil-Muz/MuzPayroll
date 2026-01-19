@@ -232,6 +232,18 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         dto.setEmployerNumber(entity.getEmployerNumber());
         dto.setEmployerEmail(entity.getEmployerEmail());
         dto.setAmendNo(entity.getAmendNo());
+        dto.setCompanyLogPK(entity.getCompanyLogPK());
+        dto.setCompanyMstID(entity.getCompanyLogPK().getCompanyMstID());
+
+        if (entity.getAuthorization() != null) {
+            dto.setAuthId(entity.getAuthorization().getAuthId());
+            dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
+            dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
+
+            if (entity.getAuthorization().getUserMst() != null) {
+                dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
+            }
+        }
 
         return dto;
     }
@@ -293,6 +305,16 @@ public class CompanyLogService extends MuzirisAbstractService<CompanyLogDTO, Com
         Long maxRowNo = companyLogRepository.findMaxRowNo(companyMstID);
 
         return Response.success(maxRowNo == null ? 0L : maxRowNo);
+    }
+
+    public List<CompanyLogDTO> getLogsByCompanyMstID(Long companyMstID) {
+
+        List<CompanyLog> logs = companyLogRepository
+                .findByCompanyLogPK_CompanyMstIDOrderByCompanyLogPK_RowNoDesc(companyMstID);
+
+        return logs.stream()
+                .map(this::entityToDto)
+                .toList();
     }
 
 }

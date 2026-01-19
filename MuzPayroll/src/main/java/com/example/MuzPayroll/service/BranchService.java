@@ -14,12 +14,16 @@ import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.BranchLog;
 import com.example.MuzPayroll.entity.BranchLogPK;
 import com.example.MuzPayroll.entity.BranchMst;
+import com.example.MuzPayroll.entity.CompanyLog;
 import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.BranchDTO;
 import com.example.MuzPayroll.entity.DTO.BranchLogDTO;
+import com.example.MuzPayroll.entity.DTO.CompanyDTO;
+import com.example.MuzPayroll.entity.DTO.CompanyLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
+import com.example.MuzPayroll.repository.BranchLogRepository;
 import com.example.MuzPayroll.repository.BranchRepository;
 
 import com.example.MuzPayroll.repository.UserRepository;
@@ -38,6 +42,9 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BranchLogRepository branchLogRepository;
 
     public List<BranchMst> getAllBranchByCompanyId(Long companyId) {
         return branchRepository.findByCompanyEntity_CompanyMstID(companyId);
@@ -659,6 +666,18 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
         dto.setAuthorization(entity.getAuthorization());
         dto.setActiveDate(entity.getActiveDate());
         dto.setActiveStatusYN(entity.getActiveStatusYN());
+        // ===== AUTHORIZATION MAPPING =====
+        if (entity.getAuthorization() != null) {
+
+            dto.setAuthId(entity.getAuthorization().getAuthId());
+            dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
+            dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
+
+            if (entity.getAuthorization().getUserMst() != null) {
+                dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
+            }
+        }
+
         return dto;
     }
 
@@ -769,6 +788,9 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
         DtoLog.setMobileNumber(dto.getMobileNumber());
         DtoLog.setEmail(dto.getEmail());
         DtoLog.setAmendNo(dto.getAmendNo());
+        DtoLog.setAmendNo(dto.getAmendNo());
+        DtoLog.setAuthorizationDate(dto.getAuthorizationDate());
+        DtoLog.setAuthorizationStatus(dto.getAuthorizationStatus());
 
         DtoLogs.add(DtoLog);
         return DtoLogs;
@@ -827,6 +849,52 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
             logRowNo++;
         }
 
+    }
+
+    // To set the Log list in the entity to retrun to ui
+    @Transactional(readOnly = true)
+    public BranchDTO getBranchWithLogs(Long branchMstID) {
+
+        // Fetch MST row
+        BranchMst entity = branchRepository.findById(branchMstID)
+                .orElseThrow(() -> new RuntimeException("Branch not found"));
+
+        // Convert MST → DTO
+        BranchDTO dto = entityToDto(entity);
+
+        // Fetch ALL logs related to this MST
+        List<BranchLog> Logs = branchLogRepository
+                .findByBranchLogPK_BranchMstIDOrderByBranchLogPK_RowNoDesc(
+                        branchMstID);
+
+        // OPTIONAL: Set MST-level audit info
+        Logs.stream()
+                .filter(log -> log.getAuthorization() != null
+                        && Boolean.TRUE.equals(
+                                log.getAuthorization().getAuthorizationStatus()))
+                .findFirst()
+                .ifPresent(log -> {
+                    dto.setAmendNo(log.getAmendNo());
+                    dto.setAuthId(log.getAuthorization().getAuthId());
+                    dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
+                    dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+
+                    if (log.getAuthorization().getUserMst() != null) {
+                        dto.setUserCode(
+                                log.getAuthorization().getUserMst().getUserCode());
+                    }
+
+                });
+
+        // Convert ALL logs → DTO list
+        List<BranchLogDTO> logDtos = Logs.stream()
+                .map(branchLogService::entityToDto)
+                .toList();
+
+        // Attach list to MST DTO
+        dto.setBranchDtoLogs(logDtos);
+
+        return dto;
     }
 
 }

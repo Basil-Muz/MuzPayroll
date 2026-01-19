@@ -15,6 +15,8 @@ public class FormListDTO {
 
     private Boolean status;
 
+    private Boolean activeStatusYN;
+
     private LocalDate InactiveDate;
 
     public Long getMstID() {
@@ -63,6 +65,14 @@ public class FormListDTO {
 
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+
+    public Boolean getActiveStatusYN() {
+        return activeStatusYN;
+    }
+
+    public void setActiveStatusYN(Boolean activeStatusYN) {
+        this.activeStatusYN = activeStatusYN;
     }
 
     public LocalDate getInactiveDate() {

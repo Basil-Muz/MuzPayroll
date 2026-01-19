@@ -19,6 +19,9 @@ public class CompanyMst {
     private List<CompanyLog> CompanyLogs;
 
     @Transient
+    private CompanyLogPK companyLogPK;
+
+    @Transient
     @JsonIgnore
     private Authorization authorization;
 
@@ -92,6 +95,14 @@ public class CompanyMst {
     @Column(nullable = false)
     private Boolean activeStatusYN;
     // Getters and setters
+
+    public CompanyLogPK getCompanyLogPK() {
+        return companyLogPK;
+    }
+
+    public void setCompanyLogPK(CompanyLogPK companyLogPK) {
+        this.companyLogPK = companyLogPK;
+    }
 
     public Boolean getActiveStatusYN() {
         return activeStatusYN;
@@ -300,4 +311,16 @@ public class CompanyMst {
     public void setCompanyLogs(List<CompanyLog> companyLogs) {
         CompanyLogs = companyLogs;
     }
+
+    @Transient
+    private String amendNo;
+
+    public String getAmendNo() {
+        return amendNo;
+    }
+
+    public void setAmendNo(String amendNo) {
+        this.amendNo = amendNo;
+    }
+
 }

@@ -39,4 +39,7 @@ public interface CompanyLogRepository extends JpaRepository<CompanyLog, CompanyL
                         """, nativeQuery = true)
         List<CompanyLog> findAllLogsByCompanyMstID(@Param("companyMstID") Long companyMstID);
 
+
+        List<CompanyLog> findByCompanyLogPK_CompanyMstIDOrderByCompanyLogPK_RowNoDesc(Long companyMstID);
+
 }

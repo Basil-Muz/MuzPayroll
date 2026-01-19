@@ -6,6 +6,7 @@ import java.util.List;
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.BranchLogPK;
 import com.example.MuzPayroll.entity.CompanyMst;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
@@ -25,6 +26,7 @@ public class BranchDTO {
     }
 
     @Transient
+    @JsonIgnore
     private Authorization authorization;
 
     public Authorization getAuthorization() {
@@ -35,6 +37,7 @@ public class BranchDTO {
         this.authorization = authorization;
     }
 
+    @JsonIgnore
     private BranchLogPK branchLogPK;
 
     public BranchLogPK getBranchLogPK() {
@@ -49,7 +52,7 @@ public class BranchDTO {
     @Column(name = "BranchMstID", unique = true, nullable = false)
     private Long branchMstID;
 
-    @Column(name = "CompanyID")
+    @JsonIgnore
     private CompanyMst companyEntity;
 
     private String code;
@@ -273,9 +276,6 @@ public class BranchDTO {
 
     // Authorization
 
-    @Column
-    private Long mstId;
-
     @Column(nullable = false)
     private String userCode;
 
@@ -299,14 +299,6 @@ public class BranchDTO {
 
     public void setAuthorizationStatus(Boolean authorizationStatus) {
         this.authorizationStatus = authorizationStatus;
-    }
-
-    public Long getMstId() {
-        return mstId;
-    }
-
-    public void setMstId(Long mstId) {
-        this.mstId = mstId;
     }
 
     public String getUserCode() {

@@ -1,6 +1,7 @@
 package com.example.MuzPayroll.repository;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,4 +42,12 @@ public interface CompanyRepository extends JpaRepository<CompanyMst, Long> {
     @Query("SELECT c FROM CompanyMst c")
     List<CompanyMst> findAllCompany();
 
+    @EntityGraph(attributePaths = "companyLogs")
+    Optional<CompanyMst> findWithLogsByCompanyMstID(Long id);
+
+    @Query("SELECT c FROM CompanyMst c WHERE c.activeStatusYN = true")
+    List<CompanyMst> findAllActiveCompanies();
+
+    @Query("SELECT c FROM CompanyMst c WHERE c.activeStatusYN = false")
+    List<CompanyMst> findAllInActiveCompanies();
 }
