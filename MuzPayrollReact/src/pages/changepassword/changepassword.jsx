@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./changepassword.css";
+import "../LoginPage/loginpage.css";
 
 function ChangePassword() {
   const navigate = useNavigate();
@@ -65,51 +65,68 @@ function ChangePassword() {
   };
 
   return (
-    <div className="change-password-container">
-      <form className="change-password-box" onSubmit={handleSubmit}>
-        <h3 className="change-password-heading">Change Password</h3>
+    <div className="login-container">
+      <form className="login-box" onSubmit={handleSubmit}>
+        <div className="logo-section">
+          <h2>Change Password</h2>
+        </div>
 
-        <div className="change-password-field">
+        {/* Current Password */}
+        <div className="form-group1">
           <label>Current Password</label>
-          <input
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="Enter current password"
-          />
+          <div className="input-wrapper">
+            <input
+              type="password"
+              placeholder="Enter current password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className={error ? "input-error" : ""}
+            />
+          </div>
         </div>
 
-        <div className="change-password-field">
+        {/* New Password */}
+        <div className="form-group1">
           <label>New Password</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Enter new password"
-          />
+          <div className="input-wrapper">
+            <input
+              type="password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className={error ? "input-error" : ""}
+            />
+          </div>
         </div>
 
-        <div className="change-password-field">
+        {/* Confirm Password */}
+        <div className="form-group1">
           <label>Confirm Password</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm new password"
-          />
+          <div className="input-wrapper">
+            <input
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={error ? "input-error" : ""}
+            />
+          </div>
         </div>
 
-        {error && <div className="error-text">{error}</div>}
-        {success && <div className="success-text">{success}</div>}
+        {error && <p className="error-msg">{error}</p>}
+        {success && <p className="success-msg">{success}</p>}
 
-        <div className="change-password-actions">
-          <button type="submit" className="change-password-btn">
-            Submit
-          </button>
-        </div>
+        <button type="submit" className="login-btn">
+          Submit
+        </button>
+
+        <p className="forgot-link" onClick={() => navigate("/")}>
+          Back to Login
+        </p>
       </form>
     </div>
   );
+
 }
 
 export default ChangePassword;

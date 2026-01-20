@@ -19,6 +19,7 @@ function LoginPage() {
   const [passwordError, setPasswordError] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
+  const [commonError, setCommonError] = useState("");
 
 
   // Handle typing: Allow only letters + numbers
@@ -73,7 +74,7 @@ function LoginPage() {
 
 
       if (!data.success) {
-        setPasswordError(data.message || "Invalid login.");
+        setCommonError(data.errors || "Invalid credentials.");
         return;
       }
       const cleanUserCode = userCode.replace("@muziris", "");
@@ -92,7 +93,7 @@ function LoginPage() {
       navigate("/home");
 
     } catch (error) {
-      setPasswordError("Server error.");
+      setCommonError("Server error.");
       console.error("Login error:", error);
     }
   };
@@ -156,6 +157,9 @@ function LoginPage() {
 
             </div>
             {passwordError && <p className="error-msg">{passwordError}</p>}
+
+            {/* Common Error */}
+            {commonError && <p className="common-error-msg">{commonError}</p>}
 
             {/* Login Button */}
             <button className="login-btn" onClick={handleLogin}>
