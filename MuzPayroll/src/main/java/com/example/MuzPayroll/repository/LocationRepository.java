@@ -41,4 +41,9 @@ public interface LocationRepository extends JpaRepository<LocationMst, Long> {
     @Query("SELECT c FROM LocationMst c")
     List<LocationMst> findAllLocation();
 
+    @Query("SELECT c FROM LocationMst c WHERE c.activeStatusYN = true")
+    List<LocationMst> findAllActiveLocation();
+
+    @Query("SELECT c FROM LocationMst c WHERE c.activeStatusYN = false")
+    List<LocationMst> findAllInActiveLocation();
 }

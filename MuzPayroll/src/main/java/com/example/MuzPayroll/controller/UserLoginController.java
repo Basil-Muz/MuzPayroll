@@ -1,15 +1,12 @@
 package com.example.MuzPayroll.controller;
 
-import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.ChangePasswordRequest;
 import com.example.MuzPayroll.entity.DTO.ForgotPasswordRequest;
 import com.example.MuzPayroll.entity.DTO.ForgotPasswordResponse;
 import com.example.MuzPayroll.entity.DTO.LoginRequest;
 import com.example.MuzPayroll.entity.DTO.LoginResponse;
-import com.example.MuzPayroll.repository.UserRepository;
+import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.service.UserMstService;
-
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,46 +19,55 @@ public class UserLoginController {
     @Autowired
     private UserMstService service;
 
+    @PostMapping("/login")
+    public ResponseEntity<Response<LoginResponse>> login(
+            @RequestBody LoginRequest request) {
 
-    @Autowired
-    private UserRepository userRepo;
+        Response<LoginResponse> response = service.login(request);
 
-@PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
-        return service.login(request);
+        return ResponseEntity
+                .status(response.getStatusCode())
+                .body(response);
     }
-@GetMapping("/user-context")
-    public LoginResponse getUserContext(
-        @RequestParam Long companyId,
-        @RequestParam Long branchId,
-        @RequestParam Long locationId,
-        @RequestParam String userCode  
-) {
-    LoginResponse resp = new LoginResponse();
 
-    UserMst user = userRepo.findByUserCode(userCode.replace("@muziris",""));
+    // ================= USER CONTEXT =================
+    @GetMapping("/user-context")
+    public ResponseEntity<Response<LoginResponse>> getUserContext(
+            @RequestParam Long companyId,
+            @RequestParam Long branchId,
+            @RequestParam Long locationId,
+            @RequestParam String userCode) {
 
-    resp.setUserName(user.getUserName());
-    resp.setLocationName(user.getLocationEntity().getLocation());
+        Response<LoginResponse> response = service.getUserContext(companyId, branchId, locationId, userCode);
 
-    resp.setCompanyId(companyId);
-    resp.setBranchId(branchId);
-    resp.setLocationId(locationId);
-    resp.setCompanyList(service.getAllCompanies());
-    resp.setBranchList(service.getAllBranches());
-    resp.setLocationList(service.getAllLocations());
-    resp.setSuccess(true);
+        return ResponseEntity
+                .status(response.getStatusCode())
+                .body(response);
+    }
 
-    return resp;
-}
-@PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
-        service.changePassword(request);
-        return ResponseEntity.ok(Map.of("message", "Password changed successfully")
-    );
-}
-@PostMapping("/forgot-password")
-    public ForgotPasswordResponse forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        return service.forgotPassword(request);
+    @PostMapping("/change-password")
+    public ResponseEntity<Response<Boolean>> changePassword(
+            @RequestBody ChangePasswordRequest request) {
+
+        Response<Boolean> response = service.changePassword(request);
+
+        if (!response.isSuccess()) {
+            return ResponseEntity
+                    .status(response.getStatusCode())
+                    .body(response);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Response<ForgotPasswordResponse>> forgotPassword(
+            @RequestBody ForgotPasswordRequest request) {
+
+        Response<ForgotPasswordResponse> response = service.forgotPassword(request);
+
+        return ResponseEntity
+                .status(response.getStatusCode())
+                .body(response);
     }
 }

@@ -1,5 +1,5 @@
 import { Country, State, City } from "country-state-city";
-import { Controller } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 import Select from "react-select";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
@@ -12,6 +12,7 @@ export default function AddressForm({
   control,
   clearErrors,
   isReadOnly,
+  setFocus,
   // flags,
   // disabled = false,
   // requiredMap = {},
@@ -32,6 +33,7 @@ export default function AddressForm({
 
   const [placeList, setPlaceList] = useState([]);
   const prevPincodeRef = useRef(null); // track the old pincode
+  // const inputPinRef=useRef(null);
   const [isPincodeResolved, setIsPincodeResolved] = useState(false); // disable the selected boxs
 
   const pinCodeRegister = register("pincode", {
@@ -54,72 +56,75 @@ export default function AddressForm({
   // useEffect(() => {
   // if (!watchedPincode || watchedPincode.length !== 6) return;
 
-  const fetchLocationByPincode = async (pincode) => {
-    if (!pincode || pincode.length !== 6) return;
+  const fetchLocationByPincode = useCallback(
+    async (pincode) => {
+      if (!pincode || pincode.length !== 6) return;
 
-    // prevent duplicate calls for same pincode
-    if (prevPincodeRef.current === pincode) return;
+      // prevent duplicate calls for same pincode
+      if (prevPincodeRef.current === pincode) return;
 
-    try {
-      const response = await fetch(
-        `https://api.postalpincode.in/pincode/${pincode}`
-      );
-      const data = await response.json();
+      try {
+        const response = await fetch(
+          `https://api.postalpincode.in/pincode/${pincode}`
+        );
+        const data = await response.json();
 
-      if (data[0]?.Status !== "Success") {
+        if (data[0]?.Status !== "Success") {
+          setError("pincode", {
+            type: "manual",
+            message: "Invalid Pincode",
+          });
+          return;
+        }
+        setIsPincodeResolved(true);
+        const postOffices = data[0].PostOffice;
+
+        const mappedPlaces = postOffices.map((po) => ({
+          label: po.Name,
+          value: po.Name,
+        }));
+
+        console.log("Function Exccecuted");
+        setPlaceList(mappedPlaces);
+
+        const currentPlace = watch("place");
+        const placeExists = mappedPlaces.some((p) => p.value === currentPlace);
+
+        // set default place ONLY if invalid
+        if (!placeExists) {
+          setValue("place", mappedPlaces[0]?.value, { shouldDirty: false });
+        }
+
+        // Country
+        setValue("country", "IN");
+
+        // State
+        const matchedState = State.getStatesOfCountry("IN").find(
+          (s) => s.name.toLowerCase() === postOffices[0].State.toLowerCase()
+        );
+
+        if (matchedState) {
+          setCountryCode("IN");
+          setStateCode(matchedState.isoCode);
+          setValue("state", matchedState.isoCode);
+        }
+
+        // District
+        setValue("district", postOffices[0].District);
+
+        clearErrors(["country", "state", "district", "place"]);
+
+        prevPincodeRef.current = pincode;
+      } catch (err) {
         setError("pincode", {
           type: "manual",
-          message: "Invalid Pincode",
+          message: "Unable to fetch location details" + err,
         });
-        return;
       }
-      setIsPincodeResolved(true);
-      const postOffices = data[0].PostOffice;
-
-      const mappedPlaces = postOffices.map((po) => ({
-        label: po.Name,
-        value: po.Name,
-      }));
-
-      console.log("Function Exccecuted");
-      setPlaceList(mappedPlaces);
-
-      const currentPlace = watch("place");
-      const placeExists = mappedPlaces.some((p) => p.value === currentPlace);
-
-      // set default place ONLY if invalid
-      if (!placeExists) {
-        setValue("place", mappedPlaces[0]?.value, { shouldDirty: false });
-      }
-
-      // Country
-      setValue("country", "IN");
-
-      // State
-      const matchedState = State.getStatesOfCountry("IN").find(
-        (s) => s.name.toLowerCase() === postOffices[0].State.toLowerCase()
-      );
-
-      if (matchedState) {
-        setCountryCode("IN");
-        setStateCode(matchedState.isoCode);
-        setValue("state", matchedState.isoCode);
-      }
-
-      // District
-      setValue("district", postOffices[0].District);
-
-      clearErrors(["country", "state", "district", "place"]);
-
-      prevPincodeRef.current = pincode;
-    } catch (err) {
-      setError("pincode", {
-        type: "manual",
-        message: "Unable to fetch location details" + err,
-      });
-    }
-  };
-
+    },
+    [setValue, setError, watch, clearErrors, setCountryCode, setStateCode]
+  );
+  //Debounce - request is only sent after a user has stopped performing an action
   const debounceRef = useRef(null);
 
   const handlePincodeChange = (value) => {
@@ -137,13 +142,12 @@ export default function AddressForm({
     // wait before calling API
     debounceRef.current = setTimeout(() => {
       fetchLocationByPincode(value);
-    }, 500); // ⏳ 500ms debounce
+    }, 500); // 500ms debounce
   };
 
-  // useEffect(() => {
-  //   if (!watchedPincode || watchedPincode.length !== 6) return;
-  //   fetchLocationByPincode(watchedPincode);
-  // }, [watchedPincode]);
+  useEffect(() => {
+    setFocus("pincode");
+  }, [setFocus]);
 
   //filtering the list value, label format
   const countryOptions = useMemo(
@@ -176,12 +180,17 @@ export default function AddressForm({
         : [],
     [countryCode, stateCode]
   );
-  const pincode = watch("pincode");
+  // React detects a render → effect → state → render loop solving React Hooks lifecycle warning
+  const pincode = useWatch({
+    control,
+    name: "pincode",
+  });
+
   useEffect(() => {
     if (pincode && pincode.length === 6) {
       fetchLocationByPincode(pincode);
     }
-  }, [pincode]);
+  }, [fetchLocationByPincode, pincode]);
 
   return (
     <>
@@ -196,9 +205,11 @@ export default function AddressForm({
           <input
             type="text"
             disabled={isReadOnly}
+            // ref={inputPinRef}
             className={`form-control ${errors.pincode ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
             placeholder="Enter pincode"
             maxLength={6}
+            autoComplete="new-password" // off the suggesstions
             inputMode="numeric"
             {...pinCodeRegister}
             onChange={(e) => {

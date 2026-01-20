@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import com.example.MuzPayroll.entity.BranchLog;
 import com.example.MuzPayroll.entity.BranchLogPK;
-import com.example.MuzPayroll.entity.CompanyLog;
 
 @Repository
 public interface BranchLogRepository extends JpaRepository<BranchLog, BranchLogPK> {

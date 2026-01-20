@@ -45,4 +45,9 @@ public interface BranchRepository extends JpaRepository<BranchMst, Long> {
     @Query("SELECT c FROM BranchMst c")
     List<BranchMst> findAllBranch();
 
+    @Query("SELECT c FROM BranchMst c WHERE c.activeStatusYN = true")
+    List<BranchMst> findAllActiveBranch();
+
+    @Query("SELECT c FROM BranchMst c WHERE c.activeStatusYN = false")
+    List<BranchMst> findAllInActiveBranch();
 }

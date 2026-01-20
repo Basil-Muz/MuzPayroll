@@ -7,16 +7,16 @@ import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import axios from "axios";
 
-import GeneralInfoForm from "../BranchPage/Tabs/General Info/GeneralInfoForm";
-import AddressForm from "../BranchPage/Tabs/General Info/AddressForm";
-import ContactForm from "../BranchPage/Tabs/General Info/ContactForm";
-import DocumentsTab from "../BranchPage/Tabs/General Info/DocumentsTab";
+import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
+import AddressForm from "../Branch Page/Tabs/General Info/AddressForm";
+import ContactForm from "../Branch Page/Tabs/General Info/ContactForm";
+import DocumentsTab from "../Branch Page/Tabs/General Info/DocumentsTab";
 
 // import StepProgress from "./General Info/StepProgress";
 // import Header from "../../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
-import "../BranchPage/css/From.css";
+import "../Branch Page/css/From.css";
 import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 
@@ -57,6 +57,7 @@ export default function GenaralLocationForm() {
     //   status: "active",
     //   location: "Zenin",
     //   expiryDate: "2025-10-10",
+    //   branchEntity:20000,
     //   generatedBy: "Admin User",
     // },
     // {
@@ -142,32 +143,6 @@ export default function GenaralLocationForm() {
     { label: "ENTRY", value: 0 },
     { label: "VERIFIED", value: 1 },
   ];
-
-  //  initialValues: {
-  //     company: "",
-  //     shortName: "",
-  //     activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
-  //     address: "",
-  //     address1: "",
-  //     address2: "",
-  //     country: "",
-  //     state: "",
-  //     district: "",
-  //     place: "",
-  //     pincode: "",
-  //     landlineNumber: "",
-  //     mobileNumber: "",
-  //     email: "",
-  //     employerName: "",
-  //     designation: "",
-  //     employerNumber: "",
-  //     employerEmail: "",
-  //     companyImage: null,
-  //     withaffectdate: "",
-  //     authorizationStatus: "0",
-  //     userCode: user_code,
-  //     withaffectdate: new Date().toISOString().split("T")[0],
-  //   },
 
   const latestAmendmentId = amendments.length
     ? amendments.reduce((latest, current) =>
@@ -259,15 +234,51 @@ export default function GenaralLocationForm() {
     clearErrors();
   };
 
+  const handleApiError = (error) => {
+    // console.error("API Error:", error);
+
+    // Network error (no response from server)
+    if (!error.response) {
+      toast.error("Unable to connect to server. Please check your network.");
+      return;
+    }
+
+    const status = error.response.status;
+
+    switch (status) {
+      case 400:
+        toast.error("Invalid request.");
+        break;
+      case 401:
+        toast.error("Session expired. Please login again.");
+        break;
+      case 403:
+        toast.error("You do not have permission.");
+        break;
+      case 404:
+        toast.error("Resource not found.");
+        break;
+      case 409:
+        toast.error("Duplicate record exists.");
+        break;
+      case 500:
+        toast.error("Server error. Please try again later.");
+        break;
+      default:
+        toast.error("Unexpected error occurred.");
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
       try {
         const [companyRes, branchRes] = await Promise.all([
+          //  Both APIs works in parallel
           axios.get(`http://localhost:8087/company/${companyId}`),
           axios.get(`http://localhost:8087/branch/company/${companyId}`),
-        ]);
+        ]); //  both APIs call start at same time and waite until both finish
 
         if (cancelled) return;
 
@@ -286,11 +297,11 @@ export default function GenaralLocationForm() {
         );
       } catch (err) {
         console.error(err);
+        handleApiError(err);
       }
     };
 
     load();
-
     return () => {
       cancelled = true;
     };
@@ -307,10 +318,10 @@ export default function GenaralLocationForm() {
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
 
-  useEffect(() => {
-    // console.log("Input ref:", authDateInputRef.current);
-    // console.log("DatePicker ref:", datePickerRef.current);
-  }, []);
+  // useEffect(() => {
+  //   // console.log("Input ref:", authDateInputRef.current);
+  //   // console.log("DatePicker ref:", datePickerRef.current);
+  // }, []);
 
   useEffect(() => {
     const date = new Date(); // current date
@@ -423,11 +434,40 @@ export default function GenaralLocationForm() {
   };
 
   const nextStep = async () => {
+    // switch next steps
     const valid = await trigger();
     if (valid) setStep((s) => s + 1);
   };
 
-  const prevStep = () => setStep((s) => s - 1);
+  const prevStep = () => setStep((s) => s - 1); // switch to previos steps
+
+  const saveLocation = async (formData) => {
+    const response = await fetch("http://localhost:8087/location/save", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw {
+        type: "HTTP_ERROR",
+        status: response.status,
+        body: text,
+      };
+    }
+
+    const text = await response.text();
+    const result = text ? JSON.parse(text) : null;
+
+    if (!result?.success) {
+      throw {
+        type: "BUSINESS_ERROR",
+        result,
+      };
+    }
+
+    return result;
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -447,37 +487,14 @@ export default function GenaralLocationForm() {
         formData.append("companyImage", data.companyImage);
       }
 
-      // company: initialCompanyId,
-      //     branch: initialBranchId,
-      //     location: "",
-      //     shortName: "",
-      //     activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
-      //     esiRegion: "",
-      //     address: "",
-      //     address1: "",
-      //     address2: "",
-      //     country: "",
-      //     state: "",
-      //     district: "",
-      //     place: "",
-      //     pincode: "",
-      //     landlineNumber: "",
-      //     mobileNumber: "",
-      //     email: "",
-      //     employerName: "",
-      //     designation: "",
-      //     employerNumber: "",
-      //     employerEmail: "",
-      //     withaffectdate: "",
-      //     authorizationStatus: "0",
-      //     user_code: user_code,
-      //     authorizationDate: new Date().toISOString().split("T")[0],
+      await saveLocation(formData);
+      toast.success("Location saved successfully!");
 
       console.log("Saving Data", formData);
-      const response = await fetch("http://localhost:8087/location/save", {
-        method: "POST",
-        body: formData,
-      });
+      // const response = await fetch("http://localhost:8087/location/save", {
+      //   method: "POST",
+      //   body: formData,
+      // });
       // console.log("FormData contents:");
       // for (const [key, value] of formData.entries()) {
       //   if (value instanceof File) {
@@ -491,20 +508,20 @@ export default function GenaralLocationForm() {
       //   }
       // }
 
-      let result;
-      try {
-        const responseText = await response.text();
-        if (responseText) {
-          result = JSON.parse(responseText);
-        }
-      } catch (parseError) {
-        console.error("Error parsing response:", parseError);
-      }
+      // let result;
+      // try {
+      //   const responseText = await response.text();
+      //   if (responseText) {
+      //     result = JSON.parse(responseText);
+      //   }
+      // } catch (parseError) {
+      //   console.error("Error parsing response:", parseError);
+      // }
 
-      if (result && result.success === true) {
-        toast.success("Location saved successfully!");
-        return;
-      }
+      // if (result && result.success === true) {
+      //   toast.success("Location saved successfully!");
+      //   return;
+      // }
 
       /* -------------------------------
                 Prepare documents JSON
@@ -563,12 +580,15 @@ export default function GenaralLocationForm() {
       //   body: formData
       // });
     } catch (err) {
-      const apiErrors = err.response?.data?.errors;
-      if (apiErrors) {
-        Object.entries(apiErrors).forEach(([field, message]) => {
-          setError(field, { type: "server", message });
-        });
-      }
+      // const apiErrors = err.response?.data?.errors;
+      // if (apiErrors) {
+      //   Object.entries(apiErrors).forEach(([field, message]) => {
+      //     setError(field, { type: "server", message });
+      //   });
+      // }
+      console.error("Submit failed:", err);
+
+      handleApiError(err);
     }
   };
 
@@ -764,7 +784,7 @@ export default function GenaralLocationForm() {
                               }, 0);
                             }}
                             dateFormat="dd/MM/yyyy"
-                            minDate={new Date()}
+                            // minDate={new Date()}
                             showMonthDropdown
                             onFocus={() => datePickerRef.current?.setOpen(true)}
                             showYearDropdown

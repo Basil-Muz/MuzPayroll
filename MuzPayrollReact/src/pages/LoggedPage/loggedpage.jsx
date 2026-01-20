@@ -25,8 +25,15 @@ function LoggedPage() {
   const {
     control,
     setValue,
+    getValues,
     formState: { errors }
   } = useForm();
+
+
+
+  console.log("🔐 Auth user:", user);
+  console.log("🧾 Stored loginData:", JSON.parse(localStorage.getItem("loginData")));
+
 
   /* ================= STATE ================= */
 
@@ -67,26 +74,31 @@ function LoggedPage() {
   /* ================= EFFECTS ================= */
 
   useEffect(() => {
-    if (!user) {
+    const stored = JSON.parse(localStorage.getItem("loginData"));
+
+    if (!user && !stored) {
       navigate("/");
       return;
     }
 
-    setCompanyId(String(user.companyId));
-    setBranchId(String(user.branchId));
-    setLocationId(String(user.locationId));
-    setFinYear(user.finYear || getCurrentFinYear());
+    const source = user || stored;
 
-    setValue("branchId", String(user.branchId));
-    setValue("locationId", String(user.locationId));
+    setCompanyId(String(source.companyId));
+    setBranchId(String(source.branchId));
+    setLocationId(String(source.locationId));
+    setFinYear(source.finYear || getCurrentFinYear());
+
+    setValue("branchId", String(source.branchId));
+    setValue("locationId", String(source.locationId));
 
     fetchContextData(
-      user.companyId,
-      user.branchId,
-      user.locationId,
-      user.userCode
+      source.companyId,
+      source.branchId,
+      source.locationId,
+      source.userCode
     );
   }, [user]);
+
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("loginData"));
@@ -98,53 +110,156 @@ function LoggedPage() {
       locationId || stored.locationId,
       stored.userCode
     );
-  }, [branchId]);
+  }, [branchId, fieldsLocked, companyId]);
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("loginData"));
+
+    if (!stored) return;
+
+    // Restore UI state
+    setCompanyId(String(stored.companyId));
+    setBranchId(String(stored.branchId));
+    setLocationId(String(stored.locationId));
+    setFinYear(stored.finYear || getCurrentFinYear());
+
+    setCompanyName(stored.companyName || "");
+
+
+    // Restore sidebar / button state
+    setSidebarOpen(stored.sidebarOpen === true);
+    setFieldsLocked(stored.fieldsLocked !== false);
+    setOkEnabled(stored.okEnabled !== false);
+    setChangeEnabled(stored.changeEnabled === true);
+  }, []);
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("loginData"));
+    if (!stored) return;
+
+    fetchContextData(
+      stored.companyId,
+      stored.branchId,
+      stored.locationId,
+      stored.userCode
+    );
+  }, []);
+
 
   /* ================= API ================= */
   const fetchContextData = async (companyId, branchId, locationId, userCode) => {
-    if (!companyId || !branchId) return;
+    console.log("fetchContextData called");
+
+    if (!companyId || !branchId) {
+      console.log(" Missing companyId / branchId");
+      return;
+    }
 
     const res = await fetch(
       `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`
     );
+    console.log("API URL:", res.url);
 
-    const data = await res.json();
+    const response = await res.json();
+    console.log("API raw response:", response);
 
-    const filteredBranches = (data.branchList || []).filter(
-      b =>
-        b.companyEntity &&
-        String(b.companyEntity.companyMstID) === String(companyId)
-    );
+    if (response.statusCode === 400) {
+      const errorMsg = response.errors?.[0] || "Invalid context";
+      toast.error(errorMsg);
 
-    if (filteredBranches.length === 0) {
+      const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+
+      // ✅ CASE: Branch exists but NO location
+      if (
+        errorMsg.toLowerCase().includes("location") ||
+        errorMsg.toLowerCase().includes("no location")
+      ) {
+        //  clear ONLY location
+        // setLocationList([]);
+        // setLocationId("");
+        // setValue("locationId", "");
+
+        localStorage.setItem(
+          "loginData",
+          JSON.stringify({
+            ...stored,
+            locationId: "",
+            locationName: ""
+          })
+        );
+
+        return;
+      }
+
+      //  CASE: Company / Branch invalid → clear both
+      setBranchList([]);
+      setLocationList([]);
+
+      setBranchId("");
+      setLocationId("");
+
+      setValue("branchId", "");
+      setValue("locationId", "");
+
+      localStorage.setItem(
+        "loginData",
+        JSON.stringify({
+          ...stored,
+          branchId: "",
+          branchName: "",
+          locationId: "",
+          locationName: ""
+        })
+      );
+
+      return;
+    }
+
+    const data = response.data;
+
+    /* ================= BRANCH (✅ FIX HERE) ================= */
+    const branchListFromApi =
+      data.branchList ||
+      data.branches ||
+      data.branchMstList ||
+      [];
+
+    if (branchListFromApi.length === 0) {
+      console.error(" No branches from backend");
       setBranchList([]);
       setLocationList([]);
       toast.error("No branches found");
       return;
     }
 
-    setBranchList(filteredBranches);
-    setCompanyName(filteredBranches[0].companyEntity.company);
+    setBranchList(branchListFromApi);
 
-    const filteredLocations = (data.locationList || []).filter(
-      l =>
-        l.branchEntity &&
-        String(l.branchEntity.branchMstID) === String(branchId)
-    );
+    if (data.company && data.company.company) {
+      setCompanyName(data.company.company);
+    }
 
-    if (filteredLocations.length === 0) {
+    /* ================= LOCATION (✅ FIX HERE) ================= */
+    const locationListFromApi =
+      data.locationList ||
+      data.locations ||
+      data.locationMstList ||
+      [];
+
+    if (locationListFromApi.length === 0) {
+      console.error(" No locations from backend");
       setLocationList([]);
       toast.error("No locations registered for this branch");
       return;
     }
 
-    setLocationList(filteredLocations);
+    setLocationList(locationListFromApi);
 
-    /* OLD LOGIC RESTORED: auto select first location */
     const selectedLocation =
-      filteredLocations.find(
+      locationListFromApi.find(
         l => String(l.locationMstID) === String(locationId)
-      ) || filteredLocations[0];
+      ) || locationListFromApi[0];
+
+    console.log(" selectedLocation:", selectedLocation);
 
     setLocationId(String(selectedLocation.locationMstID));
     setValue("locationId", String(selectedLocation.locationMstID));
@@ -154,6 +269,7 @@ function LoggedPage() {
       "loginData",
       JSON.stringify({
         ...stored,
+        userCode: stored.userCode || userCode,
         locationId: selectedLocation.locationMstID,
         locationName: selectedLocation.location
       })
@@ -189,15 +305,23 @@ function LoggedPage() {
 
   /* ================= VALIDATION ================= */
   const validateForm = () => {
-    const newErrors = {};
+    if (fieldsLocked) return true;
 
-    if (!branchId) newErrors.branchId = "Branch is required";
-    if (!locationId) newErrors.locationId = "Location is required";
-    if (!finYear) newErrors.finYear = "Financial Year is required";
+    if (!branchId) {
+      toast.error("Please select Branch");
+      return false;
+    }
 
-    setError(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!locationId) {
+      toast.error("Please select Location");
+      return false;
+    }
+
+    return true;
   };
+
+
+
 
   /* ================= ACTIONS ================= */
 
@@ -216,6 +340,7 @@ function LoggedPage() {
       "loginData",
       JSON.stringify({
         ...stored,
+        userCode: stored.userCode,
         companyId,
         branchId,
         branchName: selectedBranch?.branch || "",
@@ -242,6 +367,9 @@ function LoggedPage() {
       "loginData",
       JSON.stringify({
         ...stored,
+        userCode: stored.userCode,
+        branchId: stored.branchId,
+        locationId: stored.locationId,
         fieldsLocked: false,
         okEnabled: true,
         changeEnabled: false
@@ -252,6 +380,11 @@ function LoggedPage() {
     setOkEnabled(true);
     setChangeEnabled(false);
   };
+
+  console.log(" branchOptions:", branchOptions);
+  console.log(" locationOptions:", locationOptions);
+  console.log(" selected branchId:", branchId);
+  console.log(" selected locationId:", locationId);
 
   /* ================= UI ================= */
   return (
@@ -297,10 +430,19 @@ function LoggedPage() {
                   render={({ field }) => (
                     <Select
                       options={branchOptions}
-                      value={branchOptions.find(opt => opt.value === field.value) || null}
+                      value={branchOptions.find(opt => opt.value === branchId) || null}
                       onChange={opt => {
+                        if (!opt) {
+                          field.onChange("");
+                          setBranchId("");
+                          return;
+                        }
                         field.onChange(opt.value);
                         setBranchId(opt.value);
+                        setValue("branchId", opt.value);
+                        setLocationList([]);
+                        setValue("locationId", "");
+
                       }}
                       isDisabled={fieldsLocked}
                       classNamePrefix="form-control-select"
@@ -328,10 +470,16 @@ function LoggedPage() {
                   render={({ field }) => (
                     <Select
                       options={locationOptions}
-                      value={locationOptions.find(opt => opt.value === field.value) || null}
+                      value={locationOptions.find(opt => opt.value === locationId) || null}
                       onChange={opt => {
+                        if (!opt) {
+                          field.onChange("");
+                          setLocationId("");
+                          return;
+                        }
                         field.onChange(opt.value);
                         setLocationId(opt.value);
+
                       }}
                       isDisabled={fieldsLocked}
                       classNamePrefix="form-control-select"
@@ -340,7 +488,7 @@ function LoggedPage() {
                 />
               </div>
 
-              <div style={{ textAlign: "center"}} className="button-group">
+              <div style={{ textAlign: "center" }} className="button-group">
                 <button className="logged-btn" onClick={handleOk} disabled={!okEnabled}>
                   OK
                 </button>

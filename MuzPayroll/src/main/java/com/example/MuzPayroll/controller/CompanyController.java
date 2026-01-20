@@ -20,7 +20,6 @@ import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
-import com.example.MuzPayroll.repository.CompanyLogRepository;
 import com.example.MuzPayroll.repository.CompanyRepository;
 import com.example.MuzPayroll.service.CompanyService;
 
@@ -34,9 +33,6 @@ public class CompanyController {
 
     @Autowired
     private CompanyRepository companyRepository;
-
-    @Autowired
-    private CompanyLogRepository companyLogRepository;
 
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<CompanyDTO> saveCompany(
@@ -126,7 +122,6 @@ public class CompanyController {
 
         return ResponseEntity.ok(response);
     }
-
 
     // // TO get the company data from companyLog by giving MstID and rowno
     // @GetMapping("/amend/{companyMstID}/{rowNo}")

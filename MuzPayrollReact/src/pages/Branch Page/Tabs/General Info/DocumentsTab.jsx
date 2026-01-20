@@ -14,6 +14,7 @@ export default function DocumentsTab({
   // watch,
   setValue,
   trigger,
+  onFileSelect,
   // setError,
   // control,
   // disabled = false,
@@ -33,6 +34,18 @@ export default function DocumentsTab({
     },
     { value: "address_proof", label: "Address Proof", required: false },
   ];
+
+  const handleChange = (e, index) => {
+    console.log("FIle state", e.target.files[0]);
+    const selectedFile = e.target.files[0];
+
+    onFileSelect(selectedFile);
+
+    setValue(`documents.${index}.file`, selectedFile, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
   // const hasDocumentErrors = !!errors?.documents;
   const addDocumentRow = async () => {
     await trigger("documents"); //  validate all docs
@@ -47,12 +60,12 @@ export default function DocumentsTab({
       file: null,
       remarks: "",
     });
-    toast.success("New document row added");
+    // toast.success("New document row added");
   };
 
-    const removeDocumentRow = (index) => {
+  const removeDocumentRow = (index) => {
     remove(index);
-    toast.success("Document row removed");
+    // toast.success("Document row removed");
   };
 
   //   const handleDocumentChange = (id, updates) => {
@@ -181,15 +194,6 @@ export default function DocumentsTab({
                   )}
                 </div>
 
-                {/* className={`form-control ${errors.branchName ? "error" : ""}`}
-                    placeholder="Enter branch name"
-                    {...register('branchName', { required: "Branch name is required",
-                      pattern:{
-                        value: /^[a-zA-Z\s-]+$/,
-                        message:"Please enter valide branch name",
-                      }
-                    })} */}
-
                 <div className="field">
                   <label className="required">Document Number</label>
                   <input
@@ -231,6 +235,8 @@ export default function DocumentsTab({
                     type="file"
                     className="file-input"
                     accept=".pdf,.jpg,.jpeg,.png"
+
+                    onChange={(e) => handleChange(e, index)}
                     {...register(`documents.${index}.file`, {
                       required: "Document file is required",
                       validate: {

@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import "./designation.css";
 import Main from "../../components/MainButtons/MainButtons";
 import axios from "axios";
+
+import { RxCross2 } from "react-icons/rx";
 import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl } from "react-icons/fa";
 import { FaRegObjectGroup } from "react-icons/fa";
@@ -30,13 +32,15 @@ const Designation = () => {
       shortName: "AACT",
       description: "ASSISTANT ACCOUNTANT",
     },
-    {
-      code: "DES003",
-      activeDate: "2024-03-10",
-      name: "MANAGER ADMIN",
-      shortName: "MADMIN",
-      description: "MANAGER ADMIN",
-    },
+    // {
+    //   code: "DES003",
+    //   activeDate: "2024-03-10",
+
+    //   inActiveDate: "2025-03-10",
+    //   name: "MANAGER ADMIN",
+    //   shortName: "MADMIN",
+    //   description: "MANAGER ADMIN",
+    // },
     {
       code: "DES004",
       activeDate: "2024-04-05",
@@ -99,16 +103,16 @@ const Designation = () => {
     console.log("Print clicked");
   };
 
-  const handleNewPage = () => {
-    console.log("New page clicked");
-  };
+  // const handleNewPage = () => {
+  //   console.log("New page clicked");
+  // };
 
-  const handleFlagChange = (newFlag) => {
-    setFlag(newFlag); // update parent state
-    setTimeout(() => {
-      setFlag(false); // reset flag after 2 seconds
-    }, 1000);
-  };
+  //   const handleFlagChange = (newFlag) => {
+  //   setFlag(newFlag);  // update parent state
+  //     setTimeout(() => {
+  //       setFlag(false); // reset flag after 2 seconds
+  //     }, 1000);
+  // };
   const handleSearchChange = (e) => {
     setSearchdata(e.target.value);
   };
@@ -211,15 +215,37 @@ const Designation = () => {
         </div>
         <div className={`card-grid ${listView ? "list" : "tile"}`}>
           {advanceTypes.map((item) => (
-            <div className="advance-card" key={item.code}>
+            <div
+              className={`advance-card ${item.inActiveDate ? "inactive" : "active"}`}
+              key={item.code}
+            >
               <div className="card-header">
                 <span className="code" onClick={() => hanbleSearchChange(item)}>
                   {item.code}
                 </span>
 
                 <div className="status">
-                  <TiTick className="check-icon" />
-                  <span className="date">{item.activeDate}</span>
+                  {item.inActiveDate ? (
+                    <div className="status-stack inactive">
+                      <div className="status-item inactive">
+                        <RxCross2 className="check-icon" />
+                        <span className="status-text">Inactive</span>
+                        <span className="date">{item.inActiveDate}</span>
+                      </div>
+
+                      <div className="status-sub">
+                        <TiTick className="check-icon muted" />
+                        <span className="status-text muted">Active from</span>
+                        <span className="date muted">{item.activeDate}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="status-item active">
+                      <TiTick className="check-icon" />
+                      <span className="status-text">Active</span>
+                      <span className="date">{item.activeDate}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -269,11 +295,12 @@ const Designation = () => {
               // disabled: !hasDeletePermission
               disabled: true,
             },
-            print: {
-              onClick: handlePrint,
-              // disabled: isNewRecord
-              disabled: true,
-            },
+
+            // print: {
+            //   onClick: handlePrint,
+            //   // disabled: isNewRecord
+            //   disabled: true,
+            // },
             new: {
               onClick: toggleForm, //to toggle the designation form
             },

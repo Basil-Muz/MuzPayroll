@@ -43,17 +43,17 @@ export default function HomePage() {
           {
             title: "Company List",
             subtitle: "Company List",
-            link: "/organisation/company-list",
+            link: "/companylist",
           },
           {
             title: "Branch List",
             subtitle: "Branch List",
-            link: "/organisation/branch-list",
+            link: "/branchlist",
           },
           {
             title: "Location List",
             subtitle: "Location List",
-            link: "/organisation/location-list",
+            link: "/locationlist",
           },
         ],
         [

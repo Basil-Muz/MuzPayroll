@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.CompanyLogPK;
 
 import jakarta.persistence.Column;

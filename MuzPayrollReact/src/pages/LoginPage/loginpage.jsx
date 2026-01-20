@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginpage.css";
 import muzLogo from "../../assets/muzlogo_transparent.png";
-import {useAuth} from "../../context/AuthProvider.jsx";
+import { useAuth } from "../../context/AuthProvider.jsx";
+import { RiAdminFill } from "react-icons/ri";
+import { TbPasswordUser } from "react-icons/tb";
+import { IoEye } from "react-icons/io5";
+import { IoEyeOff } from "react-icons/io5";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -13,6 +17,9 @@ function LoginPage() {
 
   const [userCodeError, setUserCodeError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+
 
   // Handle typing: Allow only letters + numbers
   const handleUserCodeChange = (e) => {
@@ -33,7 +40,7 @@ function LoginPage() {
     if (value) setUserCode(value + "@muziris");
   };
   const handleSubmit = (e) => {
-    e.preventDefault();   // ⭐ KEY FIX
+    e.preventDefault();   // KEY FIX
     handleLogin();
   };
 
@@ -44,11 +51,11 @@ function LoginPage() {
     let isValid = true;
 
     if (!userCode.trim()) {
-      setUserCodeError("User code is required.");
+      setUserCodeError("User code is required");
       isValid = false;
     }
     if (!password.trim()) {
-      setPasswordError("Password is required.");
+      setPasswordError("Password is required");
       isValid = false;
     }
     if (!isValid) return;
@@ -58,7 +65,7 @@ function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userCode: userCode, password }),
-        
+
       });
 
       const data = await response.json();
@@ -69,19 +76,20 @@ function LoginPage() {
         setPasswordError(data.message || "Invalid login.");
         return;
       }
-     const cleanUserCode = userCode.replace("@muziris", "");
+      const cleanUserCode = userCode.replace("@muziris", "");
       // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
+      const payload = data.data; //  IMPORTANT
+
       const loginData = {
         userCode: cleanUserCode,
-        userName: data.userName, 
-        companyId: data.companyId,
-        branchId: data.branchId,
-        locationId: data.locationId,
-      
+        userName: payload.userName,
+        companyId: payload.companyId,
+        branchId: payload.branchId,
+        locationId: payload.locationId,
       };
 
-     login(loginData);
-    navigate("/home");
+      login(loginData);
+      navigate("/home");
 
     } catch (error) {
       setPasswordError("Server error.");
@@ -96,50 +104,77 @@ function LoginPage() {
           <img src={muzLogo} alt="Logo" className="login-logo" />
           <h2>Login</h2>
         </div>
-<form className="form-group" onSubmit={handleSubmit}>
-          <div className="form-group">
+        <form className="form-group1" onSubmit={handleSubmit}>
+          <div className="form-group1">
 
-          {/* User Code */}
-          <label>User Code</label>
-          <input
-            type="text"
-            value={userCode}
-            onChange={handleUserCodeChange}
-            onBlur={handleUserCodeBlur}
-            autoFocus
-          />
-          {userCodeError && <p className="error-msg">{userCodeError}</p>}
 
-          {/* Password */}
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setPasswordError("");
-            }}
-          />
-          {passwordError && <p className="error-msg">{passwordError}</p>}
+            {/* User Code */}
+            <label>User Code</label>
+            <div className="input-wrapper">
+              <RiAdminFill className="input-inside-icon" />
 
-          {/* Login Button */}
-          <button className="login-btn" onClick={handleLogin}>
-            LOGIN
-          </button>
 
-          {/* Forgot Password */}
-          <p
-            className="forgot-link"
-            onClick={() => navigate("/forgot-password")}
-          >
-            Forgot Password?
-          </p>
-          
-        </div>
-          </form>
+              <input
+                type="text"
+                value={userCode}
+                onChange={handleUserCodeChange}
+                onBlur={handleUserCodeBlur}
+                placeholder="User code"
+                className={userCodeError ? "input-error" : ""}
+                autoFocus
+
+              />
+            </div>
+
+            {userCodeError && <p className="error-msg">{userCodeError}</p>}
+
+
+            {/* Password */}
+            <label>Password</label>
+
+            <div className="input-wrapper">
+              <TbPasswordUser className="input-inside-icon" />
+
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                className={passwordError ? "input-error" : ""}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError("");
+                }}
+              />
+
+              {/* EYE ICON */}
+              <span
+                className="password-eye"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <IoEye /> : <IoEyeOff />}
+              </span>
+
+            </div>
+            {passwordError && <p className="error-msg">{passwordError}</p>}
+
+            {/* Login Button */}
+            <button className="login-btn" onClick={handleLogin}>
+              Submit
+            </button>
+
+            {/* Forgot Password */}
+            <p
+              className="forgot-link"
+              onClick={() => navigate("/forgot-password")}
+            >
+              Forgot Password
+            </p>
+
+          </div>
+        </form>
       </div>
     </div>
-    
+
   );
 }
 

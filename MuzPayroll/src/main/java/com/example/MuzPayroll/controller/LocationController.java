@@ -18,7 +18,6 @@ import com.example.MuzPayroll.entity.LocationLog;
 import com.example.MuzPayroll.entity.LocationLogPK;
 import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.DTO.AmendListDTO;
-import com.example.MuzPayroll.entity.DTO.BranchDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.LocationDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
@@ -64,10 +63,10 @@ public class LocationController {
     }
 
     // To get the Company list from the MST table
-    @GetMapping("/locationList")
-    public ResponseEntity<List<FormListDTO>> getLocationList() {
+    @GetMapping("/locationlist")
+    public ResponseEntity<List<FormListDTO>> getCompanyList() {
 
-        List<LocationMst> list = locationRepository.findAllLocation();
+        List<LocationMst> list = locationRepository.findAllActiveLocation();
 
         if (list.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -81,8 +80,36 @@ public class LocationController {
                     dto.setName(entity.getLocation());
                     dto.setShortName(entity.getShortName());
                     dto.setActiveDate(entity.getActiveDate());
-                    // dto.setStatus();
-                    // dto.setInactiveDate();
+                    dto.setStatus(entity.getActiveStatusYN());
+                    dto.setInactiveDate(entity.getInactiveDate());
+                    dto.setActiveStatusYN(entity.getActiveStatusYN());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/inactivelocationlist")
+    public ResponseEntity<List<FormListDTO>> getInactiveCompanyList() {
+
+        List<LocationMst> list = locationRepository.findAllInActiveLocation();
+
+        if (list.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<FormListDTO> response = list.stream()
+                .map(entity -> {
+                    FormListDTO dto = new FormListDTO();
+                    dto.setMstID(entity.getLocationMstID());
+                    dto.setCode(entity.getCode());
+                    dto.setName(entity.getLocation());
+                    dto.setShortName(entity.getShortName());
+                    dto.setActiveDate(entity.getActiveDate());
+                    dto.setStatus(entity.getActiveStatusYN());
+                    dto.setInactiveDate(entity.getInactiveDate());
+                    dto.setActiveStatusYN(entity.getActiveStatusYN());
                     return dto;
                 })
                 .toList();
