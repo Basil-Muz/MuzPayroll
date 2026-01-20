@@ -11,7 +11,7 @@ import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.ChangePasswordRequest;
-import com.example.MuzPayroll.entity.DTO.CompanyDTO;
+// import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.ForgotPasswordRequest;
 import com.example.MuzPayroll.entity.DTO.ForgotPasswordResponse;
 import com.example.MuzPayroll.entity.DTO.LoginRequest;
@@ -107,9 +107,7 @@ public class UserMstService {
             errors.add("Location ID is required");
         }
 
-        if (!errors.isEmpty()) {
-            return Response.error(errors);
-        }
+     
 
         UserMst user = userRepo.findByUserCode(userCode.replace("@muziris", ""));
 
@@ -130,6 +128,9 @@ public class UserMstService {
         List<LocationMst> locations = getAllLocations(branchId);
         if (locations == null || locations.isEmpty()) {
             return Response.error("No locations found for branch");
+        }
+           if (!errors.isEmpty()) {
+            return Response.error(errors);
         }
         LoginResponse resp = new LoginResponse();
         resp.setSuccess(true);
@@ -188,10 +189,7 @@ public class UserMstService {
         errors.add("New password is required");
     }
 
-    if (!errors.isEmpty()) {
-        return Response.error(errors);
-    }
-
+   
     UserMst user = userRepo.findByUserCode(userCode);
 
     if (user == null) {
@@ -201,6 +199,10 @@ public class UserMstService {
     if (!user.getPassword().equals(request.getCurrentPassword())) {
         return Response.error("Current password is incorrect");
     }
+     if (!errors.isEmpty()) {
+        return Response.error(errors);
+    }
+
 
     user.setPassword(request.getNewPassword());
     userRepo.save(user);
@@ -223,8 +225,15 @@ public class UserMstService {
     if (user == null) {
         return Response.error("Invalid user code");
     }
+    try {
+        emailService.sendPassword(user.getEmail(), user.getPassword());
+    } catch (Exception e) {
+        return Response.error("Email service failed. Try again later", 500);
+    }
+    
 
-    emailService.sendPassword(user.getEmail(), user.getPassword());
+
+    // emailService.sendPassword(user.getEmail(), user.getPassword());
 
     ForgotPasswordResponse resp = new ForgotPasswordResponse();
     resp.setSuccess(true);

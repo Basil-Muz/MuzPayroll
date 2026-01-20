@@ -120,7 +120,7 @@ function LoginPage() {
                 value={userCode}
                 onChange={handleUserCodeChange}
                 onBlur={handleUserCodeBlur}
-                placeholder="User code"
+                placeholder="e.g.abc, not abc@muziris"
                 className={userCodeError ? "input-error" : ""}
                 autoFocus
 
@@ -162,7 +162,7 @@ function LoginPage() {
             {commonError && <p className="common-error-msg">{commonError}</p>}
 
             {/* Login Button */}
-            <button className="login-btn" onClick={handleLogin}>
+            <button  type="submit" className="login-btn" >
               Submit
             </button>
 

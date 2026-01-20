@@ -78,7 +78,7 @@
   /* refined pink */
   letter-spacing: 0.5px;
   margin-bottom: 25px;
-  color:#d946ef;
+  color: #d946ef;
 }
 
 
@@ -103,7 +103,7 @@
   margin-bottom: 18px;
 
   border-radius: 34px;
-  
+
   /* box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1); */
   color: black;
   font-size: 15px;
@@ -122,6 +122,16 @@
   font-weight: 400;
   letter-spacing: 0.3px;
 }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.55) inset !important;
+  box-shadow: 0 0 0 1000px white inset !important;
+  /* -webkit-text-fill-color:  !important;
+  caret-color: #333; */
+  transition: background-color 9999s ease-in-out 0s;
+}
 
 
 .input-wrapper {
@@ -132,13 +142,14 @@
 /* INPUT */
 .input-wrapper input {
   width: 100%;
-  padding: 12px 16px 12px 42px; /* left space for icon */
+  padding: 12px 16px 12px 42px;
+  /* left space for icon */
   border-radius: 34px;
 
   background: rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(0px);
 
-  
+
   border: 1px solid var(--brand-border);
 
   font-size: 15px;
@@ -152,6 +163,7 @@
 /* ICON INSIDE INPUT */
 .input-inside-icon {
   position: absolute;
+  z-index: 2;
   left: 16px;
   top: 40%;
   transform: translateY(-60%);
@@ -159,7 +171,8 @@
   font-size: 14px;
   color: rgba(0, 0, 0, 0.5);
 
-  pointer-events: none; /* important */
+  pointer-events: none;
+  /* important */
 }
 
 /* PLACEHOLDER */
@@ -172,15 +185,15 @@
 .input-wrapper input:focus {
   /* border-color: #d946ef;
   box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.15); */
-  
+
   border-color: var(--brand);
   box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1);
 }
 
 
 /* OPTIONAL: fade icon when typing */
-.input-wrapper input:focus + .input-inside-icon,
-.input-wrapper input:not(:placeholder-shown) + .input-inside-icon {
+.input-wrapper input:focus+.input-inside-icon,
+.input-wrapper input:not(:placeholder-shown)+.input-inside-icon {
   opacity: 0.5;
 }
 
@@ -211,10 +224,11 @@
   margin-bottom: 10px;
   font-size: 13px;
   text-align: left;
- 
+
 }
+
 .input-wrapper input.input-error {
-  border-color:var(--danger);
+  border-color: var(--danger);
 
 }
 
@@ -246,19 +260,20 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(217, 70, 239, 0.35);
 }
+
 .common-error-msg {
   color: #e11d48;
   margin-top: -8px;
   margin-bottom: 10px;
   font-size: 14px;
   text-align: center;
- 
+
 }
 
 .forgot-link {
   margin-top: 14px;
   text-align: center;
-  color:var(--brand-light);
+  color: var(--brand-light);
   font-size: 14px;
   cursor: pointer;
 }

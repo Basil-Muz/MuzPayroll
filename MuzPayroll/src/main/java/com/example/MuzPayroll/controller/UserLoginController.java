@@ -62,12 +62,12 @@ public class UserLoginController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<Response<ForgotPasswordResponse>> forgotPassword(
-            @RequestBody ForgotPasswordRequest request) {
+        @RequestBody ForgotPasswordRequest request) {
 
-        Response<ForgotPasswordResponse> response = service.forgotPassword(request);
+    Response<ForgotPasswordResponse> response = service.forgotPassword(request);
 
-        return ResponseEntity
-                .status(response.getStatusCode())
-                .body(response);
-    }
+    return ResponseEntity
+            .status(response.getStatusCode())  // <-- uses YOUR DTO statusCode
+            .body(response);                   // <-- uses YOUR DTO body
+}
 }

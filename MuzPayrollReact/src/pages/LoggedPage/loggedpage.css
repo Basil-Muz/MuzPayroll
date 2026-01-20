@@ -235,4 +235,40 @@
     width: 100%;
     margin-bottom: 10px;
   }
+
+  /* ===== RESPONSIVE COMPANY LOGO (OVERRIDE) ===== */
+
+/* Override fixed size */
+.home-logo {
+  width: 35vw;              /* responsive width */
+  max-width: 250px;         /* desktop limit (keeps your design) */
+  min-width: 120px;         /* minimum for small devices */
+  height: auto;
+  object-fit: contain;
+}
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .home-logo {
+    width: 40vw;
+    max-width: 220px;
+  }
+}
+
+/* Small tablets / large phones */
+@media (max-width: 768px) {
+  .home-logo {
+    width: 50vw;
+    max-width: 180px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .home-logo {
+    width: 65vw;
+    max-width: 150px;
+  }
+}
+
 }
