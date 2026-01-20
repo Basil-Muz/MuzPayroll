@@ -373,7 +373,7 @@ const Header = ({ backendError = [] }) => {
           {shouldRenderProfile && profileOpen && (
             <div className="profile-dropdown" role="menu">
               <a 
-                href="/changePassword" 
+                href="/changepassword" 
                 role="menuitem"
                 className="profile-link"
               >

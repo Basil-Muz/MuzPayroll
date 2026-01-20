@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./forgotpassword.css";
+import "../LoginPage/loginpage.css"
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -53,31 +53,44 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="forgot-container">
-      <div className="forgot-box">
+  <div className="login-container">
+    <div className="login-box">
+      <div className="logo-section">
         <h2>Forgot Password</h2>
-
-        <label>User Code</label>
-        <input
-          type="text"
-          placeholder="Enter your user code"
-          value={userCode}
-          onChange={(e) => setUserCode(e.target.value)}
-        />
-
-        {error && <p className="error-msg">{error}</p>}
-        {message && <p className="success-msg">{message}</p>}
-
-        <button onClick={handleSubmit} disabled={loading}>
-          {loading ? "SENDING..." : "SEND PASSWORD"}
-        </button>
-
-        <p className="back-link" onClick={() => navigate("/")}>
-          Back to Login
-        </p>
       </div>
+
+      <div className="form-group1">
+        <label>User Code</label>
+
+        <div className="input-wrapper">
+          <input
+            type="text"
+            placeholder="Enter your user code"
+            value={userCode}
+            onChange={(e) => setUserCode(e.target.value)}
+            className={error ? "input-error" : ""}
+          />
+        </div>
+      </div>
+
+      {error && <p className="error-msg">{error}</p>}
+      {message && <p className="success-msg">{message}</p>}
+
+      <button
+        className="login-btn"
+        onClick={handleSubmit}
+        disabled={loading}
+      >
+        {loading ? "SENDING..." : "SEND PASSWORD"}
+      </button>
+
+      <p className="forgot-link" onClick={() => navigate("/")}>
+        Back to Login
+      </p>
     </div>
-  );
+  </div>
+);
+
 }
 
 export default ForgotPassword;

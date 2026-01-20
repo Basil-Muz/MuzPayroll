@@ -63,17 +63,16 @@ public class UserMstService {
             errors.add("Password is required");
         }
 
-        if (!errors.isEmpty()) {
-            return Response.error(errors);
-        }
-
+       
         UserMst user = userRepo.findByUserCode(userCode);
 
         if (user == null || !user.getPassword().equals(request.getPassword())) {
-            errors.add("Invalid login");
+            errors.add("Invalid user code or password");
 
         }
-
+       if (!errors.isEmpty()) {
+            return Response.error(errors);
+        }
         LoginResponse resp = new LoginResponse();
         resp.setSuccess(true);
         resp.setMessage("Login successful");

@@ -2,7 +2,7 @@ import "./App.css";
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-import { Toaster,toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import "./ToastStyles.css";
 import "./common-form.css";
 
@@ -32,18 +32,10 @@ import BranchPageForm from "./pages/Branch Page/Tabs/GenaralBranchForm.jsx";
 import CompanyPageForm from "./pages/CompanyPage/GenaralCompanyForm.jsx";
 import LocationPageForm from "./pages/LocationPage/GeneralLocationForm.jsx";
 import { AuthProvider } from "./context/AuthProvider.jsx";
-
 import PayrollGroup from "./pages/payrollgroup/payrollgroup.jsx";
-import PayrollGroupList from "./pages/payrollgroup/payrollgrouplist.jsx";
-import PayrollGroupSearch from "./pages/payrollgroup/payrollgroupsearch.jsx";
-
 import UserGroup from "./pages/UserGroup/usergroup.jsx";
-import UserGroupForm from "./pages/UserGroup/usergroupform.jsx";
 import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
-import LocationGroupForm from "./pages/LocationGroup/locationgroupform.jsx";
 import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
-import ShiftGroupSearch from "./pages/ShiftGroup/shiftgroupsearch.jsx";
-import ShiftGroupList from "./pages/ShiftGroup/shiftgrouplist.jsx";
 
 function App() {
   return (
@@ -73,17 +65,10 @@ function App() {
           <Route path="/branchform" element={<BranchPageForm />} />
           <Route path="/companyform" element={<CompanyPageForm />} />
           <Route path="/locationform" element={<LocationPageForm />} />
-
-          <Route path="/payrollgroup" element={<PayrollGroup />} />
-          <Route path="/payrollgroupsearch" element={<PayrollGroupSearch />} />
-          <Route path="/payrollgrouplist" element={<PayrollGroupList />} />
-          <Route path="/usergroupform" element={<UserGroupForm />} />
+          <Route path="/payrollgroup" element={<PayrollGroup />} />  
           <Route path="/usergroup" element={<UserGroup />} />
           <Route path="/locationgroup" element={<LocationGroup />} />
-          <Route path="/locationgroupform" element={<LocationGroupForm />} />
           <Route path="/shiftgroup" element={<ShiftGroup />} />
-          <Route path="/shiftgroupsearch" element={<ShiftGroupSearch />} />
-          <Route path="/shiftgrouplist" element={<ShiftGroupList />} />
 
         </Routes>
       </AuthProvider>
