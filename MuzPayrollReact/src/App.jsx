@@ -92,27 +92,22 @@ function App() {
         </Routes>
       </AuthProvider>
       <Toaster
-        position="top-right"
-        gutter={10}
-        toastOptions={{
-          duration: 2800,
-          style: {
-            background: "var(--glass-bg)",
-            color: "var(--text)",
-            border: "1px solid var(--border)",
-            boxShadow: "var(--shadow-lg)",
-            borderRadius: "var(--radius-lg)",
-            padding: "14px 16px",
-            maxWidth: "420px",
-            fontSize: "var(--text-sm)",
-            backdropFilter: "blur(10px)",
-          },
+      position="top-right"
+      gutter={12}
+      reverseOrder={false}
+      toastOptions={{
+        duration: 2800,
 
-          // Default icon theme
-          iconTheme: {
-            primary: "var(--brand)",
-            secondary: "var(--background)",
-          },
+        style: {
+          background: "var(--glass-bg)",
+          color: "var(--text)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-lg)",
+          padding: "0",
+          maxWidth: "420px",
+          backdropFilter: "blur(10px)",
+        },
 
           success: {
             style: {
@@ -173,7 +168,25 @@ function App() {
                 <CloseIcon />
               </button>
             </div>
-            <div className={`toast-progress ${t.visible ? "animate" : ""}`} />
+
+            <div className="toast-message">
+              <span className="toast-title">
+                {t.type === "success"
+                  ? "Success"
+                  : t.type === "error"
+                  ? "Error"
+                  : "Information"}
+              </span>
+              <p>{t.message}</p>
+            </div>
+
+            <button
+              className="toast-close"
+              onClick={() => toast.dismiss(t.id)}
+              aria-label="Close notification"
+            >
+              <CloseIcon />
+            </button>
           </div>
         )}
       </Toaster>

@@ -52,7 +52,8 @@
   /* Border Radius */
   --radius: 12px;
   --radius-sm: 8px;
-  --radius-md: 10 --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
   --radius-xl: 24px;
 
   /* Option / Disabled */
@@ -141,14 +142,18 @@
 html,
 body,
 #root {
-  height: auto;
-  min-height: 100%;
+  /* height: auto; */
+  height: 100%;
   width: 100%;
-  transform: none !important;
+  /* transform: none !important; */
   margin: 0;
   padding: 0;
 }
-
+#root,
+.page,
+.form-card {
+  overflow: visible;
+}
 body {
   /* font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; */
   /* background: linear-gradient(135deg, #f9f5faff 0%, #f0e4f2ff 100%); */
@@ -156,7 +161,8 @@ body {
   /* color: var(--text); */
   /* safety net */
   /* background-color: #f2f2f2; */
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
+  overflow-y: auto;
 }
 /* body > * {
   max-width: 100vw !important;
@@ -171,7 +177,7 @@ body {
 
 #root {
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: visible; /* when it hidden scrolling top is blocked*/
 }
 
 .branch-container-tab {
@@ -182,7 +188,7 @@ body {
   padding: 32px 16px;
   padding-bottom: 27px; /* for scroll to top button space */
   /* padding-top: var(--header-padding);  */
-  padding-top: 46px;
+  margin-top: 46px;
   /* for header space */
 }
 
@@ -1314,9 +1320,27 @@ z-index:10 !important; */
   transition: all 0.25s ease;
 }
 
-/* .amend-pill:hover { */
-/* transform: translateY(-2px); */
-/* } */
+.amend-pill {
+  position: relative;
+  overflow: hidden;
+}
+
+.amend-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand-border);
+}
+
+.amend-pill::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--border-light);
+}
 
 /* ===============================
    Left Side
@@ -1329,15 +1353,19 @@ z-index:10 !important; */
 }
 
 .pill-index {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  background: var(--background-alt);
+  /* color: #fff; */
+  border: none;
   font-weight: 700;
-  font-size: 14px;
-  background: var(--brand-light);
-  color: white;
+  border-radius: 9px;
+  color: var(--brand);
+  border: 1px solid var(--brand-border);
 }
 
 .pill-info {
@@ -1366,28 +1394,30 @@ z-index:10 !important; */
 }
 
 .pill-badge {
-  font-size: 10px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 10px;
-  text-transform: uppercase;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
 }
 
 /* ===============================
    ENTRY
 ================================ */
 
-.amend-pill.entry {
-  border-left: 4px solid var(--brand);
+.amend-pill.entry::before {
+  background: var(--brand);
+}
+.amend-pill:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-border);
 }
 
 /* ===============================
    VERIFIED
 ================================ */
 
-.pill-badge.verified {
-  background: var(--success-light);
-  color: var(--brand);
+.amend-pill.verified::before {
+  background: var(--success);
 }
 
 /* ===============================
@@ -1395,19 +1425,31 @@ z-index:10 !important; */
 ================================ */
 
 .amend-pill.selected {
-  /* background: linear-gradient(
-    135deg,
-    var(--brand-light),
-    #f5c2ff
-  ); */
   background: var(--background-alt);
   border: 1.5px solid var(--brand);
-  /* box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1); */
+  box-shadow:
+    0 0 0 3px rgba(210, 24, 216, 0.12),
+    var(--shadow-lg);
+}
+
+.amend-pill.latest::before {
+  background: linear-gradient(180deg, var(--brand), var(--brand-light));
+}
+.amend-pill.latest.selected {
+  box-shadow:
+    0 0 0 3px rgba(210, 24, 216, 0.18),
+    0 8px 20px rgba(210, 24, 216, 0.25);
 }
 
 .pill-badge.latest {
   background: var(--brand);
   color: #fff;
+}
+.pill-badge.verified {
+  background: transparent;
+  
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
 }
 
 .amend-pill.selected .pill-index {
@@ -1468,12 +1510,12 @@ z-index:10 !important; */
     padding-top: var(--header-padding);
     align-items: stretch;
   }
-
+  /* 
   .form-card {
     /* max-height: calc(100vh - 32px);
     min-height: 500px; */
-    overflow: auto;
-  }
+  /* overflow: auto; */
+  /* }  */
 
   .form-header {
     padding: 20px 16px 12px;

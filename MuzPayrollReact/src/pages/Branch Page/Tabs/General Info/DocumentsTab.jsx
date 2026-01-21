@@ -50,6 +50,7 @@ export default function DocumentsTab({
   const addDocumentRow = async () => {
     await trigger("documents"); //  validate all docs
     if (errors?.documents) {
+      // enforceToastLimit();
       toast.error("Please complete the document details");
       return;
     }

@@ -33,7 +33,7 @@
 
 /* ================= CARD ================= */
 
-.advance-card {
+.designation-page .advance-card {
   position: relative;
   min-width: 260px;
   padding: 18px 20px 20px;
@@ -92,13 +92,13 @@
 
 /* ================= CARD HEADER ================= */
 
-.card-header {
+.designation-page .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-.code {
+.designation-page .code {
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -107,20 +107,20 @@
 
 /* ================= STATUS ================= */
 
-.status {
+.designation-page .status {
   display: flex;
   align-items: flex-end;
 }
 
 /* Inactive: stacked dates */
-.status-stack {
+.designation-page .status-stack {
   display: flex;
   flex-direction: column;
   gap: 4px;
   align-items: flex-end;
 }
 
-.status-item {
+.designation-page .status-item {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -128,7 +128,7 @@
   font-weight: 500;
 }
 
-.status-item.active {
+.designation-page .status-item.active {
   color: var(--brand);
 }
 

@@ -74,13 +74,13 @@ const Designation = () => {
 
   // const isSubmitted = designationData?.status === "SUBMITTED"; //Has the designation been submitted/finalized?
 
-  // useEffect(() => {
-  //   if (!searchData.trim()) { // Only fetch all if search is empty
-  //     axios.get("http://localhost:9082/viewAdvanceType")
-  //       .then(res => setAdvanceTypes(res.data))
-  //       .catch(console.error);
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (!searchData.trim()) { // Only fetch all if search is empty
+      axios.get("http://localhost:8087/company/companyList")
+        .then(res => setAdvanceTypes(res.data))
+        .catch(console.error);
+    }
+  }, [searchData]);
 
   const handleSave = () => {
     console.log("Save clicked");

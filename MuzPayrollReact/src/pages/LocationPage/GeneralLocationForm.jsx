@@ -36,8 +36,9 @@ export default function GenaralLocationForm() {
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
 
   const datePickerRef = useRef(null);
-  const authDateInputRef = useRef(null);
+  // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
+  const dateWrapperRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
   const userObj = JSON.parse(UserData);
 
@@ -311,9 +312,23 @@ export default function GenaralLocationForm() {
     if (isVerifiedAmendment) return;
 
     const timer = setTimeout(() => {
-      authDateInputRef.current?.focus();
-      datePickerRef.current?.setOpen(true);
-    }, 200);
+      // Smooth scroll FIRST
+      dateWrapperRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      // Wait until scroll animation finishes
+      setTimeout(() => {
+        const el = document.querySelector(".withaffectdate");
+
+        if (el) {
+          el.focus({ preventScroll: true }); //  NO JUMP
+        }
+
+        datePickerRef.current?.setOpen(true);
+      }, 500); // match scroll duration
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
@@ -675,6 +690,7 @@ export default function GenaralLocationForm() {
                       setValue={setValue}
                       setError={setError}
                       clearErrors={clearErrors}
+                      setFocus={setFocus}
                       control={control}
                       flags={formFlags}
                       isUnlocked={isUnlocked || isVerifiedAmendment}
@@ -691,6 +707,7 @@ export default function GenaralLocationForm() {
                       errors={errors}
                       watch={watch}
                       setValue={setValue}
+                      setFocus={setFocus}
                       setError={setError}
                       isUnlocked={isUnlocked || isVerifiedAmendment}
                       flags={formFlags}
@@ -707,6 +724,7 @@ export default function GenaralLocationForm() {
                       setValue={setValue}
                       setError={setError}
                       fields={fields}
+                      setFocus={setFocus}
                       append={append}
                       remove={remove}
                       trigger={trigger} // validate the documents while adding new document
@@ -759,7 +777,10 @@ export default function GenaralLocationForm() {
                     </div>
 
                     <div className="amend-field">
-                      <label className="form-label required">
+                      <label
+                        className="form-label required"
+                        ref={dateWrapperRef}
+                      >
                         Authorization date
                       </label>
                       <Controller
@@ -770,7 +791,7 @@ export default function GenaralLocationForm() {
                           <DatePicker
                             ref={datePickerRef}
                             placeholderText="Select date"
-                            className={`form-control datepicker-input ${
+                            className={`form-control datepicker-input withaffectdate${
                               errors.withaffectdate ? "error" : ""
                             }`}
                             selected={
@@ -790,7 +811,6 @@ export default function GenaralLocationForm() {
                             showYearDropdown
                             customInput={
                               <input
-                                ref={authDateInputRef}
                                 className={`form-control datepicker-input ${
                                   errors.withaffectdate ? "error" : ""
                                 }`}

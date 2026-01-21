@@ -6,19 +6,25 @@ const ScrollToTopButton = ({ showAfter = 100 }) => {
   const [visible, setVisible] = useState(false);
 
   const handleScroll = useCallback(() => {
-    setVisible(window.scrollY > showAfter);
-    // console.log("Window",window.scrollY)
+    const scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+
+    setVisible(scrollTop > showAfter);
   }, [showAfter]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   const scrollToTop = () => {
-    window.scrollTo({
+    document.documentElement.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+    document.body.scrollTo({
       top: 0,
       behavior: "smooth",
     });

@@ -318,20 +318,30 @@ export default function GenaralBranchForm() {
     // console.log("Company list response: ", companyList);
   }, [loadCompanyAndBranches]);
 
-  useEffect(() => {
-    if (isVerifiedAmendment) return;
+ useEffect(() => {
+  if (isVerifiedAmendment) return;
 
-    const timer = setTimeout(() => {
-      authDateInputRef.current?.focus();
-      dateWrapperRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+  const timer = setTimeout(() => {
+    // Smooth scroll FIRST
+    dateWrapperRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    // Wait until scroll animation finishes
+    setTimeout(() => {
+      const el = document.querySelector(".withaffectdate");
+
+      if (el) {
+        el.focus({ preventScroll: true }); //  NO JUMP
+      }
+
       datePickerRef.current?.setOpen(true);
-    }, 200);
+    }, 500); // match scroll duration
+  }, 300);
 
-    return () => clearTimeout(timer);
-  }, [addingNewAmend, isVerifiedAmendment]);
+  return () => clearTimeout(timer);
+}, [addingNewAmend, isVerifiedAmendment]);
 
   // useEffect(() => {
   //   console.log("Input ref:", authDateInputRef.current);
@@ -810,7 +820,7 @@ export default function GenaralBranchForm() {
                             ref={datePickerRef}
                             isDisabled={isReadOnly}
                             placeholderText="Select date"
-                            className={`form-control datepicker-input ${
+                            className={`form-control datepicker-input withaffectdate${
                               errors.withaffectdate ? "error" : ""
                             }`}
                             selected={
@@ -1025,7 +1035,7 @@ export default function GenaralBranchForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: step < steps.length - 1 || submitStatus == 1,
+              disabled: step < steps.length - 1,
             },
             search: {
               // onClick: handleSearch,

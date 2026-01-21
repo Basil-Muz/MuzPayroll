@@ -44,21 +44,24 @@ const GeneralInfoForm = function GeneralInfoForm({
   const userObj = JSON.parse(UserData);
 
   const branchId = userObj.branchId;
-  console.log("Branches:",branchId)
+  console.log("Branches:", branchId);
   // console.log("Branch sgsg", UserData);
+
+  const formatLocalDate = (date) => date.toLocaleDateString("en-CA"); // yyyy-MM-dd
+
   useEffect(() => {
     if (companys?.length > 0) {
       setValue("companyEntity", companys[0].value);
     }
 
-  if (branchList?.length > 0) {
-    // The branchId is string but in branchList it is integer
-    setValue("branchEntity", parseInt(branchId), {
-      shouldDirty: false,
-      shouldTouch: false,
-      shouldValidate: false,
-    });
-  }
+    if (branchList?.length > 0) {
+      // The branchId is string but in branchList it is integer
+      setValue("branchEntity", parseInt(branchId), {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    }
     console.log("General info branch :", branchList);
   }, [companys, setValue, branchList, branchId]);
 
@@ -163,7 +166,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                 rules={{ required: "Please select a company" }}
                 render={({ field }) => {
                   const selectedOption = companys.find(
-                    (opt) => opt.value === field.value
+                    (opt) => opt.value === field.value,
                   );
                   // onchange={setIsCompanyMenuOpen(true)}
                   return (
@@ -182,7 +185,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                         field.onChange(option.value);
                         // setIsCompanyMenuOpen(!isCompanyMenuOpen)
                       }}
-                    // store ONLY value
+                      // store ONLY value
                     />
                   );
                 }}
@@ -205,7 +208,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                 rules={{ required: "Please select a branch" }}
                 render={({ field }) => {
                   const selectedOption = branchList.find(
-                    (opt) => opt.value === field.value
+                    (opt) => opt.value === field.value,
                   );
                   return (
                     <Select
@@ -216,13 +219,15 @@ const GeneralInfoForm = function GeneralInfoForm({
                       classNamePrefix="form-control-select"
                       className={`${errors.branchEntity ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                       value={selectedOption || null} // important
-                     onChange={(option) => field.onChange(option.value)}  // store full object
+                      onChange={(option) => field.onChange(option.value)} // store full object
                     />
                   );
                 }}
               />
               {errors.branchEntity && (
-                <span className="error-message">{errors.branchEntity.message}</span>
+                <span className="error-message">
+                  {errors.branchEntity.message}
+                </span>
               )}
             </div>
           )}
@@ -339,13 +344,12 @@ const GeneralInfoForm = function GeneralInfoForm({
                 <DatePicker
                   placeholderText="Select date"
                   disabled={isReadOnly}
-                  className={`form-control datepicker-input ${errors.activeDate ? "error" : ""
-                    }`}
+                  className={`form-control datepicker-input ${
+                    errors.activeDate ? "error" : ""
+                  }`}
                   selected={field.value ? new Date(field.value) : null}
                   onChange={(date) =>
-                    field.onChange(
-                      date ? date.toISOString().slice(0, 10) : null
-                    )
+                    field.onChange(date ? formatLocalDate(date) : null)
                   }
                   dateFormat="dd/MM/yyyy"
                   // minDate={new Date()}
@@ -509,7 +513,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                                     </span>
                                     <span className="file-size">
                                       {(field.value.size / 1024 / 1024).toFixed(
-                                        2
+                                        2,
                                       )}{" "}
                                       MB
                                     </span>

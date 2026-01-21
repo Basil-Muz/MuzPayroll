@@ -148,20 +148,20 @@ function LoggedPage() {
 
   /* ================= API ================= */
   const fetchContextData = async (companyId, branchId, locationId, userCode) => {
-    console.log("fetchContextData called");
+    // console.log("fetchContextData called");
 
     if (!companyId || !branchId) {
-      console.log(" Missing companyId / branchId");
+      // console.log(" Missing companyId / branchId");
       return;
     }
 
     const res = await fetch(
       `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`
     );
-    console.log("API URL:", res.url);
+    // console.log("API URL:", res.url);
 
     const response = await res.json();
-    console.log("API raw response:", response);
+    // console.log("API raw response:", response);
 
     if (response.statusCode === 400) {
       const errorMsg = response.errors?.[0] || "Invalid context";
@@ -259,12 +259,13 @@ function LoggedPage() {
         l => String(l.locationMstID) === String(locationId)
       ) || locationListFromApi[0];
 
-    console.log(" selectedLocation:", selectedLocation);
+    // console.log("selectedLocation:", selectedLocation);
 
     setLocationId(String(selectedLocation.locationMstID));
     setValue("locationId", String(selectedLocation.locationMstID));
 
     const stored = JSON.parse(localStorage.getItem("loginData") || {});
+
     localStorage.setItem(
       "loginData",
       JSON.stringify({
