@@ -1,6 +1,7 @@
 package com.example.MuzPayroll.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import com.example.MuzPayroll.entity.BranchLogPK;
 import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.CompanyLog;
 import com.example.MuzPayroll.entity.CompanyMst;
+import com.example.MuzPayroll.entity.LocationLog;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.BranchDTO;
 import com.example.MuzPayroll.entity.DTO.BranchLogDTO;
@@ -631,6 +633,7 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
         entity.setWithaffectdate(dto.getWithaffectdate());
         entity.setActiveDate(dto.getActiveDate());
         entity.setActiveStatusYN(dto.getActiveStatusYN());
+        entity.setInactiveDate(dto.getInactiveDate());
 
         // Set authorization if available
         if (dto.getAuthorization() != null) {
@@ -666,6 +669,8 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
         dto.setAuthorization(entity.getAuthorization());
         dto.setActiveDate(entity.getActiveDate());
         dto.setActiveStatusYN(entity.getActiveStatusYN());
+        dto.setInactiveDate(entity.getInactiveDate());
+
         // ===== AUTHORIZATION MAPPING =====
         if (entity.getAuthorization() != null) {
 
@@ -867,24 +872,47 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
                 .findByBranchLogPK_BranchMstIDOrderByBranchLogPK_RowNoDesc(
                         branchMstID);
 
-        // OPTIONAL: Set MST-level audit info
-        Logs.stream()
-                .filter(log -> log.getAuthorization() != null
-                        && Boolean.TRUE.equals(
-                                log.getAuthorization().getAuthorizationStatus()))
-                .findFirst()
-                .ifPresent(log -> {
-                    dto.setAmendNo(log.getAmendNo());
-                    dto.setAuthId(log.getAuthorization().getAuthId());
-                    dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
-                    dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+        Optional<BranchLog> selectedLog = Logs.stream()
+                .filter(log -> log.getAuthorization() != null)
+                .max(Comparator.comparing(BranchLog::getAmendNo))
+                .flatMap(latestLog -> {
 
-                    if (log.getAuthorization().getUserMst() != null) {
-                        dto.setUserCode(
-                                log.getAuthorization().getUserMst().getUserCode());
+                    // Case 1: latest is TRUE → return it
+                    if (Boolean.TRUE.equals(
+                            latestLog.getAuthorization().getAuthorizationStatus())) {
+                        return Optional.of(latestLog);
                     }
 
+                    // Case 2: latest is FALSE → find latest TRUE
+                    return Logs.stream()
+                            .filter(log -> log.getAuthorization() != null)
+                            .filter(log -> Boolean.TRUE.equals(
+                                    log.getAuthorization().getAuthorizationStatus()))
+                            .max(Comparator.comparing(BranchLog::getAmendNo));
                 });
+
+        // Case 3: no TRUE exists → fallback to latest FALSE
+        if (!selectedLog.isPresent()) {
+            selectedLog = Logs.stream()
+                    .filter(log -> log.getAuthorization() != null)
+                    .filter(log -> Boolean.FALSE.equals(
+                            log.getAuthorization().getAuthorizationStatus()))
+                    .max(Comparator.comparing(BranchLog::getAmendNo));
+        }
+
+        // Apply mapping
+        selectedLog.ifPresent(log -> {
+
+            dto.setAmendNo(log.getAmendNo());
+            dto.setAuthId(log.getAuthorization().getAuthId());
+            dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
+            dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+
+            if (log.getAuthorization().getUserMst() != null) {
+                dto.setUserCode(
+                        log.getAuthorization().getUserMst().getUserCode());
+            }
+        });
 
         // Convert ALL logs → DTO list
         List<BranchLogDTO> logDtos = Logs.stream()

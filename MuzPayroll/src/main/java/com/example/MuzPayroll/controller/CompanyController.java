@@ -72,6 +72,34 @@ public class CompanyController {
     @GetMapping("/companylist")
     public ResponseEntity<List<FormListDTO>> getCompanyList() {
 
+        List<CompanyMst> list = companyRepository.findAllCompany();
+
+        if (list.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<FormListDTO> response = list.stream()
+                .map(entity -> {
+                    FormListDTO dto = new FormListDTO();
+                    dto.setMstID(entity.getCompanyMstID());
+                    dto.setCode(entity.getCode());
+                    dto.setName(entity.getCompany());
+                    dto.setShortName(entity.getShortName());
+                    dto.setActiveDate(entity.getActiveDate());
+                    dto.setStatus(entity.getActiveStatusYN());
+                    dto.setInactiveDate(entity.getInactiveDate());
+                    dto.setActiveStatusYN(entity.getActiveStatusYN());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // To get the Company list from the MST table
+    @GetMapping("/activecompanylist")
+    public ResponseEntity<List<FormListDTO>> getCompanyActiveList() {
+
         List<CompanyMst> list = companyRepository.findAllActiveCompanies();
 
         if (list.isEmpty()) {
