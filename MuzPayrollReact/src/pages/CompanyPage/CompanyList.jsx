@@ -17,23 +17,25 @@ import Loading from "../../components/Loading/Loading";
 import "./CompanyList.css";
 
 const CompanyList = () => {
-  /* ================= STATE ================= */
   const [listView, setListView] = useState(false);
   const [searchData, setSearchData] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [groupByStatus, setGroupByStatus] = useState(false);
 
+  const [allCompanies, setAllCompanies] = useState([]);
   const [activeCompanies, setActiveCompanies] = useState([]);
   const [inactiveCompanies, setInactiveCompanies] = useState([]);
 
   const [loading, setLoading] = useState(false);
-  const [headerError] = useState([]);
 
   const navigate = useNavigate();
 
   /* ================= API ================= */
-  const fetchActiveCompanies = () =>
+  const fetchAllCompanies = () =>
     axios.get("http://localhost:8087/company/companylist");
+
+  const fetchActiveCompanies = () =>
+    axios.get("http://localhost:8087/company/activecompanylist");
 
   const fetchInactiveCompanies = () =>
     axios.get("http://localhost:8087/company/inactivecompanylist");
@@ -43,32 +45,36 @@ const CompanyList = () => {
     navigate(`/company/${mstID}`);
   };
 
-  /* ================= LOADERS ================= */
+  /* ================= INITIAL LOAD ================= */
   useEffect(() => {
-    loadActiveOnly();
+    loadAllCompanies();
   }, []);
 
-  const loadActiveOnly = async () => {
+  const loadAllCompanies = async () => {
     setLoading(true);
+    setGroupByStatus(false);
+
     try {
-      const res = await fetchActiveCompanies();
+      const res = await fetchAllCompanies();
       setTimeout(() => {
-        setActiveCompanies(res.data);
+        setAllCompanies(res.data);
+        setActiveCompanies([]);
         setInactiveCompanies([]);
         setLoading(false);
       }, 800);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setLoading(false);
     }
   };
 
+  /* ================= GROUPING ================= */
   const handleGroupSubmit = async (checked) => {
     setGroupByStatus(checked);
     setShowSearch(false);
 
     if (!checked) {
-      loadActiveOnly();
+      loadAllCompanies();
       return;
     }
 
@@ -84,48 +90,47 @@ const CompanyList = () => {
         setInactiveCompanies(inactiveRes.data);
         setLoading(false);
       }, 800);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setLoading(false);
     }
   };
 
   const handleClear = () => {
-    setGroupByStatus(false);
-    setShowSearch(false);
-    loadActiveOnly();
+    loadAllCompanies();
   };
 
-  /* ================= RENDER CARD ================= */
-  const renderCompanyCard = (item, status) => (
+  /* ================= CARD ================= */
+  const renderCard = (item, status) => (
     <div
       key={item.code}
       className={`advance-card ${status}`}
       onClick={() => handleCardClick(item.mstID)}
-      style={{ cursor: "pointer" }}
     >
+      {/* HEADER */}
       <div className="card-header">
         <span className="code">{item.code}</span>
 
-        {status === "active" ? (
-          <div className="status-item active">
-            <TiTick />
-            <span className="date">{item.activeDate}</span>
-          </div>
-        ) : (
-          <div className="status-item date">
+        {status === "inactive" ? (
+          <div className="status-stack">
             <div className="status-item active">
               <TiTick />
-              <span className="date">{item.activeDate}</span>
+              <span>{item.activeDate}</span>
             </div>
             <div className="status-item inactive">
               <RxCross2 />
-              <span className="date">{item.inactiveDate}</span>
+              <span>{item.inactiveDate}</span>
             </div>
+          </div>
+        ) : (
+          <div className="status-item active">
+            <TiTick />
+            <span>{item.activeDate}</span>
           </div>
         )}
       </div>
 
+      {/* BODY */}
       <div className="card-title">{item.name}</div>
       <div className="card-shortname">{item.shortName}</div>
     </div>
@@ -134,7 +139,7 @@ const CompanyList = () => {
   /* ================= UI ================= */
   return (
     <>
-      <Header backendError={headerError} />
+      <Header />
 
       <div className="designation-page">
         {/* HEADER */}
@@ -168,10 +173,9 @@ const CompanyList = () => {
             <div className="search-box">
               <IoIosSearch />
               <input
-                type="text"
-                placeholder="Search company..."
                 value={searchData}
                 onChange={(e) => setSearchData(e.target.value)}
+                placeholder="Search company..."
               />
             </div>
           </div>
@@ -187,17 +191,25 @@ const CompanyList = () => {
 
         {!loading && (
           <>
-            {groupByStatus && <h3 className="group-title">Active</h3>}
-            <div className={`card-grid ${listView ? "list" : "tile"}`}>
-              {activeCompanies.map((item) => renderCompanyCard(item, "active"))}
-            </div>
+            {!groupByStatus && (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {allCompanies.map((item) =>
+                  renderCard(item, item.inactiveDate ? "inactive" : "active"),
+                )}
+              </div>
+            )}
 
             {groupByStatus && (
               <>
+                <h3 className="group-title">Active</h3>
+                <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                  {activeCompanies.map((item) => renderCard(item, "active"))}
+                </div>
+
                 <h3 className="group-title inactive">Inactive</h3>
                 <div className={`card-grid ${listView ? "list" : "tile"}`}>
                   {inactiveCompanies.map((item) =>
-                    renderCompanyCard(item, "inactive"),
+                    renderCard(item, "inactive"),
                   )}
                 </div>
               </>
@@ -205,13 +217,12 @@ const CompanyList = () => {
           </>
         )}
 
-        {/* FLOATING ACTION BAR */}
         <FloatingActionBar
           actions={{
+            clear: { onClick: handleClear },
             save: { disabled: true },
-            search: { disabled: true },
-            clear: { disabled: false, onClick: handleClear },
             delete: { disabled: true },
+            search: { disabled: true },
           }}
         />
 

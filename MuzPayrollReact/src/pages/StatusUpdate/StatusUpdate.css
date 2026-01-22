@@ -1,0 +1,53 @@
+.statusupdate-page .actions {
+  display: flex;
+  align-items: end;
+  gap: 14px;
+  flex-direction: column;
+  margin-right: 45px;
+  margin-top: 45px;
+}
+.search-sidebar1 {
+  width: 300px;
+  position: fixed;
+  right: 95px;
+  top: 142px;
+  bottom: 0;
+  background: white;
+  padding: 20px;
+  border-left: 1px solid #ddd;
+
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
+}
+
+.search-sidebar1.open {
+  animation: slideIn 0.4s ease-out forwards;
+  pointer-events: auto;
+}
+
+.search-sidebar1.close {
+  animation: slideOut 0.4s ease-in forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}

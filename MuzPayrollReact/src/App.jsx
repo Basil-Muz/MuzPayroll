@@ -40,6 +40,7 @@ import PayrollGroupSearch from "./pages/payrollgroup/payrollgroupsearch.jsx";
 import CompanyList from "./pages/CompanyPage/CompanyList.jsx";
 import BranchList from "./pages/Branch Page/BranchList.jsx";
 import LocationList from "./pages/LocationPage/LocationList.jsx";
+import StatusUpdate from "./pages/StatusUpdate/StatusUpdate.jsx";
 
 import UserGroup from "./pages/UserGroup/usergroup.jsx";
 import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
@@ -82,6 +83,8 @@ function App() {
 
           <Route path="/locationlist" element={<LocationList />} />
           <Route path="/location/:locationId" element={<LocationPageForm />} />
+
+          <Route path="/statusupdate" element={<StatusUpdate />} />
 
           <Route path="/payrollgroup" element={<PayrollGroup />} />
           <Route path="/payrollgroupsearch" element={<PayrollGroupSearch />} />
