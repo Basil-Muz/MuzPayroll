@@ -5,6 +5,7 @@ import { Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ImageCropModal from "./ImageCropModal";
+const VITE_API_BASE_URL = "http://localhost:8087";
 
 const GeneralInfoForm = function GeneralInfoForm({
   register,
@@ -14,7 +15,7 @@ const GeneralInfoForm = function GeneralInfoForm({
   clearErrors,
   control,
   flags,
-  // setError,
+  setError,
   isReadOnly,
   isUnlocked,
   setFocus,
@@ -400,7 +401,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                 <Controller
                   name="companyImage"
                   control={control}
-                  // rules={{ required: "Company image is required" }}
+                  rules={{ required: "Company image is required" }}
                   render={({ field }) => (
                     <div className="image-upload-wrapper">
                       {/* Upload Area */}
@@ -415,23 +416,23 @@ const GeneralInfoForm = function GeneralInfoForm({
                             if (!file) return;
 
                             // Validate file type
-                            // if (!file.type.match("image/(png|jpeg|jpg)")) {
-                            //   setError("companyImage", {
-                            //     type: "manual",
-                            //     message:
-                            //       "Only PNG, JPG and JPEG files are allowed",
-                            //   });
-                            //   return;
-                            // }
+                            if (!file.type.match("image/(png|jpeg|jpg)")) {
+                              setError("companyImage", {
+                                type: "manual",
+                                message:
+                                  "Only PNG, JPG and JPEG files are allowed",
+                              });
+                              return;
+                            }
 
                             // Validate file size (5MB max)
-                            // if (file.size > 5 * 1024 * 1024) {
-                            //   setError("companyImage", {
-                            //     type: "manual",
-                            //     message: "File size must be less than 5MB",
-                            //   });
-                            //   return;
-                            // }
+                            if (file.size > 5 * 1024 * 1024) {
+                              setError("companyImage", {
+                                type: "manual",
+                                message: "File size must be less than 5MB",
+                              });
+                              return;
+                            }
 
                             setRawImage(file);
                             setShowCropper(true);
@@ -482,7 +483,8 @@ const GeneralInfoForm = function GeneralInfoForm({
                               {typeof field.value === "string" ? (
                                 // If it's a URL (from existing image)
                                 <img
-                                  src={field.value}
+                                  // src={field.value}
+                                  src={`${VITE_API_BASE_URL}${field.value}`}
                                   alt="Company preview"
                                   className="preview-image"
                                 />

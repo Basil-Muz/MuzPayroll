@@ -68,7 +68,7 @@ export default function AddressForm({
           `https://api.postalpincode.in/pincode/${pincode}`
         );
         const data = await response.json();
-
+        console.log("Pincode response",data)
         if (data[0]?.Status !== "Success") {
           setError("pincode", {
             type: "manual",
@@ -109,9 +109,11 @@ export default function AddressForm({
           setValue("state", matchedState.isoCode);
         }
 
+
+        
         // District
         setValue("district", postOffices[0].District);
-
+        console.log("Distruct",postOffices[0].District)
         clearErrors(["country", "state", "district", "place"]);
 
         prevPincodeRef.current = pincode;

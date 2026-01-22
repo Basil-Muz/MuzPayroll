@@ -997,7 +997,7 @@ z-index:10 !important; */
   height: auto;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  margin: 0 auto;
+  margin: 12px auto;
   display: block;
   object-fit: contain;
   background: var(--background);
@@ -1085,6 +1085,8 @@ z-index:10 !important; */
 .preview-actions {
   display: flex;
   gap: 12px;
+  margin: 12px 0;
+
   justify-content: center;
   /* margin-top: 16px; */
 }

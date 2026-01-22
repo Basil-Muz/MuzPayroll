@@ -38,7 +38,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     // private static final String UPLOAD_DIR =
     // "/src/main/java/com/example/MuzPayroll/Uploads/Company/";
 
-    private static final String UPLOAD_DIR = "Uploads://company";
+    private static final String UPLOAD_DIR = "Uploads/company/";
 
     // Image validation constants
     private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -949,27 +949,28 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
     // Save image file to disk
     private String saveImageFile(MultipartFile file) throws IOException {
-        // Create directory if it doesn't exist
-        Path uploadPath = Paths.get(UPLOAD_DIR);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
 
-        // Get original filename and extension
-        String originalFilename = file.getOriginalFilename();
-        String fileExtension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        }
-
-        // Generate unique filename with original extension
-        String filename = UUID.randomUUID() + fileExtension;
-        Path path = Paths.get(UPLOAD_DIR, filename);
-        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
-        String imagePath = UPLOAD_DIR + filename;
-        return imagePath;
+    Path uploadPath = Paths.get(UPLOAD_DIR);
+    if (!Files.exists(uploadPath)) {
+        Files.createDirectories(uploadPath);
     }
+
+    String originalFilename = file.getOriginalFilename();
+    String extension = "";
+
+    if (originalFilename != null && originalFilename.contains(".")) {
+        extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+    }
+
+    String filename = UUID.randomUUID().toString() + extension;
+    Path filePath = uploadPath.resolve(filename);
+
+    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+    // RETURN ONLY RELATIVE URL PATH
+    return "/uploads/company/" + filename;
+}
+
 
     // Check if file extension is valid
     private boolean isValidImageExtension(String extension) {

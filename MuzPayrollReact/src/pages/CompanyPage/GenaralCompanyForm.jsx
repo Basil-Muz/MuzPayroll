@@ -79,11 +79,7 @@ export default function GenaralCompanyForm() {
     //   generatedBy: "Manager",
     // },
   ]);
-  const inputMode = addingNewAmend
-    ? "INSERT"
-    : amendments.length > 0
-      ? "UPDATE"
-      : "INSERT";
+  const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
 
   console.log("amends nmber", inputMode);
   const {
@@ -100,7 +96,8 @@ export default function GenaralCompanyForm() {
     control,
     formState: { errors },
   } = useForm({
-    mode: "onChange",
+    mode: "onChange", //multi step formz
+    // reValidateMode: "onChange",
     defaultValues: {
       //  mound with one document row default
       // documents: [
@@ -259,20 +256,23 @@ export default function GenaralCompanyForm() {
       ? date.toLocaleDateString("en-CA") // yyyy-MM-dd
       : date;
 
-  const fetchCompanyAmendData = async (companyId) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8087/company/getamendlist/${companyId}`,
-      );
+  const fetchCompanyAmendData = useCallback(
+    async (companyId) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8087/company/getamendlist/${companyId}`,
+        );
 
-      setAmendments(response.data.companyDtoLogs || []); // Use the amends data
-      // delete response.data.companyDtoLogs;
-      setSelectedAmendment(response.data); //data form master table
-      console.log("Amend response", response.data);
-    } catch (error) {
-      console.error("Error fetching company data:", error);
-    }
-  };
+        setAmendments(response.data.companyDtoLogs || []); // Use the amends data
+        // delete response.data.companyDtoLogs;
+        setSelectedAmendment(response.data); //data form master table
+        console.log("Amend response", response.data);
+      } catch (error) {
+        console.error("Error fetching company data:", error);
+      }
+    },
+    [setSelectedAmendment, setAmendments],
+  );
 
   //for smooth focus
   const smoothFocus = () => {
@@ -295,10 +295,14 @@ export default function GenaralCompanyForm() {
     setFocus(fieldNameFlage); // RHF handles focus properly
   };
   // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
-  const formatDate = (date) => {
-    //datePicker bugg
-    return date.toISOString().split("T")[0]; // yyyy-mm-dd
-  };
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`; // yyyy-MM-dd
+};
+
 
   const handleGenerateAmendment = () => {
     setSelectedAmendment(null);
@@ -357,13 +361,15 @@ export default function GenaralCompanyForm() {
   //   console.log("DatePicker ref:", datePickerRef.current);
   // }, []);
   let amendLenght = amendments.length;
-  const latestAmendmentId = amendments.length
-    ? amendments.reduce((latest, current) =>
-        new Date(current.withaffectdate) > new Date(latest.withaffectdate)
-          ? current
-          : latest,
-      )
+  const latestAmendmentId = amendments.length //latest amend only entry amend with max amend number
+    ? amendments
+        .filter((a) => a.authorizationStatus === false)
+        .reduce(
+          (max, cur) => (cur.amendNo > max.amendNo ? cur : max),
+          amendments[0],
+        )
     : null;
+
   console.log("Latest amends:", latestAmendmentId);
   useEffect(() => {
     if (!companyId) return;
@@ -388,7 +394,7 @@ export default function GenaralCompanyForm() {
 
       setValue("shortName", selectedAmendment.shortName ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
       });
 
       setValue(
@@ -401,15 +407,18 @@ export default function GenaralCompanyForm() {
       );
       setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
       });
 
       setValue("company", selectedAmendment.company ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
       });
 
-      setValue("companyImage", selectedAmendment.companyImage ?? "");
+      setValue("companyImage", selectedAmendment.companyImagePath, {
+        shouldValidate: false,
+        shouldDirty: false,
+      });
 
       setValue(
         "activeDate",
