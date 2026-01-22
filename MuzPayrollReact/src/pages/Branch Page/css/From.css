@@ -692,6 +692,18 @@ body {
 input.form-control {
   font-family: Arial, sans-serif;
 }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  /* -webkit-text-fill-color: var(--background) !important; */
+  -webkit-box-shadow: 0 0 0px 1000px  var(--background)inset !important;
+  outline:none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+    border: 1.5px solid var(--border) !important;
+  color:white !important;
+}
 
 /* Address form */
 select.form-control-select {
