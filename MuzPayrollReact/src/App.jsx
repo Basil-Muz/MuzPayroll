@@ -24,7 +24,7 @@ import LoginPage from "./pages/LoginPage/loginpage.jsx";
 import LoggedPage from "./pages/LoggedPage/loggedpage.jsx";
 
 import ChangePassword from "./pages/changepassword/changepassword.jsx";
-import Logout from "./components/logout/logout.jsx";
+
 import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import Designation from "./pages/designation/designation.jsx";
@@ -58,7 +58,7 @@ function App() {
           <Route path="/documentsinfo" element={<DocumentsInfo />} />
           <Route path="/masters" element={<MasterPage />} />
           <Route path="/changepassword" element={<ChangePassword />} />
-          <Route path="/logout" element={<Logout />} />
+        
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/settings" element={<Settings />} />
 

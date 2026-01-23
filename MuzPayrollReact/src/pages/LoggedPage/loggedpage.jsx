@@ -387,6 +387,7 @@ function LoggedPage() {
   console.log(" selected locationId:", locationId);
 
   /* ================= UI ================= */
+  
   return (
     <>
       <Header backendError={backendError} />

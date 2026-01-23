@@ -6,6 +6,8 @@ import { IoNotificationsSharp } from "react-icons/io5";
 import { BiSolidCollection } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
 import { ImUser } from "react-icons/im";
+import { useAuth } from "../../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
 // Constants for better maintainability
@@ -19,7 +21,7 @@ const Header = ({ backendError = [] }) => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [dashNotifications, setDashNotifications] = useState(INITIAL_NOTIFICATIONS);
-  
+
   const location = useLocation();
   const notifTimer = useRef(null);
   const dashTimer = useRef(null);
@@ -35,6 +37,15 @@ const Header = ({ backendError = [] }) => {
       return {};
     }
   };
+
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();              // clears context + localStorage
+    navigate("/");    // redirect to login page
+  };
+
   const loginData = getLoginData();
   const locationName = loginData.locationName || "";
   const currentPath = location.pathname;
@@ -54,30 +65,30 @@ const Header = ({ backendError = [] }) => {
   }, []);
 
   // Update notifications from backend errors
-//  useEffect(() => {
-//   if (!Array.isArray(backendError)) return;
+  //  useEffect(() => {
+  //   if (!Array.isArray(backendError)) return;
 
-//   setNotifications(prev => {
-//     // prevent unnecessary updates
-//     if (JSON.stringify(prev) === JSON.stringify(backendError)) {
-//       return prev;
-//     }
-//     return backendError;
-//   });
+  //   setNotifications(prev => {
+  //     // prevent unnecessary updates
+  //     if (JSON.stringify(prev) === JSON.stringify(backendError)) {
+  //       return prev;
+  //     }
+  //     return backendError;
+  //   });
 
-//   if (backendError.length > 0) {
-//     setNotOpen(prev => {
-//       if (prev) return prev; // already open
-//       return true;
-//     });
+  //   if (backendError.length > 0) {
+  //     setNotOpen(prev => {
+  //       if (prev) return prev; // already open
+  //       return true;
+  //     });
 
-//     const autoCloseTimer = setTimeout(() => {
-//       setNotOpen(false);
-//     }, 5000);
+  //     const autoCloseTimer = setTimeout(() => {
+  //       setNotOpen(false);
+  //     }, 5000);
 
-//     return () => clearTimeout(autoCloseTimer);
-//   }
-// }, [backendError,notifications]);
+  //     return () => clearTimeout(autoCloseTimer);
+  //   }
+  // }, [backendError,notifications]);
 
   // Notification removal functions
   const removeNotification = useCallback((id) => {
@@ -154,7 +165,7 @@ const Header = ({ backendError = [] }) => {
       const isNotification = event.target.closest('.notification');
       const isDashboard = event.target.closest('.dashboard');
       const isProfile = event.target.closest('.user-profile');
-      
+
       if (!isNotification && notOpen) {
         setNotOpen(false);
       }
@@ -173,18 +184,18 @@ const Header = ({ backendError = [] }) => {
   return (
     <header className="header" role="banner">
       <div className="logo">
-        <img 
-          src="/muziris-png.ico" 
-          alt="Muziris Logo" 
-          width="106" 
+        <img
+          src="/muziris-png.ico"
+          alt="Muziris Logo"
+          width="106"
           height="55"
           loading="lazy"
         />
       </div>
-      
+
       <div className="header-right">
         {/* Notifications */}
-        <div 
+        <div
           className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`}
           onMouseEnter={handleNotifEnter}
           onMouseLeave={handleNotifLeave}
@@ -201,23 +212,23 @@ const Header = ({ backendError = [] }) => {
           }}
         >
           <IoNotificationsSharp size={19} aria-hidden="true" />
-          
+
           {notifications.length > 0 && (
-            <div 
-              className="msgs" 
+            <div
+              className="msgs"
               role="status"
               aria-label={`${notifications.length} unread notifications`}
             >
               {notifications.length}
             </div>
           )}
-          
+
           {notOpen && (
             <div className="notification-dropdown" role="menu">
               <div className="dropdown-header">
                 {/* <span>Notifications</span> */}
                 {notifications.length > 0 && (
-                  <button 
+                  <button
                     onClick={clearAllNotifications}
                     className="clear-all-btn"
                     aria-label="Clear all notifications"
@@ -226,12 +237,12 @@ const Header = ({ backendError = [] }) => {
                   </button>
                 )}
               </div>
-              
+
               {notifications.length > 0 ? (
                 <div className="notifications-list">
                   {notifications.map((notification) => (
-                    <div 
-                      key={notification.id} 
+                    <div
+                      key={notification.id}
                       className={`notification-item ${notification.status ? 'error' : 'info'}`}
                       role="menuitem"
                     >
@@ -257,7 +268,7 @@ const Header = ({ backendError = [] }) => {
 
         {/* Dashboard */}
         {shouldRenderDashboard && (
-          <div 
+          <div
             className="dashboard"
             onMouseEnter={handleDashEnter}
             onMouseLeave={handleDashLeave}
@@ -274,9 +285,9 @@ const Header = ({ backendError = [] }) => {
             }}
           >
             <BiSolidCollection size={19} aria-hidden="true" />
-            
+
             {dashNotifications.length > 0 && (
-              <div 
+              <div
                 className="msgs"
                 role="status"
                 aria-label={`${dashNotifications.length} dashboard notifications`}
@@ -284,13 +295,13 @@ const Header = ({ backendError = [] }) => {
                 {dashNotifications.length}
               </div>
             )}
-            
+
             {dashOpen && (
               <div className="notification-dropdown" role="menu">
                 <div className="dropdown-header">
                   {/* <span>Dashboard</span> */}
                   {dashNotifications.length > 0 && (
-                    <button 
+                    <button
                       onClick={clearAllDashNotifications}
                       className="clear-all-btn"
                       aria-label="Clear all dashboard notifications"
@@ -299,12 +310,12 @@ const Header = ({ backendError = [] }) => {
                     </button>
                   )}
                 </div>
-                
+
                 {dashNotifications.length > 0 ? (
                   <div className="notifications-list">
                     {dashNotifications.map((notification) => (
-                      <div 
-                        key={notification.id} 
+                      <div
+                        key={notification.id}
                         className={`notification-item ${notification.status ? 'error' : 'info'}`}
                         role="menuitem"
                       >
@@ -331,15 +342,15 @@ const Header = ({ backendError = [] }) => {
 
         {/* Location & Date */}
         <div className="location-date">
-          <span 
-            className="location" 
+          <span
+            className="location"
             title={locationName}
             aria-label={`Current location: ${locationName}`}
           >
             {locationName}
           </span>
-          <span 
-            className="date" 
+          <span
+            className="date"
             title={date}
             aria-label={`Current date: ${date}`}
           >
@@ -348,7 +359,7 @@ const Header = ({ backendError = [] }) => {
         </div>
 
         {/* User Profile */}
-        <div 
+        <div
           className="user-profile"
           onMouseEnter={handleProfileEnter}
           onMouseLeave={handleProfileLeave}
@@ -364,25 +375,29 @@ const Header = ({ backendError = [] }) => {
             }
           }}
         >
-          <ImUser 
-            size={21} 
-            style={{ color: '#d218d8ff' }} 
+          <ImUser
+            size={21}
+            style={{ color: '#d218d8ff' }}
             aria-hidden="true"
           />
-          
+
           {shouldRenderProfile && profileOpen && (
             <div className="profile-dropdown" role="menu">
-              <a 
-                href="/changepassword" 
+              <a
+                href="/changepassword"
                 role="menuitem"
                 className="profile-link"
               >
                 Change Password
               </a>
-              <a 
-                href="/logout" 
+              <a
+                href="#"
                 role="menuitem"
                 className="profile-link logout"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogout();
+                }}
               >
                 Logout
               </a>
@@ -393,8 +408,8 @@ const Header = ({ backendError = [] }) => {
         {/* Optional Settings */}
         {currentPath === "/masters/" && (
           <div className="settings">
-            <IoMdSettings 
-              size={19} 
+            <IoMdSettings
+              size={19}
               color="#161414e6"
               aria-label="Settings"
               role="button"

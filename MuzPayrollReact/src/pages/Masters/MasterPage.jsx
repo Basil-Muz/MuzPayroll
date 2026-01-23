@@ -60,7 +60,7 @@ export default function HomePage() {
           {
             title: "License Agreement",
             subtitle: "License Agreement",
-            link: "/organisation/license-agreement",
+            link: "/license-agreement",
           },
         ],
       ],
@@ -132,11 +132,11 @@ export default function HomePage() {
       subtitle: "User Rights",
       rows: [
         [
-          { title: "User", subtitle: "User", link: "/user-management/user" },
+          { title: "User", subtitle: "User", link: "/user" },
           {
             title: "Reset Password",
             subtitle: "Reset Password",
-            link: "/user-management/reset-password",
+            link: "/reset-password",
           },
         ],
       ],
