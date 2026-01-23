@@ -9,12 +9,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.LocationMst;
 
 @Repository
 public interface LocationRepository extends JpaRepository<LocationMst, Long> {
 
     Optional<LocationMst> findByCode(String code);
+
+    List<LocationMst> findByBranchEntity_BranchMstID(Long branchId);
 
     /**
      * Get the LATEST Location with LO prefix using Pageable
@@ -41,9 +44,17 @@ public interface LocationRepository extends JpaRepository<LocationMst, Long> {
     @Query("SELECT c FROM LocationMst c")
     List<LocationMst> findAllLocation();
 
-    @Query("SELECT c FROM LocationMst c WHERE c.activeStatusYN = true")
-    List<LocationMst> findAllActiveLocation();
+    @Query("""
+                SELECT b FROM LocationMst b
+                WHERE b.branchEntity.branchMstID = :branchId
+                  AND b.activeStatusYN = true
+            """)
+    List<LocationMst> findActiveBranchesByCompanyId(@Param("branchId") Long branchId);
 
-    @Query("SELECT c FROM LocationMst c WHERE c.activeStatusYN = false")
-    List<LocationMst> findAllInActiveLocation();
+    @Query("""
+                SELECT b FROM LocationMst b
+                WHERE b.branchEntity.branchMstID = :branchId
+                  AND b.activeStatusYN = false
+            """)
+    List<LocationMst> findInactiveBranchesByCompanyId(@Param("branchId") Long branchId);
 }

@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import Select from "react-select";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+
 import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -32,10 +35,11 @@ export default function GenaralCompanyForm() {
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
 
   const datePickerRef = useRef(null);
-  const authDateInputRef = useRef(null);
+  // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
   const userObj = JSON.parse(UserData);
+  const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
   // const [isReadOnly, setIsReadOnly] = useState();
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
@@ -45,7 +49,7 @@ export default function GenaralCompanyForm() {
   // (authorizationStatus===0)? "ENTRY" :
   // (authorizationStatus===0)? "ENTRY" :
 
-  const amendments = [
+  const [amendments, setAmendments] = useState([
     // {
     //   id: 3,
     //   authorizationStatus: 1,
@@ -74,8 +78,10 @@ export default function GenaralCompanyForm() {
     //   expiryDate: "",
     //   generatedBy: "Manager",
     // },
-  ];
+  ]);
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
+
+  console.log("amends nmber", inputMode);
   const {
     register,
     handleSubmit,
@@ -90,7 +96,8 @@ export default function GenaralCompanyForm() {
     control,
     formState: { errors },
   } = useForm({
-    mode: "onChange",
+    mode: "onChange", //multi step formz
+    // reValidateMode: "onChange",
     defaultValues: {
       //  mound with one document row default
       // documents: [
@@ -105,7 +112,7 @@ export default function GenaralCompanyForm() {
       userCode: userCode, //User code from local storage
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
       authorizationStatus: 0, // ENTRY
-      mode: inputMode,
+      // mode: inputMode,once assign the value not changes
       activeStatusYN: 1,
     },
   });
@@ -115,8 +122,12 @@ export default function GenaralCompanyForm() {
     name: "withaffectdate",
   });
   //workflow of amend date then name logic
-
-  const isUnlocked = !!authDate;
+  let isUnlocked = !!authDate;
+  if (amendments.length > 0) {
+    isUnlocked = true;
+  } else {
+    isUnlocked = !!authDate;
+  }
 
   // From content changes
   const [formFlags] = useState({
@@ -168,13 +179,7 @@ export default function GenaralCompanyForm() {
   //     withaffectdate: new Date().toISOString().split("T")[0],
   //   },
 
-  const latestAmendmentId = amendments.length
-    ? amendments.reduce((latest, current) =>
-        new Date(current.date) > new Date(latest.date) ? current : latest
-      )
-    : null;
-
-  const [selectedAmendment, setSelectedAmendment] = useState(latestAmendmentId);
+  const [selectedAmendment, setSelectedAmendment] = useState([]);
 
   // console.log("Selected item:", selectedAmendment?.authorizationStatus);
 
@@ -205,39 +210,70 @@ export default function GenaralCompanyForm() {
   //     }
   //   );
   // }
+
   const amendmentAuthorizationOptions = [];
 
-  if (selectedAmendment?.authorizationStatus === 0) {
+  if (selectedAmendment?.authorizationStatus === false) {
     amendmentAuthorizationOptions.push(
       {
-        label: `ENTRY : ${selectedAmendment.date}`,
+        label: `ENTRY : ${selectedAmendment.authorizationDate}`,
         value: 0,
       },
       {
         label: `VERIFIED :`,
         value: 1,
-      }
+      },
     );
   }
-
-  if (selectedAmendment?.authorizationStatus === 1) {
+  console.log("Seletced amends", selectedAmendment);
+  if (selectedAmendment?.authorizationStatus === true) {
     amendmentAuthorizationOptions.push(
+      // {
+      //   label: `ENTRY : ${selectedAmendment.withaffectdate}`,
+      //   value: 0,
+      // },
       {
-        label: `ENTRY : ${selectedAmendment.date}`,
-        value: 0,
-      },
-      {
-        label: `VERIFIED : ${selectedAmendment.date}`,
+        label: `VERIFIED : ${selectedAmendment.authorizationDate}`,
         value: 1,
-      }
+      },
     );
   }
 
   // console.log("Selected List:", amendmentAuthorizationOptions);
   const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorizationStatus === 1 && !addingNewAmend;
+    selectedAmendment?.authorizationStatus === true && !addingNewAmend;
+
+  // const DesignationDetails = () => {
+  const { companyId } = useParams();
+
+  console.log("Link id", companyId); //  received id
+  // };
 
   // console.log("Verified mde: ", isVerifiedAmendment);
+
+  const toLocalDate = (date) =>
+    date instanceof Date
+      ? date.toLocaleDateString("en-CA") // yyyy-MM-dd
+      : date;
+
+  const fetchCompanyAmendData = useCallback(
+    async (companyId) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8087/company/getamendlist/${companyId}`,
+        );
+
+        setAmendments(response.data.companyDtoLogs || []); // Use the amends data
+        // delete response.data.companyDtoLogs;
+        setSelectedAmendment(response.data); //data form master table
+        console.log("Amend response", response.data);
+      } catch (error) {
+        console.error("Error fetching company data:", error);
+      }
+    },
+    [setSelectedAmendment, setAmendments],
+  );
+
   //for smooth focus
   const smoothFocus = () => {
     const fieldNameFlage = formFlags.locationForm
@@ -259,10 +295,14 @@ export default function GenaralCompanyForm() {
     setFocus(fieldNameFlage); // RHF handles focus properly
   };
   // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
-  const formatDate = (date) => {
-    //datePicker bugg
-    return date.toISOString().split("T")[0]; // yyyy-mm-dd
-  };
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`; // yyyy-MM-dd
+};
+
 
   const handleGenerateAmendment = () => {
     setSelectedAmendment(null);
@@ -288,12 +328,30 @@ export default function GenaralCompanyForm() {
   };
 
   useEffect(() => {
+    setValue("mode", inputMode, { shouldDirty: false });
+  }, [inputMode, setValue]);
+
+  useEffect(() => {
     if (isVerifiedAmendment) return;
 
     const timer = setTimeout(() => {
-      authDateInputRef.current?.focus();
-      datePickerRef.current?.setOpen(true);
-    }, 200);
+      // Smooth scroll FIRST
+      dateWrapperRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      // Wait until scroll animation finishes
+      setTimeout(() => {
+        const el = document.querySelector(".withaffectdate");
+
+        if (el) {
+          el.focus({ preventScroll: true }); //  NO JUMP
+        }
+
+        datePickerRef.current?.setOpen(true);
+      }, 500); // match scroll duration
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
@@ -302,36 +360,73 @@ export default function GenaralCompanyForm() {
   //   console.log("Input ref:", authDateInputRef.current);
   //   console.log("DatePicker ref:", datePickerRef.current);
   // }, []);
+  let amendLenght = amendments.length;
+  const latestAmendmentId = amendments.length //latest amend only entry amend with max amend number
+    ? amendments
+        .filter((a) => a.authorizationStatus === false)
+        .reduce(
+          (max, cur) => (cur.amendNo > max.amendNo ? cur : max),
+          amendments[0],
+        )
+    : null;
+
+  console.log("Latest amends:", latestAmendmentId);
+  useEffect(() => {
+    if (!companyId) return;
+    fetchCompanyAmendData(companyId);
+  }, [companyId]);
 
   useEffect(() => {
     const date = new Date(); // current date
-    const formattedDate = date.toISOString().slice(0, 10); //yyyy-mm-dd format
+    const formattedDate = date.toISOString().split("T")[0]; //yyyy-mm-dd format
+    // console.log("Active date",formattedDate)
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
   const setingData = useCallback(
     (selectedAmendment) => {
+      if (amendLenght > 0) {
+        setValue("companyMstID", selectedAmendment.companyMstID ?? "", {
+          shouldDirty: false,
+          shouldValidate: true,
+        });
+      }
+
       setValue("shortName", selectedAmendment.shortName ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
       });
 
-      setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
+      setValue(
+        "authorizationStatus",
+        selectedAmendment.authorizationStatus ? 1 : 0,
+        {
+          shouldDirty: false,
+          shouldValidate: true,
+        },
+      );
+      setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
       });
 
       setValue("company", selectedAmendment.company ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
       });
 
-      setValue("companyImage", selectedAmendment.companyImage ?? "");
-
-      setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
+      setValue("companyImage", selectedAmendment.companyImagePath, {
+        shouldValidate: false,
         shouldDirty: false,
-        shouldValidate: true,
       });
+
+      setValue(
+        "activeDate",
+        selectedAmendment.activeDate
+          ? selectedAmendment.activeDate
+          : toLocalDate(new Date()),
+        { shouldDirty: false },
+      );
 
       setValue("pincode", selectedAmendment.pincode ?? "", {
         shouldDirty: false,
@@ -389,7 +484,7 @@ export default function GenaralCompanyForm() {
         shouldValidate: true,
       });
     },
-    [setValue]
+    [setValue, amendLenght],
   );
 
   useEffect(() => {
@@ -513,7 +608,7 @@ export default function GenaralCompanyForm() {
         userCode,
         authorizationDate: new Date().toISOString().split("T")[0],
       };
-      // console.log("Submitting data", data);
+      console.log("Submitting data", data);
       const formData = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
@@ -782,7 +877,7 @@ export default function GenaralCompanyForm() {
                                 errors.authorizationStatus ? "error" : ""
                               }
                               value={authorizationStatusOptions.find(
-                                (opt) => opt.value === field.value
+                                (opt) => opt.value === field.value,
                               )}
                               onChange={(option) =>
                                 field.onChange(option.value)
@@ -794,7 +889,10 @@ export default function GenaralCompanyForm() {
                     </div>
 
                     <div className="amend-field">
-                      <label className="form-label required">
+                      <label
+                        ref={dateWrapperRef}
+                        className="form-label required"
+                      >
                         Authorization date
                       </label>
                       <Controller
@@ -805,7 +903,7 @@ export default function GenaralCompanyForm() {
                           <DatePicker
                             ref={datePickerRef}
                             placeholderText="Select date"
-                            className={`form-control datepicker-input ${
+                            className={`form-control datepicker-input withaffectdate${
                               errors.withaffectdate ? "error" : ""
                             }`}
                             selected={
@@ -825,7 +923,7 @@ export default function GenaralCompanyForm() {
                             showYearDropdown
                             customInput={
                               <input
-                                ref={authDateInputRef}
+                                // ref={authDateInputRef}
                                 className={`form-control datepicker-input ${
                                   errors.withaffectdate ? "error" : ""
                                 }`}
@@ -861,7 +959,7 @@ export default function GenaralCompanyForm() {
                               errors.authorizationStatus ? "error" : ""
                             }
                             value={amendmentAuthorizationOptions.find(
-                              (opt) => opt.value === field.value
+                              (opt) => opt.value === field.value,
                             )}
                             onChange={(option) => field.onChange(option.value)}
                           />
@@ -872,7 +970,7 @@ export default function GenaralCompanyForm() {
                       <input type="hidden" {...register("userCode")} />
                       <input type="hidden" {...register("authorizationDate")} />
                     </div>
-                    {latestAmendmentId.authorizationStatus === 1 &&
+                    {latestAmendmentId.authorizationStatus === true &&
                       !addingNewAmend && ( // Adding the new amend only if the latest amend is verified
                         <div
                           className="btn amend-generate"
@@ -886,57 +984,64 @@ export default function GenaralCompanyForm() {
 
                 <div className="amend-container">
                   {[...amendments] // shallow copy to avoid mutating state
-                    .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
+                    // .sort((a, b) => new Date(b.withaffectdate) - new Date(a.withaffectdate)) //  descending by date
                     .map((item, index) => {
                       // then map
-                      const isSelected = selectedAmendment?.id === item.id;
+                      const isSelected =
+                        selectedAmendment?.amendNo === item.amendNo;
                       return (
                         <div
-                          key={item.id}
+                          key={item.companyMstID}
                           className={`amend-pill 
-                            ${item.id === latestAmendmentId.id ? "entry" : "verified"}
+                            ${item.amendNo == latestAmendmentId.amendNo ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}
+                            
                           `}
+                          title={
+                            item.amendNo !== latestAmendmentId.amendNo &&
+                            "This amendment has been verified and locked"
+                          }
                           onClick={() => {
-                            handleSelectAmendment(item.id, index);
+                            handleSelectAmendment(item.companyMstID, index);
                             // setAddNewAmend(false);
                             setAddingNewAmend(false);
                           }}
                         >
                           <div className="pill-left">
-                            <span className="pill-index">{item.id}</span>
+                            <span className="pill-index">{item.amendNo}</span>
                             <div className="pill-info">
                               <span className="pill-type">
-                                {item.authorizationStatus === 0
+                                {item.authorizationStatus === false
                                   ? "ENTRY"
                                   : "VERIFIED"}
                               </span>
                               <span className="pill-date">
-                                {new Date(item.date).toLocaleDateString(
-                                  "en-GB"
-                                )}
+                                {new Date(
+                                  item.withaffectdate,
+                                ).toLocaleDateString("en-GB")}
                               </span>
                             </div>
                           </div>
 
                           <div className="pill-right">
-                            {item.id == latestAmendmentId.id && (
+                            {item.amendNo == latestAmendmentId.amendNo && (
                               <span className="pill-badge verified">
                                 latest
                               </span>
                             )}
-                            {item.authorizationStatus !== 0 &&
-                              item.id !== latestAmendmentId.id && (
+                            {item.authorizationStatus !== false &&
+                              item.amendNo !== latestAmendmentId.amendNo && (
                                 <span className="pill-badge verified">
                                   ✔ Verified
                                 </span>
                               )}
-                            {item.authorizationStatus == 0 &&
-                              item.id !== latestAmendmentId.id && (
+                            {/* {item.authorizationStatus == false &&
+                              item.amendNo !==
+                                latestAmendmentId.amendNo && (
                                 <span className="pill-badge verified">
                                   Entry
                                 </span>
-                              )}
+                              )} */}
                           </div>
                         </div>
                       );

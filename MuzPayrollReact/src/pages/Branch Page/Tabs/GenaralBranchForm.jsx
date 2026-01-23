@@ -28,7 +28,7 @@ export default function GenaralBranchForm() {
   const [companyList, setCompanyList] = useState([]); //fetch companys
   const [submitStatus, setSubmitStatus] = useState(1);
 
- //changes when the file attached
+  //changes when the file attached
   // const [backendErrors, setBackendErrors] = useState([]);
   //pass the back end error to front end
 
@@ -143,7 +143,7 @@ export default function GenaralBranchForm() {
 
   const latestAmendmentId = amendments.length
     ? amendments.reduce((latest, current) =>
-        new Date(current.date) > new Date(latest.date) ? current : latest
+        new Date(current.date) > new Date(latest.date) ? current : latest,
       )
     : null;
 
@@ -162,7 +162,7 @@ export default function GenaralBranchForm() {
       {
         label: `VERIFIED :`,
         value: 1,
-      }
+      },
     );
   }
 
@@ -175,7 +175,7 @@ export default function GenaralBranchForm() {
       {
         label: `VERIFIED : ${selectedAmendment.date}`,
         value: 1,
-      }
+      },
     );
   }
 
@@ -247,7 +247,7 @@ export default function GenaralBranchForm() {
   const loadCompanyAndBranches = useCallback(async () => {
     try {
       const companyResponse = await axios.get(
-        `http://localhost:8087/company/${companyId}`
+        `http://localhost:8087/company/${companyId}`,
       );
       const company = companyResponse.data;
 
@@ -276,6 +276,7 @@ export default function GenaralBranchForm() {
     reset({
       ...getValues(), //  keep base data
       authorizationStatus: 0, // ENTRY
+      // mode: "INSERT",
       withaffectdate: "",
       // documents: [
       //   {
@@ -307,7 +308,7 @@ export default function GenaralBranchForm() {
     }
 
     const hasEmptyFile = watchedDocuments.some(
-      (doc) => !doc?.file || doc.file.length === 0
+      (doc) => !doc?.file || doc.file.length === 0,
     );
 
     setSubmitStatus(hasEmptyFile ? 1 : 0);
@@ -322,13 +323,23 @@ export default function GenaralBranchForm() {
     if (isVerifiedAmendment) return;
 
     const timer = setTimeout(() => {
-      authDateInputRef.current?.focus();
-      dateWrapperRef.current.scrollIntoView({
+      // Smooth scroll FIRST
+      dateWrapperRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
-      datePickerRef.current?.setOpen(true);
-    }, 200);
+
+      // Wait until scroll animation finishes
+      setTimeout(() => {
+        const el = document.querySelector(".withaffectdate");
+
+        if (el) {
+          el.focus({ preventScroll: true }); //  NO JUMP
+        }
+
+        datePickerRef.current?.setOpen(true);
+      }, 500); // match scroll duration
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
@@ -424,7 +435,7 @@ export default function GenaralBranchForm() {
         shouldValidate: true,
       });
     },
-    [setValue]
+    [setValue],
   );
 
   useEffect(() => {
@@ -439,7 +450,7 @@ export default function GenaralBranchForm() {
   const handleSelectAmendment = (id, index) => {
     //User Selecetion - Assign the amend data to feild
     setSelectedAmendment(amendments[index]);
-
+    setValue("mode", "UPDATE", { shouldDirty: false });
     setingData(amendments[index]);
   };
 
@@ -588,7 +599,7 @@ export default function GenaralBranchForm() {
         "data",
         new Blob([JSON.stringify(payload)], {
           type: "application/json",
-        })
+        }),
       );
 
       /* -------------------------------
@@ -783,7 +794,7 @@ export default function GenaralBranchForm() {
                                 errors.authorizationStatus ? "error" : ""
                               }
                               value={authorizationStatusOptions.find(
-                                (opt) => opt.value === field.value
+                                (opt) => opt.value === field.value,
                               )}
                               onChange={(option) =>
                                 field.onChange(option.value)
@@ -810,7 +821,7 @@ export default function GenaralBranchForm() {
                             ref={datePickerRef}
                             isDisabled={isReadOnly}
                             placeholderText="Select date"
-                            className={`form-control datepicker-input ${
+                            className={`form-control datepicker-input withaffectdate${
                               errors.withaffectdate ? "error" : ""
                             }`}
                             selected={
@@ -866,7 +877,7 @@ export default function GenaralBranchForm() {
                               errors.authorizationStatus ? "error" : ""
                             }
                             value={amendmentAuthorizationOptions.find(
-                              (opt) => opt.value === field.value
+                              (opt) => opt.value === field.value,
                             )}
                             onChange={(option) => field.onChange(option.value)}
                           />
@@ -916,7 +927,7 @@ export default function GenaralBranchForm() {
                               </span>
                               <span className="pill-date">
                                 {new Date(item.date).toLocaleDateString(
-                                  "en-GB"
+                                  "en-GB",
                                 )}
                               </span>
                             </div>
@@ -1025,7 +1036,7 @@ export default function GenaralBranchForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: step < steps.length - 1 || submitStatus == 1,
+              disabled: step < steps.length - 1,
             },
             search: {
               // onClick: handleSearch,

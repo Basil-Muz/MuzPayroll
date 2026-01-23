@@ -67,15 +67,12 @@ public class BranchController {
         return ResponseEntity.ok(dto);
     }
 
-    // To get the Company list from the MST table
-    @GetMapping("/branchlist")
-    public ResponseEntity<List<FormListDTO>> getBranchList() {
+    // To get the Branch list based on Company
+    @GetMapping("/branchlist/{companyId}")
+    public ResponseEntity<List<FormListDTO>> getBranchList(
+            @PathVariable Long companyId) {
 
-        List<BranchMst> list = branchRepository.findAllActiveBranch();
-
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        List<BranchMst> list = branchRepository.findByCompanyEntity_CompanyMstID(companyId);
 
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
@@ -95,14 +92,34 @@ public class BranchController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/inactivebranchlist")
-    public ResponseEntity<List<FormListDTO>> getInactiveCompanyList() {
+    // To get the Company list from the MST table
+    @GetMapping("/activebranchlist/{companyId}")
+    public ResponseEntity<List<FormListDTO>> getActiveBranchList(@PathVariable Long companyId) {
 
-        List<BranchMst> list = branchRepository.findAllInActiveBranch();
+        List<BranchMst> list = branchRepository.findActiveBranchesByCompanyId(companyId);
 
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        List<FormListDTO> response = list.stream()
+                .map(entity -> {
+                    FormListDTO dto = new FormListDTO();
+                    dto.setMstID(entity.getBranchMstID());
+                    dto.setCode(entity.getCode());
+                    dto.setName(entity.getBranch());
+                    dto.setShortName(entity.getShortName());
+                    dto.setActiveDate(entity.getActiveDate());
+                    dto.setStatus(entity.getActiveStatusYN());
+                    dto.setInactiveDate(entity.getInactiveDate());
+                    dto.setActiveStatusYN(entity.getActiveStatusYN());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/inactivebranchlist/{companyId}")
+    public ResponseEntity<List<FormListDTO>> getInactiveCompanyList(@PathVariable Long companyId) {
+
+        List<BranchMst> list = branchRepository.findInactiveBranchesByCompanyId(companyId);
 
         List<FormListDTO> response = list.stream()
                 .map(entity -> {

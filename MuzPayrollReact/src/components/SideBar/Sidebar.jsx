@@ -383,12 +383,12 @@ const toggleSidebar = () => {
                   <div className="user-role">Admin</div>
                 </div>
               )}
-
+{/* 
               {(isMobile || sidebarOpen) && (
                 <button className="user-action" aria-label="User actions">
                   <IoIosArrowForward size={14} />
                 </button>
-              )}
+              )} */}
             </div>
           </div>
           <button

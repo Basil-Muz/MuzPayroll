@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,15 +32,13 @@ import com.example.MuzPayroll.repository.CompanyLogRepository;
 import com.example.MuzPayroll.repository.CompanyRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
-import io.micrometer.common.lang.NonNull;
-
 @Service
 public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMst> {
 
     // private static final String UPLOAD_DIR =
     // "/src/main/java/com/example/MuzPayroll/Uploads/Company/";
 
-    private static final String UPLOAD_DIR = "Uploads://company";
+    private static final String UPLOAD_DIR = "Uploads/company/";
 
     // Image validation constants
     private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -666,6 +665,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         company.setWithaffectdate(dto.getWithaffectdate());
         company.setActiveStatusYN(dto.getActiveStatusYN());
         company.setAmendNo(dto.getAmendNo());
+        company.setInactiveDate(dto.getInactiveDate());
 
         // Set image path if already available in DTO
         if (dto.getCompanyImagePath() != null) {
@@ -711,6 +711,7 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         dto.setWithaffectdate(entity.getWithaffectdate());
         dto.setActiveStatusYN(entity.getActiveStatusYN());
         dto.setAmendNo(entity.getAmendNo());
+        dto.setInactiveDate(entity.getInactiveDate());
 
         // ===== AUTHORIZATION MAPPING =====
         if (entity.getAuthorization() != null) {
@@ -723,7 +724,6 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
                 dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
             }
         }
-
         return dto;
     }
 
@@ -878,9 +878,9 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         MultipartFile file = dto.getCompanyImage();
 
         // If no new image uploaded and no existing image path, image is required
-        // if ((file == null || file.isEmpty()) && isEmpty(dto.getCompanyImagePath())) {
-        // return Response.error("Company image is required");
-        // }
+        if ((file == null || file.isEmpty()) && isEmpty(dto.getCompanyImagePath())) {
+            return Response.error("Company image is required");
+        }
 
         // If new image is uploaded, validate and process it
         if (file != null && !file.isEmpty()) {
@@ -909,10 +909,10 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     private List<String> validateImageFile(MultipartFile file) {
         List<String> errors = new ArrayList<>();
 
-        // if (file == null || file.isEmpty()) {
-        // errors.add("Image file is empty");
-        // return errors;
-        // }
+        if (file == null || file.isEmpty()) {
+            errors.add("Image file is empty");
+            return errors;
+        }
 
         // Check file size
         long fileSize = file.getSize();
@@ -949,26 +949,26 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
 
     // Save image file to disk
     private String saveImageFile(MultipartFile file) throws IOException {
-        // Create directory if it doesn't exist
+
         Path uploadPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        // Get original filename and extension
         String originalFilename = file.getOriginalFilename();
-        String fileExtension = "";
+        String extension = "";
+
         if (originalFilename != null && originalFilename.contains(".")) {
-            fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
 
-        // Generate unique filename with original extension
-        String filename = UUID.randomUUID() + fileExtension;
-        Path path = Paths.get(UPLOAD_DIR, filename);
-        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        String filename = UUID.randomUUID().toString() + extension;
+        Path filePath = uploadPath.resolve(filename);
 
-        String imagePath = UPLOAD_DIR + filename;
-        return imagePath;
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // RETURN ONLY RELATIVE URL PATH
+        return "/uploads/company/" + filename;
     }
 
     // Check if file extension is valid
@@ -1026,23 +1026,47 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
                 .findByCompanyLogPK_CompanyMstIDOrderByCompanyLogPK_RowNoDesc(
                         companyMstID);
 
-        // OPTIONAL: Set MST-level audit info
-        companyLogs.stream()
-                .filter(log -> log.getAuthorization() != null
-                        && Boolean.TRUE.equals(
-                                log.getAuthorization().getAuthorizationStatus()))
-                .findFirst()
-                .ifPresent(log -> {
-                    dto.setAmendNo(log.getAmendNo());
-                    dto.setAuthId(log.getAuthorization().getAuthId());
-                    dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
-                    dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+        Optional<CompanyLog> selectedLog = companyLogs.stream()
+                .filter(log -> log.getAuthorization() != null)
+                .max(Comparator.comparing(CompanyLog::getAmendNo))
+                .flatMap(latestLog -> {
 
-                    if (log.getAuthorization().getUserMst() != null) {
-                        dto.setUserCode(
-                                log.getAuthorization().getUserMst().getUserCode());
+                    // Case 1: latest is TRUE → return it
+                    if (Boolean.TRUE.equals(
+                            latestLog.getAuthorization().getAuthorizationStatus())) {
+                        return Optional.of(latestLog);
                     }
+
+                    // Case 2: latest is FALSE → find latest TRUE
+                    return companyLogs.stream()
+                            .filter(log -> log.getAuthorization() != null)
+                            .filter(log -> Boolean.TRUE.equals(
+                                    log.getAuthorization().getAuthorizationStatus()))
+                            .max(Comparator.comparing(CompanyLog::getAmendNo));
                 });
+
+        // Case 3: no TRUE exists → fallback to latest FALSE
+        if (!selectedLog.isPresent()) {
+            selectedLog = companyLogs.stream()
+                    .filter(log -> log.getAuthorization() != null)
+                    .filter(log -> Boolean.FALSE.equals(
+                            log.getAuthorization().getAuthorizationStatus()))
+                    .max(Comparator.comparing(CompanyLog::getAmendNo));
+        }
+
+        // Apply mapping
+        selectedLog.ifPresent(log -> {
+
+            dto.setAmendNo(log.getAmendNo());
+            dto.setAuthId(log.getAuthorization().getAuthId());
+            dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
+            dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+
+            if (log.getAuthorization().getUserMst() != null) {
+                dto.setUserCode(
+                        log.getAuthorization().getUserMst().getUserCode());
+            }
+        });
 
         // Convert ALL logs → DTO list
         List<CompanyLogDTO> logDtos = companyLogs.stream()

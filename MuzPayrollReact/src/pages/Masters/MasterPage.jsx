@@ -25,7 +25,7 @@ export default function HomePage() {
           {
             title: "Status Update",
             subtitle: "Status Update",
-            link: "/status-update",
+            link: "/statusupdate",
           },
         ],
       ],

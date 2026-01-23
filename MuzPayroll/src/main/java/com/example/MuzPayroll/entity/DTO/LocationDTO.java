@@ -8,12 +8,14 @@ import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.LocationLogPK;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.Transient;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LocationDTO {
     @Transient
     private List<LocationLogDTO> locationDtoLogs;
@@ -334,7 +336,6 @@ public class LocationDTO {
     }
 
     // Authorization
-
 
     @Column(nullable = false)
     private String userCode;

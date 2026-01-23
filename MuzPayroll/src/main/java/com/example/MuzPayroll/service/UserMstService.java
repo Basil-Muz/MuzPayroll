@@ -14,6 +14,7 @@ import com.example.MuzPayroll.entity.DTO.ChangePasswordRequest;
 // import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.ForgotPasswordRequest;
 import com.example.MuzPayroll.entity.DTO.ForgotPasswordResponse;
+import com.example.MuzPayroll.entity.DTO.JwtUtil;
 import com.example.MuzPayroll.entity.DTO.LoginRequest;
 import com.example.MuzPayroll.entity.DTO.LoginResponse;
 import com.example.MuzPayroll.entity.DTO.Response;
@@ -40,6 +41,9 @@ public class UserMstService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     // ============================
     // LOGIN (AUTHENTICATION ONLY)
     // ============================
@@ -63,14 +67,13 @@ public class UserMstService {
             errors.add("Password is required");
         }
 
-       
         UserMst user = userRepo.findByUserCode(userCode);
 
         if (user == null || !user.getPassword().equals(request.getPassword())) {
             errors.add("Invalid user code or password");
 
         }
-       if (!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return Response.error(errors);
         }
         LoginResponse resp = new LoginResponse();
@@ -83,6 +86,8 @@ public class UserMstService {
         resp.setLocationId(user.getLocationEntity().getLocationMstID());
         resp.setUserName(user.getUserName());
 
+        String token = jwtUtil.generateToken(user.getUserCode());
+        resp.setToken(token);
         // resp.setLocationName(user.getLocationEntity().getLocation());
 
         return Response.success(resp);
@@ -107,8 +112,6 @@ public class UserMstService {
             errors.add("Location ID is required");
         }
 
-     
-
         UserMst user = userRepo.findByUserCode(userCode.replace("@muziris", ""));
 
         if (user == null) {
@@ -129,7 +132,7 @@ public class UserMstService {
         if (locations == null || locations.isEmpty()) {
             return Response.error("No locations found for branch");
         }
-           if (!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return Response.error(errors);
         }
         LoginResponse resp = new LoginResponse();
@@ -166,80 +169,76 @@ public class UserMstService {
     // CHANGE PASSWORD
     public Response<Boolean> changePassword(ChangePasswordRequest request) {
 
-    List<String> errors = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
 
-    if (request == null) {
-        return Response.error("Request cannot be null");
+        if (request == null) {
+            return Response.error("Request cannot be null");
+        }
+
+        String userCode = request.getUserCode();
+        if (userCode != null) {
+            userCode = userCode.replace("@muziris", "");
+        }
+
+        if (userCode == null || userCode.isBlank()) {
+            errors.add("User code is required");
+        }
+
+        if (request.getCurrentPassword() == null) {
+            errors.add("Current password is required");
+        }
+
+        if (request.getNewPassword() == null) {
+            errors.add("New password is required");
+        }
+
+        UserMst user = userRepo.findByUserCode(userCode);
+
+        if (user == null) {
+            return Response.error("User not found");
+        }
+
+        if (!user.getPassword().equals(request.getCurrentPassword())) {
+            return Response.error("Current password is incorrect");
+        }
+        if (!errors.isEmpty()) {
+            return Response.error(errors);
+        }
+
+        user.setPassword(request.getNewPassword());
+        userRepo.save(user);
+
+        return Response.success(true);
     }
-
-    String userCode = request.getUserCode();
-    if (userCode != null) {
-        userCode = userCode.replace("@muziris", "");
-    }
-
-    if (userCode == null || userCode.isBlank()) {
-        errors.add("User code is required");
-    }
-
-    if (request.getCurrentPassword() == null) {
-        errors.add("Current password is required");
-    }
-
-    if (request.getNewPassword() == null) {
-        errors.add("New password is required");
-    }
-
-   
-    UserMst user = userRepo.findByUserCode(userCode);
-
-    if (user == null) {
-        return Response.error("User not found");
-    }
-
-    if (!user.getPassword().equals(request.getCurrentPassword())) {
-        return Response.error("Current password is incorrect");
-    }
-     if (!errors.isEmpty()) {
-        return Response.error(errors);
-    }
-
-
-    user.setPassword(request.getNewPassword());
-    userRepo.save(user);
-
-    return Response.success(true);
-}
 
     // FORGOT PASSWORD
     // ============================
     public Response<ForgotPasswordResponse> forgotPassword(ForgotPasswordRequest request) {
 
-    if (request == null || request.getUserCode() == null) {
-        return Response.error("User code is required");
+        if (request == null || request.getUserCode() == null) {
+            return Response.error("User code is required");
+        }
+
+        String userCode = request.getUserCode().replace("@muziris", "");
+
+        UserMst user = userRepo.findByUserCode(userCode);
+
+        if (user == null) {
+            return Response.error("Invalid user code");
+        }
+        try {
+            emailService.sendPassword(user.getEmail(), user.getPassword());
+        } catch (Exception e) {
+            return Response.error("Email service failed. Try again later", 500);
+        }
+
+        // emailService.sendPassword(user.getEmail(), user.getPassword());
+
+        ForgotPasswordResponse resp = new ForgotPasswordResponse();
+        resp.setSuccess(true);
+        resp.setMessage("Password sent to registered email");
+
+        return Response.success(resp);
     }
-
-    String userCode = request.getUserCode().replace("@muziris", "");
-
-    UserMst user = userRepo.findByUserCode(userCode);
-
-    if (user == null) {
-        return Response.error("Invalid user code");
-    }
-    try {
-        emailService.sendPassword(user.getEmail(), user.getPassword());
-    } catch (Exception e) {
-        return Response.error("Email service failed. Try again later", 500);
-    }
-    
-
-
-    // emailService.sendPassword(user.getEmail(), user.getPassword());
-
-    ForgotPasswordResponse resp = new ForgotPasswordResponse();
-    resp.setSuccess(true);
-    resp.setMessage("Password sent to registered email");
-
-    return Response.success(resp);
-}
 
 }
