@@ -7,10 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.CompanyLogPK;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CompanyDTO {
 
     @Transient

@@ -74,10 +74,6 @@ public class CompanyController {
 
         List<CompanyMst> list = companyRepository.findAllCompany();
 
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
                     FormListDTO dto = new FormListDTO();
@@ -102,10 +98,6 @@ public class CompanyController {
 
         List<CompanyMst> list = companyRepository.findAllActiveCompanies();
 
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
                     FormListDTO dto = new FormListDTO();
@@ -128,10 +120,6 @@ public class CompanyController {
     public ResponseEntity<List<FormListDTO>> getInactiveCompanyList() {
 
         List<CompanyMst> list = companyRepository.findAllInActiveCompanies();
-
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
 
         List<FormListDTO> response = list.stream()
                 .map(entity -> {

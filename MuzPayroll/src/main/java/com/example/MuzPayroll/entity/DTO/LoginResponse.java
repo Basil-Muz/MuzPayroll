@@ -13,6 +13,7 @@ public class LoginResponse {
     private Long companyId;
     private Long branchId;
     private Long locationId;
+    private String token;
 
     private String userName;
     private String locationName;
@@ -24,6 +25,7 @@ public class LoginResponse {
     public boolean isSuccess() {
         return success;
     }
+
     public void setSuccess(boolean success) {
         this.success = success;
     }
@@ -31,6 +33,7 @@ public class LoginResponse {
     public String getMessage() {
         return message;
     }
+
     public void setMessage(String message) {
         this.message = message;
     }
@@ -38,6 +41,7 @@ public class LoginResponse {
     public Long getCompanyId() {
         return companyId;
     }
+
     public void setCompanyId(Long companyId) {
         this.companyId = companyId;
     }
@@ -45,6 +49,7 @@ public class LoginResponse {
     public Long getBranchId() {
         return branchId;
     }
+
     public void setBranchId(Long branchId) {
         this.branchId = branchId;
     }
@@ -52,12 +57,15 @@ public class LoginResponse {
     public Long getLocationId() {
         return locationId;
     }
+
     public void setLocationId(Long locationId) {
         this.locationId = locationId;
     }
-     public String getUserName() {
+
+    public String getUserName() {
         return userName;
     }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -65,32 +73,40 @@ public class LoginResponse {
     public String getLocationName() {
         return locationName;
     }
+
     public void setLocationName(String locationName) {
         this.locationName = locationName;
     }
 
-
     public CompanyMst getCompany() {
-    return companyList;
-}
-public void setCompany(CompanyMst companyList) {
-    this.companyList = companyList;
-}
+        return companyList;
+    }
 
-public List<BranchMst> getBranchList() {
-    return branchList;
-}
-public void setBranchList(List<BranchMst> branchList) {
-    this.branchList = branchList;
-}
+    public void setCompany(CompanyMst companyList) {
+        this.companyList = companyList;
+    }
 
-public List<LocationMst> getLocationList() {
-    return locationList;
-}
-public void setLocationList(List<LocationMst> locationList) {
-    this.locationList = locationList;
-}
+    public List<BranchMst> getBranchList() {
+        return branchList;
+    }
 
+    public void setBranchList(List<BranchMst> branchList) {
+        this.branchList = branchList;
+    }
 
+    public List<LocationMst> getLocationList() {
+        return locationList;
+    }
 
+    public void setLocationList(List<LocationMst> locationList) {
+        this.locationList = locationList;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

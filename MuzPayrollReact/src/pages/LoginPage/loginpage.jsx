@@ -21,7 +21,6 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [commonError, setCommonError] = useState("");
 
-
   // Handle typing: Allow only letters + numbers
   const handleUserCodeChange = (e) => {
     const value = e.target.value;
@@ -41,7 +40,7 @@ function LoginPage() {
     if (value) setUserCode(value + "@muziris");
   };
   const handleSubmit = (e) => {
-    e.preventDefault();   // KEY FIX
+    e.preventDefault(); // KEY FIX
     handleLogin();
   };
 
@@ -66,12 +65,10 @@ function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userCode: userCode, password }),
-
       });
 
       const data = await response.json();
       console.log("LOGIN RESPONSE FROM BACKEND:", data);
-
 
       if (!data.success) {
         setCommonError(data.errors || "Invalid credentials.");
@@ -80,18 +77,17 @@ function LoginPage() {
       const cleanUserCode = userCode.replace("@muziris", "");
       // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
       const payload = data.data; //  IMPORTANT
-
       const loginData = {
         userCode: cleanUserCode,
         userName: payload.userName,
         companyId: payload.companyId,
         branchId: payload.branchId,
         locationId: payload.locationId,
+        token: payload.token,
       };
 
       login(loginData);
       navigate("/home");
-
     } catch (error) {
       setCommonError("Server error.");
       console.error("Login error:", error);
@@ -107,28 +103,24 @@ function LoginPage() {
         </div>
         <form className="form-group1" onSubmit={handleSubmit}>
           <div className="form-group1">
-
-
             {/* User Code */}
             <label>User Code</label>
             <div className="input-wrapper">
               <RiAdminFill className="input-inside-icon" />
-
 
               <input
                 type="text"
                 value={userCode}
                 onChange={handleUserCodeChange}
                 onBlur={handleUserCodeBlur}
-                placeholder="e.g.abc, not abc@muziris"
+                placeholder="e.g. abc, not abc@muziris"
                 className={userCodeError ? "input-error" : ""}
                 autoFocus
-
+                autoComplete="username"
               />
             </div>
 
             {userCodeError && <p className="error-msg">{userCodeError}</p>}
-
 
             {/* Password */}
             <label>Password</label>
@@ -145,6 +137,7 @@ function LoginPage() {
                   setPassword(e.target.value);
                   setPasswordError("");
                 }}
+                autoComplete="current-password"
               />
 
               {/* EYE ICON */}
@@ -154,7 +147,6 @@ function LoginPage() {
               >
                 {showPassword ? <IoEye /> : <IoEyeOff />}
               </span>
-
             </div>
             {passwordError && <p className="error-msg">{passwordError}</p>}
 
@@ -162,7 +154,7 @@ function LoginPage() {
             {commonError && <p className="common-error-msg">{commonError}</p>}
 
             {/* Login Button */}
-            <button  type="submit" className="login-btn" >
+            <button type="submit" className="login-btn">
               Submit
             </button>
 
@@ -173,12 +165,10 @@ function LoginPage() {
             >
               Forgot Password
             </p>
-
           </div>
         </form>
       </div>
     </div>
-
   );
 }
 

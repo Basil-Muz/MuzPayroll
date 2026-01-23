@@ -878,9 +878,9 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         MultipartFile file = dto.getCompanyImage();
 
         // If no new image uploaded and no existing image path, image is required
-        // if ((file == null || file.isEmpty()) && isEmpty(dto.getCompanyImagePath())) {
-        // return Response.error("Company image is required");
-        // }
+        if ((file == null || file.isEmpty()) && isEmpty(dto.getCompanyImagePath())) {
+            return Response.error("Company image is required");
+        }
 
         // If new image is uploaded, validate and process it
         if (file != null && !file.isEmpty()) {
@@ -909,10 +909,10 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     private List<String> validateImageFile(MultipartFile file) {
         List<String> errors = new ArrayList<>();
 
-        // if (file == null || file.isEmpty()) {
-        // errors.add("Image file is empty");
-        // return errors;
-        // }
+        if (file == null || file.isEmpty()) {
+            errors.add("Image file is empty");
+            return errors;
+        }
 
         // Check file size
         long fileSize = file.getSize();
@@ -950,27 +950,26 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
     // Save image file to disk
     private String saveImageFile(MultipartFile file) throws IOException {
 
-    Path uploadPath = Paths.get(UPLOAD_DIR);
-    if (!Files.exists(uploadPath)) {
-        Files.createDirectories(uploadPath);
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        String filename = UUID.randomUUID().toString() + extension;
+        Path filePath = uploadPath.resolve(filename);
+
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // RETURN ONLY RELATIVE URL PATH
+        return "/uploads/company/" + filename;
     }
-
-    String originalFilename = file.getOriginalFilename();
-    String extension = "";
-
-    if (originalFilename != null && originalFilename.contains(".")) {
-        extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-    }
-
-    String filename = UUID.randomUUID().toString() + extension;
-    Path filePath = uploadPath.resolve(filename);
-
-    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-    // RETURN ONLY RELATIVE URL PATH
-    return "/uploads/company/" + filename;
-}
-
 
     // Check if file extension is valid
     private boolean isValidImageExtension(String extension) {

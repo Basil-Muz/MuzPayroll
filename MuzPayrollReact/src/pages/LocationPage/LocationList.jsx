@@ -14,8 +14,6 @@ import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import Loading from "../../components/Loading/Loading";
 
-import "./LocationList.css";
-
 const LocationList = () => {
   /* ================= STATE ================= */
   const [listView, setListView] = useState(false);
@@ -37,6 +35,7 @@ const LocationList = () => {
 
   //Convert the JSON string to objects
   const branchId = userObj.branchId;
+  const token = userObj.token;
 
   /* ================= API ================= */
 
@@ -57,6 +56,12 @@ const LocationList = () => {
   };
 
   /* ================= INITIAL LOAD ================= */
+  useEffect(() => {
+    if (!userObj?.token) {
+      navigate("/");
+    }
+  }, []);
+
   useEffect(() => {
     loadAllLocation();
   }, []);

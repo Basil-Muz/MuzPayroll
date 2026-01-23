@@ -11,7 +11,6 @@ import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
 
 function LoggedPage() {
-
   /* ================= HELPER FUNCTIONS ================= */
   function getCurrentFinYear() {
     const year = new Date().getFullYear();
@@ -26,14 +25,14 @@ function LoggedPage() {
     control,
     setValue,
     getValues,
-    formState: { errors }
+    formState: { errors },
   } = useForm();
 
-
-
   console.log("🔐 Auth user:", user);
-  console.log("🧾 Stored loginData:", JSON.parse(localStorage.getItem("loginData")));
-
+  console.log(
+    "🧾 Stored loginData:",
+    JSON.parse(localStorage.getItem("loginData")),
+  );
 
   /* ================= STATE ================= */
 
@@ -71,6 +70,8 @@ function LoggedPage() {
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
 
+
+
   /* ================= EFFECTS ================= */
 
   useEffect(() => {
@@ -95,10 +96,9 @@ function LoggedPage() {
       source.companyId,
       source.branchId,
       source.locationId,
-      source.userCode
+      source.userCode,
     );
   }, [user]);
-
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("loginData"));
@@ -108,7 +108,7 @@ function LoggedPage() {
       companyId,
       branchId,
       locationId || stored.locationId,
-      stored.userCode
+      stored.userCode,
     );
   }, [branchId, fieldsLocked, companyId]);
 
@@ -125,7 +125,6 @@ function LoggedPage() {
 
     setCompanyName(stored.companyName || "");
 
-
     // Restore sidebar / button state
     setSidebarOpen(stored.sidebarOpen === true);
     setFieldsLocked(stored.fieldsLocked !== false);
@@ -141,13 +140,17 @@ function LoggedPage() {
       stored.companyId,
       stored.branchId,
       stored.locationId,
-      stored.userCode
+      stored.userCode,
     );
   }, []);
 
-
   /* ================= API ================= */
-  const fetchContextData = async (companyId, branchId, locationId, userCode) => {
+  const fetchContextData = async (
+    companyId,
+    branchId,
+    locationId,
+    userCode,
+  ) => {
     // console.log("fetchContextData called");
 
     if (!companyId || !branchId) {
@@ -156,7 +159,7 @@ function LoggedPage() {
     }
 
     const res = await fetch(
-      `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`
+      `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`,
     );
     // console.log("API URL:", res.url);
 
@@ -184,8 +187,8 @@ function LoggedPage() {
           JSON.stringify({
             ...stored,
             locationId: "",
-            locationName: ""
-          })
+            locationName: "",
+          }),
         );
 
         return;
@@ -208,8 +211,8 @@ function LoggedPage() {
           branchId: "",
           branchName: "",
           locationId: "",
-          locationName: ""
-        })
+          locationName: "",
+        }),
       );
 
       return;
@@ -219,10 +222,7 @@ function LoggedPage() {
 
     /* ================= BRANCH (✅ FIX HERE) ================= */
     const branchListFromApi =
-      data.branchList ||
-      data.branches ||
-      data.branchMstList ||
-      [];
+      data.branchList || data.branches || data.branchMstList || [];
 
     if (branchListFromApi.length === 0) {
       console.error(" No branches from backend");
@@ -240,10 +240,7 @@ function LoggedPage() {
 
     /* ================= LOCATION (✅ FIX HERE) ================= */
     const locationListFromApi =
-      data.locationList ||
-      data.locations ||
-      data.locationMstList ||
-      [];
+      data.locationList || data.locations || data.locationMstList || [];
 
     if (locationListFromApi.length === 0) {
       console.error(" No locations from backend");
@@ -256,7 +253,7 @@ function LoggedPage() {
 
     const selectedLocation =
       locationListFromApi.find(
-        l => String(l.locationMstID) === String(locationId)
+        (l) => String(l.locationMstID) === String(locationId),
       ) || locationListFromApi[0];
 
     // console.log("selectedLocation:", selectedLocation);
@@ -272,20 +269,20 @@ function LoggedPage() {
         ...stored,
         userCode: stored.userCode || userCode,
         locationId: selectedLocation.locationMstID,
-        locationName: selectedLocation.location
-      })
+        locationName: selectedLocation.location,
+      }),
     );
   };
 
   /* ================= SELECT OPTIONS ================= */
-  const branchOptions = branchList.map(b => ({
+  const branchOptions = branchList.map((b) => ({
     value: String(b.branchMstID),
-    label: b.branch
+    label: b.branch,
   }));
 
-  const locationOptions = locationList.map(l => ({
+  const locationOptions = locationList.map((l) => ({
     value: String(l.locationMstID),
-    label: l.location
+    label: l.location,
   }));
 
   const companyOption = companyName
@@ -299,10 +296,10 @@ function LoggedPage() {
     { value: defaultFinYear, label: defaultFinYear },
     { value: "2024-2025", label: "2024-2025" },
     { value: "2025-2026", label: "2025-2026" },
-    { value: "2027-2028", label: "2027-2028" }
+    { value: "2027-2028", label: "2027-2028" },
   ];
 
-  const finYearOption = finYearOptions.find(opt => opt.value === finYear);
+  const finYearOption = finYearOptions.find((opt) => opt.value === finYear);
 
   /* ================= VALIDATION ================= */
   const validateForm = () => {
@@ -321,9 +318,6 @@ function LoggedPage() {
     return true;
   };
 
-
-
-
   /* ================= ACTIONS ================= */
 
   const handleOk = () => {
@@ -331,10 +325,10 @@ function LoggedPage() {
 
     const stored = JSON.parse(localStorage.getItem("loginData") || {});
     const selectedBranch = branchList.find(
-      b => String(b.branchMstID) === String(branchId)
+      (b) => String(b.branchMstID) === String(branchId),
     );
     const selectedLocation = locationList.find(
-      l => String(l.locationMstID) === String(locationId)
+      (l) => String(l.locationMstID) === String(locationId),
     );
 
     localStorage.setItem(
@@ -351,8 +345,8 @@ function LoggedPage() {
         sidebarOpen: true,
         fieldsLocked: true,
         okEnabled: false,
-        changeEnabled: true
-      })
+        changeEnabled: true,
+      }),
     );
 
     setSidebarOpen(true);
@@ -373,8 +367,8 @@ function LoggedPage() {
         locationId: stored.locationId,
         fieldsLocked: false,
         okEnabled: true,
-        changeEnabled: false
-      })
+        changeEnabled: false,
+      }),
     );
 
     setFieldsLocked(false);
@@ -431,8 +425,11 @@ function LoggedPage() {
                   render={({ field }) => (
                     <Select
                       options={branchOptions}
-                      value={branchOptions.find(opt => opt.value === branchId) || null}
-                      onChange={opt => {
+                      value={
+                        branchOptions.find((opt) => opt.value === branchId) ||
+                        null
+                      }
+                      onChange={(opt) => {
                         if (!opt) {
                           field.onChange("");
                           setBranchId("");
@@ -443,7 +440,6 @@ function LoggedPage() {
                         setValue("branchId", opt.value);
                         setLocationList([]);
                         setValue("locationId", "");
-
                       }}
                       isDisabled={fieldsLocked}
                       classNamePrefix="form-control-select"
@@ -458,7 +454,7 @@ function LoggedPage() {
                   value={finYearOption}
                   options={finYearOptions}
                   isDisabled={fieldsLocked}
-                  onChange={opt => setFinYear(opt.value)}
+                  onChange={(opt) => setFinYear(opt.value)}
                   classNamePrefix="form-control-select"
                 />
               </div>
@@ -471,8 +467,12 @@ function LoggedPage() {
                   render={({ field }) => (
                     <Select
                       options={locationOptions}
-                      value={locationOptions.find(opt => opt.value === locationId) || null}
-                      onChange={opt => {
+                      value={
+                        locationOptions.find(
+                          (opt) => opt.value === locationId,
+                        ) || null
+                      }
+                      onChange={(opt) => {
                         if (!opt) {
                           field.onChange("");
                           setLocationId("");
@@ -480,7 +480,6 @@ function LoggedPage() {
                         }
                         field.onChange(opt.value);
                         setLocationId(opt.value);
-
                       }}
                       isDisabled={fieldsLocked}
                       classNamePrefix="form-control-select"
@@ -490,7 +489,11 @@ function LoggedPage() {
               </div>
 
               <div style={{ textAlign: "center" }} className="button-group">
-                <button className="logged-btn" onClick={handleOk} disabled={!okEnabled}>
+                <button
+                  className="logged-btn"
+                  onClick={handleOk}
+                  disabled={!okEnabled}
+                >
                   OK
                 </button>
                 <button
@@ -501,7 +504,6 @@ function LoggedPage() {
                   Change Credentials
                 </button>
               </div>
-
             </div>
           </div>
         </div>

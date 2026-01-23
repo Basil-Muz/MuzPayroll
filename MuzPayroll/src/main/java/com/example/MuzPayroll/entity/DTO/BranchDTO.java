@@ -7,11 +7,13 @@ import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.BranchLogPK;
 import com.example.MuzPayroll.entity.CompanyMst;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BranchDTO {
 
     @Transient

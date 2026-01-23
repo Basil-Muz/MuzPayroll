@@ -14,8 +14,6 @@ import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import Loading from "../../components/Loading/Loading";
 
-import "./BranchList.css";
-
 const BranchList = () => {
   /* ================= STATE ================= */
   const [listView, setListView] = useState(false);
@@ -36,6 +34,8 @@ const BranchList = () => {
 
   //Convert the JSON string to objects
   const companyId = userObj.companyId;
+  const token = userObj.token;
+
   /* ================= API ================= */
   const fetchAllBranch = () =>
     axios.get(`http://localhost:8087/branch/branchlist/${companyId}`);
@@ -52,6 +52,13 @@ const BranchList = () => {
   };
 
   /* ================= INITIAL LOAD ================= */
+
+  useEffect(() => {
+    if (!userObj?.token) {
+      navigate("/");
+    }
+  }, []);
+
   useEffect(() => {
     loadAllBranch();
   }, []);
@@ -67,7 +74,7 @@ const BranchList = () => {
         setActiveBranch([]);
         setInactiveBranch([]);
         setLoading(false);
-      }, 800);
+      }, 1000);
     } catch (err) {
       console.error(err);
       setLoading(false);

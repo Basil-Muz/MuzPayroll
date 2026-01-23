@@ -74,10 +74,6 @@ public class BranchController {
 
         List<BranchMst> list = branchRepository.findByCompanyEntity_CompanyMstID(companyId);
 
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
                     FormListDTO dto = new FormListDTO();
@@ -102,10 +98,6 @@ public class BranchController {
 
         List<BranchMst> list = branchRepository.findActiveBranchesByCompanyId(companyId);
 
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
                     FormListDTO dto = new FormListDTO();
@@ -128,10 +120,6 @@ public class BranchController {
     public ResponseEntity<List<FormListDTO>> getInactiveCompanyList(@PathVariable Long companyId) {
 
         List<BranchMst> list = branchRepository.findInactiveBranchesByCompanyId(companyId);
-
-        if (list.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
 
         List<FormListDTO> response = list.stream()
                 .map(entity -> {

@@ -7,6 +7,8 @@ import "./ToastStyles.css";
 
 import "./common-form.css";
 
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.jsx";
+
 import Companyform from "./pages/company/Companyform.jsx";
 import BranchForm from "./pages/Branch/BranchForm.jsx";
 import LocationForm from "./pages/Location/LocationForm.jsx";
@@ -72,19 +74,75 @@ function App() {
           <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
           <Route path="/designation" element={<Designation />} />
           <Route path="/branchform" element={<BranchPageForm />} />
-          <Route path="/companyform" element={<CompanyPageForm />} />
+          <Route
+            path="/companyform"
+            element={
+              <ProtectedRoute>
+                <CompanyPageForm />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/locationform" element={<LocationPageForm />} />
 
-          <Route path="/companylist" element={<CompanyList />} />
-          <Route path="/company/:companyId" element={<CompanyPageForm />} />
+          <Route
+            path="/companylist"
+            element={
+              <ProtectedRoute>
+                <CompanyList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/company/:companyId"
+            element={
+              <ProtectedRoute>
+                <CompanyPageForm />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/branchlist" element={<BranchList />} />
-          <Route path="/branch/:branchId" element={<BranchPageForm />} />
+          <Route
+            path="/branchlist"
+            element={
+              <ProtectedRoute>
+                <BranchList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/branch/:branchId"
+            element={
+              <ProtectedRoute>
+                <BranchPageForm />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/locationlist" element={<LocationList />} />
-          <Route path="/location/:locationId" element={<LocationPageForm />} />
+          <Route
+            path="/locationlist"
+            element={
+              <ProtectedRoute>
+                <LocationList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/location/:locationId"
+            element={
+              <ProtectedRoute>
+                <LocationPageForm />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/statusupdate" element={<StatusUpdate />} />
+          <Route
+            path="/statusupdate"
+            element={
+              <ProtectedRoute>
+                <StatusUpdate />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="/payrollgroup" element={<PayrollGroup />} />
           <Route path="/payrollgroupsearch" element={<PayrollGroupSearch />} />
@@ -95,22 +153,22 @@ function App() {
         </Routes>
       </AuthProvider>
       <Toaster
-      position="top-right"
-      gutter={12}
-      reverseOrder={false}
-      toastOptions={{
-        duration: 2800,
+        position="top-right"
+        gutter={12}
+        reverseOrder={false}
+        toastOptions={{
+          duration: 2800,
 
-        style: {
-          background: "var(--glass-bg)",
-          color: "var(--text)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow-lg)",
-          padding: "0",
-          maxWidth: "420px",
-          backdropFilter: "blur(10px)",
-        },
+          style: {
+            background: "var(--glass-bg)",
+            color: "var(--text)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius-lg)",
+            boxShadow: "var(--shadow-lg)",
+            padding: "0",
+            maxWidth: "420px",
+            backdropFilter: "blur(10px)",
+          },
 
           success: {
             style: {
@@ -177,8 +235,8 @@ function App() {
                 {t.type === "success"
                   ? "Success"
                   : t.type === "error"
-                  ? "Error"
-                  : "Information"}
+                    ? "Error"
+                    : "Information"}
               </span>
               <p>{t.message}</p>
             </div>
