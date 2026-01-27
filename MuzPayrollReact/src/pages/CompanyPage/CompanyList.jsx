@@ -14,8 +14,6 @@ import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import Loading from "../../components/Loading/Loading";
 
-import "./CompanyList.css";
-
 const CompanyList = () => {
   const [listView, setListView] = useState(false);
   const [searchData, setSearchData] = useState("");
@@ -27,6 +25,11 @@ const CompanyList = () => {
   const [inactiveCompanies, setInactiveCompanies] = useState([]);
 
   const [loading, setLoading] = useState(false);
+
+  const UserData = localStorage.getItem("loginData");
+  const userObj = JSON.parse(UserData);
+
+  const token = userObj.token;
 
   const navigate = useNavigate();
 
@@ -46,6 +49,12 @@ const CompanyList = () => {
   };
 
   /* ================= INITIAL LOAD ================= */
+  useEffect(() => {
+    if (!userObj?.token) {
+      navigate("/");
+    }
+  }, []);
+
   useEffect(() => {
     loadAllCompanies();
   }, []);

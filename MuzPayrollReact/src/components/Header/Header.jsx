@@ -14,6 +14,9 @@ import { BiSolidCollection } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
 import { ImUser } from "react-icons/im";
 
+import ThemeToggle from "../ThemeToggle/ThemeToggle";
+
+
 const BLOCKED_PATHS = ["/masters", "/home", "/settings"];
 const INITIAL_NOTIFICATIONS = [];
 const HOVER_DELAY = 200; // Delay before closing on mouse leave
@@ -28,12 +31,14 @@ const Header = ({ backendError = [] }) => {
 
   const [companyName, setCompanyName] = useState("");
   const [notifications, setNotifications] = useState([]);
-  const [dashNotifications, setDashNotifications] = useState(
-    INITIAL_NOTIFICATIONS,
-  );
+
+
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
-  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [dashNotifications, setDashNotifications] = useState(
+    INITIAL_NOTIFICATIONS
+  );
+
 
   const location = useLocation();
 
@@ -314,6 +319,7 @@ const Header = ({ backendError = [] }) => {
 
   return (
     <header className="header" role="banner">
+
       <div className="header-left">
         <div className="logo">
           <img
@@ -393,6 +399,7 @@ const Header = ({ backendError = [] }) => {
             )}
           />
         </div>
+
       </div>
 
       <div className="header-right">

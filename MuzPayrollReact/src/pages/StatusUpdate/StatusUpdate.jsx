@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import { IoIosSearch } from "react-icons/io";
 import StatusSearch from "./StatusSearch";
 import Header from "../../components/Header/Header";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
@@ -50,12 +50,12 @@ const StatusUpdate = () => {
         <div className="header-section">
           <h2 className="page-title">Status Update</h2>
         </div>
-        <div className="actions">
+        <div className="jhgj vactions">
           <button
             className={`icon-btn ${isOpen ? "active" : ""}`}
             onClick={toggleSearch}
           >
-            <FaSearch />
+            <IoIosSearch />
           </button>
         </div>
 

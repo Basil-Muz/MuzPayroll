@@ -31,10 +31,10 @@ const menuItems = [
     icon: <FaUserTie size={18} />,
     children: [
       { id: "employee.profile", label: "Employee", link: "/employee" },
-      { id: "employee.list", label: "Employee List", link: "/employee/employee-list" },
-      { id: "employee.upload", label: "Employee Upload", link: "/employee/employee-upload" },
-      { id: "employee.attributes", label: "Employee Attributes", link: "/employee/employee-attribute-allocation" },
-      { id: "employee.bulkVerify", label: "Bulk Verification", link: "/employee/employee-bulk-verification" },
+      { id: "employee.list", label: "Employee List", link: "/employee-list" },
+      { id: "employee.upload", label: "Employee Upload", link: "/employee-upload" },
+      { id: "employee.attributes", label: "Employee Attributes", link: "/employee-attribute-allocation" },
+      { id: "employee.bulkVerify", label: "Bulk Verification", link: "/employee-bulk-verification" },
     ],
   },
 
@@ -44,15 +44,15 @@ const menuItems = [
     label: "Time & Payroll",
     icon: <FaRegCalendarAlt size={18} />,
     children: [
-      { id: "attendance.masterRoll", label: "Master Roll", link: "/attendance/master-roll" },
-      { id: "attendance.weekly", label: "Weekly Allocation", link: "/attendance/vering-weekly-allocation" },
-      { id: "attendance.shift", label: "Shift Allocation", link: "/attendance/varing-shift-allocation" },
-      { id: "attendance.leave", label: "Leave Allocation", link: "/attendance/leave-allocation-deallocation" },
-      { id: "attendance.exchange", label: "Leave Exchange", link: "/attendance/leave-enchangment" },
-      { id: "attendance.yearEnd", label: "Leave Year End", link: "/attendance/leave-year-end-process" },
+      { id: "attendance.masterRoll", label: "Master Roll", link: "/master-roll" },
+      { id: "attendance.weekly", label: "Weekly Allocation", link: "/weekly-allocation" },
+      { id: "attendance.shift", label: "Shift Allocation", link: "/shift-allocation" },
+      { id: "attendance.leave", label: "Leave Allocation", link: "/leave-allocation-deallocation" },
+      { id: "attendance.exchange", label: "Leave Exchange", link: "/leave-encashment" },
+      { id: "attendance.yearEnd", label: "Leave Year End", link: "/leave-year-end-process" },
 
-      { id: "process.payroll", label: "Payroll Process", link: "/process/payroll-process" },
-      { id: "process.verify", label: "Payroll Verification", link: "/process/payroll-process-verification" },
+      { id: "process.payroll", label: "Payroll Process", link: "/payroll-process" },
+      { id: "process.verify", label: "Payroll Verification", link: "/payroll-process-verification" },
     ],
   },
 
@@ -62,11 +62,11 @@ const menuItems = [
     label: "Finance",
     icon: <FaRegMoneyBillAlt size={18} />,
     children: [
-      { id: "advance.issue", label: "Advance Issue", link: "/advance/advance-issue" },
-      { id: "advance.recovery", label: "Advance Recovery", link: "/advance/advance-recovery-update" },
-      { id: "process.bonus", label: "Bonus Process", link: "/process/bonus-process" },
-      { id: "process.gratuity", label: "Gratuity Process", link: "/process/gratiuty-process" },
-      { id: "other.allowance", label: "Allowances & Deductions", link: "/other/monthly-allowance-deduction" },
+      { id: "advance.issue", label: "Advance Issue", link: "/advance-issue" },
+      { id: "advance.recovery", label: "Advance Recovery", link: "/advance-recovery-update" },
+      { id: "process.bonus", label: "Bonus Process", link: "/bonus-process" },
+      { id: "process.gratuity", label: "Gratuity Process", link: "/gratiuty-process" },
+      { id: "other.allowance", label: "Allowances & Deductions", link: "/monthly-allowance-deduction" },
     ],
   },
 
@@ -79,7 +79,7 @@ const menuItems = [
       { label: "Masters", link: "/masters" },
       { label: "Settings", link: "/settings" },
       { label: "Database Backup", link: "/database-backup" },
-      { label: "Employee Reminders", link: "/other/employee-reminder-register" },
+      { label: "Employee Reminders", link: "/employee-reminder-register" },
     ],
   },
 
@@ -89,9 +89,9 @@ const menuItems = [
     label: "Compliance",
     icon: <FaScaleBalanced size={18} />,
     children: [
-      { label: "Compliance Letters", link: "/statutary/complients-letter" },
-      { label: "Statutory Reports", link: "/statutary/report" },
-      { label: "Final Settlement", link: "/other/employee-final-settlement" },
+      { label: "Compliance Letters", link: "/complients-letter" },
+      { label: "Statutory Reports", link: "/report-and-letter" },
+      { label: "Final Settlement", link: "/employee-final-settlement" },
     ],
   },
 

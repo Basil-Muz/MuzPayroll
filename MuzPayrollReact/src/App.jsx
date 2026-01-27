@@ -7,6 +7,8 @@ import "./ToastStyles.css";
 
 import "./common-form.css";
 
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.jsx";
+
 import Companyform from "./pages/company/Companyform.jsx";
 import BranchForm from "./pages/Branch/BranchForm.jsx";
 import LocationForm from "./pages/Location/LocationForm.jsx";
@@ -24,7 +26,7 @@ import LoginPage from "./pages/LoginPage/loginpage.jsx";
 import LoggedPage from "./pages/LoggedPage/loggedpage.jsx";
 
 import ChangePassword from "./pages/changepassword/changepassword.jsx";
-import Logout from "./components/logout/logout.jsx";
+
 import ForgotPassword from "./pages/forgotpassword/forgotpassword.jsx";
 import Settings from "./pages/Settings/Settings.jsx";
 import Designation from "./pages/designation/designation.jsx";
@@ -59,7 +61,7 @@ function App() {
           <Route path="/documentsinfo" element={<DocumentsInfo />} />
           <Route path="/masters" element={<MasterPage />} />
           <Route path="/changepassword" element={<ChangePassword />} />
-          <Route path="/logout" element={<Logout />} />
+        
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/settings" element={<Settings />} />
 
@@ -72,19 +74,75 @@ function App() {
           <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
           <Route path="/designation" element={<Designation />} />
           <Route path="/branchform" element={<BranchPageForm />} />
-          <Route path="/companyform" element={<CompanyPageForm />} />
+          <Route
+            path="/companyform"
+            element={
+              <ProtectedRoute>
+                <CompanyPageForm />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/locationform" element={<LocationPageForm />} />
 
-          <Route path="/companylist" element={<CompanyList />} />
-          <Route path="/company/:companyId" element={<CompanyPageForm />} />
+          <Route
+            path="/companylist"
+            element={
+              <ProtectedRoute>
+                <CompanyList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/company/:companyId"
+            element={
+              <ProtectedRoute>
+                <CompanyPageForm />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/branchlist" element={<BranchList />} />
-          <Route path="/branch/:branchId" element={<BranchPageForm />} />
+          <Route
+            path="/branchlist"
+            element={
+              <ProtectedRoute>
+                <BranchList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/branch/:branchId"
+            element={
+              <ProtectedRoute>
+                <BranchPageForm />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/locationlist" element={<LocationList />} />
-          <Route path="/location/:locationId" element={<LocationPageForm />} />
+          <Route
+            path="/locationlist"
+            element={
+              <ProtectedRoute>
+                <LocationList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/location/:locationId"
+            element={
+              <ProtectedRoute>
+                <LocationPageForm />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/statusupdate" element={<StatusUpdate />} />
+          <Route
+            path="/statusupdate"
+            element={
+              <ProtectedRoute>
+                <StatusUpdate />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="/payrollgroup" element={<PayrollGroup />} />
           <Route path="/payrollgroupsearch" element={<PayrollGroupSearch />} />
