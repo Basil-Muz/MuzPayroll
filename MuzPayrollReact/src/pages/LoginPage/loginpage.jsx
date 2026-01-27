@@ -74,7 +74,7 @@ function LoginPage() {
         setCommonError(data.errors || "Invalid credentials.");
         return;
       }
-      const cleanUserCode = userCode.replace("@muziris", "");
+      const cleanUserCode = userCode.replace("@muziris", ""); //Removes the @muziris
       // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
       const payload = data.data; //  IMPORTANT
       const loginData = {

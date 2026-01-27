@@ -32,9 +32,21 @@ const menuItems = [
     children: [
       { id: "employee.profile", label: "Employee", link: "/employee" },
       { id: "employee.list", label: "Employee List", link: "/employee-list" },
-      { id: "employee.upload", label: "Employee Upload", link: "/employee-upload" },
-      { id: "employee.attributes", label: "Employee Attributes", link: "/employee-attribute-allocation" },
-      { id: "employee.bulkVerify", label: "Bulk Verification", link: "/employee-bulk-verification" },
+      {
+        id: "employee.upload",
+        label: "Employee Upload",
+        link: "/employee-upload",
+      },
+      {
+        id: "employee.attributes",
+        label: "Employee Attributes",
+        link: "/employee-attribute-allocation",
+      },
+      {
+        id: "employee.bulkVerify",
+        label: "Bulk Verification",
+        link: "/employee-bulk-verification",
+      },
     ],
   },
 
@@ -44,15 +56,47 @@ const menuItems = [
     label: "Time & Payroll",
     icon: <FaRegCalendarAlt size={18} />,
     children: [
-      { id: "attendance.masterRoll", label: "Master Roll", link: "/master-roll" },
-      { id: "attendance.weekly", label: "Weekly Allocation", link: "/weekly-allocation" },
-      { id: "attendance.shift", label: "Shift Allocation", link: "/shift-allocation" },
-      { id: "attendance.leave", label: "Leave Allocation", link: "/leave-allocation-deallocation" },
-      { id: "attendance.exchange", label: "Leave Exchange", link: "/leave-encashment" },
-      { id: "attendance.yearEnd", label: "Leave Year End", link: "/leave-year-end-process" },
+      {
+        id: "attendance.masterRoll",
+        label: "Master Roll",
+        link: "/master-roll",
+      },
+      {
+        id: "attendance.weekly",
+        label: "Weekly Allocation",
+        link: "/weekly-allocation",
+      },
+      {
+        id: "attendance.shift",
+        label: "Shift Allocation",
+        link: "/shift-allocation",
+      },
+      {
+        id: "attendance.leave",
+        label: "Leave Allocation",
+        link: "/leave-allocation-deallocation",
+      },
+      {
+        id: "attendance.exchange",
+        label: "Leave Exchange",
+        link: "/leave-encashment",
+      },
+      {
+        id: "attendance.yearEnd",
+        label: "Leave Year End",
+        link: "/leave-year-end-process",
+      },
 
-      { id: "process.payroll", label: "Payroll Process", link: "/payroll-process" },
-      { id: "process.verify", label: "Payroll Verification", link: "/payroll-process-verification" },
+      {
+        id: "process.payroll",
+        label: "Payroll Process",
+        link: "/payroll-process",
+      },
+      {
+        id: "process.verify",
+        label: "Payroll Verification",
+        link: "/payroll-process-verification",
+      },
     ],
   },
 
@@ -63,10 +107,22 @@ const menuItems = [
     icon: <FaRegMoneyBillAlt size={18} />,
     children: [
       { id: "advance.issue", label: "Advance Issue", link: "/advance-issue" },
-      { id: "advance.recovery", label: "Advance Recovery", link: "/advance-recovery-update" },
+      {
+        id: "advance.recovery",
+        label: "Advance Recovery",
+        link: "/advance-recovery-update",
+      },
       { id: "process.bonus", label: "Bonus Process", link: "/bonus-process" },
-      { id: "process.gratuity", label: "Gratuity Process", link: "/gratiuty-process" },
-      { id: "other.allowance", label: "Allowances & Deductions", link: "/monthly-allowance-deduction" },
+      {
+        id: "process.gratuity",
+        label: "Gratuity Process",
+        link: "/gratiuty-process",
+      },
+      {
+        id: "other.allowance",
+        label: "Allowances & Deductions",
+        link: "/monthly-allowance-deduction",
+      },
     ],
   },
 
@@ -76,10 +132,18 @@ const menuItems = [
     label: "Administration",
     icon: <FaGears size={18} />,
     children: [
-      { label: "Masters", link: "/masters" },
-      { label: "Settings", link: "/settings" },
-      { label: "Database Backup", link: "/database-backup" },
-      { label: "Employee Reminders", link: "/employee-reminder-register" },
+      { id: "admin.masters", label: "Masters", link: "/masters" },
+      { id: "admin.settings", label: "Settings", link: "/settings" },
+      {
+        id: "admin.backup",
+        label: "Database Backup",
+        link: "/database-backup",
+      },
+      {
+        id: "admin.reminders",
+        label: "Employee Reminders",
+        link: "/employee-reminder-register",
+      },
     ],
   },
 
@@ -89,12 +153,23 @@ const menuItems = [
     label: "Compliance",
     icon: <FaScaleBalanced size={18} />,
     children: [
-      { label: "Compliance Letters", link: "/complients-letter" },
-      { label: "Statutory Reports", link: "/report-and-letter" },
-      { label: "Final Settlement", link: "/employee-final-settlement" },
+      {
+        id: "compliance.letters",
+        label: "Compliance Letters",
+        link: "/complients-letter",
+      },
+      {
+        id: "compliance.reports",
+        label: "Statutory Reports",
+        link: "/report-and-letter",
+      },
+      {
+        id: "compliance.final",
+        label: "Final Settlement",
+        link: "/employee-final-settlement",
+      },
     ],
   },
-
 ];
 
 export default function Sidebar({ forceOpen }) {
@@ -105,20 +180,21 @@ export default function Sidebar({ forceOpen }) {
 
   const isMobile = useIsMobile();
   // const isTab = useIsTab();
-  const [sidebarOpen, setSidebarOpen] = useState(false);//side bar expand or collapsed
+  const [sidebarOpen, setSidebarOpen] = useState(false); //side bar expand or collapsed
   const [openSubmenu, setOpenSubmenu] = useState(null);
   // const [closingSubmenu, setClosingSubmenu] = useState(null);
   const [submenuStyle, setSubmenuStyle] = useState({
     top: 0,
     left: 0,
-    position: "absolute"
+    position: "absolute",
   });
 
   const stored = JSON.parse(localStorage.getItem("loginData"));
 
   const sidebarEnabled = stored.sidebarOpen || forceOpen; //opens navigation
-  const [active, setActive] = useState(localStorage.getItem("activeMenu") || "");
-
+  const [active, setActive] = useState(
+    localStorage.getItem("activeMenu") || "",
+  );
 
   const getSidebarClass = () => {
     if (isMobile) {
@@ -132,7 +208,7 @@ export default function Sidebar({ forceOpen }) {
 
   //  LIVE loginData (for username, location, etc.)
   const [loginData, setLoginData] = useState(() =>
-    JSON.parse(localStorage.getItem("loginData") || "{}")
+    JSON.parse(localStorage.getItem("loginData") || "{}"),
   );
 
   useEffect(() => {
@@ -149,19 +225,18 @@ export default function Sidebar({ forceOpen }) {
   const userName = loginData.userName || "User";
 
   /*  Sync sidebar enable */
-// useEffect(() => {
-//   if (!isMobile) {
-//     const stored = localStorage.getItem("loginData");
-//     if (stored) {
-//       const data = JSON.parse(stored);
-//       if (typeof data.sidebarOpen === "boolean") {
-//         // setSidebarOpen(data.sidebarOpen);
-//         setSidebarEnabled(data.sidebarOpen);
-//       }
-//     }
-//   }
-// }, [isMobile]);
-
+  // useEffect(() => {
+  //   if (!isMobile) {
+  //     const stored = localStorage.getItem("loginData");
+  //     if (stored) {
+  //       const data = JSON.parse(stored);
+  //       if (typeof data.sidebarOpen === "boolean") {
+  //         // setSidebarOpen(data.sidebarOpen);
+  //         setSidebarEnabled(data.sidebarOpen);
+  //       }
+  //     }
+  //   }
+  // }, [isMobile]);
 
   // Auto-close sidebar on mobile when clicking outside
   useEffect(() => {
@@ -216,10 +291,7 @@ export default function Sidebar({ forceOpen }) {
       const viewportHeight = window.innerHeight;
 
       // Center submenu vertically near clicked item
-      let top =
-        itemRect.top -
-        submenuHeight / 2 +
-        itemRect.height / 2;
+      let top = itemRect.top - submenuHeight / 2 + itemRect.height / 2;
 
       top = Math.max(20, Math.min(top, viewportHeight - submenuHeight));
 
@@ -243,57 +315,58 @@ export default function Sidebar({ forceOpen }) {
         zIndex: 1000,
       };
     },
-    [isMobile, sidebarOpen]
+    [isMobile, sidebarOpen],
   );
 
+  const openSubmenuFor = useCallback(
+    (e, item) => {
+      if (!sidebarRef.current) return;
 
-  const openSubmenuFor = useCallback((e, item) => {
-    if (!sidebarRef.current) return;
+      if (closeTimer.current) {
+        clearTimeout(closeTimer.current);
+        closeTimer.current = null;
+      }
 
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
+      const sidebarRect = sidebarRef.current.getBoundingClientRect();
+      const itemRect = e.currentTarget.getBoundingClientRect();
 
-    const sidebarRect = sidebarRef.current.getBoundingClientRect();
-    const itemRect = e.currentTarget.getBoundingClientRect();
+      // Calculate submenu position with boundary checking
+      const position = calculateSubmenuPosition(itemRect, sidebarRect);
 
-    // Calculate submenu position with boundary checking
-    const position = calculateSubmenuPosition(itemRect, sidebarRect);
-
-    setSubmenuStyle(position);
-    setOpenSubmenu(item.id);
-  }, [calculateSubmenuPosition]);
+      setSubmenuStyle(position);
+      setOpenSubmenu(item.id);
+    },
+    [calculateSubmenuPosition],
+  );
 
   const scheduleCloseSubmenu = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     closeTimer.current = setTimeout(() => setOpenSubmenu(null), 200);
   };
 
-const toggleSidebar = () => {
-  setSidebarOpen(prev => {
-    // if (!isMobile) {
-    //   const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
-    //   localStorage.setItem(
-    //     "loginData",
-    //     JSON.stringify({ ...stored, sidebarOpen: !prev })
-    //   );
-    // }
-    return !prev;
-  });
-  // setSidebarEnabled(prev => {
-  //   if (!isMobile) {
-  //     const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
-  //     localStorage.setItem(
-  //       "loginData",
-  //       JSON.stringify({ ...stored, sidebarOpen: !prev })
-  //     );
-  //   }
-  //   return !prev;
-  // });
-  setOpenSubmenu(null);
-};
-
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => {
+      // if (!isMobile) {
+      //   const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+      //   localStorage.setItem(
+      //     "loginData",
+      //     JSON.stringify({ ...stored, sidebarOpen: !prev })
+      //   );
+      // }
+      return !prev;
+    });
+    // setSidebarEnabled(prev => {
+    //   if (!isMobile) {
+    //     const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+    //     localStorage.setItem(
+    //       "loginData",
+    //       JSON.stringify({ ...stored, sidebarOpen: !prev })
+    //     );
+    //   }
+    //   return !prev;
+    // });
+    setOpenSubmenu(null);
+  };
 
   // Close submenu when sidebar collapses
   // useEffect(() => {
@@ -320,7 +393,9 @@ const toggleSidebar = () => {
   useEffect(() => {
     const handleResize = () => {
       if (openSubmenu && sidebarRef.current) {
-        const activeItem = document.querySelector(`[data-item-id="${openSubmenu}"]`);
+        const activeItem = document.querySelector(
+          `[data-item-id="${openSubmenu}"]`,
+        );
         if (activeItem) {
           const sidebarRect = sidebarRef.current.getBoundingClientRect();
           const itemRect = activeItem.getBoundingClientRect();
@@ -330,19 +405,19 @@ const toggleSidebar = () => {
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [openSubmenu, calculateSubmenuPosition]);
 
   return (
     <>
-      <aside
-        ref={sidebarRef}
-        className={`sidebar ${sidebarClass}`}
-      >
+      <aside ref={sidebarRef} className={`sidebar ${sidebarClass}`}>
         {/* Desktop Collapse Button */}
         {!isMobile && (
-          <div className="buttons" style={{ justifyContent: sidebarOpen ? "flex-end" : "center" }}>
+          <div
+            className="buttons"
+            style={{ justifyContent: sidebarOpen ? "flex-end" : "center" }}
+          >
             {/* <button
               className="collapse-btn"
               onClick={toggleSidebar}
@@ -363,7 +438,8 @@ const toggleSidebar = () => {
         <div
           className="sidebar-top"
           style={{
-            justifyContent: isMobile || sidebarOpen ? "space-between" : "center",
+            justifyContent:
+              isMobile || sidebarOpen ? "space-between" : "center",
           }}
         >
           <div
@@ -383,7 +459,7 @@ const toggleSidebar = () => {
                   <div className="user-role">Admin</div>
                 </div>
               )}
-{/* 
+              {/* 
               {(isMobile || sidebarOpen) && (
                 <button className="user-action" aria-label="User actions">
                   <IoIosArrowForward size={14} />
@@ -393,10 +469,10 @@ const toggleSidebar = () => {
           </div>
           <button
             className="collapse-btn"
-
             aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
-            <div className={`sidebar-icon-transition ${!sidebarOpen ? "rotated" : ""}`}
+            <div
+              className={`sidebar-icon-transition ${!sidebarOpen ? "rotated" : ""}`}
               onClick={toggleSidebar}
             >
               {sidebarOpen ? (
@@ -417,7 +493,6 @@ const toggleSidebar = () => {
               if (!isMobile) scheduleCloseSubmenu();
             }}
           >
-
             {menuItems.map((item) => {
               const hasChildren = !!item.children && item.children.length > 0;
               return (
@@ -436,7 +511,6 @@ const toggleSidebar = () => {
                     }
                   }}
                 >
-
                   <button
                     className={`nav-item ${active === item.id ? "active" : ""}`}
                     onClick={(e) => {
@@ -447,8 +521,8 @@ const toggleSidebar = () => {
 
                       if (hasChildren) {
                         if (isMobile) {
-                          setOpenSubmenu(prev =>
-                            prev === item.id ? null : item.id
+                          setOpenSubmenu((prev) =>
+                            prev === item.id ? null : item.id,
                           );
                         } else {
                           if (openSubmenu === item.id) {
@@ -459,8 +533,6 @@ const toggleSidebar = () => {
                         }
                       }
                     }}
-
-
                     title={!sidebarOpen && !isMobile ? item.label : undefined}
                     aria-current={active === item.id ? "page" : undefined}
                     aria-expanded={openSubmenu === item.id}
@@ -475,10 +547,14 @@ const toggleSidebar = () => {
 
                     {hasChildren && (isMobile || sidebarOpen) && (
                       <div className="nav-chevron" aria-hidden="true">
-                        <IoIosArrowForward size={14}
+                        <IoIosArrowForward
+                          size={14}
                           style={{
-                            transform: openSubmenu === item.id ? 'rotate(90deg)' : 'none',
-                            transition: 'transform 0.2s ease'
+                            transform:
+                              openSubmenu === item.id
+                                ? "rotate(90deg)"
+                                : "none",
+                            transition: "transform 0.2s ease",
                           }}
                         />
                       </div>
@@ -494,10 +570,9 @@ const toggleSidebar = () => {
                     <div
                       className={`submenu floating 
                         }`}
-                      style={submenuStyle}   // USE SAME STYLE EVERYWHERE
+                      style={submenuStyle} // USE SAME STYLE EVERYWHERE
                       onClick={(e) => e.stopPropagation()} // prevent sidebar close
                     >
-
                       <div
                         style={{
                           background: "#c71ebeff",
@@ -511,7 +586,13 @@ const toggleSidebar = () => {
                         {item.label}
                       </div>
 
-                      <div style={{ background: "#fff", color: "#111", padding: 8 }}>
+                      <div
+                        style={{
+                          background: "#fff",
+                          color: "#111",
+                          padding: 8,
+                        }}
+                      >
                         {item.children.map((child) => (
                           <button
                             key={child.id}
@@ -531,7 +612,8 @@ const toggleSidebar = () => {
                               transition: "background 0.2s ease",
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.background = "rgba(199, 30, 190, 0.06)";
+                              e.currentTarget.style.background =
+                                "rgba(199, 30, 190, 0.06)";
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = "transparent";
@@ -549,10 +631,18 @@ const toggleSidebar = () => {
                             >
                               <VscActivateBreakpoints size={16} />
                             </span>
-                            <span style={{ flex: 1, color: "#111827", fontSize: "14px" }}>
+                            <span
+                              style={{
+                                flex: 1,
+                                color: "#111827",
+                                fontSize: "14px",
+                              }}
+                            >
                               {child.label}
                             </span>
-                            <span style={{ color: "#9ca3af", fontSize: 12 }}>&gt;</span>
+                            <span style={{ color: "#9ca3af", fontSize: 12 }}>
+                              &gt;
+                            </span>
                           </button>
                         ))}
                       </div>
@@ -581,9 +671,17 @@ const toggleSidebar = () => {
           aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
         >
           {sidebarOpen ? (
-            <RxCross2 size={20} className="toggle-icon" style={{ color: "#c71ebeff" }} />
+            <RxCross2
+              size={20}
+              className="toggle-icon"
+              style={{ color: "#c71ebeff" }}
+            />
           ) : (
-            <MdOutlineMenu size={20} className="toggle-icon" style={{ color: "#c71ebeff" }} />
+            <MdOutlineMenu
+              size={20}
+              className="toggle-icon"
+              style={{ color: "#c71ebeff" }}
+            />
           )}
         </button>
       )}

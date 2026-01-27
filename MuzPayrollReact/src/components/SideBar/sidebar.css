@@ -23,7 +23,7 @@
   transition:
     width 250ms ease,
     transform 300ms ease;
-  z-index: 1000;
+  z-index: 10 ;
 }
 
 .sidebar-backdrop {
@@ -121,7 +121,7 @@
   position: fixed;
   right: 14px;
   bottom: 6rem;
-  z-index: 2000;
+  z-index: 100;
   width: 56px;
   height: 56px;
   /* padding-left: 9px; */

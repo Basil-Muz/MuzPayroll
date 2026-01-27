@@ -19,7 +19,7 @@ function LoggedPage() {
 
   /* ================= HOOKS ================= */
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user ,updateUser} = useAuth();
 
   const {
     control,
@@ -28,11 +28,8 @@ function LoggedPage() {
     formState: { errors },
   } = useForm();
 
-
-
   // console.log(" Auth user:", user);
   // console.log(" Stored loginData:", JSON.parse(localStorage.getItem("loginData")));
-
 
   /* ================= STATE ================= */
 
@@ -69,8 +66,6 @@ function LoggedPage() {
   const [companyList, setCompanyList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
-
-
 
   /* ================= EFFECTS ================= */
 
@@ -348,7 +343,14 @@ function LoggedPage() {
         changeEnabled: true,
       }),
     );
-
+    const loginData = {
+      branchName: selectedBranch?.branch || "",
+      locationName: selectedLocation?.location || "",
+      branchId: getValues("branchId"),
+      locationId: getValues("locationId"),
+    };
+    console.log("After Login", loginData);
+    updateUser(loginData);
     setSidebarOpen(true);
     setFieldsLocked(true);
     setOkEnabled(false);
@@ -370,7 +372,13 @@ function LoggedPage() {
         changeEnabled: false,
       }),
     );
-
+    // const loginData = {
+    //   ...stored,
+    //   branchId: getValues("branchId"),
+    //   locationId: getValues("locationId"),
+    // };
+    // console.log("After Login", loginData);
+    // login(loginData);
     setFieldsLocked(false);
     setOkEnabled(true);
     setChangeEnabled(false);
@@ -382,7 +390,7 @@ function LoggedPage() {
   // console.log(" selected locationId:", locationId);
 
   /* ================= UI ================= */
-  
+
   return (
     <>
       <Header backendError={backendError} />

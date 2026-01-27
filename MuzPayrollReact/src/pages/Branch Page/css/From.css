@@ -486,6 +486,7 @@ body {
   background: var(--background) !important;
   min-height: 44px !important;
   transition: all 0.3s ease !important;
+  /* z-index: 1001 !important; */
 }
 
 .form-control-select__control--is-focused {
@@ -673,10 +674,11 @@ body {
 
 .form-control-select__menu {
   border-radius: var(--radius);
+  position: absolute !important;
   border: 1.5px solid var(--border);
   background-color: var(--background) !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  /* z-index: 10000 !important; */
 }
 
 /* Individual option */

@@ -16,7 +16,6 @@ import { ImUser } from "react-icons/im";
 
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
-
 const BLOCKED_PATHS = ["/masters", "/home", "/settings"];
 const INITIAL_NOTIFICATIONS = [];
 const HOVER_DELAY = 200; // Delay before closing on mouse leave
@@ -25,26 +24,30 @@ const Header = ({ backendError = [] }) => {
   const [notOpen, setNotOpen] = useState(false);
   const [dashOpen, setDashOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-
-  const [contextBranch, setContextBranch] = useState(null);
-  const [contextLocation, setContextLocation] = useState(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  // const [contextBranch, setContextBranch] = useState(null);
+  // const [contextLocation, setContextLocation] = useState(null);
 
   const [companyName, setCompanyName] = useState("");
   const [notifications, setNotifications] = useState([]);
 
-
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
   const [dashNotifications, setDashNotifications] = useState(
-    INITIAL_NOTIFICATIONS
+    INITIAL_NOTIFICATIONS,
   );
-
+  const hasHydratedRef = useRef(false);
 
   const location = useLocation();
 
-  const { user } = useAuth();
+  const { user, logout, updateUser } = useAuth();
 
   const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    logout();
+    navigate("/");
+  };
 
   const { control, setValue, watch } = useForm({
     defaultValues: {
@@ -98,6 +101,7 @@ const Header = ({ backendError = [] }) => {
   /* ================= API ================= */
   const fetchContextData = useCallback(
     async (branchId, userCode) => {
+      //User code for user base access
       if (!companyId || !branchId) return;
 
       try {
@@ -160,51 +164,65 @@ const Header = ({ backendError = [] }) => {
   }, []);
 
   useEffect(() => {
-    if (!contextBranch || !branchList.length) return;
-    console.log("Branch context", contextBranch);
-    setValue("branch", contextBranch, {
-      shouldDirty: false,
-      shouldTouch: false,
-    });
+    if (branchList.length === 0) return;
 
-    fetchLocationsByBranch(contextBranch);
-  }, [contextBranch, branchList, setValue, fetchLocationsByBranch]);
-
-  useEffect(() => {
-    if (!contextLocation || !locationList.length) return;
-
-    setValue("location", contextLocation, {
-      shouldDirty: false,
-      shouldTouch: false,
-    });
-  }, [contextLocation, locationList]);
-
-  useEffect(() => {
-    if (companyId) {
-      fetchContextData(loginData.branchId, loginData.userCode);
+    const branchOption = branchList.find(
+      (b) => b.value === Number(user.branchId),
+    ); //stored ID is in string
+    // console.log("Brqanch steed", branchOption);
+    if (branchOption) {
+      setValue("branch", branchOption, {
+        //set in object not number or string
+        shouldDirty: false,
+        shouldTouch: false,
+      });
     }
-  }, [companyId, loginData.branchId, loginData.userCode, fetchContextData]);
+    fetchLocationsByBranch(Number(user.branchId));
+  }, [branchList]);
 
-  //Listen to localStorage changes (cross-tab safe)
   useEffect(() => {
-    const onStorageChange = () => {
-      const data = getLoginData();
-      setContextBranch(data.branchId);
-      setValue("branch", data.branchId, {
-      shouldDirty: false,
-      shouldTouch: false,
-    });
-      setContextLocation(data.locationId);
-      setValue("location",data.locationId,{
-      shouldDirty: false,
-      shouldTouch: false,
-    })
-      console.log("Local data chnages", data);
-    };
-  onStorageChange();
-    window.addEventListener("storage", onStorageChange);
-    return () => window.removeEventListener("storage", onStorageChange);
-  }, [user,setValue]);
+    if (locationList.length === 0) return;
+
+    const locationOption = locationList.find(
+      (l) => l.value === Number(user.locationId), //stored ID is in string
+    );
+    // console.log("location steed", locationList);
+    if (locationOption) {
+      setValue("location", locationOption, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+    }
+  }, [locationList, setValue]);
+
+  useEffect(() => {
+    if (!companyId || !user?.branchId) return;
+
+    fetchContextData(user.branchId, user.userCode);
+  }, [companyId, user?.branchId, user?.userCode, fetchContextData]);
+
+  //Listen to trigger on user changes
+  // useEffect(() => {
+  //   if (!user) return;
+
+  //   // const data = getLoginData();
+  //   // console.log("Login data", data);
+  //   // setContextBranch(user.branchId);
+  //   // console.log("Branch context", contextBranch);
+  //   setValue("branch", user.branchId, {
+  //     shouldDirty: false,
+  //     shouldTouch: false,
+  //   });
+
+  //   // setContextLocation(user.locationId);
+  //   // console.log("Location context", contextLocation);
+  //   setValue("location", user.locationId, {
+  //     shouldDirty: false,
+  //     shouldTouch: false,
+  //   });
+
+  //   // console.log("User data changed", user);
+  // }, [user?.branchId, setValue, user]);
 
   // Notification functions
   const removeNotification = useCallback((id) => {
@@ -319,7 +337,6 @@ const Header = ({ backendError = [] }) => {
 
   return (
     <header className="header" role="banner">
-
       <div className="header-left">
         <div className="logo">
           <img
@@ -351,23 +368,28 @@ const Header = ({ backendError = [] }) => {
                 isSearchable
                 isClearable={false}
                 classNamePrefix="form-control-select"
-                value={
-                  branchList.find((opt) => opt.value === field.value) || null
-                }
-                onChange={(option) => {
+                value={field.value}
+                onChange={(option, actionMeta) => {
                   if (!option) return;
+                  if (actionMeta.action !== "select-option") return;
 
-                  const newBranch = option.value;
-                  const prevBranch = watch("branch");
+                  // STORE OBJECT ONLY
+                  field.onChange(option);
 
-                  field.onChange(newBranch);
+                  const newBranchId = option.value;
 
-                  // reset location ONLY if branch truly changed
-                  if (newBranch !== prevBranch) {
-                    setValue("location", "");
-                    setLocationList([]);
-                    fetchLocationsByBranch(newBranch);
-                  }
+                  // RESET LOCATION CORRECTLY
+                  setValue("location", null);
+                  setLocationList([]);
+
+                  // FETCH
+                  fetchLocationsByBranch(newBranchId);
+
+                  // UPDATE CONTEXT
+                  updateUser({
+                    branchId: newBranchId,
+                    locationId: null,
+                  });
                 }}
               />
             )}
@@ -387,19 +409,23 @@ const Header = ({ backendError = [] }) => {
                 isClearable={false}
                 isDisabled={!watch("branch") || loadingLocation}
                 classNamePrefix="form-control-select"
-                value={
-                  locationList.find((opt) => opt.value === field.value) || null
-                }
-                onChange={(option) => {
-                  if (option) {
-                    field.onChange(option.value);
-                  }
+                value={field.value}
+                onChange={(option, actionMeta) => {
+                  if (!option) return;
+                  if (actionMeta.action !== "select-option") return;
+
+                  //  STORE OBJECT ONLY
+                  field.onChange(option);
+
+                  //  UPDATE CONTEXT
+                  updateUser({
+                    locationId: option.value,
+                  });
                 }}
               />
             )}
           />
         </div>
-
       </div>
 
       <div className="header-right">
@@ -599,7 +625,7 @@ const Header = ({ backendError = [] }) => {
                 type="button"
                 role="menuitem"
                 className="profile-link logout"
-                onClick={() => navigate("/logout")}
+                onClick={() => handleLogOut()}
               >
                 Logout
               </button>
