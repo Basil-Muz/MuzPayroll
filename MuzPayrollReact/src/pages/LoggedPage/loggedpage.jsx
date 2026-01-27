@@ -31,8 +31,8 @@ function LoggedPage() {
 
 
 
-  console.log("🔐 Auth user:", user);
-  console.log("🧾 Stored loginData:", JSON.parse(localStorage.getItem("loginData")));
+  // console.log(" Auth user:", user);
+  // console.log(" Stored loginData:", JSON.parse(localStorage.getItem("loginData")));
 
 
   /* ================= STATE ================= */
@@ -225,7 +225,7 @@ function LoggedPage() {
       [];
 
     if (branchListFromApi.length === 0) {
-      console.error(" No branches from backend");
+      // console.error(" No branches from backend");
       setBranchList([]);
       setLocationList([]);
       toast.error("No branches found");
@@ -246,7 +246,7 @@ function LoggedPage() {
       [];
 
     if (locationListFromApi.length === 0) {
-      console.error(" No locations from backend");
+      // console.error(" No locations from backend");
       setLocationList([]);
       toast.error("No locations registered for this branch");
       return;
@@ -382,10 +382,10 @@ function LoggedPage() {
     setChangeEnabled(false);
   };
 
-  console.log(" branchOptions:", branchOptions);
-  console.log(" locationOptions:", locationOptions);
-  console.log(" selected branchId:", branchId);
-  console.log(" selected locationId:", locationId);
+  // console.log(" branchOptions:", branchOptions);
+  // console.log(" locationOptions:", locationOptions);
+  // console.log(" selected branchId:", branchId);
+  // console.log(" selected locationId:", locationId);
 
   /* ================= UI ================= */
   return (

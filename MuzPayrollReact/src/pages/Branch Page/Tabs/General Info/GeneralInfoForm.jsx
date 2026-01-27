@@ -272,7 +272,7 @@ const GeneralInfoForm = function GeneralInfoForm({
               {...register(fieldName, {
                 required: `Name is required ${fieldName}`,
                 pattern: {
-                  value: /^[a-zA-Z\s-]+$/,
+                  value: /^[a-zA-Z0-9\s-]+$/,
                   message: "Please enter valide name",
                 },
                 onChange: (e) => {
@@ -314,7 +314,7 @@ const GeneralInfoForm = function GeneralInfoForm({
               {...register("shortName", {
                 required: "short name is required",
                 pattern: {
-                  value: /^[A-Z0-9]*$/,
+                  value: /^[a-zA-Z0-9\s-]+$/,
                   message: "Please enter valide name",
                 },
               })}

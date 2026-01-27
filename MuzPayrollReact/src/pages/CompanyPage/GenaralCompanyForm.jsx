@@ -25,7 +25,7 @@ const steps = ["General Info", "Address", "Contact", "Document Into"];
 
 export default function GenaralCompanyForm() {
   const [step, setStep] = useState(0); //switch steps
-  const [submitStatus, setSubmitStatus] = useState(1);
+  // const [submitStatus, setSubmitStatus] = useState(1);
   const [selectedAmendment, setSelectedAmendment] = useState(null);
   // const [backendErrors, setBackendErrors] = useState([]);
   //pass the back end error to front end
@@ -50,36 +50,7 @@ export default function GenaralCompanyForm() {
   // (authorizationStatus===0)? "ENTRY" :
   // (authorizationStatus===0)? "ENTRY" :
 
-  const [amendments, setAmendments] = useState([
-    // {
-    //   id: 3,
-    //   authorizationStatus: 1,
-    //   date: "2025-10-20",
-    //   shortName: "TCS",
-    //   company: "Tata Consultancy Services",
-    //   status: "active",
-    //   expiryDate: "2025-10-10",
-    //   generatedBy: "Admin User",
-    // },
-    // {
-    //   id: 2,
-    //   authorizationStatus: 1,
-    //   date: "2025-10-10",
-    //   status: "expired",
-    //   expiryDate: "2021-12-31",
-    //   company: "International Business Machines",
-    //   shortName: "IBM",
-    //   generatedBy: "System",
-    // },
-    // {
-    //   id: 1,
-    //   authorizationStatus: 1,
-    //   date: "2025-01-01",
-    //   status: "inactive",
-    //   expiryDate: "",
-    //   generatedBy: "Manager",
-    // },
-  ]);
+  const [amendments, setAmendments] = useState([]);
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
 
   // console.log("amends nmber", inputMode);
@@ -91,7 +62,6 @@ export default function GenaralCompanyForm() {
     clearErrors,
     setValue,
     reset,
-
     getValues,
     setFocus,
     watch,
@@ -154,33 +124,6 @@ export default function GenaralCompanyForm() {
     { label: "ENTRY", value: 0 },
     { label: "VERIFIED", value: 1 },
   ];
-
-  //  initialValues: {
-  //     company: "",
-  //     shortName: "",
-  //     activeDate: new Date().toISOString().split("T")[0], // only date, not datetime
-  //     address: "",
-  //     address1: "",
-  //     address2: "",
-  //     country: "",
-  //     state: "",
-  //     district: "",
-  //     place: "",
-  //     pincode: "",
-  //     landlineNumber: "",
-  //     mobileNumber: "",
-  //     email: "",
-  //     employerName: "",
-  //     designation: "",
-  //     employerNumber: "",
-  //     employerEmail: "",
-  //     companyImage: null,
-  //     withaffectdate: "",
-  //     authorizationStatus: "0",
-  //     userCode: user_code,
-  //     withaffectdate: new Date().toISOString().split("T")[0],
-  //   },
-
   // console.log("Selected item:", selectedAmendment?.authorizationStatus);
 
   // const amendmentAuthorizationOptions = [];
@@ -246,13 +189,13 @@ export default function GenaralCompanyForm() {
   // const hasUserChanges = Object.keys(dirtyFields).length > 0;
   const isLastStep = step === steps.length - 1;
   // const documentsValid = submitStatus === 0;
-  const isAmendMode = amendments.length > 0 ;
+  const isAmendMode = amendments.length > 0;
 
   const canSave =
     !isVerifiedAmendment &&
-    ((isAmendMode && isDirty) || (!isAmendMode && step === steps.length - 1));
+    ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
 
-  console.log("Can save", canSave);
+  // console.log("Can save", canSave);
   // const canSave =
   //   !isVerifiedAmendment &&
   //   // Amendment mode: user changed something
@@ -263,7 +206,7 @@ export default function GenaralCompanyForm() {
   // const DesignationDetails = () => {
   const { companyId } = useParams();
 
-  console.log("Link id", companyId); //  received id
+  // console.log("Link id", companyId); //  received id
   // };
 
   // console.log("Verified mde: ", isVerifiedAmendment);
@@ -407,17 +350,6 @@ export default function GenaralCompanyForm() {
     : null;
 
   // console.log("Latest amends:", latestAmendmentId);
-  useEffect(() => {
-    if (!companyId) return;
-    fetchCompanyAmendData(companyId);
-  }, [companyId, fetchCompanyAmendData]);
-
-  useEffect(() => {
-    const date = new Date(); // current date
-    const formattedDate = date.toISOString().split("T")[0]; //yyyy-mm-dd format
-    // console.log("Active date",formattedDate)
-    setValue("activeDate", formattedDate);
-  }, [setValue]);
 
   const setingData = useCallback(
     (selectedAmendment) => {
@@ -522,6 +454,18 @@ export default function GenaralCompanyForm() {
     },
     [setValue, amendLenght],
   );
+
+  useEffect(() => {
+    if (!companyId) return;
+    fetchCompanyAmendData(companyId);
+  }, [companyId, fetchCompanyAmendData]);
+
+  useEffect(() => {
+    const date = new Date(); // current date
+    const formattedDate = date.toISOString().split("T")[0]; //yyyy-mm-dd format
+    // console.log("Active date",formattedDate)
+    setValue("activeDate", formattedDate);
+  }, [setValue]);
 
   useEffect(() => {
     //Api call should bo here
@@ -639,12 +583,17 @@ export default function GenaralCompanyForm() {
 
   const onSubmit = async (data) => {
     try {
+      await trigger("documents"); //  validate all docs
+      if (errors?.documents) {
+        toast.error("Please complete the document details");
+        return;
+      }
       const payload = {
         ...data,
         userCode,
         authorizationDate: new Date().toISOString().split("T")[0],
       };
-      console.log("Submitting data", data);
+      // console.log("Submitting data", data);
       const formData = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
@@ -654,8 +603,10 @@ export default function GenaralCompanyForm() {
       });
 
       if (payload.companyImage instanceof File) {
+        //  New Image file from user
         formData.append("companyImage", payload.companyImage);
       } else if (typeof payload.companyImage === "string") {
+        //Old image in amends
         formData.append("companyImagePath", payload.companyImage);
       }
 
@@ -756,6 +707,24 @@ export default function GenaralCompanyForm() {
       console.error("Submit failed:", err);
 
       handleApiError(err);
+    }
+  };
+
+  const handleClear = () => {
+    if (selectedAmendment) {
+      // Restore selected amendment values
+      setingData(selectedAmendment);
+
+      clearErrors();
+      toast.success("Changes cleared");
+    } else {
+      //  New record → reset to empty insert state
+      reset({
+        userCode,
+        authorizationStatus: 0,
+        withaffectdate: "",
+        activeDate: new Date().toISOString().split("T")[0],
+      });
     }
   };
 
@@ -874,6 +843,7 @@ export default function GenaralCompanyForm() {
                       setValue={setValue}
                       setError={setError}
                       fields={fields}
+                      control={control}
                       append={append}
                       remove={remove}
                       trigger={trigger} // validate the documents while adding new document
@@ -1040,7 +1010,7 @@ export default function GenaralCompanyForm() {
                             "This amendment has been verified and locked"
                           }
                           onClick={() => {
-                            handleSelectAmendment(item.companyMstID, index);
+                            handleSelectAmendment(item.locationMstID, index);
                             // setAddNewAmend(false);
                             setAddingNewAmend(false);
                           }}
@@ -1173,7 +1143,7 @@ export default function GenaralCompanyForm() {
               disabled: true,
             },
             clear: {
-              // onClick: handleClear,
+              onClick: handleClear,
               // disabled:true,
             },
             // delete: {
