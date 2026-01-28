@@ -1,5 +1,6 @@
 package com.example.MuzPayroll.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,18 +13,23 @@ import com.example.MuzPayroll.entity.Authorization;
 @Repository
 public interface AuthorizationRepository extends JpaRepository<Authorization, Long> {
 
-    @Query("SELECT a.authorizationStatus FROM Authorization a WHERE a.authId = :authId ")
-    Optional<Boolean> findStatusByAuthId(@Param("authId") Long authId);
+  @Query("SELECT a.authorizationStatus FROM Authorization a WHERE a.authId = :authId ")
+  Optional<Boolean> findStatusByAuthId(@Param("authId") Long authId);
 
-    @Query("SELECT MAX(a.authId) FROM Authorization a WHERE a.mstId = :mstId")
-    Optional<Long> findLatestAuthIdByMstId(@Param("mstId") Long mstId);
+  @Query("SELECT MAX(a.authId) FROM Authorization a WHERE a.mstId = :mstId")
+  Optional<Long> findLatestAuthIdByMstId(@Param("mstId") Long mstId);
 
-    @Query("""
-                SELECT MAX(a.authId)
-                FROM Authorization a
-                WHERE a.mstId = :mstId
-                  AND a.authorizationStatus = true
-            """)
-    Optional<Long> findLatestAuthorizedAuthIdByMstId(@Param("mstId") Long mstId);
+  @Query("""
+          SELECT MAX(a.authId)
+          FROM Authorization a
+          WHERE a.mstId = :mstId
+            AND a.authorizationStatus = true
+      """)
+  Optional<Long> findLatestAuthorizedAuthIdByMstId(@Param("mstId") Long mstId);
 
+  @Query("SELECT a.authorizationStatus FROM Authorization a WHERE a.mstId = :mstId ")
+  Optional<Boolean> findStatusByMstId(@Param("mstId") Long mstId);
+
+  @Query("SELECT COUNT(a) FROM Authorization a WHERE a.mstId = :mstId")
+  long countByMstId(@Param("mstId") Long mstId);
 }

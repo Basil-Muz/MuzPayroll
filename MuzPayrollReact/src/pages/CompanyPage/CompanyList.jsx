@@ -72,7 +72,6 @@ const CompanyList = () => {
         setLoading(false);
       }, 800);
     } catch (err) {
-      console.error(err);
       setLoading(false);
     }
   };
