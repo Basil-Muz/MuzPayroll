@@ -190,7 +190,7 @@ export default function Sidebar({ forceOpen }) {
   });
 
   const stored = JSON.parse(localStorage.getItem("loginData"));
-
+  console.log("console in sdebar",stored)
   const sidebarEnabled = stored.sidebarOpen || forceOpen; //opens navigation
   const [active, setActive] = useState(
     localStorage.getItem("activeMenu") || "",

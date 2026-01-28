@@ -8,27 +8,35 @@ export const AuthProvider = ({ children }) => {
     return stored ? JSON.parse(stored) : null;
   });
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("loginData", JSON.stringify(user));
-    }
-  }, [user]);
+//   useEffect(() => {
+//     if (user) {
+//       localStorage.setItem("loginData", JSON.stringify(user));
+//     }
+//   }, [user]);
 
-  const updateUser = (updates) => {
-    setUser((prev) => ({
-      ...prev,
-      ...updates,
-    }));
-    const stored = JSON.parse(localStorage.getItem("loginData")) || {};
-
-    localStorage.setItem(
-      "loginData",
-      JSON.stringify({
-        ...stored,
-        ...updates,
-      }),
-    );
-  };
+//   const updateUser = (updates) => {
+//     setUser((prev) => ({
+//       ...prev,
+//       ...updates,
+//     }));
+//     const stored = JSON.parse(localStorage.getItem("loginData")) || {};
+//     console.log("Data from Auth Provider Befor update",stored)
+//     localStorage.setItem(
+//       "loginData",
+//       JSON.stringify({
+//         ...stored,
+//         ...updates,
+//       }),
+//     );
+//         console.log("Data from Auth Provider After update",user)
+//   };
+    const updateUser = (updates) => {
+  setUser((prev) => {
+    const next = { ...prev, ...updates };
+    localStorage.setItem("loginData", JSON.stringify(next));
+    return next;
+  });
+};
 
   const login = (loginData) => {
     setUser(loginData);

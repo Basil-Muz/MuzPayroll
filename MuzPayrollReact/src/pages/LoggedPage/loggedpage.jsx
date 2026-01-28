@@ -19,7 +19,7 @@ function LoggedPage() {
 
   /* ================= HOOKS ================= */
   const navigate = useNavigate();
-  const { user ,updateUser} = useAuth();
+  const { user, updateUser } = useAuth();
 
   const {
     control,
@@ -108,36 +108,36 @@ function LoggedPage() {
   }, [branchId, fieldsLocked, companyId]);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("loginData"));
+    const latest = JSON.parse(localStorage.getItem("loginData") || {});
 
-    if (!stored) return;
+    if (!latest) return;
 
     // Restore UI state
-    setCompanyId(String(stored.companyId));
-    setBranchId(String(stored.branchId));
-    setLocationId(String(stored.locationId));
-    setFinYear(stored.finYear || getCurrentFinYear());
+    setCompanyId(String(latest.companyId));
+    setBranchId(String(latest.branchId));
+    setLocationId(String(latest.locationId));
+    setFinYear(latest.finYear || getCurrentFinYear());
 
-    setCompanyName(stored.companyName || "");
+    setCompanyName(latest.companyName || "");
 
     // Restore sidebar / button state
-    setSidebarOpen(stored.sidebarOpen === true);
-    setFieldsLocked(stored.fieldsLocked !== false);
-    setOkEnabled(stored.okEnabled !== false);
-    setChangeEnabled(stored.changeEnabled === true);
+    setSidebarOpen(latest.sidebarOpen === true);
+    setFieldsLocked(latest.fieldsLocked !== false);
+    setOkEnabled(latest.okEnabled !== false);
+    setChangeEnabled(latest.changeEnabled === true);
   }, []);
 
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("loginData"));
-    if (!stored) return;
+  // useEffect(() => {
+  //   const latest = JSON.parse(localStorage.getItem("loginData"));
+  //   if (!latest) return;
 
-    fetchContextData(
-      stored.companyId,
-      stored.branchId,
-      stored.locationId,
-      stored.userCode,
-    );
-  }, []);
+  //   fetchContextData(
+  //     latest.companyId,
+  //     latest.branchId,
+  //     latest.locationId,
+  //     latest.userCode,
+  //   );
+  // }, []);
 
   /* ================= API ================= */
   const fetchContextData = async (
@@ -165,7 +165,7 @@ function LoggedPage() {
       const errorMsg = response.errors?.[0] || "Invalid context";
       toast.error(errorMsg);
 
-      const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
+      const latest = JSON.parse(localStorage.getItem("loginData") || "{}");
 
       // ✅ CASE: Branch exists but NO location
       if (
@@ -180,7 +180,7 @@ function LoggedPage() {
         localStorage.setItem(
           "loginData",
           JSON.stringify({
-            ...stored,
+            ...latest,
             locationId: "",
             locationName: "",
           }),
@@ -202,7 +202,7 @@ function LoggedPage() {
       localStorage.setItem(
         "loginData",
         JSON.stringify({
-          ...stored,
+          ...latest,
           branchId: "",
           branchName: "",
           locationId: "",
@@ -317,40 +317,49 @@ function LoggedPage() {
 
   const handleOk = () => {
     if (!validateForm()) return;
-
-    const stored = JSON.parse(localStorage.getItem("loginData") || {});
+    
     const selectedBranch = branchList.find(
       (b) => String(b.branchMstID) === String(branchId),
     );
     const selectedLocation = locationList.find(
       (l) => String(l.locationMstID) === String(locationId),
     );
-
-    localStorage.setItem(
-      "loginData",
-      JSON.stringify({
-        ...stored,
-        userCode: stored.userCode,
-        companyId,
-        branchId,
-        branchName: selectedBranch?.branch || "",
-        locationId,
-        locationName: selectedLocation?.location || "",
-        finYear,
-        sidebarOpen: true,
-        fieldsLocked: true,
-        okEnabled: false,
-        changeEnabled: true,
-      }),
-    );
-    const loginData = {
+    console.log("sidebar");
+    // localStorage.setItem(
+    //   "loginData",
+    //   JSON.stringify({
+    //     ...stored,
+    //     userCode: stored.userCode,
+    //     companyId,
+    //     branchId,
+    //     sidebarOpen: true,
+    //     branchName: selectedBranch?.branch || "",
+    //     locationId,
+    //     locationName: selectedLocation?.location || "",
+    //     finYear,
+    //     fieldsLocked: true,
+    //     okEnabled: false,
+    //     changeEnabled: true,
+    //   }),
+    // );
+    updateUser({
+      userCode: user?.userCode,
+      companyId,
+      branchId,
       branchName: selectedBranch?.branch || "",
+      locationId,
       locationName: selectedLocation?.location || "",
-      branchId: getValues("branchId"),
-      locationId: getValues("locationId"),
-    };
-    console.log("After Login", loginData);
-    updateUser(loginData);
+      finYear,
+      sidebarOpen: true,
+      fieldsLocked: true,
+      okEnabled: false,
+      changeEnabled: true,
+    });
+
+    setSidebarOpen(true);
+    setFieldsLocked(true);
+    setOkEnabled(false);
+    setChangeEnabled(true);
     setSidebarOpen(true);
     setFieldsLocked(true);
     setOkEnabled(false);

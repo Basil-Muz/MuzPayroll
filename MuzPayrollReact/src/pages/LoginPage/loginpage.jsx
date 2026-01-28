@@ -84,6 +84,7 @@ function LoginPage() {
         branchId: payload.branchId,
         locationId: payload.locationId,
         token: payload.token,
+        sidebarOpen: false,
       };
 
       login(loginData);
