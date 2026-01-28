@@ -320,7 +320,7 @@
     }
 }
 
-.floating-action-bar {
+.locationgroup-page.floating-action-bar {
     top: 300px;
     /* ✅ BELOW HEADER + SEARCH */
     z-index: 1000;

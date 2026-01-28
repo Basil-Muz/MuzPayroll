@@ -9,6 +9,10 @@ import { useAuth } from "../../context/AuthProvider";
 import { toast } from "react-hot-toast";
 import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
+import LoadingPage from "../../components/Loaders/Loading";
+
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
 
 function LoggedPage() {
   /* ================= HELPER FUNCTIONS ================= */
@@ -34,6 +38,8 @@ function LoggedPage() {
   /* ================= STATE ================= */
 
   const [companyName, setCompanyName] = useState("");
+
+  const { showRailLoader, hideLoader } = useLoader();
 
   const [fieldsLocked, setFieldsLocked] = useState(() => {
     const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
@@ -167,7 +173,7 @@ function LoggedPage() {
 
       const latest = JSON.parse(localStorage.getItem("loginData") || "{}");
 
-      // ✅ CASE: Branch exists but NO location
+      // CASE: Branch exists but NO location
       if (
         errorMsg.toLowerCase().includes("location") ||
         errorMsg.toLowerCase().includes("no location")
@@ -233,7 +239,7 @@ function LoggedPage() {
       setCompanyName(data.company.company);
     }
 
-    /* ================= LOCATION (✅ FIX HERE) ================= */
+    /* ================= LOCATION (FIX HERE) ================= */
     const locationListFromApi =
       data.locationList || data.locations || data.locationMstList || [];
 
@@ -315,34 +321,76 @@ function LoggedPage() {
 
   /* ================= ACTIONS ================= */
 
-  const handleOk = () => {
-    if (!validateForm()) return;
-    
+  // const handleOk = () => {
+  //   if (!validateForm()) return;
+
+  //   showRailLoader("Applying branch & location settings…");
+  //   hideLoader()
+  //   const selectedBranch = branchList.find(
+  //     (b) => String(b.branchMstID) === String(branchId),
+  //   );
+  //   const selectedLocation = locationList.find(
+  //     (l) => String(l.locationMstID) === String(locationId),
+  //   );
+  //   // console.log("sidebar");
+  //   // localStorage.setItem(
+  //   //   "loginData",
+  //   //   JSON.stringify({
+  //   //     ...stored,
+  //   //     userCode: stored.userCode,
+  //   //     companyId,
+  //   //     branchId,
+  //   //     sidebarOpen: true,
+  //   //     branchName: selectedBranch?.branch || "",
+  //   //     locationId,
+  //   //     locationName: selectedLocation?.location || "",
+  //   //     finYear,
+  //   //     fieldsLocked: true,
+  //   //     okEnabled: false,
+  //   //     changeEnabled: true,
+  //   //   }),
+  //   // );
+  //   updateUser({
+  //     userCode: user?.userCode,
+  //     companyId,
+  //     branchId,
+  //     branchName: selectedBranch?.branch || "",
+  //     locationId,
+  //     locationName: selectedLocation?.location || "",
+  //     finYear,
+  //     sidebarOpen: true,
+  //     fieldsLocked: true,
+  //     okEnabled: false,
+  //     changeEnabled: true,
+  //   });
+
+  //   setSidebarOpen(true);
+  //   setFieldsLocked(true);
+  //   setOkEnabled(false);
+  //   setChangeEnabled(true);
+  //   setSidebarOpen(true);
+  //   setFieldsLocked(true);
+  //   setOkEnabled(false);
+  //   setChangeEnabled(true);
+  // };
+
+const handleOk = async () => {
+  if (!validateForm()) return;
+   const startTime = Date.now();
+  // show loader
+  showRailLoader("Applying branch and location changes…");
+
+  try {
     const selectedBranch = branchList.find(
-      (b) => String(b.branchMstID) === String(branchId),
+      (b) => String(b.branchMstID) === String(branchId)
     );
+
     const selectedLocation = locationList.find(
-      (l) => String(l.locationMstID) === String(locationId),
+      (l) => String(l.locationMstID) === String(locationId)
     );
-    console.log("sidebar");
-    // localStorage.setItem(
-    //   "loginData",
-    //   JSON.stringify({
-    //     ...stored,
-    //     userCode: stored.userCode,
-    //     companyId,
-    //     branchId,
-    //     sidebarOpen: true,
-    //     branchName: selectedBranch?.branch || "",
-    //     locationId,
-    //     locationName: selectedLocation?.location || "",
-    //     finYear,
-    //     fieldsLocked: true,
-    //     okEnabled: false,
-    //     changeEnabled: true,
-    //   }),
-    // );
-    updateUser({
+
+    // await global update
+    await updateUser({
       userCode: user?.userCode,
       companyId,
       branchId,
@@ -356,15 +404,19 @@ function LoggedPage() {
       changeEnabled: true,
     });
 
+    // UI state AFTER user context update
     setSidebarOpen(true);
     setFieldsLocked(true);
     setOkEnabled(false);
     setChangeEnabled(true);
-    setSidebarOpen(true);
-    setFieldsLocked(true);
-    setOkEnabled(false);
-    setChangeEnabled(true);
-  };
+
+  } finally {
+    await ensureMinDuration(startTime, 1200);
+    // hide loader ONLY at the end
+    hideLoader();
+  }
+};
+
 
   const handleChangeCredentials = () => {
     const stored = JSON.parse(localStorage.getItem("loginData"));
@@ -526,6 +578,7 @@ function LoggedPage() {
           </div>
         </div>
       </div>
+      {/* <LoadingPage /> */}
       <Footer />
     </>
   );

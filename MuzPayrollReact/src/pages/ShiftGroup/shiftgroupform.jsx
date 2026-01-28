@@ -8,7 +8,7 @@ import { RxCross2 } from "react-icons/rx";
 import { GrMoon } from "react-icons/gr";
 import { GrSun } from "react-icons/gr";
 import { LiaAdjustSolid } from "react-icons/lia";
-import Loading from '../../components/Loading/Loading';
+import Loading from '../../components/Loaders/Loading';
 function ShiftGroupForm({ toggleForm,data }) {
 
     const [position, setPosition] = useState({ x: 355, y: 43 });

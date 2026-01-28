@@ -48,10 +48,14 @@ import UserGroup from "./pages/UserGroup/usergroup.jsx";
 import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
 import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 
+import LoaderRenderer from "./components/Loaders/LoaderRenderer.jsx";
+
 function App() {
   return (
     <>
-      <AuthProvider>
+    <AuthProvider>
+    <LoaderRenderer />
+      
         <Routes>
           {/* <Route path="/" element={<Page />} /> */}
           <Route path="/" element={<LoginPage />} />

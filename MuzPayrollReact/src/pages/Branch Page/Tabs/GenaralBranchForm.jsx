@@ -1004,7 +1004,7 @@ export default function GenaralBranchForm() {
                         selectedAmendment?.amendNo === item.amendNo;
                       return (
                         <div
-                          key={item.branchMstID}
+                          key={item.amendNo}
                           className={`amend-pill 
                             ${item.amendNo == latestAmendmentId.amendNo ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}

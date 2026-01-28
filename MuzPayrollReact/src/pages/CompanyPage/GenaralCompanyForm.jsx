@@ -999,7 +999,7 @@ export default function GenaralCompanyForm() {
                         selectedAmendment?.amendNo === item.amendNo;
                       return (
                         <div
-                          key={item.companyMstID}
+                          key={item.amendNo}
                           className={`amend-pill 
                             ${item.amendNo == latestAmendmentId.amendNo ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}

@@ -12,7 +12,7 @@ import Header from "../../components/Header/Header";
 import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import Loading from "../../components/Loading/Loading";
+import Loading from "../../components/Loaders/Loading";
 
 const BranchList = () => {
   /* ================= STATE ================= */

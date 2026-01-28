@@ -12,7 +12,9 @@ import Header from "../../components/Header/Header";
 import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import Loading from "../../components/Loading/Loading";
+// import Loading from "../../components/Loaders/Loading";
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
 
 const CompanyList = () => {
   const [listView, setListView] = useState(false);
@@ -32,6 +34,8 @@ const CompanyList = () => {
   const token = userObj.token;
 
   const navigate = useNavigate();
+
+  const { showRailLoader, hideLoader } = useLoader(); //Import functions from context
 
   /* ================= API ================= */
   const fetchAllCompanies = () =>
@@ -60,7 +64,10 @@ const CompanyList = () => {
   }, []);
 
   const loadAllCompanies = async () => {
-    setLoading(true);
+    // setLoading(true);
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Retrieving available companies…");
     setGroupByStatus(false);
 
     try {
@@ -69,11 +76,15 @@ const CompanyList = () => {
         setAllCompanies(res.data);
         setActiveCompanies([]);
         setInactiveCompanies([]);
-        setLoading(false);
+        // setLoading(false);
       }, 800);
     } catch (err) {
       console.error(err);
-      setLoading(false);
+      // setLoading(false);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      // hide loader ONLY at the end
+      hideLoader();
     }
   };
 
