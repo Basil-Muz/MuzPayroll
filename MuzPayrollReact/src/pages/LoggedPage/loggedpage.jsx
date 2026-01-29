@@ -374,49 +374,47 @@ function LoggedPage() {
   //   setChangeEnabled(true);
   // };
 
-const handleOk = async () => {
-  if (!validateForm()) return;
-   const startTime = Date.now();
-  // show loader
-  showRailLoader("Applying branch and location changes…");
+  const handleOk = async () => {
+    if (!validateForm()) return;
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Applying branch and location changes…");
 
-  try {
-    const selectedBranch = branchList.find(
-      (b) => String(b.branchMstID) === String(branchId)
-    );
+    try {
+      const selectedBranch = branchList.find(
+        (b) => String(b.branchMstID) === String(branchId),
+      );
 
-    const selectedLocation = locationList.find(
-      (l) => String(l.locationMstID) === String(locationId)
-    );
+      const selectedLocation = locationList.find(
+        (l) => String(l.locationMstID) === String(locationId),
+      );
 
-    // await global update
-    await updateUser({
-      userCode: user?.userCode,
-      companyId,
-      branchId,
-      branchName: selectedBranch?.branch || "",
-      locationId,
-      locationName: selectedLocation?.location || "",
-      finYear,
-      sidebarOpen: true,
-      fieldsLocked: true,
-      okEnabled: false,
-      changeEnabled: true,
-    });
+      // await global update
+      await updateUser({
+        userCode: user?.userCode,
+        companyId,
+        branchId,
+        branchName: selectedBranch?.branch || "",
+        locationId,
+        locationName: selectedLocation?.location || "",
+        finYear,
+        sidebarOpen: true,
+        fieldsLocked: true,
+        okEnabled: false,
+        changeEnabled: true,
+      });
 
-    // UI state AFTER user context update
-    setSidebarOpen(true);
-    setFieldsLocked(true);
-    setOkEnabled(false);
-    setChangeEnabled(true);
-
-  } finally {
-    await ensureMinDuration(startTime, 1200);
-    // hide loader ONLY at the end
-    hideLoader();
-  }
-};
-
+      // UI state AFTER user context update
+      setSidebarOpen(true);
+      setFieldsLocked(true);
+      setOkEnabled(false);
+      setChangeEnabled(true);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      // hide loader ONLY at the end
+      hideLoader();
+    }
+  };
 
   const handleChangeCredentials = () => {
     const stored = JSON.parse(localStorage.getItem("loginData"));

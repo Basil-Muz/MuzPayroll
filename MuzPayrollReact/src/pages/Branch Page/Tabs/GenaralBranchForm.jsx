@@ -21,6 +21,9 @@ import "../css/From.css";
 import ThemeToggle from "../../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../../components/ScrollToTop/ScrollToTopButton";
 
+import { useLoader } from "../../../context/LoaderContext";
+import { ensureMinDuration } from "../../../utils/loaderDelay";
+
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 // let submitStatus = 0; //Toggle the submit or save button
 
@@ -51,6 +54,8 @@ export default function GenaralBranchForm() {
   const userCode = userObj.userCode.split("@", 1)[0];
   const companyId = userObj.companyId;
   // console.log("Logeeded data company", companyId);
+
+  const { showRailLoader, hideLoader } = useLoader();
 
   const [amendments, setAmendments] = useState([
     // {
@@ -566,12 +571,17 @@ export default function GenaralBranchForm() {
   };
 
   const onSubmit = async (data) => {
+    await trigger("documents"); //  validate all docs
+    if (errors?.documents) {
+      toast.error("Please complete the document details");
+      return;
+    }
+    const startTime = Date.now();
+    // show loader
+    const hasAmend = amendments.length === 0;
+    if (hasAmend) showRailLoader("Saving branch information…");
+    else showRailLoader("Updating branch details…");
     try {
-      await trigger("documents"); //  validate all docs
-      if (errors?.documents) {
-        toast.error("Please complete the document details");
-        return;
-      }
       const payload = {
         ...data,
         userCode,
@@ -705,6 +715,18 @@ export default function GenaralBranchForm() {
       //   });
       // }
       handleApiError(err);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      await loadCompanyAndBranches();
+      setStep(0); //Goes to step 1
+      // hide loader ONLY at the end
+      if (!hasAmend) {
+        fetchBranchAmendData(branchId); //  fetch amendment data
+      } else {
+        reset(); // reset react-hook-form
+        datePickerRef.current?.setOpen(true);
+      }
+      hideLoader();
     }
   };
 

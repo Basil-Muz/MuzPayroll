@@ -167,7 +167,7 @@ li.active .dot {
 .rail-text {
   margin-top: 14px;
   font-size: var(--text-sm);
-  color: var(--inactive-bg);
+  color: var(--text-dark);
   opacity: 1;
 }
 

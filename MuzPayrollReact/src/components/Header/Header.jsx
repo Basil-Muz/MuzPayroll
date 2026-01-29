@@ -36,7 +36,7 @@ const Header = ({ backendError = [] }) => {
   const [dashNotifications, setDashNotifications] = useState(
     INITIAL_NOTIFICATIONS,
   );
-  const hasHydratedRef = useRef(false);
+  // const hasHydratedRef = useRef(false);
 
   const location = useLocation();
 
@@ -593,7 +593,7 @@ const Header = ({ backendError = [] }) => {
         >
           <ImUser size={20} aria-hidden="true" />
 
-          {shouldRenderProfile && profileOpen && (
+          { profileOpen && (
             <div
               className="profile-dropdown"
               role="menu"
@@ -608,27 +608,28 @@ const Header = ({ backendError = [] }) => {
                 </div>
               </div>
 
-              <div className="profile-divider" />
+              
+              {shouldRenderProfile && <div><div className="profile-divider" />
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="profile-link"
+                  onClick={() => navigate("/changepassword")}
+                >
+                  Change Password
+                </button>
 
-              <button
-                type="button"
-                role="menuitem"
-                className="profile-link"
-                onClick={() => navigate("/changepassword")}
-              >
-                Change Password
-              </button>
+                <div className="profile-divider" />
 
-              <div className="profile-divider" />
-
-              <button
-                type="button"
-                role="menuitem"
-                className="profile-link logout"
-                onClick={() => handleLogOut()}
-              >
-                Logout
-              </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="profile-link logout"
+                  onClick={() => handleLogOut()}
+                >
+                  Logout
+                </button>
+              </div>}
             </div>
           )}
         </div>

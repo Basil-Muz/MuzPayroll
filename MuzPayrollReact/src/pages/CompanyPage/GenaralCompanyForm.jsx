@@ -21,6 +21,9 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
+
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
 export default function GenaralCompanyForm() {
@@ -52,6 +55,8 @@ export default function GenaralCompanyForm() {
 
   const [amendments, setAmendments] = useState([]);
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
+
+  const { showRailLoader, hideLoader } = useLoader();
 
   // console.log("amends nmber", inputMode);
   const {
@@ -582,12 +587,18 @@ export default function GenaralCompanyForm() {
   };
 
   const onSubmit = async (data) => {
+    await trigger("documents"); //  validate all docs
+    if (errors?.documents) {
+      toast.error("Please complete the document details");
+      return;
+    }
+    const startTime = Date.now();
+    const hasAmend = amendments.length === 0;
+    // show loader
+    if (hasAmend) showRailLoader("Saving company information…");
+    else showRailLoader("Updating company details…");
+
     try {
-      await trigger("documents"); //  validate all docs
-      if (errors?.documents) {
-        toast.error("Please complete the document details");
-        return;
-      }
       const payload = {
         ...data,
         userCode,
@@ -622,7 +633,10 @@ export default function GenaralCompanyForm() {
       //     console.log(key, value);
       //   }
       // }
+
       await saveCompany(formData);
+
+      //setCanSave(false);     // disable save button
       toast.success("Company saved successfully!");
       //     try {
       //
@@ -707,6 +721,18 @@ export default function GenaralCompanyForm() {
       console.error("Submit failed:", err);
 
       handleApiError(err);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      setStep(0); //Goes to step 1
+      if (!hasAmend) {
+        fetchCompanyAmendData(companyId); // fetch the amendment data
+      } else {
+        reset(); // reset react-hook-form
+        datePickerRef.current?.setOpen(true);
+      }
+
+      // hide loader ONLY at the end
+      hideLoader();
     }
   };
 

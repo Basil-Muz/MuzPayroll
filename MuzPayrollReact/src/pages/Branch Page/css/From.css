@@ -115,6 +115,8 @@
   --border-light: rgba(255, 255, 255, 0.08);
   /* Background Colors */
   --background: #140916;
+    --bg: #241126;
+  /* --bg:##1c0d1f; */
   --dark-background: #1c0d1f;
   --background-alt: #241126;
   --glass-bg: rgba(36, 17, 38, 0.85);

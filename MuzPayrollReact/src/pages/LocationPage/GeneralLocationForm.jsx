@@ -21,10 +21,14 @@ import "../Branch Page/css/From.css";
 import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
+
 const steps = ["General Info", "Address", "Contact", "Document Into"];
 
 export default function GenaralLocationForm() {
   const [step, setStep] = useState(0); //switch steps
+
   const [companyList, setCompanyList] = useState([]);
   const [branchList, setBranchList] = useState([]);
 
@@ -49,6 +53,8 @@ export default function GenaralLocationForm() {
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
   const companyId = userObj.companyId;
+
+  const { showRailLoader, hideLoader } = useLoader();
 
   //Amend data
   const [amendments, setAmendments] = useState([]);
@@ -237,7 +243,7 @@ export default function GenaralLocationForm() {
   const handleGenerateAmendment = () => {
     setSelectedAmendment(null);
     setAddingNewAmend(true);
-    // setIsReadOnly(false);                                                                                               
+    // setIsReadOnly(false);
     reset({
       ...getValues(), //  keep base data
       authorizationStatus: 0, // ENTRY
@@ -288,7 +294,7 @@ export default function GenaralLocationForm() {
       default:
         toast.error("Unexpected error occurred.");
     }
-  },[]);
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -538,6 +544,16 @@ export default function GenaralLocationForm() {
   };
 
   const onSubmit = async (data) => {
+    await trigger("documents"); //  validate all docs
+    if (errors?.documents) {
+      toast.error("Please complete the document details");
+      return;
+    }
+    const startTime = Date.now();
+    const hasAmend = amendments.length === 0;
+    // show loader
+    if (amendments.length === 0) showRailLoader("Saving location information…");
+    else showRailLoader("Updating location details…");
     try {
       setValue("userCode", userCode);
       setValue("authorizationDate", new Date());
@@ -657,6 +673,18 @@ export default function GenaralLocationForm() {
       console.error("Submit failed:", err);
 
       handleApiError(err);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      setStep(0); //Goes to step 1
+      if (!hasAmend) {
+        fetchLocationAmendData(locationId); // fetch the amendment data
+      } else {
+        reset(); // reset react-hook-form
+        datePickerRef.current?.setOpen(true);
+      }
+      // hide loader ONLY at the end
+      hideLoader();
+      
     }
   };
 
@@ -940,7 +968,7 @@ export default function GenaralLocationForm() {
 
                 <div className="amend-container">
                   {[...amendments] // shallow copy to avoid mutating state
-                   // .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
+                    // .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
                     .map((item, index) => {
                       // then map
                       const isSelected =
