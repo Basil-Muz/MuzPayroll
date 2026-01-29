@@ -5,7 +5,7 @@ import Footer from "../../components/Footer/Footer";
 import "./loggedpage.css";
 import muzLogo from "../../assets/muzlogo_transparent.png";
 import Sidebar from "../../components/SideBar/Sidebar";
-import { useAuth } from "../../context/AuthProvider";
+
 import { toast } from "react-hot-toast";
 import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
@@ -13,6 +13,8 @@ import LoadingPage from "../../components/Loaders/Loading";
 
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
+
+import { useAuth } from "../../context/AuthProvider";
 
 function LoggedPage() {
   /* ================= HELPER FUNCTIONS ================= */
@@ -158,7 +160,7 @@ function LoggedPage() {
       // console.log(" Missing companyId / branchId");
       return;
     }
-
+    
     const res = await fetch(
       `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`,
     );
@@ -409,6 +411,7 @@ function LoggedPage() {
       setFieldsLocked(true);
       setOkEnabled(false);
       setChangeEnabled(true);
+      console.log("User in logged page", user);
     } finally {
       await ensureMinDuration(startTime, 1200);
       // hide loader ONLY at the end

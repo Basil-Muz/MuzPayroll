@@ -62,18 +62,19 @@ const Header = ({ backendError = [] }) => {
   const profileTimerRef = useRef(null);
 
   // Parse login data safely
-  const getLoginData = () => {
-    try {
-      const data = localStorage.getItem("loginData");
-      return data ? JSON.parse(data) : {};
-    } catch (error) {
-      console.error("Error parsing login data:", error);
-      return {};
-    }
-  };
+  // const getLoginData = () => {
+  //   try {
+  //     const data = localStorage.getItem("loginData");
+  //     return data ? JSON.parse(data) : {};
+  //   } catch (error) {
+  //     console.error("Error parsing login data:", error);
+  //     return {};
+  //   }
+  // };
 
-  const loginData = getLoginData();
-  const companyId = loginData.companyId;
+  // const loginData = getLoginData();
+  const companyId = user.companyId;
+
   const currentPath = location.pathname;
 
   const shouldRenderDashboard = !BLOCKED_PATHS.includes(currentPath);
@@ -199,7 +200,7 @@ const Header = ({ backendError = [] }) => {
     if (!companyId || !user?.branchId) return;
 
     fetchContextData(user.branchId, user.userCode);
-  }, [companyId, user?.branchId, user?.userCode, fetchContextData]);
+  }, [companyId, user?.branchId, user?.userCode,user?.locationId, fetchContextData]);
 
   //Listen to trigger on user changes
   // useEffect(() => {
@@ -603,8 +604,8 @@ const Header = ({ backendError = [] }) => {
               <div className="profile-user">
                 <ImUser size={18} aria-hidden="true" />
                 <div className="profile-names">
-                  <strong>{loginData.userName || "User"}</strong>
-                  <span>{loginData.role || "Admin"}</span>
+                  <strong>{user.userName || "User"}</strong>
+                  <span>{user.role || "Admin"}</span>
                 </div>
               </div>
 
