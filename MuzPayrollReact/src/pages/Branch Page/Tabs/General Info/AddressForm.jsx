@@ -30,7 +30,7 @@ export default function AddressForm({
   // const countryOptions = useMemo(() => countryList().getData(), []);
   const [countryCode, setCountryCode] = useState("");
   const [stateCode, setStateCode] = useState("");
-
+  const [customDistrictOptions, setCustomDistrictOptions] = useState([]);
   const [placeList, setPlaceList] = useState([]);
   const prevPincodeRef = useRef(null); // track the old pincode
   // const inputPinRef=useRef(null);
@@ -56,6 +56,17 @@ export default function AddressForm({
   // useEffect(() => {
   // if (!watchedPincode || watchedPincode.length !== 6) return;
 
+  const districtOptions = useMemo(
+    () =>
+      countryCode && stateCode
+        ? City.getCitiesOfState(countryCode, stateCode).map((d) => ({
+            value: d.name,
+            label: d.name,
+          }))
+        : [],
+    [countryCode, stateCode],
+  );
+
   const fetchLocationByPincode = useCallback(
     async (pincode) => {
       if (!pincode || pincode.length !== 6) return;
@@ -65,10 +76,10 @@ export default function AddressForm({
 
       try {
         const response = await fetch(
-          `https://api.postalpincode.in/pincode/${pincode}`
+          `https://api.postalpincode.in/pincode/${pincode}`,
         );
         const data = await response.json();
-        console.log("Pincode response",data)
+        // console.log("Pincode response", data);
         if (data[0]?.Status !== "Success") {
           setError("pincode", {
             type: "manual",
@@ -84,7 +95,7 @@ export default function AddressForm({
           value: po.Name,
         }));
 
-        console.log("Function Exccecuted");
+        // console.log("Function Exccecuted");
         setPlaceList(mappedPlaces);
 
         const currentPlace = watch("place");
@@ -100,7 +111,7 @@ export default function AddressForm({
 
         // State
         const matchedState = State.getStatesOfCountry("IN").find(
-          (s) => s.name.toLowerCase() === postOffices[0].State.toLowerCase()
+          (s) => s.name.toLowerCase() === postOffices[0].State.toLowerCase(),
         );
 
         if (matchedState) {
@@ -109,11 +120,39 @@ export default function AddressForm({
           setValue("state", matchedState.isoCode);
         }
 
-
-        
         // District
-        setValue("district", postOffices[0].District);
-        console.log("Distruct",postOffices[0].District)
+        // District
+        const districtName = postOffices[0].District;
+
+        // Base options from country-state-city
+        const baseDistrictOptions = City.getCitiesOfState(
+          "IN",
+          matchedState.isoCode,
+        ).map((d) => ({
+          value: d.name,
+          label: d.name,
+        }));
+
+        // Check if API district exists
+        const districtExists = baseDistrictOptions.some(
+          (d) => d.value.toLowerCase() === districtName.toLowerCase(),
+        );
+
+        // Inject if missing
+        const mergedDistrictOptions = districtExists
+          ? baseDistrictOptions
+          : [
+              { value: districtName, label: districtName },
+              ...baseDistrictOptions,
+            ];
+
+        // Save merged options
+        setCustomDistrictOptions(mergedDistrictOptions);
+
+        // Set value
+        setValue("district", districtName, { shouldDirty: false });
+
+        console.log("Distruct", postOffices[0].District);
         clearErrors(["country", "state", "district", "place"]);
 
         prevPincodeRef.current = pincode;
@@ -124,7 +163,15 @@ export default function AddressForm({
         });
       }
     },
-    [setValue, setError, watch, clearErrors, setCountryCode, setStateCode]
+    [
+      setValue,
+      setError,
+      watch,
+      clearErrors,
+      setCountryCode,
+      setStateCode,
+      districtOptions,
+    ],
   );
   //Debounce - request is only sent after a user has stopped performing an action
   const debounceRef = useRef(null);
@@ -148,6 +195,10 @@ export default function AddressForm({
   };
 
   useEffect(() => {
+    setCustomDistrictOptions([]);
+  }, [stateCode]);
+
+  useEffect(() => {
     setFocus("pincode");
   }, [setFocus]);
 
@@ -158,7 +209,7 @@ export default function AddressForm({
         value: c.isoCode,
         label: c.name,
       })),
-    []
+    [],
   );
 
   const stateOptions = useMemo(
@@ -169,19 +220,9 @@ export default function AddressForm({
             label: s.name,
           }))
         : [],
-    [countryCode]
+    [countryCode],
   );
 
-  const districtOptions = useMemo(
-    () =>
-      countryCode && stateCode
-        ? City.getCitiesOfState(countryCode, stateCode).map((d) => ({
-            value: d.name,
-            label: d.name,
-          }))
-        : [],
-    [countryCode, stateCode]
-  );
   // React detects a render → effect → state → render loop solving React Hooks lifecycle warning
   const pincode = useWatch({
     control,
@@ -254,7 +295,7 @@ export default function AddressForm({
                 className={`${errors.country ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                 value={
                   countryOptions.find(
-                    (option) => option.value === field.value
+                    (option) => option.value === field.value,
                   ) || null
                 }
                 onChange={(option) => {
@@ -313,23 +354,29 @@ export default function AddressForm({
             name="district"
             control={control}
             rules={{ required: "District is required" }}
-            render={({ field }) => (
-              <Select
-                options={districtOptions}
-                placeholder="Select district"
-                isDisabled={isReadOnly || !stateCode || isPincodeResolved}
-                // isDisabled={true}
-                isSearchable
-                classNamePrefix="form-control-select"
-                className={`${errors.district ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
-                value={
-                  districtOptions.find(
-                    (option) => option.value === field.value
-                  ) || null
-                }
-                onChange={(option) => field.onChange(option?.value)}
-              />
-            )}
+            render={({ field }) => {
+              const finalOptions = customDistrictOptions.length
+                ? customDistrictOptions
+                : districtOptions;
+
+              const selectedOption = finalOptions.find(
+                (option) => option.value === field.value,
+              );
+              return (
+                <Select
+                  //Updated option for option missing react select box
+                  options={finalOptions}
+                  placeholder="Select district"
+                  isDisabled={isReadOnly || !stateCode || isPincodeResolved}
+                  // isDisabled={true}
+                  isSearchable
+                  classNamePrefix="form-control-select"
+                  className={`${errors.district ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                  value={selectedOption || null}
+                  onChange={(option) => field.onChange(option?.value)}
+                />
+              );
+            }}
           />
 
           {errors.district && (
@@ -358,7 +405,7 @@ export default function AddressForm({
             rules={{ required: "Place is required" }}
             render={({ field }) => {
               const selectedOption = placeList.find(
-                (opt) => opt.value === field.value
+                (opt) => opt.value === field.value,
               );
 
               return (

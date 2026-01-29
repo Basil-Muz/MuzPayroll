@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
+import { useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
@@ -26,7 +27,7 @@ const steps = ["General Info", "Address", "Contact", "Document Into"];
 export default function GenaralBranchForm() {
   const [step, setStep] = useState(0); // switch steps
   const [companyList, setCompanyList] = useState([]); //fetch companys
-  const [submitStatus, setSubmitStatus] = useState(1);
+  // const [submitStatus, setSubmitStatus] = useState(1);
 
   //changes when the file attached
   // const [backendErrors, setBackendErrors] = useState([]);
@@ -38,7 +39,7 @@ export default function GenaralBranchForm() {
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
 
   const datePickerRef = useRef(null); //To focus the date picker
-  const authDateInputRef = useRef(null);
+  // const authDateInputRef = useRef(null);
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
   const generalInfoRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
@@ -51,7 +52,7 @@ export default function GenaralBranchForm() {
   const companyId = userObj.companyId;
   // console.log("Logeeded data company", companyId);
 
-  const amendments = [
+  const [amendments, setAmendments] = useState([
     // {
     //   id: 3,
     //   authorizationStatus: 1,
@@ -80,7 +81,7 @@ export default function GenaralBranchForm() {
     //   activeDate: "",
     //   generatedBy: "Manager",
     // },
-  ];
+  ]);
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
   const {
     register,
@@ -94,7 +95,7 @@ export default function GenaralBranchForm() {
     watch,
     getValues,
     control,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -118,7 +119,13 @@ export default function GenaralBranchForm() {
 
   const authDate = watch("withaffectdate"); //workflow of amend date then name logic
 
-  const isUnlocked = !!authDate;
+  //workflow of amend date then name logic
+  let isUnlocked = !!authDate;
+  if (amendments.length > 0) {
+    isUnlocked = true;
+  } else {
+    isUnlocked = !!authDate;
+  }
 
   // From content changes
   const [formFlags] = useState({
@@ -134,29 +141,23 @@ export default function GenaralBranchForm() {
 
   const watchedDocuments = watch("documents");
   // const watchedPincode = watch("branchPinCode");
-
-  console.log("Submit status: ", step < steps.length - 1 && submitStatus == 1);
+  const { branchId } = useParams();
+  // console.log("Submit status: ", step < steps.length - 1 && submitStatus == 1);
   const authorizationStatusOptions = [
     { label: "ENTRY", value: 0 },
     { label: "VERIFIED", value: 1 },
   ];
 
-  const latestAmendmentId = amendments.length
-    ? amendments.reduce((latest, current) =>
-        new Date(current.date) > new Date(latest.date) ? current : latest,
-      )
-    : null;
-
-  const [selectedAmendment, setSelectedAmendment] = useState(latestAmendmentId);
+  const [selectedAmendment, setSelectedAmendment] = useState(null);
 
   // console.log("Selected item:", selectedAmendment);
 
   const amendmentAuthorizationOptions = [];
 
-  if (selectedAmendment?.authorizationStatus === 0) {
+  if (selectedAmendment?.authorizationStatus === false) {
     amendmentAuthorizationOptions.push(
       {
-        label: `ENTRY : ${selectedAmendment.date}`,
+        label: `ENTRY : ${selectedAmendment.authorizationDate}`,
         value: 0,
       },
       {
@@ -166,21 +167,55 @@ export default function GenaralBranchForm() {
     );
   }
 
-  if (selectedAmendment?.authorizationStatus === 1) {
+  if (selectedAmendment?.authorizationStatus === true) {
     amendmentAuthorizationOptions.push(
       {
-        label: `ENTRY : ${selectedAmendment.date}`,
+        label: `ENTRY : ${selectedAmendment.authorizationDate}`,
         value: 0,
       },
       {
-        label: `VERIFIED : ${selectedAmendment.date}`,
+        label: `VERIFIED : ${selectedAmendment.authorizationDate}`,
         value: 1,
       },
     );
   }
 
   const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorizationStatus === 1 && !addingNewAmend;
+    selectedAmendment?.authorizationStatus === true && !addingNewAmend;
+
+  // const hasUserChanges = Object.keys(dirtyFields).length > 0;
+  const isLastStep = step === steps.length - 1;
+  // const documentsValid = submitStatus === 0;
+  const isAmendMode = amendments.length > 0;
+
+  const canSave =
+    !isVerifiedAmendment &&
+    ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
+
+  const toLocalDate = (date) =>
+    date instanceof Date
+      ? date.toLocaleDateString("en-CA") // yyyy-MM-dd
+      : date;
+
+  const fetchBranchAmendData = useCallback(
+    async (branchId) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8087/branch/getamendlist/${branchId}`,
+        );
+
+        setAmendments(response.data.branchDtoLogs || []); // Use the amends data
+        // // delete response.data.companyDtoLogs;
+        console.log("Amend response", amendments);
+        setSelectedAmendment(response.data); //data form master table
+        setValue("branchMstID", response.data.branchMstID);
+        console.log("Selected response", selectedAmendment);
+      } catch (error) {
+        console.error("Error fetching company data:", error);
+      }
+    },
+    [setSelectedAmendment, setAmendments, setValue],
+  );
 
   // console.log("Locaked ", isUnlocked || isVerifiedAmendment); //true
   //for smooth focus
@@ -205,20 +240,23 @@ export default function GenaralBranchForm() {
   };
   // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
   const formatDate = (date) => {
-    //datePicker bugg
-    return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`; // yyyy-MM-dd
   };
 
   const handleApiError = (error) => {
     // console.error("API Error:", error);
 
     // Network error (no response from server)
-    if (!error.body) {
+    if (!error.response) {
       toast.error("Unable to connect to server. Please check your network.");
       return;
     }
-    console.log("Error", error);
-    const status = error.status;
+    // console.log("Error", error);
+    const status = error.type;
 
     switch (status) {
       case 400:
@@ -243,6 +281,26 @@ export default function GenaralBranchForm() {
         toast.error("Unexpected error occurred.");
     }
   };
+
+  const latestAmendmentId = amendments.length
+    ? amendments
+        .filter((a) => a.authorizationStatus === false)
+        .reduce(
+          (max, cur) => (cur.amendNo > max.amendNo ? cur : max),
+          amendments[0],
+        )
+    : null;
+
+  useEffect(() => {
+    setValue("mode", inputMode, { shouldDirty: false });
+  }, [inputMode, setValue]);
+
+  useEffect(() => {
+    const date = new Date(); // current date
+    const formattedDate = date.toISOString().split("T")[0]; //yyyy-mm-dd format
+    // console.log("Active date",formattedDate)
+    setValue("activeDate", formattedDate);
+  }, [setValue]);
 
   const loadCompanyAndBranches = useCallback(async () => {
     try {
@@ -301,18 +359,24 @@ export default function GenaralBranchForm() {
   //     // console.log("Submit status1 ", submitStatus);
   //   }
   // }, [watchedDocuments, file]);
+
   useEffect(() => {
-    if (!watchedDocuments?.length) {
-      setSubmitStatus(1);
-      return;
-    }
+    if (!branchId) return;
+    fetchBranchAmendData(branchId);
+  }, [branchId, fetchBranchAmendData]);
 
-    const hasEmptyFile = watchedDocuments.some(
-      (doc) => !doc?.file || doc.file.length === 0,
-    );
+  // useEffect(() => {
+  //   if (!watchedDocuments?.length) {
+  //     setSubmitStatus(1);
+  //     return;
+  //   }
 
-    setSubmitStatus(hasEmptyFile ? 1 : 0);
-  }, [watchedDocuments]);
+  //   const hasEmptyFile = watchedDocuments.some(
+  //     (doc) => !doc?.file || doc.file.length === 0,
+  //   );
+
+  //   setSubmitStatus(hasEmptyFile ? 1 : 0);
+  // }, [watchedDocuments]);
 
   useEffect(() => {
     loadCompanyAndBranches();
@@ -362,22 +426,34 @@ export default function GenaralBranchForm() {
         shouldValidate: true,
       });
 
-      setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
+      setValue(
+        "authorizationStatus",
+        selectedAmendment.authorizationStatus ? 1 : 0, //  Status from back end is boolean(true/flase)
+        {
+          shouldDirty: false,
+          shouldValidate: true,
+        },
+      );
+
+      setValue("branch", selectedAmendment.branch ?? "", {
         shouldDirty: false,
         shouldValidate: true,
       });
 
-      setValue("company", selectedAmendment.company ?? "", {
+      setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
       });
 
-      setValue("companyImage", selectedAmendment.companyImage ?? "");
+      // setValue("companyImage", selectedAmendment.companyImage ?? "");
 
-      setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
+      setValue(
+        "activeDate",
+        selectedAmendment.activeDate
+          ? selectedAmendment.activeDate
+          : toLocalDate(new Date()),
+        { shouldDirty: false },
+      );
 
       setValue("pincode", selectedAmendment.pincode ?? "", {
         shouldDirty: false,
@@ -496,15 +572,19 @@ export default function GenaralBranchForm() {
         toast.error("Please complete the document details");
         return;
       }
-
-      setValue("userCode", userCode);
-      setValue("authorizationDate", new Date());
-      // console.log("Submitting data", data);
+      const payload = {
+        ...data,
+        userCode,
+        authorizationDate: new Date().toISOString().split("T")[0],
+      };
+      // setValue("userCode", userCode);
+      // setValue("authorizationDate", new Date());
+      console.log("Submitting data", data);
       const formData = new FormData();
 
-      Object.keys(data).forEach((key) => {
+      Object.entries(payload).forEach(([key, value]) => {
         if (key !== "companyImage") {
-          formData.append(key, data[key]);
+          formData.append(key, value);
         }
       });
 
@@ -565,42 +645,42 @@ export default function GenaralBranchForm() {
           Prepare documents JSON
         (NO FileList inside JSON)
       -------------------------------- */
-      const documentsPayload = data.documents.map((doc) => {
-        // Append file separately
-        if (doc.file && doc.file.length > 0) {
-          formData.append("files", doc.file[0]); //  backend handles array
-        }
+      // const documentsPayload = data.documents.map((doc) => {
+      //   // Append file separately
+      //   if (doc.file && doc.file.length > 0) {
+      //     formData.append("files", doc.file[0]); //  backend handles array
+      //   }
 
-        return {
-          type: doc.type,
-          number: doc.number,
-          expiryDate: doc.expiryDate,
-          remarks: doc.remarks || "",
-        };
-      });
+      //   return {
+      //     type: doc.type,
+      //     number: doc.number,
+      //     expiryDate: doc.expiryDate,
+      //     remarks: doc.remarks || "",
+      //   };
+      // });
 
       /* -------------------------------
           Prepare final JSON payload
       -------------------------------- */
-      const payload = {
-        ...data,
-        documents: documentsPayload,
-      };
+      // const payload = {
+      //   ...data,
+      //   documents: documentsPayload,
+      // };
 
       // console.log("payload:", payload);
 
       //  VERY IMPORTANT: remove FileList from payload
-      delete payload.documents?.file;
+      // delete payload.documents?.file;
 
       /* -------------------------------
           Append JSON as Blob
       -------------------------------- */
-      formData.append(
-        "data",
-        new Blob([JSON.stringify(payload)], {
-          type: "application/json",
-        }),
-      );
+      // formData.append(
+      //   "data",
+      //   new Blob([JSON.stringify(payload)], {
+      //     type: "application/json",
+      //   }),
+      // );
 
       /* -------------------------------
           Debug FormData (correct way)
@@ -625,6 +705,24 @@ export default function GenaralBranchForm() {
       //   });
       // }
       handleApiError(err);
+    }
+  };
+
+  const handleClear = () => {
+    if (selectedAmendment) {
+      // Restore selected amendment values
+      setingData(selectedAmendment);
+
+      clearErrors();
+      toast.success("Changes cleared");
+    } else {
+      //  New record → reset to empty insert state
+      reset({
+        userCode,
+        authorizationStatus: 0,
+        withaffectdate: "",
+        activeDate: new Date().toISOString().split("T")[0],
+      });
     }
   };
 
@@ -819,7 +917,6 @@ export default function GenaralBranchForm() {
                         render={({ field }) => (
                           <DatePicker
                             ref={datePickerRef}
-                            isDisabled={isReadOnly}
                             placeholderText="Select date"
                             className={`form-control datepicker-input withaffectdate${
                               errors.withaffectdate ? "error" : ""
@@ -831,7 +928,7 @@ export default function GenaralBranchForm() {
                               field.onChange(date ? formatDate(date) : null);
 
                               setTimeout(() => {
-                                smoothFocus("name"); //  Focus to name after selecting the date
+                                smoothFocus(); //  Focus to name after selecting the date
                               }, 0);
                             }}
                             dateFormat="dd/MM/yyyy"
@@ -841,7 +938,7 @@ export default function GenaralBranchForm() {
                             showYearDropdown
                             customInput={
                               <input
-                                ref={authDateInputRef}
+                                // ref={authDateInputRef}
                                 className={`form-control datepicker-input ${
                                   errors.withaffectdate ? "error" : ""
                                 }`}
@@ -886,7 +983,7 @@ export default function GenaralBranchForm() {
                       <input type="hidden" {...register("userCode")} />
                       <input type="hidden" {...register("authorizationDate")} />
                     </div>
-                    {latestAmendmentId.authorizationStatus === 1 &&
+                    {latestAmendmentId.authorizationStatus === true &&
                       !addingNewAmend && ( // Adding the new amend only if the latest amend is verified
                         <div
                           className="btn amend-generate"
@@ -900,53 +997,60 @@ export default function GenaralBranchForm() {
 
                 <div className="amend-container">
                   {[...amendments] // shallow copy to avoid mutating state
-                    .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
+                    //.sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
                     .map((item, index) => {
                       // then map
-                      const isSelected = selectedAmendment?.id === item.id;
+                      const isSelected =
+                        selectedAmendment?.amendNo === item.amendNo;
                       return (
                         <div
-                          key={item.id}
+                          key={item.amendNo}
                           className={`amend-pill 
-                            ${item.id === latestAmendmentId.id ? "entry" : "verified"}
+                            ${item.amendNo == latestAmendmentId.amendNo ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}
+                            
                           `}
+                          title={
+                            item.amendNo !== latestAmendmentId.amendNo
+                              ? "This amendment has been verified and locked"
+                              : ""
+                          }
                           onClick={() => {
-                            handleSelectAmendment(item.id, index);
+                            handleSelectAmendment(item.branchMstID, index);
                             // setAddNewAmend(false);
                             setAddingNewAmend(false);
                           }}
                         >
                           <div className="pill-left">
-                            <span className="pill-index">{item.id}</span>
+                            <span className="pill-index">{item.amendNo}</span>
                             <div className="pill-info">
                               <span className="pill-type">
-                                {item.authorizationStatus === 0
+                                {item.authorizationStatus === false
                                   ? "ENTRY"
                                   : "VERIFIED"}
                               </span>
                               <span className="pill-date">
-                                {new Date(item.date).toLocaleDateString(
-                                  "en-GB",
-                                )}
+                                {new Date(
+                                  item.withaffectdate,
+                                ).toLocaleDateString("en-GB")}
                               </span>
                             </div>
                           </div>
 
                           <div className="pill-right">
-                            {item.id == latestAmendmentId.id && (
+                            {item.amendNo == latestAmendmentId.amendNo && (
                               <span className="pill-badge verified">
                                 latest
                               </span>
                             )}
-                            {item.authorizationStatus !== 0 &&
-                              item.id !== latestAmendmentId.id && (
+                            {item.authorizationStatus !== false &&
+                              item.amendNo !== latestAmendmentId.amendNo && (
                                 <span className="pill-badge verified">
                                   ✔ Verified
                                 </span>
                               )}
-                            {item.authorizationStatus == 0 &&
-                              item.id !== latestAmendmentId.id && (
+                            {item.authorizationStatus == false &&
+                              item.amendNo !== latestAmendmentId.amendNo && (
                                 <span className="pill-badge verified">
                                   Entry
                                 </span>
@@ -1036,14 +1140,14 @@ export default function GenaralBranchForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: step < steps.length - 1,
+              disabled: !canSave,
             },
             search: {
               // onClick: handleSearch,
               disabled: true,
             },
             clear: {
-              // onClick: handleClear,
+              onClick: handleClear,
               // disabled:true,
             },
             // delete: {

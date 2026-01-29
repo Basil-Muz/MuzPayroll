@@ -3,10 +3,12 @@ import { IoIosSearch } from "react-icons/io";
 import StatusSearch from "./StatusSearch";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import Loading from "../../components/Loading/Loading";
+import Loading from "../../components/Loaders/Loading";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
 import "./StatusUpdate.css";
 
 const StatusUpdate = () => {
@@ -14,13 +16,13 @@ const StatusUpdate = () => {
   const [loading, setLoading] = useState(false);
   const [tableData, setTableData] = useState([]);
   const [statusType, setStatusType] = useState("Active");
-  const searchRef = useRef(null);
-  const datePickerRef = useRef(null);
 
-  /* ===== APPLY SEARCH RESULT ===== */
+  const searchRef = useRef(null);
+  const { showRailLoader, hideLoader } = useLoader();
+
+  /* ===== APPLY SEARCH ===== */
   const handleApply = (data, status) => {
-    console.log("Status received from StatusSearch:", status);
-    setStatusType(status || "Active"); // safety fallback
+    setStatusType(status || "Active");
 
     const formatted = data.map((row) => ({
       ...row,
@@ -38,13 +40,18 @@ const StatusUpdate = () => {
     setTableData((prev) =>
       prev.map((row) =>
         row.code === code
-          ? { ...row, inactiveDate: value, dateError: false }
+          ? {
+              ...row,
+              inactiveDate: value,
+              saveChecked: value ? true : false,
+              dateError: false,
+            }
           : row,
       ),
     );
   };
 
-  /* ===== SINGLE SAVE CHECK ===== */
+  /* ===== SINGLE CHECK ===== */
   const handleSaveCheck = (code) => {
     setTableData((prev) =>
       prev.map((row) =>
@@ -55,11 +62,17 @@ const StatusUpdate = () => {
 
   /* ===== SELECT ALL ===== */
   const isAllSelected =
-    tableData.length > 0 && tableData.every((row) => row.saveChecked);
+    tableData.length > 0 &&
+    tableData.every(
+      (row) => row.saveChecked && (statusType !== "Active" || row.inactiveDate),
+    );
 
   const handleSelectAll = (checked) => {
     setTableData((prev) =>
-      prev.map((row) => ({ ...row, saveChecked: checked })),
+      prev.map((row) => ({
+        ...row,
+        saveChecked: checked && (statusType !== "Active" || row.inactiveDate),
+      })),
     );
   };
 
@@ -68,11 +81,7 @@ const StatusUpdate = () => {
     let hasError = false;
 
     const validated = tableData.map((row) => {
-      if (
-        statusType === "Active" &&
-        row.saveChecked &&
-        (!row.inactiveDate || row.inactiveDate.trim() === "")
-      ) {
+      if (statusType === "Active" && row.saveChecked && !row.inactiveDate) {
         hasError = true;
         return { ...row, dateError: true };
       }
@@ -82,10 +91,12 @@ const StatusUpdate = () => {
     setTableData(validated);
     if (hasError) return;
 
-    const payload = validated.filter((row) => row.saveChecked);
-    if (payload.length === 0) return;
+    const payload = validated.filter((r) => r.saveChecked);
+    if (!payload.length) return;
 
-    setLoading(true);
+    const startTime = Date.now();
+    showRailLoader("Saving");
+
     try {
       await axios.post(
         statusType === "Active"
@@ -96,37 +107,40 @@ const StatusUpdate = () => {
 
       alert("Saved successfully");
       handleClear();
-    } catch (err) {
-      console.error("Save error", err);
+    } catch {
       alert("Save failed");
     } finally {
-      setLoading(false);
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
   };
 
   /* ===== CLEAR ===== */
-  const handleClear = () => {
-    setLoading(true);
+  const handleClear = async () => {
+    const startTime = Date.now();
+    showRailLoader("Clearing");
+
     setIsOpen(true);
     setTableData([]);
     searchRef.current?.clearSearch();
-    setTimeout(() => setLoading(false), 500);
+
+    await ensureMinDuration(startTime, 600);
+    hideLoader();
   };
 
   /* ===== REFRESH ===== */
-  const handleRefresh = () => {
-    setLoading(true);
+  const handleRefresh = async () => {
+    const startTime = Date.now();
+    showRailLoader("Refresh");
     searchRef.current?.refreshSearch();
-    setTimeout(() => setLoading(false), 500);
+    await ensureMinDuration(startTime, 600);
+    hideLoader();
   };
 
   return (
     <>
       <Header />
-      {loading && <Loading />}
-
       <div className="statusupdate-page">
-        {/* HEADER */}
         <div className="head-main-section">
           <h2 className="page-title">Status Update</h2>
           <button
@@ -137,7 +151,6 @@ const StatusUpdate = () => {
           </button>
         </div>
 
-        {/* SEARCH */}
         <StatusSearch
           ref={searchRef}
           isOpen={isOpen}
@@ -145,7 +158,6 @@ const StatusUpdate = () => {
           hasData={tableData.length > 0}
         />
 
-        {/* TABLE */}
         {tableData.length > 0 && (
           <div className="statusupdate-table">
             <table>
@@ -175,7 +187,6 @@ const StatusUpdate = () => {
                     <td>{item.name}</td>
                     <td>{item.activeDate}</td>
 
-                    {/* INACTIVE DATE */}
                     <td>
                       {statusType === "Active" ? (
                         <>
@@ -206,7 +217,6 @@ const StatusUpdate = () => {
                               />
                             }
                           />
-
                           {item.dateError && (
                             <div className="field-error">
                               Inactive date is required
@@ -218,12 +228,10 @@ const StatusUpdate = () => {
                       )}
                     </td>
 
-                    {/* SAVE CHECKBOX */}
                     <td>
                       <input
                         type="checkbox"
                         checked={item.saveChecked}
-                        // disabled={statusType === "Active" && !item.inactiveDate}
                         onChange={() => handleSaveCheck(item.code)}
                       />
                     </td>
@@ -234,14 +242,13 @@ const StatusUpdate = () => {
           </div>
         )}
 
-        {/* ACTION BAR */}
         <FloatingActionBar
           actions={{
             clear: { onClick: handleClear },
             refresh: { onClick: handleRefresh },
             save: {
               onClick: handleSave,
-              disabled: !tableData.some((row) => row.saveChecked),
+              disabled: !tableData.some((r) => r.saveChecked),
             },
             delete: { disabled: true },
             print: { disabled: true },

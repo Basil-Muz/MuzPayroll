@@ -3,6 +3,13 @@ import "../../css/Documents.css";
 import { toast } from "react-hot-toast";
 import { IoRemoveCircleOutline } from "react-icons/io5";
 import { AiOutlineDelete } from "react-icons/ai";
+import { Controller } from "react-hook-form";
+import DatePicker from "react-datepicker";
+import { FaRegCalendarAlt } from "react-icons/fa";
+
+import "react-datepicker/dist/react-datepicker.css";
+
+import Select from "react-select";
 import { MdDelete } from "react-icons/md";
 export default function DocumentsTab({
   fields,
@@ -16,7 +23,7 @@ export default function DocumentsTab({
   trigger,
   onFileSelect,
   // setError,
-  // control,
+  control,
   // disabled = false,
   // requiredMap = {},
 }) {
@@ -174,20 +181,31 @@ export default function DocumentsTab({
               <div className="card-body">
                 <div className="field">
                   <label>Document Type</label>
-                  <select
-                    // className={`form-control ${errors.documentType ? "error" : ""}`}
-                    placeholder="Enter document type"
-                    className={`form-control ${errors?.documents?.[index]?.type ? "doc-error" : ""}`}
-                    {...register(`documents.${index}.type`, {
-                      required: "Document type is required",
-                    })}
-                  >
-                    {documentTypes.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label} {type.required && " *"}
-                      </option>
-                    ))}
-                  </select>
+                  <Controller
+                    name={`documents.${index}.type`}
+                    control={control}
+                    rules={{ required: "Document type is required" }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={documentTypes.filter((opt) => opt.value)}
+                        placeholder="Select document type"
+                        isClearable
+                        classNamePrefix="form-control-select"
+                        className={`${errors?.documents?.[index]?.type ? "error" : ""} `}
+                        // hasError={!!errors?.documents?.[index]?.type}
+                        value={
+                          documentTypes.find(
+                            (opt) => opt.value === field.value,
+                          ) || null
+                        }
+                        onChange={(option) =>
+                          field.onChange(option ? option.value : "")
+                        }
+                      />
+                    )}
+                  />
+
                   {errors?.documents?.[index]?.type && (
                     <span className="error-message">
                       {errors.documents[index].type.message}
@@ -205,8 +223,8 @@ export default function DocumentsTab({
                     {...register(`documents.${index}.number`, {
                       required: "Document number is required",
                       pattern: {
-                        value: /^[a-zA-Z]+$/,
-                        message: "Only alphanumeric allowed",
+                        value: /^[a-zA-Z0-9]{5,20}$/,
+                        message: "Invalide document number",
                       },
                     })}
                   />
@@ -219,11 +237,32 @@ export default function DocumentsTab({
 
                 <div className="field">
                   <label>Expiry Date</label>
-                  <input
-                    className={`form-control ${errors?.documents?.[index]?.expiryDate ? "doc-error" : ""}`}
-                    type="date"
-                    min={new Date().toISOString().split("T")[0]}
-                    {...register(`documents.${index}.expiryDate`)}
+                  <Controller
+                    control={control}
+                    name={`documents.${index}.expiryDate`}
+                    render={({ field }) => (
+                      <DatePicker
+                        selected={field.value ? new Date(field.value) : null}
+                        onChange={(date) =>
+                          field.onChange(date ? date.toISOString() : "")
+                        }
+                        minDate={new Date()}
+                        placeholderText="Select expiry date"
+                        className={`form-control datepicker-input${
+                          errors?.documents?.[index]?.expiryDate
+                            ? "doc-error"
+                            : ""
+                        }`}
+                        dateFormat="dd/MM/yyyy"
+                        calendarClassName="custom-datepicker"
+                        popperClassName="custom-datepicker-popper"
+                        showMonthDropdown
+                        showYearDropdown
+                        dropdownMode="select"
+                        // showIcon
+                        // calendarIcon={<FaRegCalendarAlt size={16} />}
+                      />
+                    )}
                   />
                 </div>
               </div>
@@ -236,7 +275,6 @@ export default function DocumentsTab({
                     type="file"
                     className="file-input"
                     accept=".pdf,.jpg,.jpeg,.png"
-
                     onChange={(e) => handleChange(e, index)}
                     {...register(`documents.${index}.file`, {
                       required: "Document file is required",

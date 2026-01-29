@@ -48,10 +48,14 @@ import UserGroup from "./pages/UserGroup/usergroup.jsx";
 import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
 import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 
+import LoaderRenderer from "./components/Loaders/LoaderRenderer.jsx";
+
 function App() {
   return (
     <>
-      <AuthProvider>
+    <AuthProvider>
+    <LoaderRenderer />
+      
         <Routes>
           {/* <Route path="/" element={<Page />} /> */}
           <Route path="/" element={<LoginPage />} />
@@ -229,25 +233,6 @@ function App() {
                 <CloseIcon />
               </button>
             </div>
-
-            <div className="toast-message">
-              <span className="toast-title">
-                {t.type === "success"
-                  ? "Success"
-                  : t.type === "error"
-                    ? "Error"
-                    : "Information"}
-              </span>
-              <p>{t.message}</p>
-            </div>
-
-            <button
-              className="toast-close"
-              onClick={() => toast.dismiss(t.id)}
-              aria-label="Close notification"
-            >
-              <CloseIcon />
-            </button>
           </div>
         )}
       </Toaster>

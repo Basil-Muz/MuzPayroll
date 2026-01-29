@@ -10,7 +10,7 @@ import { TiTick } from "react-icons/ti";
 import Search from "../../components/search/Search";
 import UserGroupForm from "./usergroupform";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
-import Loading from "../../components/Loading/Loading";
+import Loading from "../../components/Loaders/Loading";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 

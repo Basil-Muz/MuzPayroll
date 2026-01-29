@@ -8,7 +8,8 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import axios from "axios";
-
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
 const StatusSearch = forwardRef(({ isOpen, onApply, hasData }, ref) => {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -16,7 +17,7 @@ const StatusSearch = forwardRef(({ isOpen, onApply, hasData }, ref) => {
       status: "Active",
     },
   });
-
+  const { showRailLoader, hideLoader } = useLoader();
   const selectRef = useRef(null);
   const [options, setOptions] = useState([]);
 
@@ -44,6 +45,8 @@ const StatusSearch = forwardRef(({ isOpen, onApply, hasData }, ref) => {
 
   /* ===== APPLY ===== */
   const onSubmit = async (filters) => {
+    const startTime = Date.now();
+    showRailLoader("Retrieving available Data…");
     try {
       const res = await axios.get(
         filters.status === "Active"
@@ -54,8 +57,6 @@ const StatusSearch = forwardRef(({ isOpen, onApply, hasData }, ref) => {
 
       onApply(res.data, filters.status);
     } catch (err) {
-      console.error(err);
-
       const mockData = [
         {
           code: "OPT001",
@@ -72,6 +73,9 @@ const StatusSearch = forwardRef(({ isOpen, onApply, hasData }, ref) => {
       ];
 
       onApply(mockData, filters.status);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
   };
 
