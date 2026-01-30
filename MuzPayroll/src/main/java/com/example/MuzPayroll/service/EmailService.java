@@ -1,23 +1,16 @@
 package com.example.MuzPayroll.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
-
     public void sendPassword(String toEmail, String password) {
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Forgot Password - MuzPayroll");
-        message.setText("Your password is: " + password);
-
-        mailSender.send(message);
+        System.out.println("======================================");
+        System.out.println("📧 FORGOT PASSWORD (DEV MODE)");
+        System.out.println("To Email : " + toEmail);
+        System.out.println("Password : " + password);
+        System.out.println("======================================");
     }
 }

@@ -21,6 +21,10 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [commonError, setCommonError] = useState("");
 
+  const [attemptsLeft, setAttemptsLeft] = useState(null);
+  const [accountLocked, setAccountLocked] = useState(false);
+
+
   // Handle typing: Allow only letters + numbers
   const handleUserCodeChange = (e) => {
     const value = e.target.value;
@@ -45,6 +49,10 @@ function LoginPage() {
   };
 
   const handleLogin = async () => {
+    setAttemptsLeft(null);
+    setAccountLocked(false);
+    setCommonError("");
+
     setUserCodeError("");
     setPasswordError("");
 
@@ -71,9 +79,29 @@ function LoginPage() {
       console.log("LOGIN RESPONSE FROM BACKEND:", data);
 
       if (!data.success) {
-        setCommonError(data.errors || "Invalid credentials.");
+        const errorMsg = Array.isArray(data.errors)
+          ? data.errors[0]
+          : data.errors;
+
+        setCommonError(errorMsg);
+
+        // Account locked
+        if (errorMsg.includes("Maximum login attempts")) {
+          setAccountLocked(true);
+          setAttemptsLeft(0);
+        }
+
+        // Attempts left
+        if (errorMsg.includes("Attempts left")) {
+          const match = errorMsg.match(/\d+/);
+          if (match) {
+            setAttemptsLeft(Number(match[0]));
+          }
+        }
+
         return;
       }
+
       const cleanUserCode = userCode.replace("@muziris", "");
       // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
       const payload = data.data; //  IMPORTANT
@@ -92,6 +120,7 @@ function LoginPage() {
       setCommonError("Server error.");
       console.error("Login error:", error);
     }
+
   };
 
   return (
@@ -153,10 +182,25 @@ function LoginPage() {
             {/* Common Error */}
             {commonError && <p className="common-error-msg">{commonError}</p>}
 
+            {/* Attempt warning
+            {attemptsLeft !== null && !accountLocked && (
+              <p className="warning-msg">
+                Attempts left: {attemptsLeft}
+              </p>
+            )} */}
+
+            {/* Account locked */}
+            {accountLocked && (
+              <p className="error-msg">
+                Your account is locked. Please contact admin or reset password.
+              </p>
+            )}
+
             {/* Login Button */}
-            <button type="submit" className="login-btn">
+            <button type="submit" className="login-btn" disabled={accountLocked}>
               Submit
             </button>
+
 
             {/* Forgot Password */}
             <p

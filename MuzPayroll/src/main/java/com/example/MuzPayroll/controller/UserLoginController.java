@@ -6,11 +6,14 @@ import com.example.MuzPayroll.entity.DTO.ForgotPasswordResponse;
 import com.example.MuzPayroll.entity.DTO.LoginRequest;
 import com.example.MuzPayroll.entity.DTO.LoginResponse;
 import com.example.MuzPayroll.entity.DTO.Response;
+import com.example.MuzPayroll.service.ChangePasswordService;
+import com.example.MuzPayroll.service.ForgotPasswordService;
 import com.example.MuzPayroll.service.UserMstService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -18,6 +21,11 @@ public class UserLoginController {
 
     @Autowired
     private UserMstService service;
+
+    @Autowired
+    private ChangePasswordService changepassword;
+    @Autowired
+    private ForgotPasswordService forgotpassword;
 
     @PostMapping("/login")
     public ResponseEntity<Response<LoginResponse>> login(
@@ -49,7 +57,7 @@ public class UserLoginController {
     public ResponseEntity<Response<Boolean>> changePassword(
             @RequestBody ChangePasswordRequest request) {
 
-        Response<Boolean> response = service.changePassword(request);
+        Response<Boolean> response = changepassword.changePassword(request);
 
         if (!response.isSuccess()) {
             return ResponseEntity
@@ -64,7 +72,7 @@ public class UserLoginController {
     public ResponseEntity<Response<ForgotPasswordResponse>> forgotPassword(
         @RequestBody ForgotPasswordRequest request) {
 
-    Response<ForgotPasswordResponse> response = service.forgotPassword(request);
+    Response<ForgotPasswordResponse> response = forgotpassword.forgotPassword(request);
 
     return ResponseEntity
             .status(response.getStatusCode())  // <-- uses YOUR DTO statusCode
