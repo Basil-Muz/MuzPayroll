@@ -1,0 +1,18 @@
+export const COMMON_BRANCH_FIELD_MAP = {
+  branchMstID: "branchMstID",
+  shortName: "shortName",
+  authorizationStatus: "authorizationStatus",
+  withaffectdate: "withaffectdate",
+//   companyEntity: "company",
+  branch: "branch",
+  activeDate: "activeDate",
+  pincode: "pincode",
+  address: "address",
+  country: "country",
+  state: "state",
+  district: "district",
+  place: "place",
+  email: "email",
+  mobileNumber: "mobileNumber",
+  landlineNumber: "landlineNumber",
+};

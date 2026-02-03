@@ -1,15 +1,15 @@
 // services/company.service.js
-import axios from "axios";
+import api from "../api/axiosInstance";
 
 // Fetch company amendment list
 export const getCompanyAmendList = (companyId) => {
-  return axios.get(
-    `http://localhost:8087/company/getamendlist/${companyId}`
-  );
+  return api.get(`/company/getamendlist/${companyId}`);
 };
 
 export const saveCompany = (data) => {
-  return axios.post(
-    "http://localhost:8087/company/save",data
-  );
+  return api.post("/company/save", data);
+};
+
+export const fetchCompany = (companyId) => {
+  return api.get(`/company/${companyId}`);
 };

@@ -21,9 +21,12 @@ import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 import { COMMON_COMPANY_FIELD_MAP } from "../../constants/companyFieldMap";
 import { steps } from "../../constants/FormSteps";
 
+//service
+import { getCompanyAmendList } from "../../services/company.service";
+import { saveCompany } from "../../services/company.service"
 //Hook (flow control)
 import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
-import { useCompanyAmendList } from "../../hooks/useCompanyAmendList";
+import { useEntityAmendList } from "../../hooks/useEntityAmendList";
 import { useSmoothFormFocus } from "../../hooks/useSmoothFormFocus";
 import { useGenerateAmend } from "../../hooks/useGenerateAmend";
 import { useFormStepper } from "../../hooks/useFormStepper";
@@ -63,8 +66,11 @@ export default function GenaralCompanyForm() {
     // setAmendments,
     selectedAmendment,
     setSelectedAmendment,
-    fetchCompanyAmendData,
-  } = useCompanyAmendList();
+    fetchEntityAmendData,
+  } = useEntityAmendList({
+    entity: "company",
+    getEntityAmendList: getCompanyAmendList,
+  });
 
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
   // console.log("amends nmber", inputMode);
@@ -145,7 +151,9 @@ export default function GenaralCompanyForm() {
     reset,
     companyId,
     amendments, // SAME STATE
-    refreshAmendments: fetchCompanyAmendData,
+    refreshAmendments: fetchEntityAmendData,
+    entity:"company",
+    saveEntity: saveCompany,
   });
 
   const { nextStep, prevStep } = useFormStepper({
@@ -283,8 +291,8 @@ export default function GenaralCompanyForm() {
 
   useEffect(() => {
     if (!companyId) return;
-    fetchCompanyAmendData(companyId);
-  }, [companyId, fetchCompanyAmendData]);
+    fetchEntityAmendData(companyId);
+  }, [companyId, fetchEntityAmendData]);
 
   useEffect(() => {
     const date = new Date(); // current date

@@ -272,8 +272,9 @@ const GeneralInfoForm = function GeneralInfoForm({
               {...register(fieldName, {
                 required: `Name is required ${fieldName}`,
                 pattern: {
-                  value: /^[a-zA-Z\s.'-]+$/,
-                  message: "Only letters, spaces, dots, and hyphens are allowed",
+                  value: /^[a-zA-Z0-9\s.-]+$/,
+                  message:
+                    "Only letters, numbers, spaces, dots, and hyphens are allowed",
                 },
                 onChange: (e) => {
                   const value = e.target.value;

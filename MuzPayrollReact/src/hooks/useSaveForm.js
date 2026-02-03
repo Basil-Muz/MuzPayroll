@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { useLoader } from "../context/LoaderContext";
-import { saveCompany } from "../services/company.service";
 // import { useCompanyAmendList } from "./useCompanyAmendList";
 import { handleApiError } from "../utils/errorToastResolver";
 import { ensureMinDuration } from "../utils/loaderDelay";
@@ -14,16 +13,18 @@ export const useSaveForm = ({
   companyId,
   amendments,
   refreshAmendments,
+  entity,
+  saveEntity,
   //   setStep,
 }) => {
   const { showRailLoader, hideLoader } = useLoader();
   const [step, setStep] = useState(0); //   switch steps
   const datePickerRef = useRef(null); //    Open authrization datePickerRef after save
-//   const {
-//     // amendments,
-//     // setAmendments,
-//     fetchCompanyAmendData,
-//   } = useCompanyAmendList();
+  //   const {
+  //     // amendments,
+  //     // setAmendments,
+  //     fetchCompanyAmendData,
+  //   } = useCompanyAmendList();
 
   const onSubmit = async (data) => {
     const isValid = await trigger("documents"); //  validate all docs
@@ -36,8 +37,8 @@ export const useSaveForm = ({
     const isFirstAmend = amendments.length === 0;
 
     // show loader
-    if (isFirstAmend) showRailLoader("Saving company information…");
-    else showRailLoader("Updating company details…");
+    if (isFirstAmend) showRailLoader("Saving"+ entity +"information…");
+    else showRailLoader("Updating" + entity +" details…");
 
     try {
       const payload = {
@@ -75,10 +76,10 @@ export const useSaveForm = ({
       //   }
       // }
 
-      await saveCompany(formData); // to call the API
-    //   await refreshAmendments(companyId);   //  refresh Amendments data
+      await saveEntity(formData); // to call the API
+      //   await refreshAmendments(companyId);   //  refresh Amendments data
       //setCanSave(false);     // disable save button
-      toast.success("Company saved successfully!");
+      toast.success(entity +" saved successfully!");
       setStep(0); //Goes to step 1
       console.log("Has Amend", isFirstAmend);
       // reset only on success
@@ -171,7 +172,7 @@ export const useSaveForm = ({
 
       handleApiError(err, {
         operation: "save", //Opration name
-        entity: "company", //Table name
+        entity: entity, //Table name
       });
     } finally {
       await ensureMinDuration(startTime, 1200);

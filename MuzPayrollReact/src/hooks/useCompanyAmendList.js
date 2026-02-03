@@ -12,7 +12,7 @@ export const useCompanyAmendList = () => {
       try {
         const response = await getCompanyAmendList(companyId);
 
-        setAmendments(response.data.companyDtoLogs || []); // Use the amends data
+        // setAmendments(response.data.companyDtoLogs || []); // Use the amends data
         // delete response.data.companyDtoLogs;
         
         const list = response.data.companyDtoLogs || [];

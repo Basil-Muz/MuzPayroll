@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
@@ -6,88 +6,72 @@ import { useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import axios from "axios";
-
 import GeneralInfoForm from "./General Info/GeneralInfoForm";
 import AddressForm from "./General Info/AddressForm";
 import ContactForm from "./General Info/ContactForm";
 import DocumentsTab from "./General Info/DocumentsTab";
-
-import StepProgress from "./General Info/StepProgress";
-import Header from "../../../components/Header/Header";
 import FloatingActionBar from "../../../components/demo_buttons/FloatingActionBar";
 
 import "../css/From.css";
 import ThemeToggle from "../../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../../components/ScrollToTop/ScrollToTopButton";
 
-import { useLoader } from "../../../context/LoaderContext";
-import { ensureMinDuration } from "../../../utils/loaderDelay";
+//Hook (flow control)
+import { useSetAmendmentData } from "../../../hooks/useSetAmendmentData";
+import { useEntityAmendList } from "../../../hooks/useEntityAmendList";
+import { useSmoothFormFocus } from "../../../hooks/useSmoothFormFocus";
+import { useLoadCompany } from "../../../hooks/useLoadCompany";
+import { useGenerateAmend } from "../../../hooks/useGenerateAmend";
+import { useFormStepper } from "../../../hooks/useFormStepper";
+import { useSaveForm } from "../../../hooks/useSaveForm";
 
-const steps = ["General Info", "Address", "Contact", "Document Into"];
-// let submitStatus = 0; //Toggle the submit or save button
+//service
+import { getBranchAmendList } from "../../../services/branch.service";
+import { saveBranch } from "../../../services/branch.service";
+//  constants
+import { steps } from "../../../constants/FormSteps";
+import { COMMON_BRANCH_FIELD_MAP } from "../../../constants/branchFieldMap";
+
+//Utils (Helpers)
+import { formatDate } from "../../../utils/dateFormater";
 
 export default function GenaralBranchForm() {
-  const [step, setStep] = useState(0); // switch steps
-  const [companyList, setCompanyList] = useState([]); //fetch companys
+  //const [step, setStep] = useState(0); // switch steps
+
+  //const [companyList, setCompanyList] = useState([]); //fetch companys
   // const [submitStatus, setSubmitStatus] = useState(1);
-
-  //changes when the file attached
-  // const [backendErrors, setBackendErrors] = useState([]);
-  //pass the back end error to front end
-
-  // const [addNewAmend, setAddNewAmend] = useState(false);
   // true when latest amned is verified enables the genarate button
+  // const [addNewAmend, setAddNewAmend] = useState(false);
 
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
-
-  const datePickerRef = useRef(null); //To focus the date picker
+  //const datePickerRef = useRef(null); //To focus the date picker
   // const authDateInputRef = useRef(null);
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
   const generalInfoRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
   // console.log("User data",UserData);
   const userObj = JSON.parse(UserData);
-  const [isReadOnly, setIsReadOnly] = useState();
 
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
   const companyId = userObj.companyId;
-  // console.log("Logeeded data company", companyId);
 
-  const { showRailLoader, hideLoader } = useLoader();
+  //Fetch company amendmends data
+  const {
+    amendments,
+    // setAmendments,
+    selectedAmendment,
+    setSelectedAmendment,
+    fetchEntityAmendData,
+  } = useEntityAmendList({
+    entity: "branch",
+    getEntityAmendList: getBranchAmendList,
+  });
 
-  const [amendments, setAmendments] = useState([
-    // {
-    //   id: 3,
-    //   authorizationStatus: 1,
-    //   date: "2025-10-20",
-    //   shortName: "TCS",
-    //   pincode: 680732,
-    //   branch: "Tata Consultancy Services",
-    //   status: "active",
-    //   activeDate: "2025-10-10",
-    //   generatedBy: "Admin User",
-    // },
-    // {
-    //   id: 2,
-    //   authorizationStatus: 1,
-    //   date: "2025-10-10",
-    //   branch: "Tata Consultancy Services",
-    //   status: "expired",
-    //   activeDate: "2021-12-31",
-    //   generatedBy: "System",
-    // },
-    // {
-    //   id: 1,
-    //   authorizationStatus: 1,
-    //   date: "2025-01-01",
-    //   status: "inactive",
-    //   activeDate: "",
-    //   generatedBy: "Manager",
-    // },
-  ]);
+  const { loadCompany, companyList } = useLoadCompany(); //  Fetch the company with company id
+
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
+
   const {
     register,
     handleSubmit,
@@ -122,7 +106,38 @@ export default function GenaralBranchForm() {
     },
   });
 
-  const authDate = watch("withaffectdate"); //workflow of amend date then name logic
+  const amendLenght = amendments.length;
+
+  //seting amend data with selected amend pill
+  const { setAmendmentData } = useSetAmendmentData({
+    amendLenght,
+    setValue,
+    fieldMap: COMMON_BRANCH_FIELD_MAP,
+  });
+
+  //  handle generate amendmend
+  const { handleGenerateAmendment } = useGenerateAmend({
+    setSelectedAmendment,
+    setAddingNewAmend,
+    reset,
+    getValues,
+    clearErrors,
+    // setIsReadOnly,
+  });
+
+  const { onSubmit, step, setStep, datePickerRef } = useSaveForm({
+    trigger,
+    //   errors,
+    userCode,
+    reset,
+    companyId,
+    amendments, // SAME STATE
+    refreshAmendments: fetchEntityAmendData,
+    entity: "branch",
+    saveEntity: saveBranch,
+  });
+
+  const authDate = watch("withaffectdate"); //  workflow of amend date then name logic
 
   //workflow of amend date then name logic
   let isUnlocked = !!authDate;
@@ -139,6 +154,11 @@ export default function GenaralBranchForm() {
     locationForm: false,
   });
 
+  const { smoothFocus } = useSmoothFormFocus({
+    formFlags,
+    setFocus,
+  });
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "documents",
@@ -147,15 +167,11 @@ export default function GenaralBranchForm() {
   const watchedDocuments = watch("documents");
   // const watchedPincode = watch("branchPinCode");
   const { branchId } = useParams();
-  // console.log("Submit status: ", step < steps.length - 1 && submitStatus == 1);
+
   const authorizationStatusOptions = [
     { label: "ENTRY", value: 0 },
     { label: "VERIFIED", value: 1 },
   ];
-
-  const [selectedAmendment, setSelectedAmendment] = useState(null);
-
-  // console.log("Selected item:", selectedAmendment);
 
   const amendmentAuthorizationOptions = [];
 
@@ -197,95 +213,62 @@ export default function GenaralBranchForm() {
     !isVerifiedAmendment &&
     ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
 
-  const toLocalDate = (date) =>
-    date instanceof Date
-      ? date.toLocaleDateString("en-CA") // yyyy-MM-dd
-      : date;
+  // const fetchEntityAmendData = useCallback(
+  //   async (branchId) => {
+  //     try {
+  //       const response = await axios.get(
+  //         `http://localhost:8087/branch/getamendlist/${branchId}`,
+  //       );
 
-  const fetchBranchAmendData = useCallback(
-    async (branchId) => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8087/branch/getamendlist/${branchId}`,
-        );
-
-        setAmendments(response.data.branchDtoLogs || []); // Use the amends data
-        // // delete response.data.companyDtoLogs;
-        console.log("Amend response", amendments);
-        setSelectedAmendment(response.data); //data form master table
-        setValue("branchMstID", response.data.branchMstID);
-        console.log("Selected response", selectedAmendment);
-      } catch (error) {
-        console.error("Error fetching company data:", error);
-      }
-    },
-    [setSelectedAmendment, setAmendments, setValue],
-  );
-
+  //       setAmendments(response.data.branchDtoLogs || []); // Use the amends data
+  //       // // delete response.data.companyDtoLogs;
+  //       // console.log("Amend response", amendments);
+  //       setSelectedAmendment(response.data); //data form master table
+  //       setValue("branchMstID", response.data.branchMstID);
+  //       // console.log("Selected response", selectedAmendment);
+  //     } catch (error) {
+  //       console.error("Error fetching company data:", error);
+  //     }
+  //   },
+  //   [setSelectedAmendment, setAmendments, setValue],
+  // );
   // console.log("Locaked ", isUnlocked || isVerifiedAmendment); //true
-  //for smooth focus
-  const smoothFocus = (fieldName) => {
-    const fieldNameFlage = formFlags.locationForm
-      ? "location"
-      : formFlags.companyForm
-        ? "company"
-        : formFlags.branchForm
-          ? "branch"
-          : fieldName;
-
-    const el = document.querySelector(`[name=${fieldNameFlage}]`);
-    if (el) {
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-
-    setFocus(fieldNameFlage); // RHF handles focus properly
-  };
   // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
 
-    return `${year}-${month}-${day}`; // yyyy-MM-dd
-  };
+  // const handleApiError = (error) => {
+  //   // console.error("API Error:", error);
 
-  const handleApiError = (error) => {
-    // console.error("API Error:", error);
+  //   // Network error (no response from server)
+  //   if (!error.response) {
+  //     toast.error("Unable to connect to server. Please check your network.");
+  //     return;
+  //   }
+  //   // console.log("Error", error);
+  //   const status = error.type;
 
-    // Network error (no response from server)
-    if (!error.response) {
-      toast.error("Unable to connect to server. Please check your network.");
-      return;
-    }
-    // console.log("Error", error);
-    const status = error.type;
-
-    switch (status) {
-      case 400:
-        toast.error(error.errors[0]);
-        break;
-      case 401:
-        toast.error("Session expired. Please login again.");
-        break;
-      case 403:
-        toast.error("You do not have permission.");
-        break;
-      case 404:
-        toast.error("Resource not found.");
-        break;
-      case 409:
-        toast.error("Duplicate record exists.");
-        break;
-      case 500:
-        toast.error("Server error. Please try again later.");
-        break;
-      default:
-        toast.error("Unexpected error occurred.");
-    }
-  };
+  //   switch (status) {
+  //     case 400:
+  //       toast.error(error.errors[0]);
+  //       break;
+  //     case 401:
+  //       toast.error("Session expired. Please login again.");
+  //       break;
+  //     case 403:
+  //       toast.error("You do not have permission.");
+  //       break;
+  //     case 404:
+  //       toast.error("Resource not found.");
+  //       break;
+  //     case 409:
+  //       toast.error("Duplicate record exists.");
+  //       break;
+  //     case 500:
+  //       toast.error("Server error. Please try again later.");
+  //       break;
+  //     default:
+  //       toast.error("Unexpected error occurred.");
+  //   }
+  // };
 
   const latestAmendmentId = amendments.length
     ? amendments
@@ -307,53 +290,29 @@ export default function GenaralBranchForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  const loadCompanyAndBranches = useCallback(async () => {
-    try {
-      const companyResponse = await axios.get(
-        `http://localhost:8087/company/${companyId}`,
-      );
-      const company = companyResponse.data;
+  // const handleGenerateAmendment = () => {
+  //   setSelectedAmendment(null);
+  //   setAddingNewAmend(true);
+  //   setIsReadOnly(false);
 
-      // console.log("Company Listdasfgwsdrg:", company.companyMstID);
+  //   reset({
+  //     ...getValues(), //  keep base data
+  //     authorizationStatus: 0, // ENTRY
+  //     // mode: "INSERT",
+  //     withaffectdate: "",
+  //     // documents: [
+  //     //   {
+  //     //     type: "",
+  //     //     number: "",
+  //     //     expiryDate: "",
+  //     //     file: null,
+  //     //     remarks: "",
+  //     //   },
+  //     // ],
+  //   });
 
-      const companyobj = {
-        value: company.companyMstID,
-        label: company.company,
-      };
-      setCompanyList([companyobj]);
-
-      // console.log("Company List: ",company);
-      // setCompanyList([company]);
-      // setInitialCompanyId(company.companyMstID); // store it
-    } catch (error) {
-      // toast.error("Failed to load company:", error);
-      handleApiError(error);
-    }
-  }, [companyId]);
-
-  const handleGenerateAmendment = () => {
-    setSelectedAmendment(null);
-    setAddingNewAmend(true);
-    setIsReadOnly(false);
-
-    reset({
-      ...getValues(), //  keep base data
-      authorizationStatus: 0, // ENTRY
-      // mode: "INSERT",
-      withaffectdate: "",
-      // documents: [
-      //   {
-      //     type: "",
-      //     number: "",
-      //     expiryDate: "",
-      //     file: null,
-      //     remarks: "",
-      //   },
-      // ],
-    });
-
-    clearErrors();
-  };
+  //   clearErrors();
+  // };
 
   // useEffect(() => {
   //   if (watchedDocuments && watchedDocuments.length > 0) {
@@ -367,8 +326,8 @@ export default function GenaralBranchForm() {
 
   useEffect(() => {
     if (!branchId) return;
-    fetchBranchAmendData(branchId);
-  }, [branchId, fetchBranchAmendData]);
+    fetchEntityAmendData(branchId);
+  }, [branchId, fetchEntityAmendData]);
 
   // useEffect(() => {
   //   if (!watchedDocuments?.length) {
@@ -384,9 +343,8 @@ export default function GenaralBranchForm() {
   // }, [watchedDocuments]);
 
   useEffect(() => {
-    loadCompanyAndBranches();
-    // console.log("Company list response: ", companyList);
-  }, [loadCompanyAndBranches]);
+    loadCompany(companyId);
+  }, [loadCompany, companyId]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -424,100 +382,102 @@ export default function GenaralBranchForm() {
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
-  const setingData = useCallback(
-    (selectedAmendment) => {
-      setValue("shortName", selectedAmendment.shortName ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
+  // const setingData = useCallback(
+  //   (selectedAmendment) => {
+  //     setValue("shortName", selectedAmendment.shortName ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
 
-      setValue(
-        "authorizationStatus",
-        selectedAmendment.authorizationStatus ? 1 : 0, //  Status from back end is boolean(true/flase)
-        {
-          shouldDirty: false,
-          shouldValidate: true,
-        },
-      );
+  //     setValue("branchMstID", selectedAmendment.branchMstID);
 
-      setValue("branch", selectedAmendment.branch ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
+  //     setValue(
+  //       "authorizationStatus",
+  //       selectedAmendment.authorizationStatus ? 1 : 0, //  Status from back end is boolean(true/flase)
+  //       {
+  //         shouldDirty: false,
+  //         shouldValidate: true,
+  //       },
+  //     );
 
-      setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
-        shouldDirty: false,
-        shouldValidate: false,
-      });
+  //     setValue("branch", selectedAmendment.branch ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
 
-      // setValue("companyImage", selectedAmendment.companyImage ?? "");
+  //     setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: false,
+  //     });
 
-      setValue(
-        "activeDate",
-        selectedAmendment.activeDate
-          ? selectedAmendment.activeDate
-          : toLocalDate(new Date()),
-        { shouldDirty: false },
-      );
+  //     // setValue("companyImage", selectedAmendment.companyImage ?? "");
 
-      setValue("pincode", selectedAmendment.pincode ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
+  //     setValue(
+  //       "activeDate",
+  //       selectedAmendment.activeDate
+  //         ? selectedAmendment.activeDate
+  //         : toLocalDate(new Date()),
+  //       { shouldDirty: false },
+  //     );
 
-      setValue("address", selectedAmendment.address ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
+  //     setValue("pincode", selectedAmendment.pincode ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
 
-      setValue("country", selectedAmendment.country ?? "IN", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
+  //     setValue("address", selectedAmendment.address ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
 
-      setValue("state", selectedAmendment.state ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("district", selectedAmendment.district ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("place", selectedAmendment.place ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("email", selectedAmendment.email ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerName", selectedAmendment.employerName ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("designation", selectedAmendment.designation ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-    },
-    [setValue],
-  );
+  //     setValue("country", selectedAmendment.country ?? "IN", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+
+  //     setValue("state", selectedAmendment.state ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("district", selectedAmendment.district ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("place", selectedAmendment.place ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("email", selectedAmendment.email ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("employerName", selectedAmendment.employerName ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //     setValue("designation", selectedAmendment.designation ?? "", {
+  //       shouldDirty: false,
+  //       shouldValidate: true,
+  //     });
+  //   },
+  //   [setValue],
+  // );
 
   useEffect(() => {
     //Api call should bo here
@@ -525,218 +485,216 @@ export default function GenaralBranchForm() {
 
     if (!selectedAmendment) return;
     //Amend Auto selection whille loading
-    setingData(selectedAmendment);
-  }, [selectedAmendment, setingData]);
+    setAmendmentData(selectedAmendment);
+  }, [selectedAmendment, setAmendmentData]);
 
   const handleSelectAmendment = (id, index) => {
     //User Selecetion - Assign the amend data to feild
     setSelectedAmendment(amendments[index]);
-    setValue("mode", "UPDATE", { shouldDirty: false });
-    setingData(amendments[index]);
+    // setValue("mode", "UPDATE", { shouldDirty: false });
+    setAmendmentData(amendments[index]);
   };
 
-  const nextStep = async () => {
-    const valid = await trigger();
-    if (valid) setStep((s) => s + 1);
-  };
+  const { nextStep, prevStep } = useFormStepper({
+    trigger,
+    setStep,
+  });
 
-  const prevStep = () => setStep((s) => s - 1);
+  // const saveBranch = async (formData) => {
+  //   const response = await fetch("http://localhost:8087/branch/save", {
+  //     method: "POST",
+  //     body: formData,
+  //   });
 
-  const saveBranch = async (formData) => {
-    const response = await fetch("http://localhost:8087/branch/save", {
-      method: "POST",
-      body: formData,
-    });
+  //   if (!response.ok) {
+  //     const text = await response.text();
+  //     throw {
+  //       type: "HTTP_ERROR",
+  //       status: response.status,
+  //       body: text,
+  //     };
+  //   }
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw {
-        type: "HTTP_ERROR",
-        status: response.status,
-        body: text,
-      };
-    }
+  //   const text = await response.text();
+  //   const result = text ? JSON.parse(text) : null;
 
-    const text = await response.text();
-    const result = text ? JSON.parse(text) : null;
+  //   if (!result?.success) {
+  //     throw {
+  //       type: "BUSINESS_ERROR",
+  //       result,
+  //     };
+  //   }
 
-    if (!result?.success) {
-      throw {
-        type: "BUSINESS_ERROR",
-        result,
-      };
-    }
+  //   return result;
+  // };
 
-    return result;
-  };
+  // const onSubmit = async (data) => {
+  //   await trigger("documents"); //  validate all docs
+  //   if (errors?.documents) {
+  //     toast.error("Please complete the document details");
+  //     return;
+  //   }
+  //   const startTime = Date.now();
+  //   // show loader
+  //   const hasAmend = amendments.length === 0;
+  //   if (hasAmend) showRailLoader("Saving branch information…");
+  //   else showRailLoader("Updating branch details…");
+  //   try {
+  //     const payload = {
+  //       ...data,
+  //       userCode,
+  //       authorizationDate: new Date().toISOString().split("T")[0],
+  //     };
+  //     // setValue("userCode", userCode);
+  //     // setValue("authorizationDate", new Date());
+  //     console.log("Submitting data", data);
+  //     const formData = new FormData();
 
-  const onSubmit = async (data) => {
-    await trigger("documents"); //  validate all docs
-    if (errors?.documents) {
-      toast.error("Please complete the document details");
-      return;
-    }
-    const startTime = Date.now();
-    // show loader
-    const hasAmend = amendments.length === 0;
-    if (hasAmend) showRailLoader("Saving branch information…");
-    else showRailLoader("Updating branch details…");
-    try {
-      const payload = {
-        ...data,
-        userCode,
-        authorizationDate: new Date().toISOString().split("T")[0],
-      };
-      // setValue("userCode", userCode);
-      // setValue("authorizationDate", new Date());
-      console.log("Submitting data", data);
-      const formData = new FormData();
+  //     Object.entries(payload).forEach(([key, value]) => {
+  //       if (key !== "companyImage") {
+  //         formData.append(key, value);
+  //       }
+  //     });
 
-      Object.entries(payload).forEach(([key, value]) => {
-        if (key !== "companyImage") {
-          formData.append(key, value);
-        }
-      });
+  //     if (data.companyImage) {
+  //       formData.append("companyImage", data.companyImage);
+  //     }
 
-      if (data.companyImage) {
-        formData.append("companyImage", data.companyImage);
-      }
+  //     // console.log("FormData contents:");
+  //     // for (const [key, value] of formData.entries()) {
+  //     //   if (value instanceof File) {
+  //     //     console.log(key, {
+  //     //       name: value.name,
+  //     //       size: value.size,
+  //     //       type: value.type,
+  //     //     });
+  //     //   } else {
+  //     //     console.log(key, value);
+  //     //   }
+  //     // }
 
-      // console.log("FormData contents:");
-      // for (const [key, value] of formData.entries()) {
-      //   if (value instanceof File) {
-      //     console.log(key, {
-      //       name: value.name,
-      //       size: value.size,
-      //       type: value.type,
-      //     });
-      //   } else {
-      //     console.log(key, value);
-      //   }
-      // }
+  //     // const response = await fetch("http://localhost:8087/branch/save", {
+  //     //   method: "POST",
+  //     //   body: formData,
+  //     // });
 
-      // const response = await fetch("http://localhost:8087/branch/save", {
-      //   method: "POST",
-      //   body: formData,
-      // });
+  //     // let result;
+  //     // try {
+  //     //   const responseText = await response.text();
+  //     //   if (responseText) {
+  //     //     console.log("response", responseText);
+  //     //     result = JSON.parse(responseText);
+  //     //   }
+  //     // } catch (parseError) {
+  //     //   toast.error("Error parsing response:", parseError);
+  //     // }
+  //     const result = await saveBranch(formData);
+  //     if (result && result.success === true) {
+  //       toast.success("Branch saved successfully!");
 
-      // let result;
-      // try {
-      //   const responseText = await response.text();
-      //   if (responseText) {
-      //     console.log("response", responseText);
-      //     result = JSON.parse(responseText);
-      //   }
-      // } catch (parseError) {
-      //   toast.error("Error parsing response:", parseError);
-      // }
-      const result = await saveBranch(formData);
-      if (result && result.success === true) {
-        toast.success("Branch saved successfully!");
+  //       await loadCompany(companyId);
+  //       setStep(0); //Goes to step 1
+  //       // Load after save confirm only
+  //       if (!hasAmend) {
+  //         fetchEntityAmendData(branchId); //  fetch amendment data
+  //       } else {
+  //         reset(); // reset react-hook-form
+  //         datePickerRef.current?.setOpen(true);
+  //       }
 
-        await loadCompanyAndBranches();
-        setStep(0); //Goes to step 1
-        // Load after save confirm only
-        if (!hasAmend) {
-          fetchBranchAmendData(branchId); //  fetch amendment data
-        } else {
-          reset(); // reset react-hook-form
-          datePickerRef.current?.setOpen(true);
-        }
+  //       // SAVE → VIEW → GENERATE AMENDMENT → SAVE AMENDMENT → VERIFY
+  //       //  isVerifiedAmendment(true); //  lock
+  //       // const status = getValues("authorizationStatus");
+  //       // console.log("Status ", status);
+  //       // const status1 = watch("authorizationStatus");
+  //       // console.log("Status1 ", status1);
+  //       // if (status === 1) {
+  //       //   //activate amend mode
+  //       //   setIsReadOnly(true);
+  //       //   setAddingNewAmend(true);
+  //       // } else {
+  //       //   setAddingNewAmend(false); // exit amend mode
+  //       //   //setMode("VIEW"); // optional state
+  //       // }
 
-        // SAVE → VIEW → GENERATE AMENDMENT → SAVE AMENDMENT → VERIFY
-        //  isVerifiedAmendment(true); //  lock
-        // const status = getValues("authorizationStatus");
-        // console.log("Status ", status);
-        // const status1 = watch("authorizationStatus");
-        // console.log("Status1 ", status1);
-        // if (status === 1) {
-        //   //activate amend mode
-        //   setIsReadOnly(true);
-        //   setAddingNewAmend(true);
-        // } else {
-        //   setAddingNewAmend(false); // exit amend mode
-        //   //setMode("VIEW"); // optional state
-        // }
+  //       return;
+  //     }
 
-        return;
-      }
+  //     /* -------------------------------
+  //         Prepare documents JSON
+  //       (NO FileList inside JSON)
+  //     -------------------------------- */
+  //     // const documentsPayload = data.documents.map((doc) => {
+  //     //   // Append file separately
+  //     //   if (doc.file && doc.file.length > 0) {
+  //     //     formData.append("files", doc.file[0]); //  backend handles array
+  //     //   }
 
-      /* -------------------------------
-          Prepare documents JSON
-        (NO FileList inside JSON)
-      -------------------------------- */
-      // const documentsPayload = data.documents.map((doc) => {
-      //   // Append file separately
-      //   if (doc.file && doc.file.length > 0) {
-      //     formData.append("files", doc.file[0]); //  backend handles array
-      //   }
+  //     //   return {
+  //     //     type: doc.type,
+  //     //     number: doc.number,
+  //     //     expiryDate: doc.expiryDate,
+  //     //     remarks: doc.remarks || "",
+  //     //   };
+  //     // });
 
-      //   return {
-      //     type: doc.type,
-      //     number: doc.number,
-      //     expiryDate: doc.expiryDate,
-      //     remarks: doc.remarks || "",
-      //   };
-      // });
+  //     /* -------------------------------
+  //         Prepare final JSON payload
+  //     -------------------------------- */
+  //     // const payload = {
+  //     //   ...data,
+  //     //   documents: documentsPayload,
+  //     // };
 
-      /* -------------------------------
-          Prepare final JSON payload
-      -------------------------------- */
-      // const payload = {
-      //   ...data,
-      //   documents: documentsPayload,
-      // };
+  //     // console.log("payload:", payload);
 
-      // console.log("payload:", payload);
+  //     //  VERY IMPORTANT: remove FileList from payload
+  //     // delete payload.documents?.file;
 
-      //  VERY IMPORTANT: remove FileList from payload
-      // delete payload.documents?.file;
+  //     /* -------------------------------
+  //         Append JSON as Blob
+  //     -------------------------------- */
+  //     // formData.append(
+  //     //   "data",
+  //     //   new Blob([JSON.stringify(payload)], {
+  //     //     type: "application/json",
+  //     //   }),
+  //     // );
 
-      /* -------------------------------
-          Append JSON as Blob
-      -------------------------------- */
-      // formData.append(
-      //   "data",
-      //   new Blob([JSON.stringify(payload)], {
-      //     type: "application/json",
-      //   }),
-      // );
+  //     /* -------------------------------
+  //         Debug FormData (correct way)
+  //     -------------------------------- */
+  //     // console.log("FormData entries:");
+  //     // for (const [key, value] of formData.entries()) {
+  //     //   console.log(key, value instanceof File ? "FILE" : value);
+  //     // }
 
-      /* -------------------------------
-          Debug FormData (correct way)
-      -------------------------------- */
-      // console.log("FormData entries:");
-      // for (const [key, value] of formData.entries()) {
-      //   console.log(key, value instanceof File ? "FILE" : value);
-      // }
+  //     /* -------------------------------
+  //         API CALL (example)
+  //     -------------------------------- */
+  //     // await fetch("/api/branch/save", {
+  //     //   method: "POST",
+  //     //   body: formData
+  //     // });
+  //   } catch (err) {
+  //     // const apiErrors = err.response?.data?.errors;
+  //     // if (apiErrors) {
+  //     //   Object.entries(apiErrors).forEach(([field, message]) => {
+  //     //     setError(field, { type: "server", message });
+  //     //   });
+  //     // }
+  //     handleApiError(err);
+  //   } finally {
+  //     await ensureMinDuration(startTime, 1200);
 
-      /* -------------------------------
-          API CALL (example)
-      -------------------------------- */
-      // await fetch("/api/branch/save", {
-      //   method: "POST",
-      //   body: formData
-      // });
-    } catch (err) {
-      // const apiErrors = err.response?.data?.errors;
-      // if (apiErrors) {
-      //   Object.entries(apiErrors).forEach(([field, message]) => {
-      //     setError(field, { type: "server", message });
-      //   });
-      // }
-      handleApiError(err);
-    } finally {
-      await ensureMinDuration(startTime, 1200);
-
-      hideLoader();
-    }
-  };
+  //     hideLoader();
+  //   }
+  // };
 
   const handleClear = () => {
     if (selectedAmendment) {
       // Restore selected amendment values
-      setingData(selectedAmendment);
+      setAmendmentData(selectedAmendment);
 
       clearErrors();
       toast.success("Changes cleared");
@@ -826,7 +784,7 @@ export default function GenaralBranchForm() {
                       control={control}
                       setFocus={setFocus}
                       flags={formFlags}
-                      isReadOnly={isVerifiedAmendment || isReadOnly}
+                      isReadOnly={isVerifiedAmendment}
                       isUnlocked={isUnlocked || isVerifiedAmendment}
                       ref={generalInfoRef}
                       companys={companyList}
@@ -846,7 +804,7 @@ export default function GenaralBranchForm() {
                       control={control}
                       setFocus={setFocus}
                       flags={formFlags}
-                      isReadOnly={isVerifiedAmendment || isReadOnly}
+                      isReadOnly={isVerifiedAmendment}
                     />
                   </div>
                 )}
@@ -911,7 +869,7 @@ export default function GenaralBranchForm() {
                               options={authorizationStatusOptions}
                               placeholder="Select amendment type"
                               isSearchable={false}
-                              isDisabled={isReadOnly}
+                              isDisabled={isVerifiedAmendment}
                               classNamePrefix="form-control-select"
                               className={
                                 errors.authorizationStatus ? "error" : ""

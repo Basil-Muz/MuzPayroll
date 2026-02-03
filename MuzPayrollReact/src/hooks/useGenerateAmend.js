@@ -6,6 +6,7 @@ export const useGenerateAmend = ({
   reset,
   getValues,
   clearErrors,
+  // setIsReadOnly,
 }) => {
     //Prepare form for generating new amendments
   const handleGenerateAmendment = useCallback(() => {

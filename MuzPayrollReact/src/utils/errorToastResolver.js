@@ -4,7 +4,7 @@ export const handleApiError = (
   error,
   {
     entity,
-    operation , // fetch | save | update | delete
+    // operation , // fetch | save | update | delete
   },
 ) => {
   // console.error("API Error:", error);
@@ -21,7 +21,7 @@ export const handleApiError = (
   const status = error.type;
   switch (status) {
     case 400:
-      toast.error("Invalid request.");
+      toast.error(error.errors[0] ?? "Invalid request.");
       break;
     case 401:
       toast.error("Session expired. Please login again.");
@@ -31,7 +31,7 @@ export const handleApiError = (
       break;
     case 404:
       toast.error(
-        error?.errors[0] || `${entity ? entity + " " : ""}not found.`,
+        error?.errors[0] || `${entity ? entity + " " : ""} not found.`,
       );
       break;
     case 409:
