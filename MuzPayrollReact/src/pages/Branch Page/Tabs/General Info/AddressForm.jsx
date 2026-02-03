@@ -56,16 +56,20 @@ export default function AddressForm({
   // useEffect(() => {
   // if (!watchedPincode || watchedPincode.length !== 6) return;
 
-  const districtOptions = useMemo(
-    () =>
-      countryCode && stateCode
-        ? City.getCitiesOfState(countryCode, stateCode).map((d) => ({
-            value: d.name,
-            label: d.name,
-          }))
-        : [],
-    [countryCode, stateCode],
-  );
+  const districtOptions = useMemo(() => {
+    if (customDistrictOptions.length > 0) {
+      return customDistrictOptions;
+    }
+
+    if (countryCode && stateCode) {
+      return City.getCitiesOfState(countryCode, stateCode).map((d) => ({
+        value: d.name,
+        label: d.name,
+      }));
+    }
+
+    return [];
+  }, [customDistrictOptions, countryCode, stateCode]);
 
   const fetchLocationByPincode = useCallback(
     async (pincode) => {
@@ -170,7 +174,6 @@ export default function AddressForm({
       clearErrors,
       setCountryCode,
       setStateCode,
-      districtOptions,
     ],
   );
   //Debounce - request is only sent after a user has stopped performing an action
@@ -194,9 +197,9 @@ export default function AddressForm({
     }, 500); // 500ms debounce
   };
 
-  useEffect(() => {
-    setCustomDistrictOptions([]);
-  }, [stateCode]);
+  // useEffect(() => {
+  //   setCustomDistrictOptions([]);
+  // }, [stateCode]);
 
   useEffect(() => {
     setFocus("pincode");

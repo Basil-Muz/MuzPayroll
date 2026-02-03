@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import { useEffect } from "react";
 export default function ContactForm({
   register,
   errors,
@@ -10,9 +10,9 @@ export default function ContactForm({
   // disabled = {branchEmail:false},
   // requiredMap = {},
 }) {
-  useEffect(()=>{
-    setFocus("email")
-  },[setFocus])
+  useEffect(() => {
+    setFocus("email");
+  }, [setFocus]);
   return (
     <>
       <div className="form-section-header">
@@ -74,7 +74,7 @@ export default function ContactForm({
             {...register("landlineNumber", {
               required: false,
               pattern: {
-                value: /^[0-9]{8}$/,
+                value: /^(0\d{2,4}[- ]?)?\d{6,8}$/,
                 message: "Please enter a valid landlineNumber number",
               },
             })}

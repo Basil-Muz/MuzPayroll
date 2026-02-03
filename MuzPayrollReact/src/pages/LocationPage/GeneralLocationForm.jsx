@@ -573,7 +573,15 @@ export default function GenaralLocationForm() {
 
       await saveLocation(formData);
       toast.success("Location saved successfully!");
+      setStep(0); //Goes to step 1
 
+      if (!hasAmend) {
+        load(); // re-fechcomapny and branch data
+        fetchLocationAmendData(locationId); // fetch the amendment data
+      } else {
+        reset(); // reset react-hook-form
+        datePickerRef.current?.setOpen(true);
+      }
       // console.log("Saving Data", formData);
       // const response = await fetch("http://localhost:8087/location/save", {
       //   method: "POST",
@@ -675,16 +683,9 @@ export default function GenaralLocationForm() {
       handleApiError(err);
     } finally {
       await ensureMinDuration(startTime, 1200);
-      setStep(0); //Goes to step 1
-      if (!hasAmend) {
-        fetchLocationAmendData(locationId); // fetch the amendment data
-      } else {
-        reset(); // reset react-hook-form
-        datePickerRef.current?.setOpen(true);
-      }
+
       // hide loader ONLY at the end
       hideLoader();
-      
     }
   };
 

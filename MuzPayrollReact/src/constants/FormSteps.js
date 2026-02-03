@@ -1,0 +1,1 @@
+export const steps = ["General Info", "Address", "Contact", "Document Into"];

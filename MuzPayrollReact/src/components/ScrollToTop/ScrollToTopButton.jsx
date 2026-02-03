@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { FaArrowUp } from "react-icons/fa";
+import { IoIosArrowUp } from "react-icons/io";
 import "./ScrollToTopButton.css";
 
 const ScrollToTopButton = ({ showAfter = 100 }) => {
@@ -38,7 +38,7 @@ const ScrollToTopButton = ({ showAfter = 100 }) => {
       title="Scroll to top"
       tabIndex={visible ? 0 : -1}
     >
-      <FaArrowUp size={20} />
+      <IoIosArrowUp size={26} />
     </button>
   );
 };

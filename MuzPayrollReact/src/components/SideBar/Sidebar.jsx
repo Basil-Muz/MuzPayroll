@@ -14,7 +14,7 @@ import { FaGears } from "react-icons/fa6";
 
 import "./sidebar.css";
 
-import useIsMobile from "../../hook/useIsMobile";
+import useIsMobile from "../../hooks/useIsMobile";
 
 // import useIsTab from "../../hook/useIsTab";
 import { useNavigate } from "react-router-dom";

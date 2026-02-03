@@ -30,7 +30,7 @@ function LoggedPage() {
   const {
     control,
     setValue,
-    getValues,
+    // getValues,
     formState: { errors },
   } = useForm();
 
@@ -68,10 +68,10 @@ function LoggedPage() {
   const [locationId, setLocationId] = useState("");
   const [finYear, setFinYear] = useState("");
 
-  const [error, setError] = useState({});
-  const [backendError, setBackendError] = useState([]);
+  // const [error, setError] = useState({});
+  const [backendError] = useState([]);
 
-  const [companyList, setCompanyList] = useState([]);
+  // const [companyList, setCompanyList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
 

@@ -633,20 +633,31 @@ export default function GenaralBranchForm() {
       const result = await saveBranch(formData);
       if (result && result.success === true) {
         toast.success("Branch saved successfully!");
+
+        await loadCompanyAndBranches();
+        setStep(0); //Goes to step 1
+        // Load after save confirm only
+        if (!hasAmend) {
+          fetchBranchAmendData(branchId); //  fetch amendment data
+        } else {
+          reset(); // reset react-hook-form
+          datePickerRef.current?.setOpen(true);
+        }
+
         // SAVE → VIEW → GENERATE AMENDMENT → SAVE AMENDMENT → VERIFY
         //  isVerifiedAmendment(true); //  lock
-        const status = getValues("authorizationStatus");
+        // const status = getValues("authorizationStatus");
         // console.log("Status ", status);
         // const status1 = watch("authorizationStatus");
         // console.log("Status1 ", status1);
-        if (status === 1) {
-          //activate amend mode
-          setIsReadOnly(true);
-          setAddingNewAmend(true);
-        } else {
-          setAddingNewAmend(false); // exit amend mode
-          //setMode("VIEW"); // optional state
-        }
+        // if (status === 1) {
+        //   //activate amend mode
+        //   setIsReadOnly(true);
+        //   setAddingNewAmend(true);
+        // } else {
+        //   setAddingNewAmend(false); // exit amend mode
+        //   //setMode("VIEW"); // optional state
+        // }
 
         return;
       }
@@ -717,15 +728,7 @@ export default function GenaralBranchForm() {
       handleApiError(err);
     } finally {
       await ensureMinDuration(startTime, 1200);
-      await loadCompanyAndBranches();
-      setStep(0); //Goes to step 1
-      // hide loader ONLY at the end
-      if (!hasAmend) {
-        fetchBranchAmendData(branchId); //  fetch amendment data
-      } else {
-        reset(); // reset react-hook-form
-        datePickerRef.current?.setOpen(true);
-      }
+
       hideLoader();
     }
   };
