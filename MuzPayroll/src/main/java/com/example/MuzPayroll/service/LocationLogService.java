@@ -219,6 +219,8 @@ public class LocationLogService extends MuzirisAbstractService<LocationLogDTO, L
         dto.setEsiRegion(entity.getEsiRegion());
         dto.setLocatioinLogPK(entity.getLocationLogPK());
         dto.setAmendNo(entity.getAmendNo());
+        dto.setCompanyMstID(entity.getCompanyEntity().getCompanyMstID());
+        dto.setBranchMstID(entity.getBranchEntity().getBranchMstID());
 
         if (entity.getAuthorization() != null) {
             dto.setAuthId(entity.getAuthorization().getAuthId());

@@ -1,59 +1,74 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
-import Select from "react-select";
+// React & core libraries
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 
-import { toast } from "react-hot-toast";
+// Third-party UI libraries & icons
+import Select from "react-select";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
-import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
+//Constants
+import { steps } from "../../constants/FormSteps";
+import { COMMON_COMPANY_FIELD_MAP } from "../../constants/companyFieldMap";
+
+//Hook (flow control)
+import { useSaveForm } from "../../hooks/useSaveForm";
+import { useFormClear } from "../../hooks/useFormClear";
+import { useFormStepper } from "../../hooks/useFormStepper";
+import { useGenerateAmend } from "../../hooks/useGenerateAmend";
+import { useSmoothFormFocus } from "../../hooks/useSmoothFormFocus";
+import { useEntityAmendList } from "../../hooks/useEntityAmendList";
+import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
+
+//service
+import { saveCompany } from "../../services/company.service";
+import { getCompanyAmendList } from "../../services/company.service";
+
+//Utils (Helpers)
+import { formatDate } from "../../utils/dateFormater";
+
+//  Components
+import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
 import AddressForm from "../Branch Page/Tabs/General Info/AddressForm";
 import ContactForm from "../Branch Page/Tabs/General Info/ContactForm";
 import DocumentsTab from "../Branch Page/Tabs/General Info/DocumentsTab";
-
-// import StepProgress from "./General Info/StepProgress";
-// import Header from "../../../components/Header/Header";
+import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
+import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
-import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
-import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
-
-const steps = ["General Info", "Address", "Contact", "Document Into"];
+// Styles
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function GenaralCompanyForm() {
-  const [step, setStep] = useState(0); //switch steps
-  // const [submitStatus, setSubmitStatus] = useState(1);
-  const [selectedAmendment, setSelectedAmendment] = useState(null);
-  // const [backendErrors, setBackendErrors] = useState([]);
-  //pass the back end error to front end
-
-  // const [addNewAmend, setAddNewAmend] = useState(false);
-  // true when latest amned is verified enables the genarate button
-
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
-
-  const datePickerRef = useRef(null);
   // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
   const userObj = JSON.parse(UserData);
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
-  // const [isReadOnly, setIsReadOnly] = useState();
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
-  // console.log("Logeeded data", userCode);
 
-  //  (authorizationStatus===0)? "ENTRY" :
-  // (authorizationStatus===0)? "ENTRY" :
-  // (authorizationStatus===0)? "ENTRY" :
+  const { companyId } = useParams();
 
-  const [amendments, setAmendments] = useState([]);
+  //Fetch company amend data
+  const {
+    amendments,
+    // setAmendments,
+    selectedAmendment,
+    setSelectedAmendment,
+    fetchEntityAmendData,
+    // isVerifiedAmendment,
+  } = useEntityAmendList({
+    entity: "company",
+    getEntityAmendList: getCompanyAmendList,
+    addingNewAmend,
+    setAddingNewAmend,
+  });
+
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
 
-  // console.log("amends nmber", inputMode);
   const {
     register,
     handleSubmit,
@@ -89,17 +104,14 @@ export default function GenaralCompanyForm() {
     },
   });
 
-  const authDate = useWatch({
-    control,
-    name: "withaffectdate",
+  const amendLenght = amendments.length;
+
+  //seting amend data with selected amend pill
+  const { setAmendmentData } = useSetAmendmentData({
+    amendLenght,
+    setValue,
+    fieldMap: COMMON_COMPANY_FIELD_MAP,
   });
-  //workflow of amend date then name logic
-  let isUnlocked = !!authDate;
-  if (amendments.length > 0) {
-    isUnlocked = true;
-  } else {
-    isUnlocked = !!authDate;
-  }
 
   // From content changes
   const [formFlags] = useState({
@@ -107,6 +119,50 @@ export default function GenaralCompanyForm() {
     branchForm: false,
     locationForm: false,
   });
+
+  const { smoothFocus } = useSmoothFormFocus({
+    formFlags,
+    setFocus,
+  });
+
+  const authDate = useWatch({
+    control,
+    name: "withaffectdate",
+  });
+
+  //Handle the generate new amend
+  const { handleGenerateAmendment } = useGenerateAmend({
+    setSelectedAmendment,
+    setAddingNewAmend,
+    reset,
+    getValues,
+    clearErrors,
+  });
+
+  const { onSubmit, step, setStep, datePickerRef } = useSaveForm({
+    trigger,
+    //   errors,
+    userCode,
+    reset,
+    entityId: companyId, // compay id for fetch amendments data
+    amendments, // SAME STATE
+    refreshAmendments: fetchEntityAmendData, // amend api call for company
+    entity: "company",
+    saveEntity: saveCompany,
+  });
+
+  const { nextStep, prevStep } = useFormStepper({
+    trigger,
+    setStep,
+  });
+
+  //workflow of amend date then name logic
+  let isUnlocked = !!authDate;
+  if (amendments.length > 0) {
+    isUnlocked = true;
+  } else {
+    isUnlocked = !!authDate;
+  }
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -124,35 +180,8 @@ export default function GenaralCompanyForm() {
     { label: "ENTRY", value: 0 },
     { label: "VERIFIED", value: 1 },
   ];
-  // console.log("Selected item:", selectedAmendment?.authorizationStatus);
 
   // const amendmentAuthorizationOptions = [];
-
-  // if (selectedAmendment?.authorizationStatus === 0) {
-  //   amendmentAuthorizationOptions.push(
-  //     {
-  //       label: `ENTRY : ${selectedAmendment.date}`,
-  //       value: 0,
-  //     },
-  //     {
-  //       label: `VERIFIED `,
-  //       value: 1,
-  //     }
-  //   );
-  // }
-
-  // if (selectedAmendment?.authorizationStatus === 1) {
-  //   amendmentAuthorizationOptions.push(
-  //     {
-  //       label: `ENTRY : ${selectedAmendment.date}`,
-  //       value: 0,
-  //     },
-  //     {
-  //       label: `VERIFIED : ${selectedAmendment.date}`,
-  //       value: 1,
-  //     }
-  //   );
-  // }
 
   const amendmentAuthorizationOptions = [];
 
@@ -181,11 +210,11 @@ export default function GenaralCompanyForm() {
       },
     );
   }
-
-  // console.log("Selected List:", amendmentAuthorizationOptions);
-  const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorizationStatus === true && !addingNewAmend;
-
+  const isVerifiedAmendment = useMemo(() => {
+    // Read-only VERIFIED mode
+    return selectedAmendment?.authorizationStatus === true && !addingNewAmend;
+  }, [selectedAmendment, addingNewAmend]);
+  console.log("Is varified", isVerifiedAmendment);
   // const hasUserChanges = Object.keys(dirtyFields).length > 0;
   const isLastStep = step === steps.length - 1;
   // const documentsValid = submitStatus === 0;
@@ -203,89 +232,6 @@ export default function GenaralCompanyForm() {
   //     // New entry mode: complete all steps + valid docs
   //     (!isAmendMode && isLastStep && documentsValid));
 
-  // const DesignationDetails = () => {
-  const { companyId } = useParams();
-
-  // console.log("Link id", companyId); //  received id
-  // };
-
-  // console.log("Verified mde: ", isVerifiedAmendment);
-
-  const toLocalDate = (date) =>
-    date instanceof Date
-      ? date.toLocaleDateString("en-CA") // yyyy-MM-dd
-      : date;
-
-  const fetchCompanyAmendData = useCallback(
-    async (companyId) => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8087/company/getamendlist/${companyId}`,
-        );
-
-        setAmendments(response.data.companyDtoLogs || []); // Use the amends data
-        // delete response.data.companyDtoLogs;
-        setSelectedAmendment(response.data); //data form master table
-        // console.log("Amend response", response.data);
-      } catch (error) {
-        console.error("Error fetching company data:", error);
-      }
-    },
-    [setSelectedAmendment, setAmendments],
-  );
-
-  //for smooth focus
-  const smoothFocus = () => {
-    const fieldNameFlage = formFlags.locationForm
-      ? "location"
-      : formFlags.companyForm
-        ? "company"
-        : formFlags.branchForm
-          ? "branch"
-          : "";
-    const el = document.querySelector(`[name=${fieldNameFlage}]`);
-    if (el) {
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      // console.log("sgvwrg");
-    }
-
-    setFocus(fieldNameFlage); // RHF handles focus properly
-  };
-  // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`; // yyyy-MM-dd
-  };
-
-  const handleGenerateAmendment = () => {
-    setSelectedAmendment(null);
-    setAddingNewAmend(true);
-    // setIsReadOnly(false);
-
-    reset({
-      ...getValues(), //  keep base data
-      authorizationStatus: 0, // ENTRY
-      withaffectdate: "",
-      // documents: [
-      //   {
-      //     type: "",
-      //     number: "",
-      //     expiryDate: "",
-      //     file: null,
-      //     remarks: "",
-      //   },
-      // ],
-    });
-
-    clearErrors();
-  };
-
   // useEffect(() => {
   //   if (!watchedDocuments?.length) {
   //     console.log("Documents chnaged");
@@ -299,7 +245,7 @@ export default function GenaralCompanyForm() {
   //   console.log("Documents chnaged", hasEmptyFile);
   //   setSubmitStatus(hasEmptyFile ? 1 : 0);
   // }, [watchedDocuments]);
-  // console.log("Submit status: ", step < steps.length - 1 || submitStatus == 1);
+
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });
   }, [inputMode, setValue]);
@@ -329,16 +275,6 @@ export default function GenaralCompanyForm() {
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
 
-  // useEffect(() => {
-  //   console.log("Input ref:", authDateInputRef.current);
-  //   console.log("DatePicker ref:", datePickerRef.current);
-  // }, []);
-  let amendLenght = amendments.length;
-  //latest amend only entry amend with max amend number
-  // const latestAmendmentId = amendments
-  //   .filter((a) => a.authorizationStatus === false)
-  //   .reduce((max, cur) => (cur.amendNo > max.amendNo ? cur : max), null);
-
   //latest amend only entry amend with max amend number
   const latestAmendmentId = amendments.length
     ? amendments
@@ -349,121 +285,14 @@ export default function GenaralCompanyForm() {
         )
     : null;
 
-  // console.log("Latest amends:", latestAmendmentId);
-
-  const setingData = useCallback(
-    (selectedAmendment) => {
-      if (amendLenght > 0) {
-        setValue("companyMstID", selectedAmendment.companyMstID ?? "", {
-          shouldDirty: false,
-          shouldValidate: true,
-        });
-      }
-
-      setValue("shortName", selectedAmendment.shortName ?? "", {
-        shouldDirty: false,
-        shouldValidate: false,
-      });
-
-      setValue(
-        "authorizationStatus",
-        selectedAmendment.authorizationStatus ? 1 : 0,
-        {
-          shouldDirty: false,
-          shouldValidate: true,
-        },
-      );
-      setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
-        shouldDirty: false,
-        shouldValidate: false,
-      });
-
-      setValue("company", selectedAmendment.company ?? "", {
-        shouldDirty: false,
-        shouldValidate: false,
-      });
-
-      setValue("companyImage", selectedAmendment.companyImagePath, {
-        shouldValidate: false,
-        shouldDirty: false,
-      });
-
-      setValue(
-        "activeDate",
-        selectedAmendment.activeDate
-          ? selectedAmendment.activeDate
-          : toLocalDate(new Date()),
-        { shouldDirty: false },
-      );
-
-      setValue("pincode", selectedAmendment.pincode ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-
-      setValue("address", selectedAmendment.address ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-
-      setValue("country", selectedAmendment.country ?? "IN", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-
-      setValue("state", selectedAmendment.state ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("district", selectedAmendment.district ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("place", selectedAmendment.place ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("email", selectedAmendment.email ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerName", selectedAmendment.employerName ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("designation", selectedAmendment.designation ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-    },
-    [setValue, amendLenght],
-  );
-
   useEffect(() => {
     if (!companyId) return;
-    fetchCompanyAmendData(companyId);
-  }, [companyId, fetchCompanyAmendData]);
+    fetchEntityAmendData(companyId);
+  }, [companyId, fetchEntityAmendData]);
 
   useEffect(() => {
     const date = new Date(); // current date
     const formattedDate = date.toISOString().split("T")[0]; //yyyy-mm-dd format
-    // console.log("Active date",formattedDate)
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
@@ -473,14 +302,14 @@ export default function GenaralCompanyForm() {
 
     if (!selectedAmendment) return;
     //Amend Auto selection whille loading
-    setingData(selectedAmendment);
-  }, [selectedAmendment, setingData]);
+    setAmendmentData(selectedAmendment);
+  }, [selectedAmendment, setAmendmentData]);
 
   const handleSelectAmendment = (id, index) => {
     // User Selecetion - Assign the amend data to feild
     setSelectedAmendment(amendments[index]);
 
-    setingData(amendments[index]);
+    // setAmendmentData(amendments[index]);
     // setValue("shortName", amendments[index].shortName);
 
     // setValue("company", amendments[index].company, {
@@ -489,244 +318,13 @@ export default function GenaralCompanyForm() {
     // });
   };
 
-  const nextStep = async () => {
-    const valid = await trigger();
-    if (valid) setStep((s) => s + 1);
-  };
-
-  const prevStep = () => setStep((s) => s - 1);
-
-  const handleApiError = (error) => {
-    // console.error("API Error:", error);
-
-    // Network / connection issue
-    if (!error.response) {
-      toast.error("Unable to connect to server. Please check your network.");
-      return;
-    }
-
-    // HTTP errors
-    if (error.type === "HTTP_ERROR") {
-      switch (error.status) {
-        case 400:
-          toast.error("Invalid request.");
-          break;
-        case 401:
-          toast.error("Session expired. Please login again.");
-          break;
-        case 403:
-          toast.error("You do not have permission.");
-          break;
-        case 409:
-          toast.error("Duplicate record exists.");
-          break;
-        case 500:
-          toast.error("Server error. Please try again later.");
-          break;
-        default:
-          toast.error("Unexpected error occurred.");
-      }
-      return;
-    }
-
-    //  Backend validation / business errors
-    if (error.type === "BUSINESS_ERROR") {
-      const { message, errors } = error.result;
-
-      if (message) {
-        toast.error(message);
-      }
-
-      // Map backend errors to form fields
-      if (errors) {
-        Object.entries(errors).forEach(([field, msg]) => {
-          setError(field, {
-            type: "server",
-            message: msg,
-          });
-        });
-      }
-      return;
-    }
-
-    //  Fallback
-    toast.error("Something went wrong. Please try again.");
-  };
-
-  const saveCompany = async (formData) => {
-    const response = await fetch("http://localhost:8087/company/save", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw {
-        type: "HTTP_ERROR",
-        status: response.status,
-        body: text,
-      };
-    }
-
-    const text = await response.text();
-    const result = text ? JSON.parse(text) : null;
-
-    if (!result?.success) {
-      throw {
-        type: "BUSINESS_ERROR",
-        result,
-      };
-    }
-
-    return result;
-  };
-
-  const onSubmit = async (data) => {
-    try {
-      await trigger("documents"); //  validate all docs
-      if (errors?.documents) {
-        toast.error("Please complete the document details");
-        return;
-      }
-      const payload = {
-        ...data,
-        userCode,
-        authorizationDate: new Date().toISOString().split("T")[0],
-      };
-      // console.log("Submitting data", data);
-      const formData = new FormData();
-
-      Object.entries(payload).forEach(([key, value]) => {
-        if (key !== "companyImage") {
-          formData.append(key, value);
-        }
-      });
-
-      if (payload.companyImage instanceof File) {
-        //  New Image file from user
-        formData.append("companyImage", payload.companyImage);
-      } else if (typeof payload.companyImage === "string") {
-        //Old image in amends
-        formData.append("companyImagePath", payload.companyImage);
-      }
-
-      // console.log("FormData contents:");
-      // for (const [key, value] of formData.entries()) {
-      //   if (value instanceof File) {
-      //     console.log(key, {
-      //       name: value.name,
-      //       size: value.size,
-      //       type: value.type,
-      //     });
-      //   } else {
-      //     console.log(key, value);
-      //   }
-      // }
-      await saveCompany(formData);
-      toast.success("Company saved successfully!");
-      //     try {
-      //
-      //       // const responseText = await response.text();
-      //       // if (responseText) {
-      //       //   result = JSON.parse(responseText);
-      //       // }
-      //     } catch (error) {
-      //   handleApiError(error);
-      // }
-      //       console.error("Error parsing response:", parseError);
-      //     }
-
-      // if (result && result.success === true) {
-      //   toast.success("Company saved successfully!");
-      //   return;
-      // }
-
-      /* -------------------------------
-          Prepare documents JSON
-        (NO FileList inside JSON)
-      -------------------------------- */
-      // const documentsPayload = data.documents.map((doc) => {
-      //   // Append file separately
-      //   if (doc.file && doc.file.length > 0) {
-      //     formData.append("files", doc.file[0]); //  backend handles array
-      //   }
-
-      //   return {
-      //     type: doc.type,
-      //     number: doc.number,
-      //     expiryDate: doc.expiryDate,
-      //     remarks: doc.remarks || "",
-      //   };
-      // });
-
-      /* -------------------------------
-          Prepare final JSON payload
-      -------------------------------- */
-      // const payload = {
-      //   ...data,
-      //   documents: documentsPayload,
-      // };
-
-      // console.log("payload:", payload);
-
-      //  VERY IMPORTANT: remove FileList from payload
-      // delete payload.documents?.file;
-
-      /* -------------------------------
-          Append JSON as Blob
-      -------------------------------- */
-      // formData.append(
-      //   "data",
-      //   new Blob([JSON.stringify(payload)], {
-      //     type: "application/json",
-      //   })
-      // );
-
-      /* -------------------------------
-          Debug FormData (correct way)
-      -------------------------------- */
-      // console.log("FormData entries:");
-      // for (const [key, value] of formData.entries()) {
-      //   console.log(key, value instanceof File ? "FILE" : value);
-      // }
-
-      /* -------------------------------
-          API CALL (example)
-      -------------------------------- */
-      // await fetch("/api/branch/save", {
-      //   method: "POST",
-      //   body: formData
-      // });
-    } catch (err) {
-      // const apiErrors = err.response?.data?.errors;
-      // if (apiErrors) {
-      //   Object.entries(apiErrors).forEach(([field, message]) => {
-      //     setError(field, { type: "server", message });
-      //   });
-      // }
-      console.error("Submit failed:", err);
-
-      handleApiError(err);
-    }
-  };
-
-  const handleClear = () => {
-    if (selectedAmendment) {
-      // Restore selected amendment values
-      setingData(selectedAmendment);
-
-      clearErrors();
-      toast.success("Changes cleared");
-    } else {
-      //  New record → reset to empty insert state
-      reset({
-        userCode,
-        authorizationStatus: 0,
-        withaffectdate: "",
-        activeDate: new Date().toISOString().split("T")[0],
-      });
-    }
-  };
+  const { handleClear } = useFormClear({
+    setAmendmentData,
+    selectedAmendment,
+    clearErrors,
+    reset,
+    userCode,
+  });
 
   return (
     <>

@@ -1,61 +1,94 @@
+// React and core libraries
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
-import Select from "react-select";
-import { toast } from "react-hot-toast";
-import { useParams } from "react-router-dom";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import axios from "axios";
 
-import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
+// Third-party libraries
+import Select from "react-select";
+import DatePicker from "react-datepicker";
+import { useParams } from "react-router-dom";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
+
+//  Hooks
+import { useSaveForm } from "../../hooks/useSaveForm";
+import { useFormClear } from "../../hooks/useFormClear";
+import { useLoadBranch } from "../../hooks/useLoadBranch";
+import { useFormStepper } from "../../hooks/useFormStepper";
+import { useLoadCompany } from "../../hooks/useLoadCompany";
+import { useGenerateAmend } from "../../hooks/useGenerateAmend";
+import { useEntityAmendList } from "../../hooks/useEntityAmendList";
+import { useSmoothFormFocus } from "../../hooks/useSmoothFormFocus";
+import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
+
+//  Services (API calls)
+import { getLocationAmendList } from "../../services/location.service";
+import { saveLocation } from "../../services/location.service";
+//  Utils / helpers
+import { formatDate } from "../../utils/dateFormater";
+import { handleApiError } from "../../utils/errorToastResolver";
+
+//  Constants
+import { steps } from "../../constants/FormSteps";
+import { COMMON_LOCATION_FIELD_MAP } from "../../constants/locationFieldMap";
+//  Components
+import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
 import AddressForm from "../Branch Page/Tabs/General Info/AddressForm";
 import ContactForm from "../Branch Page/Tabs/General Info/ContactForm";
 import DocumentsTab from "../Branch Page/Tabs/General Info/DocumentsTab";
-
-// import StepProgress from "./General Info/StepProgress";
-// import Header from "../../../components/Header/Header";
+import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
+import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
-import "../Branch Page/css/From.css";
-import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
-import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
-
-const steps = ["General Info", "Address", "Contact", "Document Into"];
+// Styles
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function GenaralLocationForm() {
-  const [step, setStep] = useState(0); //switch steps
-  const [companyList, setCompanyList] = useState([]);
-  const [branchList, setBranchList] = useState([]);
 
-  // const [backendErrors, setBackendErrors] = useState([]);
-  //pass the back end error to front end
+  /* ------------------------------------------------------------------
+   * 1. LOCAL STATE & REFS
+   * ------------------------------------------------------------------ */
+  const [addingNewAmend, setAddingNewAmend] = useState(false);
 
-  // const [addNewAmend, setAddNewAmend] = useState(false);
-  // true when latest amned is verified enables the genarate button
-
-  const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
-
-  const datePickerRef = useRef(null);
-  // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
   const dateWrapperRef = useRef(null);
-
   const cancelledRef = useRef(false);
 
-  const UserData = localStorage.getItem("loginData");
-  const userObj = JSON.parse(UserData);
 
-  //Convert the JSON string to objects
+  /* ------------------------------------------------------------------
+   * 2. USER / SESSION DATA
+   * ------------------------------------------------------------------ */
+  const userObj = JSON.parse(localStorage.getItem("loginData"));
   const userCode = userObj.userCode.split("@", 1)[0];
   const companyId = userObj.companyId;
 
-  //Amend data
-  const [amendments, setAmendments] = useState([]);
 
-  //Mode for backend
-  const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
+  /* ------------------------------------------------------------------
+   * 3. ROUTE PARAMS
+   * ------------------------------------------------------------------ */
+  const { locationId } = useParams();
 
+
+  /* ------------------------------------------------------------------
+   * 4. DOMAIN / BUSINESS HOOKS
+   * ------------------------------------------------------------------ */
+  const {
+    amendments,
+    selectedAmendment,
+    setSelectedAmendment,
+    fetchEntityAmendData,
+  } = useEntityAmendList({
+    entity: "location",
+    getEntityAmendList: getLocationAmendList,
+    addingNewAmend,
+    setAddingNewAmend,
+  });
+
+  const { loadCompany, companyList } = useLoadCompany();
+  const { loadBranches, branchList } = useLoadBranch();
+
+
+  /* ------------------------------------------------------------------
+   * 5. FORM INITIALIZATION (React Hook Form)
+   * ------------------------------------------------------------------ */
   const {
     register,
     handleSubmit,
@@ -72,44 +105,66 @@ export default function GenaralLocationForm() {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      //  mound with one document row default
-      // documents: [
-      //   {
-      //     type: "",
-      //     number: "",
-      //     expiryDate: "",
-      //     file: null,
-      //     remarks: "",
-      //   },
-      // ],
-      userCode: userCode, //User code from local storage
-      authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
-      authorizationStatus: 0, // ENTRY
-      // mode: inputMode,
+      userCode,
+      authorizationDate: new Date().toISOString().split("T")[0],
+      authorizationStatus: 0,
       activeStatusYN: 1,
     },
   });
+
+  /* ------------------------------------------------------------------
+   * 6. DERIVED FORM STATE
+   * ------------------------------------------------------------------ */
+  const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
 
   const authDate = useWatch({
     control,
     name: "withaffectdate",
   });
 
-  //workflow of amend date then name logic
-  let isUnlocked = !!authDate;
-  if (amendments.length > 0) {
-    isUnlocked = true;
-  } else {
-    isUnlocked = !!authDate;
-  }
+  const isUnlocked = amendments.length > 0 ? true : !!authDate;
 
-  // From content changes
-  const [formFlags] = useState({
+  const isAmendMode = amendments.length > 0;
+  const isVerifiedAmendment =
+    selectedAmendment?.authorizationStatus === true && !addingNewAmend;
+
+
+  /* ------------------------------------------------------------------
+   * 7. UI / FLOW CONTROL HOOKS
+   * ------------------------------------------------------------------ */
+  const formFlags = {
     companyForm: false,
     branchForm: false,
     locationForm: true,
+  };
+
+  const { smoothFocus } = useSmoothFormFocus({ formFlags, setFocus });
+
+  const { handleGenerateAmendment } = useGenerateAmend({
+    setSelectedAmendment,
+    setAddingNewAmend,
+    reset,
+    getValues,
+    clearErrors,
   });
 
+  const { onSubmit, step, setStep, datePickerRef } = useSaveForm({
+    trigger,
+    userCode,
+    reset,
+    entityId: locationId,
+    amendments,
+    refreshAmendments: fetchEntityAmendData,
+    entity: "location",
+    saveEntity: saveLocation,
+  });
+
+  const { nextStep, prevStep } = useFormStepper({ trigger, setStep });
+
+
+  /* ------------------------------------------------------------------
+   * 8. FIELD ARRAYS & WATCHERS
+   * ------------------------------------------------------------------ */
   const { fields, append, remove } = useFieldArray({
     control,
     name: "documents",
@@ -120,204 +175,83 @@ export default function GenaralLocationForm() {
     name: "documents",
   });
 
-  // const watchedPincode = watch("branchPinCode");
 
+  /* ------------------------------------------------------------------
+   * 9. DERIVED OPTIONS & COMPUTED VALUES
+   * ------------------------------------------------------------------ */
   const authorizationStatusOptions = [
     { label: "ENTRY", value: 0 },
     { label: "VERIFIED", value: 1 },
   ];
 
-  //latest amend only entry amend with max amend number
   const latestAmendmentId = amendments.length
     ? amendments
-        .filter((a) => a.authorizationStatus === false)
-        .reduce(
-          (max, cur) => (cur.amendNo > max.amendNo ? cur : max),
-          amendments[0],
-        )
+        .filter(a => a.authorizationStatus === false)
+        .reduce((max, cur) => (cur.amendNo > max.amendNo ? cur : max), amendments[0])
     : null;
-
-  const [selectedAmendment, setSelectedAmendment] = useState(null);
-
-  // console.log("Selected item:", selectedAmendment);
 
   const amendmentAuthorizationOptions = [];
 
   if (selectedAmendment?.authorizationStatus === false) {
     amendmentAuthorizationOptions.push(
-      {
-        label: `ENTRY : ${selectedAmendment.authorizationDate}`,
-        value: 0,
-      },
-      {
-        label: `VERIFIED :`,
-        value: 1,
-      },
-    );
-  }
-  // console.log("Seletced amends", selectedAmendment);
-  if (selectedAmendment?.authorizationStatus === true) {
-    amendmentAuthorizationOptions.push(
-      // {
-      //   label: `ENTRY : ${selectedAmendment.withaffectdate}`,
-      //   value: 0,
-      // },
-      {
-        label: `VERIFIED : ${selectedAmendment.authorizationDate}`,
-        value: 1,
-      },
+      { label: `ENTRY : ${selectedAmendment.authorizationDate}`, value: 0 },
+      { label: "VERIFIED :", value: 1 }
     );
   }
 
-  const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorizationStatus === true && !addingNewAmend;
+  if (selectedAmendment?.authorizationStatus === true) {
+    amendmentAuthorizationOptions.push({
+      label: `VERIFIED : ${selectedAmendment.authorizationDate}`,
+      value: 1,
+    });
+  }
 
   const isLastStep = step === steps.length - 1;
-  // const documentsValid = submitStatus === 0;
-  const isAmendMode = amendments.length > 0;
 
   const canSave =
     !isVerifiedAmendment &&
     ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
 
-  const { locationId } = useParams();
 
-  const toLocalDate = (date) =>
-    date instanceof Date
-      ? date.toLocaleDateString("en-CA") // yyyy-MM-dd
-      : date;
+  /* ------------------------------------------------------------------
+   * 10. DATA MAPPING HELPERS
+   * ------------------------------------------------------------------ */
+  const amendLength = amendments.length;
 
-  const fetchLocationAmendData = useCallback(
-    async (locationId) => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8087/location/getamendlist/${locationId}`,
-        );
+  const { setAmendmentData } = useSetAmendmentData({
+    amendLenght: amendLength,
+    setValue,
+    fieldMap: COMMON_LOCATION_FIELD_MAP,
+  });
 
-        setAmendments(response.data.locationDtoLogs || []); // Use the amends data
-        // delete response.data.companyDtoLogs;
-        setSelectedAmendment(response.data); //data form master table
-        console.log("Amend response", response.data);
-      } catch (error) {
-        console.error("Error fetching company data:", error);
-      }
-    },
-    [setSelectedAmendment, setAmendments],
-  );
 
-  //for smooth focus
-  const smoothFocus = (fieldName) => {
-    const fieldNameFlage = formFlags.locationForm
-      ? "location"
-      : formFlags.companyForm
-        ? "company"
-        : formFlags.branchForm
-          ? "branch"
-          : fieldName;
-    const el = document.querySelector(`[name=${fieldNameFlage}]`);
-    if (el) {
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      console.log("sgvwrg");
-    }
-
-    setFocus(fieldNameFlage); // RHF handles focus properly
-  };
-  // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`; // yyyy-MM-dd
+  /* ------------------------------------------------------------------
+   * 11. EVENT HANDLERS
+   * ------------------------------------------------------------------ */
+  const handleSelectAmendment = (_, index) => {
+    setSelectedAmendment(amendments[index]);
+    setAmendmentData(amendments[index]);
   };
 
-  const handleGenerateAmendment = () => {
-    setSelectedAmendment(null);
-    setAddingNewAmend(true);
-    // setIsReadOnly(false);                                                                                               
-    reset({
-      ...getValues(), //  keep base data
-      authorizationStatus: 0, // ENTRY
-      withaffectdate: "",
-      // documents: [
-      //   {
-      //     type: "",
-      //     number: "",
-      //     expiryDate: "",
-      //     file: null,
-      //     remarks: "",
-      //   },
-      // ],
-    });
-
-    clearErrors();
-  };
-
-  const handleApiError = useCallback((error) => {
-    console.error("API Error:", error);
-
-    // Network error (no response from server)
-    if (!error.body) {
-      toast.error("Unable to connect to server. Please check your network.");
-      return;
-    }
-    const status = error.response.type;
-
-    switch (status) {
-      case 400:
-        toast.error(error.response.message[0]);
-        break;
-      case 401:
-        toast.error("Session expired. Please login again.");
-        break;
-      case 403:
-        toast.error("You do not have permission.");
-        break;
-      case 404:
-        toast.error("Resource not found.");
-        break;
-      case 409:
-        toast.error("Duplicate record exists.");
-        break;
-      case 500:
-        toast.error("Server error. Please try again later.");
-        break;
-      default:
-        toast.error("Unexpected error occurred.");
-    }
-  },[]);
-
+  const { handleClear } = useFormClear({
+    selectedAmendment,
+    setAmendmentData,
+    clearErrors,
+    reset,
+    userCode,
+  });
+  
+  /* ------------------------------------------------------------------
+   * 12. SIDE EFFECTS
+   * ------------------------------------------------------------------ */
   const load = useCallback(async () => {
     try {
-      const [companyRes, branchRes] = await Promise.all([
-        axios.get(`http://localhost:8087/company/${companyId}`),
-        axios.get(`http://localhost:8087/branch/company/${companyId}`),
-      ]);
-
-      if (cancelledRef.current) return;
-
-      setCompanyList([
-        {
-          value: companyRes.data.companyMstID,
-          label: companyRes.data.company,
-        },
-      ]);
-
-      setBranchList(
-        branchRes.data.map((branch) => ({
-          value: branch.branchMstID,
-          label: branch.branch,
-        })),
-      );
+      loadBranches(companyId);
+      loadCompany(companyId);
     } catch (err) {
-      if (!cancelledRef.current) {
-        handleApiError(err);
-      }
+      if (!cancelledRef.current) handleApiError(err);
     }
-  }, [companyId, handleApiError]);
+  }, [companyId]);
 
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });
@@ -326,357 +260,37 @@ export default function GenaralLocationForm() {
   useEffect(() => {
     cancelledRef.current = false;
     load();
-
-    return () => {
-      cancelledRef.current = true;
-    };
+    return () => (cancelledRef.current = true);
   }, [load]);
+
+  useEffect(() => {
+    if (!locationId) return;
+    fetchEntityAmendData(locationId);
+  }, [locationId, fetchEntityAmendData]);
+
+  useEffect(() => {
+    if (!selectedAmendment) return;
+    setAmendmentData(selectedAmendment);
+  }, [selectedAmendment, setAmendmentData]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
 
     const timer = setTimeout(() => {
-      // Smooth scroll FIRST
-      dateWrapperRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      dateWrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
 
-      // Wait until scroll animation finishes
       setTimeout(() => {
-        const el = document.querySelector(".withaffectdate");
-
-        if (el) {
-          el.focus({ preventScroll: true }); //  NO JUMP
-        }
-
+        document.querySelector(".withaffectdate")?.focus({ preventScroll: true });
         datePickerRef.current?.setOpen(true);
-      }, 500); // match scroll duration
+      }, 500);
     }, 300);
 
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
 
-  // useEffect(() => {
-  //   // console.log("Input ref:", authDateInputRef.current);
-  //   // console.log("DatePicker ref:", datePickerRef.current);
-  // }, []);
-  let amendLenght = amendments.length;
   useEffect(() => {
-    const date = new Date(); // current date
-    const formattedDate = date.toISOString().slice(0, 10); //yyyy-mm-dd format
-    setValue("activeDate", formattedDate);
+    setValue("activeDate", new Date().toISOString().slice(0, 10));
   }, [setValue]);
-
-  const setingData = useCallback(
-    (selectedAmendment) => {
-      if (amendLenght > 0) {
-        setValue("locationMstID", selectedAmendment.locationMstID ?? "", {
-          shouldDirty: false,
-          shouldValidate: true,
-        });
-      }
-      setValue("location", selectedAmendment.location ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-
-      setValue("shortName", selectedAmendment.shortName ?? "", {
-        shouldDirty: false,
-        shouldValidate: false,
-      });
-
-      setValue(
-        "authorizationStatus",
-        selectedAmendment.authorizationStatus ? 1 : 0,
-        {
-          shouldDirty: false,
-          shouldValidate: true,
-        },
-      );
-
-      setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
-        shouldDirty: false,
-        shouldValidate: false,
-      });
-
-      setValue("esiRegion", selectedAmendment.esiRegion ?? "", {
-        shouldDirty: false,
-        shouldValidate: false,
-      });
-
-      setValue("company", selectedAmendment.company ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-
-      // setValue("companyImage", selectedAmendment.companyImage ?? "");
-
-      //seting in the local date format from db date
-      setValue(
-        "activeDate",
-        selectedAmendment.activeDate
-          ? selectedAmendment.activeDate
-          : toLocalDate(new Date()),
-        { shouldDirty: false },
-      );
-
-      setValue("pincode", selectedAmendment.pincode ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-
-      setValue("address", selectedAmendment.address ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-
-      setValue("country", selectedAmendment.country ?? "IN", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-
-      setValue("state", selectedAmendment.state ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("district", selectedAmendment.district ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("place", selectedAmendment.place ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("email", selectedAmendment.email ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerName", selectedAmendment.employerName ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-      setValue("designation", selectedAmendment.designation ?? "", {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
-    },
-    [setValue, amendLenght],
-  );
-
-  useEffect(() => {
-    if (!locationId) return;
-    fetchLocationAmendData(locationId);
-  }, [locationId, fetchLocationAmendData]);
-
-  useEffect(() => {
-    //Api call should bo here
-    //after doing the api call then you must add the field values i added name and company for demo
-
-    if (!selectedAmendment) return;
-    //Amend Auto selection whille loading
-    setingData(selectedAmendment);
-  }, [selectedAmendment, setingData]);
-
-  const handleSelectAmendment = (id, index) => {
-    //User Selecetion - Assign the amend data to feild
-    setSelectedAmendment(amendments[index]);
-
-    setingData(amendments[index]);
-  };
-
-  const nextStep = async () => {
-    // switch next steps
-    const valid = await trigger();
-    if (valid) setStep((s) => s + 1);
-  };
-
-  const prevStep = () => setStep((s) => s - 1); // switch to previos steps
-
-  const saveLocation = async (formData) => {
-    const response = await fetch("http://localhost:8087/location/save", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw {
-        type: "HTTP_ERROR",
-        status: response.status,
-        body: text,
-      };
-    }
-
-    const text = await response.text();
-    const result = text ? JSON.parse(text) : null;
-
-    if (!result?.success) {
-      throw {
-        type: "BUSINESS_ERROR",
-        result,
-      };
-    }
-
-    return result;
-  };
-
-  const onSubmit = async (data) => {
-    try {
-      setValue("userCode", userCode);
-      setValue("authorizationDate", new Date());
-      // console.log("Submitting data", data);
-
-      const formData = new FormData();
-
-      Object.keys(data).forEach((key) => {
-        if (key !== "companyImage") {
-          formData.append(key, data[key]);
-        }
-      });
-
-      // if (data.companyImage) {
-      //   formData.append("companyImage", data.companyImage);
-      // }
-
-      await saveLocation(formData);
-      toast.success("Location saved successfully!");
-
-      // console.log("Saving Data", formData);
-      // const response = await fetch("http://localhost:8087/location/save", {
-      //   method: "POST",
-      //   body: formData,
-      // });
-      // console.log("FormData contents:");
-      // for (const [key, value] of formData.entries()) {
-      //   if (value instanceof File) {
-      //     console.log(key, {
-      //       name: value.name,
-      //       size: value.size,
-      //       type: value.type,
-      //     });
-      //   } else {
-      //     console.log(key, value);
-      //   }
-      // }
-
-      // let result;
-      // try {
-      //   const responseText = await response.text();
-      //   if (responseText) {
-      //     result = JSON.parse(responseText);
-      //   }
-      // } catch (parseError) {
-      //   console.error("Error parsing response:", parseError);
-      // }
-
-      // if (result && result.success === true) {
-      //   toast.success("Location saved successfully!");
-      //   return;
-      // }
-
-      /* -------------------------------
-                Prepare documents JSON
-              (NO FileList inside JSON)
-            -------------------------------- */
-      // const documentsPayload = data.documents.map((doc) => {
-      //   // Append file separately
-      //   if (doc.file && doc.file.length > 0) {
-      //     formData.append("files", doc.file[0]); //  backend handles array
-      //   }
-
-      //   return {
-      //     type: doc.type,
-      //     number: doc.number,
-      //     expiryDate: doc.expiryDate,
-      //     remarks: doc.remarks || "",
-      //   };
-      // });
-
-      /* -------------------------------
-                Prepare final JSON payload
-            -------------------------------- */
-      // const payload = {
-      //   ...data,
-      //   documents: documentsPayload,
-      // };
-
-      // console.log("payload:", payload);
-
-      //  VERY IMPORTANT: remove FileList from payload
-      // delete payload.documents?.file;
-
-      /* -------------------------------
-                Append JSON as Blob
-            -------------------------------- */
-      // formData.append(
-      //   "data",
-      //   new Blob([JSON.stringify(payload)], {
-      //     type: "application/json",
-      //   })
-      // );
-
-      /* -------------------------------
-                Debug FormData (correct way)
-            -------------------------------- */
-      // console.log("FormData entries:");
-      // for (const [key, value] of formData.entries()) {
-      //   console.log(key, value instanceof File ? "FILE" : value);
-      // }
-
-      /* -------------------------------
-                API CALL (example)
-            -------------------------------- */
-      // await fetch("/api/branch/save", {
-      //   method: "POST",
-      //   body: formData
-      // });
-    } catch (err) {
-      // const apiErrors = err.response?.data?.errors;
-      // if (apiErrors) {
-      //   Object.entries(apiErrors).forEach(([field, message]) => {
-      //     setError(field, { type: "server", message });
-      //   });
-      // }
-      console.error("Submit failed:", err);
-
-      handleApiError(err);
-    }
-  };
-
-  const handleClear = () => {
-    if (selectedAmendment) {
-      // Restore selected amendment values
-      setingData(selectedAmendment);
-
-      clearErrors();
-      toast.success("Changes cleared");
-    } else {
-      //  New record → reset to empty insert state
-      reset({
-        userCode,
-        authorizationStatus: 0,
-        withaffectdate: "",
-        activeDate: new Date().toISOString().split("T")[0],
-      });
-    }
-  };
 
   return (
     <>
@@ -940,7 +554,7 @@ export default function GenaralLocationForm() {
 
                 <div className="amend-container">
                   {[...amendments] // shallow copy to avoid mutating state
-                   // .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
+                    // .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
                     .map((item, index) => {
                       // then map
                       const isSelected =
@@ -1055,17 +669,6 @@ export default function GenaralLocationForm() {
                         </svg>
                       </button>
                     )
-                    // : (
-                    //   <button
-                    //     type="submit" p-bott
-                    //     className="btn btn-primary"
-                    //   >
-                    //     Complete Registration
-                    //     <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    //       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    //     </svg>
-                    //   </button>
-                    // )
                   }
                 </div>
               </div>

@@ -5,7 +5,7 @@ import Footer from "../../components/Footer/Footer";
 import "./loggedpage.css";
 import muzLogo from "../../assets/muzlogo_transparent.png";
 import Sidebar from "../../components/SideBar/Sidebar";
-import { useAuth } from "../../context/AuthProvider";
+
 import { toast } from "react-hot-toast";
 import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
@@ -13,6 +13,8 @@ import LoadingPage from "../../components/Loaders/Loading";
 
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
+
+import { useAuth } from "../../context/AuthProvider";
 
 function LoggedPage() {
   /* ================= HELPER FUNCTIONS ================= */
@@ -28,7 +30,7 @@ function LoggedPage() {
   const {
     control,
     setValue,
-    getValues,
+    // getValues,
     formState: { errors },
   } = useForm();
 
@@ -66,10 +68,10 @@ function LoggedPage() {
   const [locationId, setLocationId] = useState("");
   const [finYear, setFinYear] = useState("");
 
-  const [error, setError] = useState({});
-  const [backendError, setBackendError] = useState([]);
+  // const [error, setError] = useState({});
+  const [backendError] = useState([]);
 
-  const [companyList, setCompanyList] = useState([]);
+  // const [companyList, setCompanyList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
 
@@ -158,7 +160,7 @@ function LoggedPage() {
       // console.log(" Missing companyId / branchId");
       return;
     }
-
+    
     const res = await fetch(
       `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`,
     );
@@ -374,49 +376,48 @@ function LoggedPage() {
   //   setChangeEnabled(true);
   // };
 
-const handleOk = async () => {
-  if (!validateForm()) return;
-   const startTime = Date.now();
-  // show loader
-  showRailLoader("Applying branch and location changes…");
+  const handleOk = async () => {
+    if (!validateForm()) return;
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Applying branch and location changes…");
 
-  try {
-    const selectedBranch = branchList.find(
-      (b) => String(b.branchMstID) === String(branchId)
-    );
+    try {
+      const selectedBranch = branchList.find(
+        (b) => String(b.branchMstID) === String(branchId),
+      );
 
-    const selectedLocation = locationList.find(
-      (l) => String(l.locationMstID) === String(locationId)
-    );
+      const selectedLocation = locationList.find(
+        (l) => String(l.locationMstID) === String(locationId),
+      );
 
-    // await global update
-    await updateUser({
-      userCode: user?.userCode,
-      companyId,
-      branchId,
-      branchName: selectedBranch?.branch || "",
-      locationId,
-      locationName: selectedLocation?.location || "",
-      finYear,
-      sidebarOpen: true,
-      fieldsLocked: true,
-      okEnabled: false,
-      changeEnabled: true,
-    });
+      // await global update
+      await updateUser({
+        userCode: user?.userCode,
+        companyId,
+        branchId,
+        branchName: selectedBranch?.branch || "",
+        locationId,
+        locationName: selectedLocation?.location || "",
+        finYear,
+        sidebarOpen: true,
+        fieldsLocked: true,
+        okEnabled: false,
+        changeEnabled: true,
+      });
 
-    // UI state AFTER user context update
-    setSidebarOpen(true);
-    setFieldsLocked(true);
-    setOkEnabled(false);
-    setChangeEnabled(true);
-
-  } finally {
-    await ensureMinDuration(startTime, 1200);
-    // hide loader ONLY at the end
-    hideLoader();
-  }
-};
-
+      // UI state AFTER user context update
+      setSidebarOpen(true);
+      setFieldsLocked(true);
+      setOkEnabled(false);
+      setChangeEnabled(true);
+      console.log("User in logged page", user);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      // hide loader ONLY at the end
+      hideLoader();
+    }
+  };
 
   const handleChangeCredentials = () => {
     const stored = JSON.parse(localStorage.getItem("loginData"));

@@ -73,10 +73,10 @@ input[type="radio"] {
 }
 /* ================= FLOATING ACTION BAR ================= */
 
-.floating-action-bar {
+.shift-group-page .floating-action-bar {
   position: fixed;
   right: 18px;
-  top: 290px;                 /* ✅ BELOW HEADER + SEARCH */
+  top: 290px;                 /*  BELOW HEADER + SEARCH */
   display: flex;
   flex-direction: column;
   gap: 10px;

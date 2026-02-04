@@ -45,7 +45,7 @@ const GeneralInfoForm = function GeneralInfoForm({
   const userObj = JSON.parse(UserData);
 
   const branchId = userObj.branchId;
-  console.log("Branches:", branchId);
+  // console.log("Branches:", branchId);
   // console.log("Branch sgsg", UserData);
 
   const formatLocalDate = (date) => date.toLocaleDateString("en-CA"); // yyyy-MM-dd
@@ -63,7 +63,7 @@ const GeneralInfoForm = function GeneralInfoForm({
         shouldValidate: false,
       });
     }
-    console.log("General info branch :", branchList);
+    // console.log("General info branch :", branchList);
   }, [companys, setValue, branchList, branchId]);
 
   useEffect(() => {
@@ -272,8 +272,9 @@ const GeneralInfoForm = function GeneralInfoForm({
               {...register(fieldName, {
                 required: `Name is required ${fieldName}`,
                 pattern: {
-                  value: /^[a-zA-Z0-9\s-]+$/,
-                  message: "Please enter valide name",
+                  value: /^[a-zA-Z0-9\s.-]+$/,
+                  message:
+                    "Only letters, numbers, spaces, dots, and hyphens are allowed",
                 },
                 onChange: (e) => {
                   const value = e.target.value;
@@ -524,45 +525,47 @@ const GeneralInfoForm = function GeneralInfoForm({
                               )}
                             </div>
 
-                            <div className="preview-actions">
-                              <button
-                                type="button"
-                                className="btn-change-image"
-                                onClick={() =>
-                                  document
-                                    .getElementById("company-image-upload")
-                                    .click()
-                                }
-                              >
-                                Change Image
-                              </button>
-                              <button
-                                type="button"
-                                className="btn-remove-image"
-                                onClick={() => {
-                                  field.onChange(null);
-                                  if (fileInputRef.current) {
-                                    fileInputRef.current.value = "";
-                                  }
-                                }}
-                                aria-label="Remove image"
-                              >
-                                {" "}
-                                Remove
-                                {/* <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg> */}
-                              </button>
-                              {showCropper && (
+                            {!isReadOnly && (
+                              <div className="preview-actions">
                                 <button
                                   type="button"
-                                  className="btn-crop-image"
-                                  onClick={() => setShowCropper(true)}
+                                  className="btn-change-image"
+                                  onClick={() =>
+                                    document
+                                      .getElementById("company-image-upload")
+                                      .click()
+                                  }
                                 >
-                                  Edit Crop
+                                  Change Image
                                 </button>
-                              )}
-                            </div>
+                                <button
+                                  type="button"
+                                  className="btn-remove-image"
+                                  onClick={() => {
+                                    field.onChange(null);
+                                    if (fileInputRef.current) {
+                                      fileInputRef.current.value = "";
+                                    }
+                                  }}
+                                  aria-label="Remove image"
+                                >
+                                  {" "}
+                                  Remove
+                                  {/* <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg> */}
+                                </button>
+                                {showCropper && (
+                                  <button
+                                    type="button"
+                                    className="btn-crop-image"
+                                    onClick={() => setShowCropper(true)}
+                                  >
+                                    Edit Crop
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

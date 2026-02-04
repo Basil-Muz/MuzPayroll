@@ -15,14 +15,10 @@ import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.BranchLog;
 import com.example.MuzPayroll.entity.BranchLogPK;
 import com.example.MuzPayroll.entity.BranchMst;
-import com.example.MuzPayroll.entity.CompanyLog;
 import com.example.MuzPayroll.entity.CompanyMst;
-import com.example.MuzPayroll.entity.LocationLog;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.BranchDTO;
 import com.example.MuzPayroll.entity.DTO.BranchLogDTO;
-import com.example.MuzPayroll.entity.DTO.CompanyDTO;
-import com.example.MuzPayroll.entity.DTO.CompanyLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
 import com.example.MuzPayroll.repository.BranchLogRepository;
@@ -670,6 +666,7 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
         dto.setActiveDate(entity.getActiveDate());
         dto.setActiveStatusYN(entity.getActiveStatusYN());
         dto.setInactiveDate(entity.getInactiveDate());
+        dto.setCompanyMstID(entity.getCompanyEntity().getCompanyMstID());
 
         // ===== AUTHORIZATION MAPPING =====
         if (entity.getAuthorization() != null) {

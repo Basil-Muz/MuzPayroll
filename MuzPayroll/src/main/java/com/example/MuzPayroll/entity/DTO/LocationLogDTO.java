@@ -99,7 +99,26 @@ public class LocationLogDTO {
 
     private Long locationMstID;
 
+    private Long companyMstID;
+
+    private Long branchMstID;
     // Getters and setters
+
+    public Long getBranchMstID() {
+        return branchMstID;
+    }
+
+    public void setBranchMstID(Long branchMstID) {
+        this.branchMstID = branchMstID;
+    }
+
+    public Long getCompanyMstID() {
+        return companyMstID;
+    }
+
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
+    }
 
     public Long getLocationMstID() {
         return locationMstID;

@@ -13,8 +13,12 @@ import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import Loading from "../../components/Loaders/Loading";
+
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
+
+import { useAuth } from "../../context/AuthProvider";
+
 const LocationList = () => {
   /* ================= STATE ================= */
   const [listView, setListView] = useState(false);
@@ -32,7 +36,7 @@ const LocationList = () => {
   const [headerError] = useState([]);
 
   const navigate = useNavigate();
-
+  const { user } = useAuth();
   const UserData = localStorage.getItem("loginData");
   const userObj = JSON.parse(UserData);
 
@@ -67,7 +71,7 @@ const LocationList = () => {
 
   useEffect(() => {
     loadAllLocation();
-  }, []);
+  }, [user.branchId]);
 
   const loadAllLocation = async () => {
     const startTime = Date.now();

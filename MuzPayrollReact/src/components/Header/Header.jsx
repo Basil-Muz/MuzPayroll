@@ -17,6 +17,7 @@ import { ImUser } from "react-icons/im";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
 const BLOCKED_PATHS = ["/masters", "/home", "/settings"];
+const CONTEXT_SWITCHER = ["/home"];
 const INITIAL_NOTIFICATIONS = [];
 const HOVER_DELAY = 200; // Delay before closing on mouse leave
 
@@ -36,7 +37,7 @@ const Header = ({ backendError = [] }) => {
   const [dashNotifications, setDashNotifications] = useState(
     INITIAL_NOTIFICATIONS,
   );
-  const hasHydratedRef = useRef(false);
+  // const hasHydratedRef = useRef(false);
 
   const location = useLocation();
 
@@ -62,23 +63,24 @@ const Header = ({ backendError = [] }) => {
   const profileTimerRef = useRef(null);
 
   // Parse login data safely
-  const getLoginData = () => {
-    try {
-      const data = localStorage.getItem("loginData");
-      return data ? JSON.parse(data) : {};
-    } catch (error) {
-      console.error("Error parsing login data:", error);
-      return {};
-    }
-  };
+  // const getLoginData = () => {
+  //   try {
+  //     const data = localStorage.getItem("loginData");
+  //     return data ? JSON.parse(data) : {};
+  //   } catch (error) {
+  //     console.error("Error parsing login data:", error);
+  //     return {};
+  //   }
+  // };
 
-  const loginData = getLoginData();
-  const companyId = loginData.companyId;
+  // const loginData = getLoginData();
+  const companyId = user.companyId;
+
   const currentPath = location.pathname;
 
   const shouldRenderDashboard = !BLOCKED_PATHS.includes(currentPath);
   const shouldRenderProfile = BLOCKED_PATHS.includes(currentPath);
-
+  const shouldRenderHome = CONTEXT_SWITCHER.includes(currentPath)
   const handleApiError = (error) => {
     if (!error.response) {
       toast.error("Unable to connect to server.");
@@ -199,7 +201,7 @@ const Header = ({ backendError = [] }) => {
     if (!companyId || !user?.branchId) return;
 
     fetchContextData(user.branchId, user.userCode);
-  }, [companyId, user?.branchId, user?.userCode, fetchContextData]);
+  }, [companyId, user?.branchId, user?.userCode,user?.locationId, fetchContextData]);
 
   //Listen to trigger on user changes
   // useEffect(() => {
@@ -349,7 +351,7 @@ const Header = ({ backendError = [] }) => {
         </div>
 
         {/* Context Switcher */}
-        <div className="context-switcher" aria-label="Working context">
+        { !shouldRenderHome && <div className="context-switcher" aria-label="Working context">
           {/* Company (Read-only) */}
           <div className="company-pill" title={companyName}>
             {companyName}
@@ -425,7 +427,7 @@ const Header = ({ backendError = [] }) => {
               />
             )}
           />
-        </div>
+        </div>}
       </div>
 
       <div className="header-right">
@@ -593,7 +595,7 @@ const Header = ({ backendError = [] }) => {
         >
           <ImUser size={20} aria-hidden="true" />
 
-          {shouldRenderProfile && profileOpen && (
+          { profileOpen && (
             <div
               className="profile-dropdown"
               role="menu"
@@ -603,32 +605,33 @@ const Header = ({ backendError = [] }) => {
               <div className="profile-user">
                 <ImUser size={18} aria-hidden="true" />
                 <div className="profile-names">
-                  <strong>{loginData.userName || "User"}</strong>
-                  <span>{loginData.role || "Admin"}</span>
+                  <strong>{user.userName || "User"}</strong>
+                  <span>{user.role || "Admin"}</span>
                 </div>
               </div>
 
-              <div className="profile-divider" />
+              
+              {shouldRenderProfile && <div><div className="profile-divider" />
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="profile-link"
+                  onClick={() => navigate("/changepassword")}
+                >
+                  Change Password
+                </button>
 
-              <button
-                type="button"
-                role="menuitem"
-                className="profile-link"
-                onClick={() => navigate("/changepassword")}
-              >
-                Change Password
-              </button>
+                <div className="profile-divider" />
 
-              <div className="profile-divider" />
-
-              <button
-                type="button"
-                role="menuitem"
-                className="profile-link logout"
-                onClick={() => handleLogOut()}
-              >
-                Logout
-              </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="profile-link logout"
+                  onClick={() => handleLogOut()}
+                >
+                  Logout
+                </button>
+              </div>}
             </div>
           )}
         </div>

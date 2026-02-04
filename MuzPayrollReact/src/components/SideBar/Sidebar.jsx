@@ -9,12 +9,17 @@ import { FaScaleBalanced } from "react-icons/fa6";
 import { FaUserTie } from "react-icons/fa";
 import { IoMdArrowDropleft } from "react-icons/io";
 import { IoMdArrowDropright } from "react-icons/io";
-import "./sidebar.css";
-import useIsMobile from "../../hook/useIsMobile";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaGears } from "react-icons/fa6";
+
+import "./sidebar.css";
+
+import useIsMobile from "../../hooks/useIsMobile";
+
 // import useIsTab from "../../hook/useIsTab";
 import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../../context/AuthProvider";
 
 const menuItems = [
   {
@@ -174,6 +179,8 @@ const menuItems = [
 
 export default function Sidebar({ forceOpen }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const sidebarRef = useRef(null);
   const closeTimer = useRef(null);
   // const submenuRef = useRef(null);
@@ -189,11 +196,12 @@ export default function Sidebar({ forceOpen }) {
     position: "absolute",
   });
 
-  const stored = JSON.parse(localStorage.getItem("loginData"));
-  console.log("console in sdebar",stored)
-  const sidebarEnabled = stored.sidebarOpen || forceOpen; //opens navigation
+  // console.log("console in sdebar", stored);
+
+  const sidebarEnabled = user.sidebarOpen || forceOpen; //opens navigation
+
   const [active, setActive] = useState(
-    localStorage.getItem("activeMenu") || "",
+    user.activeMenu || "",
   );
 
   const getSidebarClass = () => {
@@ -207,13 +215,11 @@ export default function Sidebar({ forceOpen }) {
   const sidebarClass = getSidebarClass();
 
   //  LIVE loginData (for username, location, etc.)
-  const [loginData, setLoginData] = useState(() =>
-    JSON.parse(localStorage.getItem("loginData") || "{}"),
-  );
+  const [loginData, setLoginData] = useState(() => user);
 
   useEffect(() => {
     const syncLoginData = () => {
-      setLoginData(JSON.parse(localStorage.getItem("loginData") || "{}"));
+      setLoginData(user);
     };
 
     window.addEventListener("loginDataChanged", syncLoginData);
@@ -221,7 +227,7 @@ export default function Sidebar({ forceOpen }) {
     return () => {
       window.removeEventListener("loginDataChanged", syncLoginData);
     };
-  }, []);
+  }, [user]);
   const userName = loginData.userName || "User";
 
   /*  Sync sidebar enable */

@@ -53,7 +53,17 @@ public class BranchLogDTO {
 
     private Long branchMstID;
 
+    private Long companyMstID;
+
     // Getters and setters
+
+    public Long getCompanyMstID() {
+        return companyMstID;
+    }
+
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
+    }
 
     public Long getBranchMstID() {
         return branchMstID;
