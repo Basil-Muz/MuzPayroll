@@ -1,5 +1,6 @@
 /* ===== VARIABLES ===== */
 :root {
+  
   /* Brand Colors - Purple Theme */
   --brand: #d218d8ff;
   --brand-light: #e525ebff;
@@ -40,6 +41,7 @@
 
   /* Background Colors */
   --background: #ffffffff;
+  --bg:#f9f3f9;
   --dark-background: #381e3bff;
   --background-alt: #ffefffff;
   --glass-bg: rgba(255, 255, 255, 0.88);
@@ -479,12 +481,14 @@ body {
 .form-control-select__control {
   width: 100% !important;
   /* padding: 4px 8px; */
+  min-width:  150px !important;
   border: 1.5px solid var(--border) !important;
   border-radius: var(--radius) !important;
   font-size: 14px !important;
   background: var(--background) !important;
   min-height: 44px !important;
   transition: all 0.3s ease !important;
+  /* z-index: 1001 !important; */
 }
 
 .form-control-select__control--is-focused {
@@ -524,6 +528,18 @@ body {
 .datepicker-input.error {
   border-color: #ef4444;
 }
+
+.react-datepicker__calendar-icon {
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text) !important;
+}
+
+.react-datepicker__calendar-icon:hover {
+  color: #4f46e5;
+}
+
 
 .custom-datepicker .react-datepicker__header {
   background: #fbe9ffff;
@@ -660,10 +676,11 @@ body {
 
 .form-control-select__menu {
   border-radius: var(--radius);
+  position: absolute !important;
   border: 1.5px solid var(--border);
   background-color: var(--background) !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  /* z-index: 10000 !important; */
 }
 
 /* Individual option */
@@ -691,6 +708,18 @@ body {
 
 input.form-control {
   font-family: Arial, sans-serif;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  /* -webkit-text-fill-color: var(--background) !important; */
+  -webkit-box-shadow: 0 0 0px 1000px  var(--background)inset !important;
+  outline:none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+    border: 1.5px solid var(--border) !important;
+  color:white !important;
 }
 
 /* Address form */

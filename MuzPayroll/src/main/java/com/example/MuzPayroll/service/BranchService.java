@@ -725,14 +725,51 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
                 dto.setAuthId(savedAuth.getAuthId());
 
             } else {
-                // No save, return existing entity
-                savedEntity = entity;
-                // ===== SAVE AUTHORIZATION =====
-                Authorization auth = entity.getAuthorization();
-                auth.setMstId(savedEntity.getBranchMstID());
-                authorizationRepository.save(auth);
-                Authorization savedAuth = authorizationRepository.save(auth);
-                dto.setAuthId(savedAuth.getAuthId());
+                Long mstId = dto.getBranchMstID();
+
+                long count = authorizationRepository.countByMstId(mstId);
+
+                if (count == 1) {
+                    // Exactly ONE row exists
+                    Optional<Boolean> statusOpt = authorizationRepository.findStatusByMstId(mstId);
+
+                    if (statusOpt.isPresent()) {
+                        Boolean status = statusOpt.get();
+
+                        if (Boolean.TRUE.equals(status)) {
+                            // No save, return existing entity
+                            savedEntity = entity;
+                            // ===== SAVE AUTHORIZATION =====
+                            Authorization auth = entity.getAuthorization();
+                            auth.setMstId(savedEntity.getBranchMstID());
+                            authorizationRepository.save(auth);
+                            Authorization savedAuth = authorizationRepository.save(auth);
+                            dto.setAuthId(savedAuth.getAuthId());
+                        } else {
+                            // ===== SAVE =====
+                            savedEntity = branchRepository.save(entity);
+
+                            // ===== SAVE AUTHORIZATION =====
+                            Authorization auth = entity.getAuthorization();
+                            auth.setMstId(savedEntity.getBranchMstID());
+                            authorizationRepository.save(auth);
+                            Authorization savedAuth = authorizationRepository.save(auth);
+                            dto.setAuthId(savedAuth.getAuthId());
+
+                        }
+                    }
+                } else if (count > 1) {
+
+                    // MORE THAN ONE row exists
+                    // No save, return existing entity
+                    savedEntity = entity;
+                    // ===== SAVE AUTHORIZATION =====
+                    Authorization auth = entity.getAuthorization();
+                    auth.setMstId(savedEntity.getBranchMstID());
+                    authorizationRepository.save(auth);
+                    Authorization savedAuth = authorizationRepository.save(auth);
+                    dto.setAuthId(savedAuth.getAuthId());
+                }
 
             }
 

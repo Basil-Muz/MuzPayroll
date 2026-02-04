@@ -1,3 +1,4 @@
+/* ===== ACTIONS ===== */
 .statusupdate-page .actions {
   display: flex;
   align-items: end;
@@ -6,19 +7,166 @@
   margin-right: 45px;
   margin-top: 45px;
 }
-.search-sidebar1 {
+
+.statusupdate-page .header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 15px;
+  color: #333;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  padding-top: 0px;
+  border-bottom: 1px dotted #999;
+}
+
+.statusupdate-page .head-main-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 80px;
+  margin-right: 28px;
+}
+
+.statusupdate-page .page-title {
+  padding-left: 15px;
+  font-size: 30px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+/* ===== TABLE WRAPPER ===== */
+.statusupdate-page .statusupdate-table {
+  margin: 10px 115px 0 30px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--brand-border);
+}
+
+/* ===== TABLE ===== */
+.statusupdate-page .statusupdate-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* ===== HEADER (CLEAN + STRONG) ===== */
+.statusupdate-page .statusupdate-table th {
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(210, 24, 216, 0.12); /* stronger header */
+  border-bottom: 1px solid var(--brand-border);
+  text-align: left;
+}
+
+/* ===== BODY ===== */
+.statusupdate-page .statusupdate-table td {
+  padding: 12px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+}
+
+/* ===== HOVER (FIRST FEEDBACK) ===== */
+.statusupdate-page .statusupdate-table tbody tr:hover {
+  background: rgba(210, 24, 216, 0.06);
+}
+
+/* ===== SELECTED (LIGHT BUT CLEAR) ===== */
+.statusupdate-page
+  .statusupdate-table
+  tbody
+  tr:has(input[type="checkbox"]:checked) {
+  background: rgba(210, 24, 216, 0.1);
+}
+
+/* ===== CHECKBOX (KEEP GOOD COLOR) ===== */
+.statusupdate-page table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--brand);
+}
+
+/* ===== ALIGN ===== */
+.statusupdate-page .statusupdate-table th,
+.statusupdate-page .statusupdate-table td {
+  vertical-align: middle;
+}
+
+/* ===== EMPTY CELL ===== */
+.statusupdate-page .statusupdate-table td:empty {
+  color: #888;
+}
+.statusupdate-page .field-error {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ===== SIDEBAR Z-INDEX FIX ===== */
+.statusupdate-page .search-sidebar1 {
+  z-index: 150;
+}
+
+/* ===== SIDEBAR BUTTON ===== */
+.statusupdate-page .siderbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-right: 30px;
+  margin-top: 32px;
+}
+
+/* ===== ICON BUTTON ===== */
+.statusupdate-page .button-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--brand-border);
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.statusupdate-page .button-icon:hover {
+  background: rgba(210, 24, 216, 0.12);
+  color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+/* PRIMARY */
+.statusupdate-page .button-icon.primary {
+  background: linear-gradient(135deg, var(--brand), #b017b5);
+  color: #fff;
+  border: none;
+}
+
+/* ===== SIDEBAR ===== */
+.statusupdate-page .search-sidebar1 {
   width: 300px;
   position: fixed;
   right: 95px;
   top: 142px;
-  bottom: 0;
+  bottom: 2%;
   background: white;
   padding: 20px;
   border-left: 1px solid #ddd;
-
   opacity: 0;
   transform: translateX(100%);
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .search-sidebar1.open {
@@ -27,9 +175,158 @@
 }
 
 .search-sidebar1.close {
-  animation: slideOut 0.4s ease-in forwards;
+  animation: slideOut 0.3s ease-in forwards;
+  pointer-events: none;
 }
 
+/* ===== SEARCH CONTROLS ===== */
+.statusupdate-page .search-select,
+.statusupdate-page .search-radio {
+  border-bottom: 1px dotted #999;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+}
+
+/* ===== RADIO ===== */
+.statusupdate-page .search-radio input[type="radio"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #777;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+}
+
+.statusupdate-page .search-radio input[type="radio"]:checked {
+  border-color: #e525eb;
+}
+
+.statusupdate-page .search-radio input[type="radio"]:checked::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background-color: #e525eb;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ===== ERROR ===== */
+.statusupdate-page .error-message {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.statusupdate-page .react-datepicker {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+.statusupdate-page .step-animate .datepicker-input {
+  width: 100%;
+}
+.statusupdate-page .datepicker-input:focus {
+  outline: none;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px rgba(199, 30, 190, 0.15);
+}
+
+.statusupdate-page .datepicker-input.error {
+  border-color: #ef4444;
+}
+
+.statusupdate-page .custom-datepicker .react-datepicker__header {
+  background: #fbe9ffff;
+  border-bottom: none;
+  padding: 10px 0;
+}
+.statusupdate-page .react-datepicker__navigation--next {
+  right: 4px;
+  top: 9px;
+}
+.statusupdate-page .react-datepicker__navigation--previous {
+  left: 4px;
+  top: 9px;
+}
+.statusupdate-page .react-datepicker__month-container {
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 15px;
+  padding-bottom: 6px;
+}
+.statusupdate-page .custom-datepicker {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 10px;
+  font-family: inherit;
+}
+.statusupdate-page .custom-datepicker select {
+  background: #fff !important;
+  border: 1px solid #e9d5ff;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 13px;
+  color: var(--brand-dark);
+}
+.statusupdate-page .custom-datepicker option:hover {
+  background: var(--background);
+}
+.custom-datepicker .react-datepicker__day-name {
+  color: var(--brand-dark);
+  font-weight: 500;
+  font-size: 12px;
+}
+.custom-datepicker .react-datepicker__day {
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+.custom-datepicker .react-datepicker__day:hover {
+  background: rgba(199, 30, 190, 0.12);
+}
+.custom-datepicker .react-datepicker__day--selected,
+.custom-datepicker .react-datepicker__day--keyboard-selected {
+  background: #c71ebeff;
+  color: #fff;
+  font-weight: 600;
+}
+.custom-datepicker .react-datepicker__day--disabled {
+  color: #d1d5db;
+}
+.custom-datepicker-popper {
+  z-index: 9999;
+}
+.custom-datepicker {
+  animation: scaleIn 0.15s ease-out;
+}
+.statusupdate-page .datepicker-input {
+  width: 100%;
+}
+
+.statusupdate-page .datepicker-input.error {
+  border-color: #ef4444;
+}
+
+.custom-datepicker {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 10px;
+}
+
+.custom-datepicker-popper {
+  z-index: 9999;
+}
+
+/* ===== ANIMATIONS ===== */
 @keyframes slideIn {
   from {
     opacity: 0;

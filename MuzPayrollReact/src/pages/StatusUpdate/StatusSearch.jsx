@@ -1,41 +1,140 @@
-import { useState } from "react";
-
-function StatusSearch({ isOpen, onApply }) {
-  const [form, setForm] = useState({
-    purpose: "",
-    status: "ALL",
-    verify: "ALL",
+import {
+  useEffect,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import { Controller, useForm } from "react-hook-form";
+import Select from "react-select";
+import axios from "axios";
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
+const StatusSearch = forwardRef(({ isOpen, onApply, hasData }, ref) => {
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      option: "",
+      status: "Active",
+    },
   });
+  const { showRailLoader, hideLoader } = useLoader();
+  const selectRef = useRef(null);
+  const [options, setOptions] = useState([]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onApply(form);
+  const mockOptions = [
+    { value: "OPT001", label: "Option One" },
+    { value: "OPT002", label: "Option Two" },
+  ];
+
+  useEffect(() => {
+    setOptions(mockOptions);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => selectRef.current?.focus(), 0);
+    }
+  }, [isOpen]);
+
+  useImperativeHandle(ref, () => ({
+    clearSearch() {
+      reset({ option: "", status: "Active" });
+    },
+    refreshSearch() {},
+  }));
+
+  /* ===== APPLY ===== */
+  const onSubmit = async (filters) => {
+    const startTime = Date.now();
+    showRailLoader("Retrieving available Data…");
+    try {
+      const res = await axios.get(
+        filters.status === "Active"
+          ? "http://localhost:8087/company/activecompanylist"
+          : "http://localhost:8087/company/inactivecompanylist",
+        { params: filters },
+      );
+
+      onApply(res.data, filters.status);
+    } catch (err) {
+      const mockData = [
+        {
+          code: "OPT001",
+          name: "Option One",
+          activeDate: "2024-01-01",
+          inactiveDate: "",
+        },
+        {
+          code: "OPT002",
+          name: "Option Two",
+          activeDate: "2023-05-01",
+          inactiveDate: "2024-12-31",
+        },
+      ];
+
+      onApply(mockData, filters.status);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
+    }
   };
 
   return (
     <form
       className={`search-sidebar1 ${isOpen ? "open" : "close"}`}
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <h3>Search</h3>
 
-      <div className="search-section">
-        <label>Group</label>
-        <select
-          value={form.purpose}
-          onChange={(e) => setForm({ ...form, purpose: e.target.value })}
-        >
-          <option value="">Select</option>
-          <option value="Normal Shift">Normal Shift</option>
-          <option value="Night Shift">Night Shift</option>
-        </select>
-      </div>
+      {/* OPTION */}
+      <Controller
+        name="option"
+        control={control}
+        render={({ field }) => (
+          <Select
+            ref={selectRef}
+            options={options}
+            placeholder="Select option"
+            value={options.find((o) => o.value === field.value) || null}
+            onChange={(o) => field.onChange(o.value)}
+            isDisabled={hasData}
+          />
+        )}
+      />
 
-      <button className="search-button" type="submit">
+      {/* STATUS */}
+      <Controller
+        name="status"
+        control={control}
+        render={({ field }) => (
+          <div className="search-radio">
+            <label>
+              <input
+                type="radio"
+                checked={field.value === "Active"}
+                onChange={() => field.onChange("Active")}
+                disabled={hasData}
+              />
+              Active
+            </label>
+            <label>
+              <input
+                type="radio"
+                checked={field.value === "Inactive"}
+                onChange={() => field.onChange("Inactive")}
+                disabled={hasData}
+              />
+              Inactive
+            </label>
+          </div>
+        )}
+      />
+
+      <button type="submit" className="btn btn-primary" disabled={hasData}>
         Apply
       </button>
     </form>
   );
-}
+});
 
 export default StatusSearch;

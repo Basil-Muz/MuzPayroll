@@ -7,7 +7,7 @@ import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
 import ShiftGroupForm from "./shiftgroupform";
-import Loading from "../../components/Loading/Loading";
+import Loading from "../../components/Loaders/Loading";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import "./shiftgroup.css";
 

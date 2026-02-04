@@ -1,0 +1,259 @@
+/* ===== Overlay ===== */
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== STEP LOADER ===== */
+.step-card {
+  width: 420px;
+  padding: 28px 32px;
+  border: 1px solid var(--border-light);
+
+  background: var(--glass-bg);
+  color: var(--text);
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.step-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text-dark);
+  letter-spacing: 0.2px;
+}
+
+/* ===== Step List ===== */
+.step-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.step-list li {
+  color: var(--text);
+  opacity: 0.7;
+}
+
+.step-list li.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.step-list li.done {
+  opacity: 0.85;
+}
+
+/* ===== Dots ===== */
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+li.done .dot {
+  background: var(--success);
+}
+
+li.active .dot {
+  background: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-border);
+}
+
+/* ===== Hint ===== */
+.step-hint {
+  margin-top: 18px;
+  font-size: 12px;
+  opacity: 0.85;
+  text-align: center;
+  color: var(--primary);
+}
+
+/* ===== Error ===== */
+.step-error {
+  color: var(--danger);
+  margin-top: 16px;
+  font-size: 13px;
+  background: var(--danger-light);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.retry-limit {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--danger-dark);
+}
+
+/* ===== Actions ===== */
+.step-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.step-actions button {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+
+  font-size: var(--text-sm);
+  background: var(--button-primary);
+  color: #fff;
+}
+
+.step-actions button:hover {
+  background: var(--button-primary-hover);
+}
+
+.step-actions button.secondary {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+/* ===== RAIL LOADER ===== */
+.rail-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rail {
+  width: 260px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.rail span {
+  display: block;
+  width: 35%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--brand),
+    var(--brand-light),
+    transparent
+  );
+
+  animation: railMove 1.2s ease-in-out infinite;
+}
+
+@keyframes railMove {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+.rail-text {
+  margin-top: 14px;
+  font-size: var(--text-sm);
+  color: var(--inactive-bg);
+  opacity: 1;
+}
+
+/* ===== INLINE LOADER ===== */
+.inline-spinner {
+  display: inline-block;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile / Small screens (≤ 480px) */
+@media (max-width: 480px) {
+  .step-card {
+    width: calc(100% - 32px);
+    padding: 20px;
+    border-radius: var(--radius-md);
+  }
+
+  .step-title {
+    font-size: var(--text-md);
+    text-align: center;
+  }
+
+  .step-list li {
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .step-actions {
+    flex-direction: column;
+  }
+
+  .step-actions button {
+    width: 100%;
+  }
+
+  .rail {
+    width: 200px;
+  }
+
+  .rail-text {
+    font-size: 13px;
+    text-align: center;
+  }
+}
+
+/* Tablets and small laptops */
+@media (max-width: 768px) {
+  .step-card {
+    width: 90%;
+    max-width: 420px;
+  }
+
+  .step-title {
+    font-size: var(--text-md);
+  }
+
+  .rail {
+    width: 220px;
+  }
+}
+/* Very large screens (≥ 1440px) */
+@media (min-width: 1440px) {
+  .step-card {
+    width: 460px;
+  }
+
+  .step-title {
+    font-size: var(--text-xl);
+  }
+}
+@media (max-width: 480px) {
+  .loader-overlay {
+    padding: 16px;
+  }
+}

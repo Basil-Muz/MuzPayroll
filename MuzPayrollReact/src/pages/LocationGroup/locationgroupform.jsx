@@ -5,7 +5,7 @@ import { MdOutlineCancel } from "react-icons/md";
 import { IoNotificationsSharp } from "react-icons/io5";
 import axios from 'axios';
 import { RxCross2 } from "react-icons/rx";
-import Loading from '../../components/Loading/Loading';
+import Loading from '../../components/Loaders/Loading';
 
 function LocationGroupForm({ toggleForm, data }) {
 

@@ -762,14 +762,52 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
                 dto.setAuthId(savedAuth.getAuthId());
 
             } else {
-                // No save, return existing entity
-                savedCompany = company;
-                // ===== SAVE AUTHORIZATION =====
-                Authorization auth = company.getAuthorization();
-                auth.setMstId(savedCompany.getCompanyMstID());
-                authorizationRepository.save(auth);
-                Authorization savedAuth = authorizationRepository.save(auth);
-                dto.setAuthId(savedAuth.getAuthId());
+
+                Long mstId = dto.getCompanyMstID();
+
+                long count = authorizationRepository.countByMstId(mstId);
+
+                if (count == 1) {
+                    // Exactly ONE row exists
+                    Optional<Boolean> statusOpt = authorizationRepository.findStatusByMstId(mstId);
+
+                    if (statusOpt.isPresent()) {
+                        Boolean status = statusOpt.get();
+
+                        if (Boolean.TRUE.equals(status)) {
+                            // No save, return existing entity
+                            savedCompany = company;
+                            // ===== SAVE AUTHORIZATION =====
+                            Authorization auth = company.getAuthorization();
+                            auth.setMstId(savedCompany.getCompanyMstID());
+                            authorizationRepository.save(auth);
+                            Authorization savedAuth = authorizationRepository.save(auth);
+                            dto.setAuthId(savedAuth.getAuthId());
+                        } else if (Boolean.FALSE.equals(status)) {
+                            // ===== SAVE COMPANY =====
+                            savedCompany = companyRepository.save(company);
+
+                            // ===== SAVE AUTHORIZATION =====
+                            Authorization auth = company.getAuthorization();
+                            auth.setMstId(savedCompany.getCompanyMstID());
+                            authorizationRepository.save(auth);
+                            Authorization savedAuth = authorizationRepository.save(auth);
+                            dto.setAuthId(savedAuth.getAuthId());
+
+                        }
+                    }
+                } else if (count > 1) {
+
+                    // MORE THAN ONE row exists
+                    // No save, return existing entity
+                    savedCompany = company;
+                    // ===== SAVE AUTHORIZATION =====
+                    Authorization auth = company.getAuthorization();
+                    auth.setMstId(savedCompany.getCompanyMstID());
+                    authorizationRepository.save(auth);
+                    Authorization savedAuth = authorizationRepository.save(auth);
+                    dto.setAuthId(savedAuth.getAuthId());
+                }
 
             }
 

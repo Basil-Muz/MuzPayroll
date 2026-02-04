@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
+import { useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
@@ -39,6 +40,9 @@ export default function GenaralLocationForm() {
   // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
   const dateWrapperRef = useRef(null);
+
+  const cancelledRef = useRef(false);
+
   const UserData = localStorage.getItem("loginData");
   const userObj = JSON.parse(UserData);
 
@@ -46,39 +50,12 @@ export default function GenaralLocationForm() {
   const userCode = userObj.userCode.split("@", 1)[0];
   const companyId = userObj.companyId;
 
-  // console.log("Logeeded data", userCode);
+  //Amend data
+  const [amendments, setAmendments] = useState([]);
 
-  const amendments = [
-    // {
-    //   id: 3,
-    //   authorizationStatus: 1,
-    //   date: "2025-10-20",
-    //   shortName: "TCS",
-    //   company: "Tata Consultancy Services",
-    //   status: "active",
-    //   location: "Zenin",
-    //   expiryDate: "2025-10-10",
-    //   branchEntity:20000,
-    //   generatedBy: "Admin User",
-    // },
-    // {
-    //   id: 2,
-    //   authorizationStatus: 1,
-    //   date: "2025-10-10",
-    //   status: "expired",
-    //   expiryDate: "2021-12-31",
-    //   generatedBy: "System",
-    // },
-    // {
-    //   id: 1,
-    //   authorizationStatus: 1,
-    //   date: "2025-01-01",
-    //   status: "inactive",
-    //   expiryDate: "",
-    //   generatedBy: "Manager",
-    // },
-  ];
+  //Mode for backend
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
+
   const {
     register,
     handleSubmit,
@@ -91,7 +68,7 @@ export default function GenaralLocationForm() {
     getValues,
     watch,
     control,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -108,7 +85,7 @@ export default function GenaralLocationForm() {
       userCode: userCode, //User code from local storage
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
       authorizationStatus: 0, // ENTRY
-      mode: inputMode,
+      // mode: inputMode,
       activeStatusYN: 1,
     },
   });
@@ -117,9 +94,14 @@ export default function GenaralLocationForm() {
     control,
     name: "withaffectdate",
   });
-  //workflow of amend date then name logic
 
-  const isUnlocked = !!authDate;
+  //workflow of amend date then name logic
+  let isUnlocked = !!authDate;
+  if (amendments.length > 0) {
+    isUnlocked = true;
+  } else {
+    isUnlocked = !!authDate;
+  }
 
   // From content changes
   const [formFlags] = useState({
@@ -145,46 +127,83 @@ export default function GenaralLocationForm() {
     { label: "VERIFIED", value: 1 },
   ];
 
+  //latest amend only entry amend with max amend number
   const latestAmendmentId = amendments.length
-    ? amendments.reduce((latest, current) =>
-        new Date(current.date) > new Date(latest.date) ? current : latest
-      )
+    ? amendments
+        .filter((a) => a.authorizationStatus === false)
+        .reduce(
+          (max, cur) => (cur.amendNo > max.amendNo ? cur : max),
+          amendments[0],
+        )
     : null;
 
-  const [selectedAmendment, setSelectedAmendment] = useState(latestAmendmentId);
+  const [selectedAmendment, setSelectedAmendment] = useState(null);
 
   // console.log("Selected item:", selectedAmendment);
 
   const amendmentAuthorizationOptions = [];
 
-  if (selectedAmendment?.authorizationStatus === 0) {
+  if (selectedAmendment?.authorizationStatus === false) {
     amendmentAuthorizationOptions.push(
       {
-        label: `ENTRY : ${selectedAmendment.date}`,
+        label: `ENTRY : ${selectedAmendment.authorizationDate}`,
         value: 0,
       },
       {
         label: `VERIFIED :`,
         value: 1,
-      }
+      },
     );
   }
-
-  if (selectedAmendment?.authorizationStatus === 1) {
+  // console.log("Seletced amends", selectedAmendment);
+  if (selectedAmendment?.authorizationStatus === true) {
     amendmentAuthorizationOptions.push(
+      // {
+      //   label: `ENTRY : ${selectedAmendment.withaffectdate}`,
+      //   value: 0,
+      // },
       {
-        label: `ENTRY : ${selectedAmendment.date}`,
-        value: 0,
-      },
-      {
-        label: `VERIFIED : ${selectedAmendment.date}`,
+        label: `VERIFIED : ${selectedAmendment.authorizationDate}`,
         value: 1,
-      }
+      },
     );
   }
 
   const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorizationStatus === 1 && !addingNewAmend;
+    selectedAmendment?.authorizationStatus === true && !addingNewAmend;
+
+  const isLastStep = step === steps.length - 1;
+  // const documentsValid = submitStatus === 0;
+  const isAmendMode = amendments.length > 0;
+
+  const canSave =
+    !isVerifiedAmendment &&
+    ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
+
+  const { locationId } = useParams();
+
+  const toLocalDate = (date) =>
+    date instanceof Date
+      ? date.toLocaleDateString("en-CA") // yyyy-MM-dd
+      : date;
+
+  const fetchLocationAmendData = useCallback(
+    async (locationId) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8087/location/getamendlist/${locationId}`,
+        );
+
+        setAmendments(response.data.locationDtoLogs || []); // Use the amends data
+        // delete response.data.companyDtoLogs;
+        setSelectedAmendment(response.data); //data form master table
+        console.log("Amend response", response.data);
+      } catch (error) {
+        console.error("Error fetching company data:", error);
+      }
+    },
+    [setSelectedAmendment, setAmendments],
+  );
 
   //for smooth focus
   const smoothFocus = (fieldName) => {
@@ -208,15 +227,17 @@ export default function GenaralLocationForm() {
   };
   // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
   const formatDate = (date) => {
-    //datePicker bugg
-    return date.toLocaleDateString("en-CA"); // yyyy-mm-dd
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`; // yyyy-MM-dd
   };
 
   const handleGenerateAmendment = () => {
     setSelectedAmendment(null);
     setAddingNewAmend(true);
-    // setIsReadOnly(false);
-
+    // setIsReadOnly(false);                                                                                               
     reset({
       ...getValues(), //  keep base data
       authorizationStatus: 0, // ENTRY
@@ -235,20 +256,19 @@ export default function GenaralLocationForm() {
     clearErrors();
   };
 
-  const handleApiError = (error) => {
-    // console.error("API Error:", error);
+  const handleApiError = useCallback((error) => {
+    console.error("API Error:", error);
 
     // Network error (no response from server)
-    if (!error.response) {
+    if (!error.body) {
       toast.error("Unable to connect to server. Please check your network.");
       return;
     }
-
-    const status = error.response.status;
+    const status = error.response.type;
 
     switch (status) {
       case 400:
-        toast.error("Invalid request.");
+        toast.error(error.response.message[0]);
         break;
       case 401:
         toast.error("Session expired. Please login again.");
@@ -268,45 +288,49 @@ export default function GenaralLocationForm() {
       default:
         toast.error("Unexpected error occurred.");
     }
-  };
+  },[]);
 
-  useEffect(() => {
-    let cancelled = false;
+  const load = useCallback(async () => {
+    try {
+      const [companyRes, branchRes] = await Promise.all([
+        axios.get(`http://localhost:8087/company/${companyId}`),
+        axios.get(`http://localhost:8087/branch/company/${companyId}`),
+      ]);
 
-    const load = async () => {
-      try {
-        const [companyRes, branchRes] = await Promise.all([
-          //  Both APIs works in parallel
-          axios.get(`http://localhost:8087/company/${companyId}`),
-          axios.get(`http://localhost:8087/branch/company/${companyId}`),
-        ]); //  both APIs call start at same time and waite until both finish
+      if (cancelledRef.current) return;
 
-        if (cancelled) return;
+      setCompanyList([
+        {
+          value: companyRes.data.companyMstID,
+          label: companyRes.data.company,
+        },
+      ]);
 
-        setCompanyList([
-          {
-            value: companyRes.data.companyMstID,
-            label: companyRes.data.company,
-          },
-        ]);
-
-        setBranchList(
-          branchRes.data.map((branch) => ({
-            value: branch.branchMstID,
-            label: branch.branch,
-          }))
-        );
-      } catch (err) {
-        console.error(err);
+      setBranchList(
+        branchRes.data.map((branch) => ({
+          value: branch.branchMstID,
+          label: branch.branch,
+        })),
+      );
+    } catch (err) {
+      if (!cancelledRef.current) {
         handleApiError(err);
       }
-    };
+    }
+  }, [companyId, handleApiError]);
 
+  useEffect(() => {
+    setValue("mode", inputMode, { shouldDirty: false });
+  }, [inputMode, setValue]);
+
+  useEffect(() => {
+    cancelledRef.current = false;
     load();
+
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
-  }, [companyId]);
+  }, [load]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -337,7 +361,7 @@ export default function GenaralLocationForm() {
   //   // console.log("Input ref:", authDateInputRef.current);
   //   // console.log("DatePicker ref:", datePickerRef.current);
   // }, []);
-
+  let amendLenght = amendments.length;
   useEffect(() => {
     const date = new Date(); // current date
     const formattedDate = date.toISOString().slice(0, 10); //yyyy-mm-dd format
@@ -346,6 +370,12 @@ export default function GenaralLocationForm() {
 
   const setingData = useCallback(
     (selectedAmendment) => {
+      if (amendLenght > 0) {
+        setValue("locationMstID", selectedAmendment.locationMstID ?? "", {
+          shouldDirty: false,
+          shouldValidate: true,
+        });
+      }
       setValue("location", selectedAmendment.location ?? "", {
         shouldDirty: false,
         shouldValidate: true,
@@ -353,12 +383,26 @@ export default function GenaralLocationForm() {
 
       setValue("shortName", selectedAmendment.shortName ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
       });
 
-      setValue("authorizationStatus", selectedAmendment.authorizationStatus, {
+      setValue(
+        "authorizationStatus",
+        selectedAmendment.authorizationStatus ? 1 : 0,
+        {
+          shouldDirty: false,
+          shouldValidate: true,
+        },
+      );
+
+      setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
         shouldDirty: false,
-        shouldValidate: true,
+        shouldValidate: false,
+      });
+
+      setValue("esiRegion", selectedAmendment.esiRegion ?? "", {
+        shouldDirty: false,
+        shouldValidate: false,
       });
 
       setValue("company", selectedAmendment.company ?? "", {
@@ -366,12 +410,16 @@ export default function GenaralLocationForm() {
         shouldValidate: true,
       });
 
-      setValue("companyImage", selectedAmendment.companyImage ?? "");
+      // setValue("companyImage", selectedAmendment.companyImage ?? "");
 
-      setValue("activeDate", selectedAmendment.activeDate ?? new Date(), {
-        shouldDirty: false,
-        shouldValidate: true,
-      });
+      //seting in the local date format from db date
+      setValue(
+        "activeDate",
+        selectedAmendment.activeDate
+          ? selectedAmendment.activeDate
+          : toLocalDate(new Date()),
+        { shouldDirty: false },
+      );
 
       setValue("pincode", selectedAmendment.pincode ?? "", {
         shouldDirty: false,
@@ -429,8 +477,13 @@ export default function GenaralLocationForm() {
         shouldValidate: true,
       });
     },
-    [setValue]
+    [setValue, amendLenght],
   );
+
+  useEffect(() => {
+    if (!locationId) return;
+    fetchLocationAmendData(locationId);
+  }, [locationId, fetchLocationAmendData]);
 
   useEffect(() => {
     //Api call should bo here
@@ -488,7 +541,7 @@ export default function GenaralLocationForm() {
     try {
       setValue("userCode", userCode);
       setValue("authorizationDate", new Date());
-      console.log("Submitting data", data);
+      // console.log("Submitting data", data);
 
       const formData = new FormData();
 
@@ -498,14 +551,14 @@ export default function GenaralLocationForm() {
         }
       });
 
-      if (data.companyImage) {
-        formData.append("companyImage", data.companyImage);
-      }
+      // if (data.companyImage) {
+      //   formData.append("companyImage", data.companyImage);
+      // }
 
       await saveLocation(formData);
       toast.success("Location saved successfully!");
 
-      console.log("Saving Data", formData);
+      // console.log("Saving Data", formData);
       // const response = await fetch("http://localhost:8087/location/save", {
       //   method: "POST",
       //   body: formData,
@@ -604,6 +657,24 @@ export default function GenaralLocationForm() {
       console.error("Submit failed:", err);
 
       handleApiError(err);
+    }
+  };
+
+  const handleClear = () => {
+    if (selectedAmendment) {
+      // Restore selected amendment values
+      setingData(selectedAmendment);
+
+      clearErrors();
+      toast.success("Changes cleared");
+    } else {
+      //  New record → reset to empty insert state
+      reset({
+        userCode,
+        authorizationStatus: 0,
+        withaffectdate: "",
+        activeDate: new Date().toISOString().split("T")[0],
+      });
     }
   };
 
@@ -765,7 +836,7 @@ export default function GenaralLocationForm() {
                                 errors.authorizationStatus ? "error" : ""
                               }
                               value={authorizationStatusOptions.find(
-                                (opt) => opt.value === field.value
+                                (opt) => opt.value === field.value,
                               )}
                               onChange={(option) =>
                                 field.onChange(option.value)
@@ -846,7 +917,7 @@ export default function GenaralLocationForm() {
                               errors.authorizationStatus ? "error" : ""
                             }
                             value={amendmentAuthorizationOptions.find(
-                              (opt) => opt.value === field.value
+                              (opt) => opt.value === field.value,
                             )}
                             onChange={(option) => field.onChange(option.value)}
                           />
@@ -855,7 +926,7 @@ export default function GenaralLocationForm() {
                       <input type="hidden" {...register("userCode")} />
                       <input type="hidden" {...register("authorizationDate")} />
                     </div>
-                    {latestAmendmentId.authorizationStatus === 1 &&
+                    {latestAmendmentId.authorizationStatus === true &&
                       !addingNewAmend && ( // Adding the new amend only if the latest amend is verified
                         <div
                           className="btn amend-generate"
@@ -869,57 +940,58 @@ export default function GenaralLocationForm() {
 
                 <div className="amend-container">
                   {[...amendments] // shallow copy to avoid mutating state
-                    .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
+                   // .sort((a, b) => new Date(b.date) - new Date(a.date)) //  descending by date
                     .map((item, index) => {
                       // then map
-                      const isSelected = selectedAmendment?.id === item.id;
+                      const isSelected =
+                        selectedAmendment?.amendNo === item.amendNo;
                       return (
                         <div
-                          key={item.id}
+                          key={item.amendNo}
                           className={`amend-pill 
-                            ${item.id === latestAmendmentId?.id ? "entry" : "verified"}
+                            ${item.amendNo === latestAmendmentId?.amendNo ? "entry" : "verified"}
                             ${isSelected ? "selected" : ""}
                           `}
                           onClick={() => {
-                            handleSelectAmendment(item.id, index);
+                            handleSelectAmendment(item.amendNo, index);
                             // setAddNewAmend(false);
                             setAddingNewAmend(false);
                           }}
                         >
                           <div className="pill-left">
-                            <span className="pill-index">{item.id}</span>
+                            <span className="pill-index">{item.amendNo}</span>
                             <div className="pill-info">
                               <span className="pill-type">
-                                {item.authorizationStatus === 0
+                                {item.authorizationStatus === false
                                   ? "ENTRY"
                                   : "VERIFIED"}
                               </span>
                               <span className="pill-date">
-                                {new Date(item.date).toLocaleDateString(
-                                  "en-GB"
-                                )}
+                                {new Date(
+                                  item.withaffectdate,
+                                ).toLocaleDateString("en-GB")}
                               </span>
                             </div>
                           </div>
 
                           <div className="pill-right">
-                            {item.id == latestAmendmentId.id && (
-                              <span className="pill-badge verified">
-                                latest
-                              </span>
-                            )}
-                            {item.authorizationStatus !== 0 &&
-                              item.id !== latestAmendmentId.id && (
+                            {item.authorizationStatus == false &&
+                              item.amendNo == latestAmendmentId.amendNo && (
                                 <span className="pill-badge verified">
-                                  ✔ Verified
+                                  latest
                                 </span>
                               )}
-                            {item.authorizationStatus == 0 &&
-                              item.id !== latestAmendmentId.id && (
+                            {item.authorizationStatus == true && (
+                              <span className="pill-badge verified">
+                                ✔ Verified
+                              </span>
+                            )}
+                            {/* {item.authorizationStatus == false &&
+                              item.amendNo !== latestAmendmentId.amendNo && (
                                 <span className="pill-badge verified">
                                   Entry
                                 </span>
-                              )}
+                              )} */}
                           </div>
                         </div>
                       );
@@ -1005,14 +1077,14 @@ export default function GenaralLocationForm() {
             save: {
               onClick: handleSubmit(onSubmit),
               // disabled:true,
-              disabled: step < steps.length - 1,
+              disabled: !canSave,
             },
             search: {
               // onClick: handleSearch,
               disabled: true,
             },
             clear: {
-              // onClick: handleClear,
+              onClick: handleClear,
               // disabled:true,
             },
             // delete: {
@@ -1030,7 +1102,7 @@ export default function GenaralLocationForm() {
             //to toggle the designation form
             // },
             refresh: {
-              // onClick: () => window.location.reload(),
+              onClick: load,
               // Refresh the page
             },
           }}

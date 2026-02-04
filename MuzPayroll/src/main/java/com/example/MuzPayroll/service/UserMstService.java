@@ -13,8 +13,8 @@ import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.ChangePasswordRequest;
  
 // import com.example.MuzPayroll.entity.DTO.CompanyDTO;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordRequest;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordResponse;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordOtpRequest;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequest;
 import com.example.MuzPayroll.entity.DTO.JwtUtil;
 import com.example.MuzPayroll.entity.DTO.LoginRequest;
 import com.example.MuzPayroll.entity.DTO.LoginResponse;

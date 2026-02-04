@@ -1,44 +1,65 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { Controller } from "react-hook-form";
 import Select from "react-select";
 import { useForm } from "react-hook-form";
-
+import { useAuth } from "../../context/AuthProvider";
 import "./Header.css";
 import { IoMdSettings } from "react-icons/io";
 import { IoNotificationsSharp } from "react-icons/io5";
 import { BiSolidCollection } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
 import { ImUser } from "react-icons/im";
-import { useAuth } from "../../context/AuthProvider";
-import { useNavigate } from "react-router-dom";
+
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
-// Constants for better maintainability
 const BLOCKED_PATHS = ["/masters", "/home", "/settings"];
-const HOVER_DELAY = 300; // Increased from 200ms for better UX
 const INITIAL_NOTIFICATIONS = [];
+const HOVER_DELAY = 200; // Delay before closing on mouse leave
 
 const Header = ({ backendError = [] }) => {
   const [notOpen, setNotOpen] = useState(false);
   const [dashOpen, setDashOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  // const [contextBranch, setContextBranch] = useState(null);
+  // const [contextLocation, setContextLocation] = useState(null);
+
   const [companyName, setCompanyName] = useState("");
   const [notifications, setNotifications] = useState([]);
 
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
   const [dashNotifications, setDashNotifications] = useState(
-    INITIAL_NOTIFICATIONS
+    INITIAL_NOTIFICATIONS,
   );
-  const { control, setValue, watch } = useForm();
+  const hasHydratedRef = useRef(false);
 
   const location = useLocation();
-  const notifTimer = useRef(null);
-  const dashTimer = useRef(null);
-  const profileTimer = useRef(null);
+
+  const { user, logout, updateUser } = useAuth();
+
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    logout();
+    navigate("/");
+  };
+
+  const { control, setValue, watch } = useForm({
+    defaultValues: {
+      branch: "",
+      location: "",
+    },
+  });
+
+  // Refs for hover timers
+  const notifTimerRef = useRef(null);
+  const dashTimerRef = useRef(null);
+  const profileTimerRef = useRef(null);
 
   // Parse login data safely
   const getLoginData = () => {
@@ -51,322 +72,278 @@ const Header = ({ backendError = [] }) => {
     }
   };
 
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();              // clears context + localStorage
-    navigate("/");    // redirect to login page
-  };
-
   const loginData = getLoginData();
-  console.log("Company name", loginData.companyId);
   const companyId = loginData.companyId;
-  const locationName = loginData.locationName || "";
   const currentPath = location.pathname;
-  const date = new Date().toLocaleDateString();
 
-  // Determine visibility
   const shouldRenderDashboard = !BLOCKED_PATHS.includes(currentPath);
   const shouldRenderProfile = BLOCKED_PATHS.includes(currentPath);
 
+  const handleApiError = (error) => {
+    if (!error.response) {
+      toast.error("Unable to connect to server.");
+      return;
+    }
+
+    const status = error.status;
+    const errorMessages = {
+      400: error.errors?.[0] || "Bad request",
+      401: "Session expired. Please login again.",
+      403: "You do not have permission.",
+      404: "Resource not found.",
+      409: "Duplicate record exists.",
+      500: "Server error. Please try again later.",
+    };
+
+    toast.error(errorMessages[status] || "Unexpected error occurred.");
+  };
+
   /* ================= API ================= */
   const fetchContextData = useCallback(
-    async (branchId, locationId, userCode) => {
-      console.log("fetchContextData called", companyId);
+    async (branchId, userCode) => {
+      //User code for user base access
+      if (!companyId || !branchId) return;
 
-      if (!companyId || !branchId) {
-        // console.log(" Missing companyId / branchId");
-        return;
+      try {
+        const [companyRes, branchRes] = await Promise.all([
+          axios.get(`http://localhost:8087/company/${companyId}`),
+          axios.get(`http://localhost:8087/branch/company/${companyId}`),
+        ]);
+
+        setCompanyName(companyRes.data.company);
+        setBranchList(
+          branchRes.data.map((branch) => ({
+            value: branch.branchMstID,
+            label: branch.branch,
+          })),
+        );
+      } catch (err) {
+        handleApiError(err);
       }
+    },
+    [companyId],
+  );
 
-      const [companyres, branchRes] = await Promise.all([
-        //  Both APIs works in parallel
-        axios.get(`http://localhost:8087/company/${companyId}`),
-        axios.get(`http://localhost:8087/branch/company/${companyId}`),
-      ]); //  both APIs call start at same time and waite until both finish
-      // console.log("API URL:", res.url);
-
-      setBranchList(
-        branchRes.data.map((branch) => ({
-          value: branch.branchMstID,
-          label: branch.branch,
-        }))
-      );
-
-      // const response = await res.json();
-      console.log("Header API raw response:", companyres.data);
-      setCompanyName(companyres.data.company);
-      if (branchRes.statusCode === 400) {
-        const errorMsg = branchRes.errors?.[0] || "Invalid context";
-        toast.error(errorMsg);
-
-        const stored = JSON.parse(localStorage.getItem("loginData") || "{}");
-
-        // CASE: Branch exists but NO location
-        if (
-          errorMsg.toLowerCase().includes("location") ||
-          errorMsg.toLowerCase().includes("no location")
-        ) {
-          //  clear ONLY location
-          setLocationList([]);
-          // setLocationId("");
-          // setValue("locationId", "");
-
-          localStorage.setItem(
-            "loginData",
-            JSON.stringify({
-              ...stored,
-              locationId: "",
-              locationName: "",
-            })
-          );
-
-          return;
-        }
-
-        //  CASE: Company / Branch invalid → clear both
-        setBranchList([]);
-        setLocationList([]);
-
-        // setBranchId("");
-        // setLocationId("");
-
-        // setValue("branchId", "");
-        // setValue("locationId", "");
-
-        localStorage.setItem(
-          "loginData",
-          JSON.stringify({
-            ...stored,
-            branchId: "",
-            branchName: "",
-            locationId: "",
-            locationName: "",
-          })
+  const fetchLocationsByBranch = useCallback(
+    async (branchId) => {
+      try {
+        setLoadingLocation(true);
+        const res = await axios.get(
+          `http://localhost:8087/location/locationlist/${branchId}`,
         );
 
-        return;
-      }
-
-      const data = branchRes.data;
-
-      /* ================= BRANCH ( FIX HERE) ================= */
-      const branchListFromApi =
-        data || data.branches || data.branchMstList || [];
-
-      if (branchListFromApi.length === 0) {
-        console.error(" No branches from backend");
-        setBranchList([]);
+        setLocationList(
+          res.data.map((loc) => ({
+            value: loc.mstID,
+            label: loc.name,
+          })),
+        );
+      } catch (err) {
+        handleApiError(err);
         setLocationList([]);
-        toast.error("No branches found");
-        return;
+      } finally {
+        setLoadingLocation(false);
       }
-      setBranchList(
-        branchListFromApi.map((branch) => ({
-          value: branch.branchMstID,
-          name: branch.branch,
-        }))
-      );
-
-      if (data.company && data.company.company) {
-        // setCompanyName(data.company.company);
-      }
-      // const locData=
-      // /* ================= LOCATION ( FIX HERE) ================= */
-      // const locationListFromApi =
-      //   data1.locationList || data.locations || data.locationMstList || [];
-
-      // if (locationListFromApi.length === 0) {
-      //   console.error(" No locations from backend");
-      //   setLocationList([]);
-      //   toast.error("No locations registered for this branch");
-      //   return;
-      // }
-
-      // setLocationList(locationListFromApi);
-
-      // const selectedLocation =
-      //   locationListFromApi.find(
-      //     (l) => String(l.locationMstID) === String(locationId)
-      //   ) || locationListFromApi[0];
-
-      // console.log(" selectedLocation:", selectedLocation);
-
-      // setLocationId(String(selectedLocation.locationMstID));
-      // setValue("locationId", String(selectedLocation.locationMstID));
-
-      // const stored = JSON.parse(localStorage.getItem("loginData") || {});
-      // localStorage.setItem(
-      //   "loginData",
-      //   JSON.stringify({
-      //     ...stored,
-      //     userCode: stored.userCode || userCode,
-      //     locationId: selectedLocation.locationMstID,
-      //     locationName: selectedLocation.location,
-      //   })
-      // );
     },
-    []
+    [setLocationList],
   );
+
+  // useEffect(() => {
+  //   const data = getLoginData();
+  //   setContextBranch(data.branchId || null);
+  //   setContextLocation(data.locationId || null);
+  // }, []);
 
   // Clean up timers on unmount
   useEffect(() => {
     return () => {
-      clearTimeout(notifTimer.current);
-      clearTimeout(dashTimer.current);
-      clearTimeout(profileTimer.current);
+      clearTimeout(notifTimerRef.current);
+      clearTimeout(dashTimerRef.current);
+      clearTimeout(profileTimerRef.current);
     };
   }, []);
+
   useEffect(() => {
-    if (companyId) {
-      fetchContextData(
-        loginData.branchId,
-        loginData.locationId,
-        loginData.userCode
-      );
+    if (branchList.length === 0) return;
+
+    const branchOption = branchList.find(
+      (b) => b.value === Number(user.branchId),
+    ); //stored ID is in string
+    // console.log("Brqanch steed", branchOption);
+    if (branchOption) {
+      setValue("branch", branchOption, {
+        //set in object not number or string
+        shouldDirty: false,
+        shouldTouch: false,
+      });
     }
-  }, [
-    companyId,
-    loginData.branchId,
-    loginData.locationId,
-    loginData.userCode,
-    fetchContextData,
-  ]);
+    fetchLocationsByBranch(Number(user.branchId));
+  }, [branchList]);
 
-  // Update notifications from backend errors
-  //  useEffect(() => {
-  //   if (!Array.isArray(backendError)) return;
+  useEffect(() => {
+    if (locationList.length === 0) return;
 
-  //   setNotifications(prev => {
-  //     // prevent unnecessary updates
-  //     if (JSON.stringify(prev) === JSON.stringify(backendError)) {
-  //       return prev;
-  //     }
-  //     return backendError;
+    const locationOption = locationList.find(
+      (l) => l.value === Number(user.locationId), //stored ID is in string
+    );
+    // console.log("location steed", locationList);
+    if (locationOption) {
+      setValue("location", locationOption, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+    }
+  }, [locationList, setValue]);
+
+  useEffect(() => {
+    if (!companyId || !user?.branchId) return;
+
+    fetchContextData(user.branchId, user.userCode);
+  }, [companyId, user?.branchId, user?.userCode, fetchContextData]);
+
+  //Listen to trigger on user changes
+  // useEffect(() => {
+  //   if (!user) return;
+
+  //   // const data = getLoginData();
+  //   // console.log("Login data", data);
+  //   // setContextBranch(user.branchId);
+  //   // console.log("Branch context", contextBranch);
+  //   setValue("branch", user.branchId, {
+  //     shouldDirty: false,
+  //     shouldTouch: false,
   //   });
 
-  //   if (backendError.length > 0) {
-  //     setNotOpen(prev => {
-  //       if (prev) return prev; // already open
-  //       return true;
-  //     });
+  //   // setContextLocation(user.locationId);
+  //   // console.log("Location context", contextLocation);
+  //   setValue("location", user.locationId, {
+  //     shouldDirty: false,
+  //     shouldTouch: false,
+  //   });
 
-  //     const autoCloseTimer = setTimeout(() => {
-  //       setNotOpen(false);
-  //     }, 5000);
+  //   // console.log("User data changed", user);
+  // }, [user?.branchId, setValue, user]);
 
-  //     return () => clearTimeout(autoCloseTimer);
-  //   }
-  // }, [backendError,notifications]);
-
-  // Notification removal functions
+  // Notification functions
   const removeNotification = useCallback((id) => {
     setNotifications((prev) =>
-      prev.filter((notification) => notification.id !== id)
+      prev.filter((notification) => notification.id !== id),
     );
   }, []);
 
   const removeDashNotification = useCallback((id) => {
     setDashNotifications((prev) =>
-      prev.filter((notification) => notification.id !== id)
+      prev.filter((notification) => notification.id !== id),
     );
   }, []);
 
-  // Clear all notifications
   const clearAllNotifications = useCallback(() => {
     setNotifications([]);
   }, []);
 
-  // Clear all dashboard notifications
   const clearAllDashNotifications = useCallback(() => {
     setDashNotifications([]);
   }, []);
 
-  // Hover handlers with better UX
-  const handleNotifEnter = useCallback(() => {
-    clearTimeout(notifTimer.current);
+  // Close all dropdowns
+  const closeAllDropdowns = useCallback(() => {
+    setNotOpen(false);
     setDashOpen(false);
+    setProfileOpen(false);
+  }, []);
+
+  // Toggle dropdown (close others)
+  const toggleDropdown = useCallback(
+    (type) => {
+      closeAllDropdowns();
+      if (type === "notification") setNotOpen((prev) => !prev);
+      else if (type === "dashboard") setDashOpen((prev) => !prev);
+      else if (type === "profile") setProfileOpen((prev) => !prev);
+    },
+    [closeAllDropdowns],
+  );
+
+  // Notification hover handlers
+  const handleNotifEnter = useCallback(() => {
+    clearTimeout(notifTimerRef.current);
     setNotOpen(true);
   }, []);
 
   const handleNotifLeave = useCallback(() => {
-    notifTimer.current = setTimeout(() => {
+    notifTimerRef.current = setTimeout(() => {
       setNotOpen(false);
     }, HOVER_DELAY);
   }, []);
 
+  // Dashboard hover handlers
   const handleDashEnter = useCallback(() => {
-    clearTimeout(dashTimer.current);
-    setNotOpen(false);
+    clearTimeout(dashTimerRef.current);
     setDashOpen(true);
   }, []);
 
   const handleDashLeave = useCallback(() => {
-    dashTimer.current = setTimeout(() => {
+    dashTimerRef.current = setTimeout(() => {
       setDashOpen(false);
     }, HOVER_DELAY);
   }, []);
 
+  // Profile hover handlers
   const handleProfileEnter = useCallback(() => {
-    clearTimeout(profileTimer.current);
+    clearTimeout(profileTimerRef.current);
     setProfileOpen(true);
   }, []);
 
   const handleProfileLeave = useCallback(() => {
-    profileTimer.current = setTimeout(() => {
+    profileTimerRef.current = setTimeout(() => {
       setProfileOpen(false);
     }, HOVER_DELAY);
   }, []);
 
-  // Handle escape key to close dropdowns
+  // Handle keyboard
+  const handleKeyDown = (e, callback) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      callback();
+    }
+  };
+
+  // Close on Escape
   useEffect(() => {
-    const handleEscapeKey = (event) => {
-      if (event.key === "Escape") {
-        setNotOpen(false);
-        setDashOpen(false);
-        setProfileOpen(false);
-      }
+    const handleEscape = (e) => {
+      if (e.key === "Escape") closeAllDropdowns();
     };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [closeAllDropdowns]);
 
-    document.addEventListener("keydown", handleEscapeKey);
-    return () => document.removeEventListener("keydown", handleEscapeKey);
-  }, []);
-
-  // Handle click outside to close dropdowns
+  // Close on click outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (e) => {
+      const isNotification = e.target.closest(".notification");
+      const isDashboard = e.target.closest(".dashboard");
+      const isProfile = e.target.closest(".user-profile");
+      const isDropdown =
+        e.target.closest(".notification-dropdown") ||
+        e.target.closest(".profile-dropdown");
 
-      const isNotification = event.target.closest(".notification");
-      const isDashboard = event.target.closest(".dashboard");
-      const isProfile = event.target.closest(".user-profile");
-
-
-      if (!isNotification && notOpen) {
-        setNotOpen(false);
-      }
-      if (!isDashboard && dashOpen) {
-        setDashOpen(false);
-      }
-      if (!isProfile && profileOpen) {
-        setProfileOpen(false);
+      if (!isNotification && !isDashboard && !isProfile && !isDropdown) {
+        closeAllDropdowns();
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [notOpen, dashOpen, profileOpen]);
+  }, [closeAllDropdowns]);
 
   return (
     <header className="header" role="banner">
-
       <div className="header-left">
         <div className="logo">
           <img
             src="/muziris-png.ico"
             alt="Muziris Logo"
-            width="106"
-            height="55"
+            width="120px"
+            height="46"
             loading="lazy"
           />
         </div>
@@ -374,9 +351,9 @@ const Header = ({ backendError = [] }) => {
         {/* Context Switcher */}
         <div className="context-switcher" aria-label="Working context">
           {/* Company (Read-only) */}
-          <span className="company-name" title={companyName}>
+          <div className="company-pill" title={companyName}>
             {companyName}
-          </span>
+          </div>
 
           {/* Branch */}
           <Controller
@@ -385,25 +362,34 @@ const Header = ({ backendError = [] }) => {
             rules={{ required: "Branch is required" }}
             render={({ field }) => (
               <Select
+                {...field}
                 options={branchList}
-                placeholder="Select Branch"
+                placeholder="Branch"
                 isSearchable
-                // isDisabled={isReadOnly}
+                isClearable={false}
                 classNamePrefix="form-control-select"
-                // className={`${errors.branch ? "error" : ""}`}
-                value={
-                  branchList.find((option) => option.value === field.value) ||
-                  null
-                }
-                onChange={(option) => {
-                  field.onChange(option.value);
+                value={field.value}
+                onChange={(option, actionMeta) => {
+                  if (!option) return;
+                  if (actionMeta.action !== "select-option") return;
 
-                  // Payroll-safe reset
-                  // setValue("location", "");
+                  // STORE OBJECT ONLY
+                  field.onChange(option);
+
+                  const newBranchId = option.value;
+
+                  // RESET LOCATION CORRECTLY
+                  setValue("location", null);
                   setLocationList([]);
 
-                  // If you fetch locations by branch
-                  // fetchLocationsByBranch(option.value);
+                  // FETCH
+                  fetchLocationsByBranch(newBranchId);
+
+                  // UPDATE CONTEXT
+                  updateUser({
+                    branchId: newBranchId,
+                    locationId: null,
+                  });
                 }}
               />
             )}
@@ -416,45 +402,48 @@ const Header = ({ backendError = [] }) => {
             rules={{ required: "Location is required" }}
             render={({ field }) => (
               <Select
+                {...field}
                 options={locationList}
-                placeholder="Select Location"
+                placeholder="Location"
                 isSearchable
-                // isDisabled={isReadOnly || !watch("branch")}
+                isClearable={false}
+                isDisabled={!watch("branch") || loadingLocation}
                 classNamePrefix="form-control-select"
-                // className={`${errors.location ? "error" : ""}`}
-                value={
-                  locationList.find((option) => option.value === field.value) ||
-                  null
-                }
-                onChange={(option) => {
-                  field.onChange(option.value);
+                value={field.value}
+                onChange={(option, actionMeta) => {
+                  if (!option) return;
+                  if (actionMeta.action !== "select-option") return;
+
+                  //  STORE OBJECT ONLY
+                  field.onChange(option);
+
+                  //  UPDATE CONTEXT
+                  updateUser({
+                    locationId: option.value,
+                  });
                 }}
               />
             )}
           />
         </div>
-
       </div>
 
       <div className="header-right">
         {/* Notifications */}
         <div
           className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`}
+          onClick={() => toggleDropdown("notification")}
           onMouseEnter={handleNotifEnter}
           onMouseLeave={handleNotifLeave}
-          onClick={() => setNotOpen(!notOpen)}
           role="button"
           tabIndex="0"
           aria-label="Notifications"
           aria-expanded={notOpen}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setNotOpen(!notOpen);
-            }
-          }}
+          onKeyDown={(e) =>
+            handleKeyDown(e, () => toggleDropdown("notification"))
+          }
         >
-          <IoNotificationsSharp size={19} aria-hidden="true" />
+          <IoNotificationsSharp size={20} aria-hidden="true" />
 
           {notifications.length > 0 && (
             <div
@@ -467,10 +456,14 @@ const Header = ({ backendError = [] }) => {
           )}
 
           {notOpen && (
-            <div className="notification-dropdown" role="menu">
-              <div className="dropdown-header">
-                {/* <span>Notifications</span> */}
-                {notifications.length > 0 && (
+            <div
+              className="notification-dropdown"
+              role="menu"
+              onMouseEnter={handleNotifEnter}
+              onMouseLeave={handleNotifLeave}
+            >
+              {notifications.length > 0 && (
+                <div className="dropdown-header">
                   <button
                     onClick={clearAllNotifications}
                     className="clear-all-btn"
@@ -478,24 +471,24 @@ const Header = ({ backendError = [] }) => {
                   >
                     Clear All
                   </button>
-                )}
-              </div>
+                </div>
+              )}
 
               {notifications.length > 0 ? (
                 <div className="notifications-list">
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-
-                      className={`notification-item ${notification.status ? "error" : "info"}`}
-
+                      className={`notification-item ${
+                        notification.status ? "error" : "info"
+                      }`}
                       role="menuitem"
                     >
                       <p className="notification-msg">{notification.msg}</p>
                       <button
                         onClick={() => removeNotification(notification.id)}
                         className="remove-btn"
-                        aria-label={`Remove notification: ${notification.msg}`}
+                        aria-label="Remove"
                       >
                         <RxCross2 size={16} aria-hidden="true" />
                       </button>
@@ -503,9 +496,7 @@ const Header = ({ backendError = [] }) => {
                   ))}
                 </div>
               ) : (
-                <p className="no-msg" role="alert">
-                  No notifications
-                </p>
+                <p className="no-msg">No notifications</p>
               )}
             </div>
           )}
@@ -515,56 +506,56 @@ const Header = ({ backendError = [] }) => {
         {shouldRenderDashboard && (
           <div
             className="dashboard"
+            onClick={() => toggleDropdown("dashboard")}
             onMouseEnter={handleDashEnter}
             onMouseLeave={handleDashLeave}
-            onClick={() => setDashOpen(!dashOpen)}
             role="button"
             tabIndex="0"
-            aria-label="Dashboard notifications"
+            aria-label="Dashboard"
             aria-expanded={dashOpen}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setDashOpen(!dashOpen);
-              }
-            }}
+            onKeyDown={(e) =>
+              handleKeyDown(e, () => toggleDropdown("dashboard"))
+            }
           >
-            <BiSolidCollection size={19} aria-hidden="true" />
+            <BiSolidCollection size={20} aria-hidden="true" />
 
             {dashNotifications.length > 0 && (
               <div
                 className="msgs"
                 role="status"
-                aria-label={`${dashNotifications.length} dashboard notifications`}
+                aria-label={`${dashNotifications.length} alerts`}
               >
                 {dashNotifications.length}
               </div>
             )}
 
             {dashOpen && (
-              <div className="notification-dropdown" role="menu">
-                <div className="dropdown-header">
-                  {/* <span>Dashboard</span> */}
-                  {dashNotifications.length > 0 && (
+              <div
+                className="notification-dropdown"
+                role="menu"
+                onMouseEnter={handleDashEnter}
+                onMouseLeave={handleDashLeave}
+              >
+                {dashNotifications.length > 0 && (
+                  <div className="dropdown-header">
                     <button
                       onClick={clearAllDashNotifications}
                       className="clear-all-btn"
-                      aria-label="Clear all dashboard notifications"
+                      aria-label="Clear all alerts"
                     >
                       Clear All
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {dashNotifications.length > 0 ? (
                   <div className="notifications-list">
                     {dashNotifications.map((notification) => (
                       <div
                         key={notification.id}
-
-
-                        className={`notification-item ${notification.status ? "error" : "info"}`}
-
+                        className={`notification-item ${
+                          notification.status ? "error" : "info"
+                        }`}
                         role="menuitem"
                       >
                         <p className="notification-msg">{notification.msg}</p>
@@ -573,7 +564,7 @@ const Header = ({ backendError = [] }) => {
                             removeDashNotification(notification.id)
                           }
                           className="remove-btn"
-                          aria-label={`Remove dashboard notification: ${notification.msg}`}
+                          aria-label="Remove"
                         >
                           <RxCross2 size={16} aria-hidden="true" />
                         </button>
@@ -581,99 +572,78 @@ const Header = ({ backendError = [] }) => {
                     ))}
                   </div>
                 ) : (
-                  <p className="no-msg" role="alert">
-                    No dashboard notifications
-                  </p>
+                  <p className="no-msg">No alerts</p>
                 )}
               </div>
             )}
           </div>
         )}
 
-        {/* Location & Date */}
-        <div className="location-date">
-          <span
-            className="location"
-            title={locationName}
-            aria-label={`Current location: ${locationName}`}
-          >
-            {locationName}
-          </span>
-          <span
-            className="date"
-            title={date}
-            aria-label={`Current date: ${date}`}
-          >
-            {date}
-          </span>
-        </div>
-
         {/* User Profile */}
         <div
           className="user-profile"
+          onClick={() => toggleDropdown("profile")}
           onMouseEnter={handleProfileEnter}
           onMouseLeave={handleProfileLeave}
-          onClick={() => setProfileOpen(!profileOpen)}
           role="button"
           tabIndex="0"
           aria-label="User profile"
           aria-expanded={profileOpen}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setProfileOpen(!profileOpen);
-            }
-          }}
+          onKeyDown={(e) => handleKeyDown(e, () => toggleDropdown("profile"))}
         >
-
-          <ImUser
-            size={21}
-            style={{ color: '#d218d8ff' }}
-            aria-hidden="true"
-          />
-
-
+          <ImUser size={20} aria-hidden="true" />
 
           {shouldRenderProfile && profileOpen && (
-            <div className="profile-dropdown" role="menu">
-              <a
-                href="/changepassword"
+            <div
+              className="profile-dropdown"
+              role="menu"
+              onMouseEnter={handleProfileEnter}
+              onMouseLeave={handleProfileLeave}
+            >
+              <div className="profile-user">
+                <ImUser size={18} aria-hidden="true" />
+                <div className="profile-names">
+                  <strong>{loginData.userName || "User"}</strong>
+                  <span>{loginData.role || "Admin"}</span>
+                </div>
+              </div>
+
+              <div className="profile-divider" />
+
+              <button
+                type="button"
                 role="menuitem"
                 className="profile-link"
+                onClick={() => navigate("/changepassword")}
               >
                 Change Password
-              </a>
+              </button>
 
-              <a
-                href="#"
+              <div className="profile-divider" />
+
+              <button
+                type="button"
                 role="menuitem"
                 className="profile-link logout"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleLogout();
-                }}
+                onClick={() => handleLogOut()}
               >
-
                 Logout
-              </a>
+              </button>
             </div>
           )}
         </div>
 
-        {/* Optional Settings */}
+        {/* Settings */}
         {currentPath === "/masters/" && (
-          <div className="settings">
-            <IoMdSettings
-              size={19}
-              color="#161414e6"
-              aria-label="Settings"
-              role="button"
-              tabIndex="0"
-            />
+          <div
+            className="settings"
+            role="button"
+            tabIndex="0"
+            aria-label="Settings"
+          >
+            <IoMdSettings size={20} aria-hidden="true" />
           </div>
         )}
-
-        {/* <ThemeToggle /> */}
       </div>
     </header>
   );

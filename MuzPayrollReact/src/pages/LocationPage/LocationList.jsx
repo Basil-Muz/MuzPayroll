@@ -12,8 +12,9 @@ import Header from "../../components/Header/Header";
 import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import Loading from "../../components/Loading/Loading";
-
+import Loading from "../../components/Loaders/Loading";
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
 const LocationList = () => {
   /* ================= STATE ================= */
   const [listView, setListView] = useState(false);
@@ -26,6 +27,8 @@ const LocationList = () => {
   const [inactiveLocation, setInactiveLocation] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const { showRailLoader, hideLoader } = useLoader();
+
   const [headerError] = useState([]);
 
   const navigate = useNavigate();
@@ -67,7 +70,8 @@ const LocationList = () => {
   }, []);
 
   const loadAllLocation = async () => {
-    setLoading(true);
+    const startTime = Date.now();
+    showRailLoader("Retrieving available location…");
     setGroupByStatus(false);
 
     try {
@@ -76,11 +80,11 @@ const LocationList = () => {
         setAllLocation(res.data);
         setActiveLocation([]);
         setInactiveLocation([]);
-        setLoading(false);
       }, 800);
     } catch (err) {
-      console.error(err);
-      setLoading(false);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
   };
 
@@ -94,7 +98,8 @@ const LocationList = () => {
       return;
     }
 
-    setLoading(true);
+    const startTime = Date.now();
+    showRailLoader("Retrieving available location…");
     try {
       const [activeRes, inactiveRes] = await Promise.all([
         fetchActiveLocation(),
@@ -108,7 +113,9 @@ const LocationList = () => {
       }, 800);
     } catch (err) {
       console.error(err);
-      setLoading(false);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
   };
 

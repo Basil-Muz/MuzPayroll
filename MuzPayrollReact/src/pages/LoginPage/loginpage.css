@@ -218,13 +218,20 @@ input:-webkit-autofill:active {
 /* ===========================
    ERROR MESSAGE
    =========================== */
-.login-box .error-msg {
+.error-msg {
   color: #e11d48;
-  margin-top: -8px;
+  margin-top: 3px;
   margin-bottom: 10px;
   font-size: 13px;
   text-align: left;
 
+}
+.success-msg {
+  color: var(--success);
+  margin-top: -8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  text-align: left;
 }
 
 .input-wrapper input.input-error {

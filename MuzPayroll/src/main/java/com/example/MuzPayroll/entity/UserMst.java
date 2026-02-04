@@ -1,12 +1,17 @@
 package com.example.MuzPayroll.entity;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class UserMst {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "UserMstID", unique = true, nullable = false)
+    private Long userMstID;
 
     @Column(nullable = false, unique = true)
     private String userCode;
@@ -30,23 +35,20 @@ public class UserMst {
     @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
-
     @ManyToOne
     @JoinColumn(name = "BranchID", nullable = false)
     private BranchMst branchEntity;
 
-
     @ManyToOne
     @JoinColumn(name = "LocationID", nullable = false)
-    private LocationMst  locationEntity;
+    private LocationMst locationEntity;
 
-    
-    public Long getId() {
-        return id;
+    public Long getUserMstID() {
+        return userMstID;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserMstID(Long userMstID) {
+        this.userMstID = userMstID;
     }
 
     public String getUserCode() {
@@ -96,6 +98,7 @@ public class UserMst {
     public void setUserAttempt(Integer userAttempt) {
         this.userAttempt = userAttempt;
     }
+
     public CompanyMst getCompanyEntity() {
         return companyEntity;
     }
@@ -103,7 +106,6 @@ public class UserMst {
     public void setCompanyEntity(CompanyMst companyEntity) {
         this.companyEntity = companyEntity;
     }
-
 
     public BranchMst getBranchEntity() {
         return branchEntity;
@@ -113,14 +115,12 @@ public class UserMst {
         this.branchEntity = branchEntity;
     }
 
-
     public LocationMst getLocationEntity() {
         return locationEntity;
     }
 
     public void setLocationEntity(LocationMst locationEntity) {
-         this.locationEntity = locationEntity;
+        this.locationEntity = locationEntity;
     }
 
-  
 }

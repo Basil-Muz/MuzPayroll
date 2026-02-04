@@ -12,8 +12,9 @@ import Header from "../../components/Header/Header";
 import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import Loading from "../../components/Loading/Loading";
-
+import Loading from "../../components/Loaders/Loading";
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
 const BranchList = () => {
   /* ================= STATE ================= */
   const [listView, setListView] = useState(false);
@@ -26,6 +27,7 @@ const BranchList = () => {
   const [inactiveBranch, setInactiveBranch] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const { showRailLoader, hideLoader } = useLoader();
 
   const navigate = useNavigate();
 
@@ -64,7 +66,8 @@ const BranchList = () => {
   }, []);
 
   const loadAllBranch = async () => {
-    setLoading(true);
+    const startTime = Date.now();
+    showRailLoader("Retrieving available branch…");
     setGroupByStatus(false);
 
     try {
@@ -76,8 +79,10 @@ const BranchList = () => {
         setLoading(false);
       }, 1000);
     } catch (err) {
-      console.error(err);
       setLoading(false);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
   };
 
@@ -91,7 +96,8 @@ const BranchList = () => {
       return;
     }
 
-    setLoading(true);
+    const startTime = Date.now();
+    showRailLoader("Retrieving available branch…");
     try {
       const [activeRes, inactiveRes] = await Promise.all([
         fetchActiveBranch(),
@@ -104,8 +110,9 @@ const BranchList = () => {
         setLoading(false);
       }, 800);
     } catch (err) {
-      console.error(err);
-      setLoading(false);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
   };
 
@@ -200,9 +207,8 @@ const BranchList = () => {
         </div>
 
         {/* CONTENT */}
-        {loading && <Loading />}
 
-        {!loading && (
+        {
           <>
             {!groupByStatus && (
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
@@ -226,7 +232,7 @@ const BranchList = () => {
               </>
             )}
           </>
-        )}
+        }
 
         <FloatingActionBar
           actions={{

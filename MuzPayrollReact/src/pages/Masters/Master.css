@@ -4,7 +4,7 @@
   display: flex;
   /* min-height: 100vh; */
   padding-top: 66px;
-  background-color: #e9e9e9ff;
+  background-color:   var(--bg);
   font-family: "Roboto", Arial, sans-serif;
 }
 
