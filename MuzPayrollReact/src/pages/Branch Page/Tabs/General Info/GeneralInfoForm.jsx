@@ -45,7 +45,7 @@ const GeneralInfoForm = function GeneralInfoForm({
   const userObj = JSON.parse(UserData);
 
   const branchId = userObj.branchId;
-  console.log("Branches:", branchId);
+  // console.log("Branches:", branchId);
   // console.log("Branch sgsg", UserData);
 
   const formatLocalDate = (date) => date.toLocaleDateString("en-CA"); // yyyy-MM-dd
@@ -63,7 +63,7 @@ const GeneralInfoForm = function GeneralInfoForm({
         shouldValidate: false,
       });
     }
-    console.log("General info branch :", branchList);
+    // console.log("General info branch :", branchList);
   }, [companys, setValue, branchList, branchId]);
 
   useEffect(() => {

@@ -17,6 +17,7 @@ import { ImUser } from "react-icons/im";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
 const BLOCKED_PATHS = ["/masters", "/home", "/settings"];
+const CONTEXT_SWITCHER = ["/home"];
 const INITIAL_NOTIFICATIONS = [];
 const HOVER_DELAY = 200; // Delay before closing on mouse leave
 
@@ -79,7 +80,7 @@ const Header = ({ backendError = [] }) => {
 
   const shouldRenderDashboard = !BLOCKED_PATHS.includes(currentPath);
   const shouldRenderProfile = BLOCKED_PATHS.includes(currentPath);
-
+  const shouldRenderHome = CONTEXT_SWITCHER.includes(currentPath)
   const handleApiError = (error) => {
     if (!error.response) {
       toast.error("Unable to connect to server.");
@@ -350,7 +351,7 @@ const Header = ({ backendError = [] }) => {
         </div>
 
         {/* Context Switcher */}
-        <div className="context-switcher" aria-label="Working context">
+        { !shouldRenderHome && <div className="context-switcher" aria-label="Working context">
           {/* Company (Read-only) */}
           <div className="company-pill" title={companyName}>
             {companyName}
@@ -426,7 +427,7 @@ const Header = ({ backendError = [] }) => {
               />
             )}
           />
-        </div>
+        </div>}
       </div>
 
       <div className="header-right">

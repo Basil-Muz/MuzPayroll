@@ -10,11 +10,11 @@ export const useSaveForm = ({
   //   errors,
   userCode,
   reset,
-  companyId,
+  entityId,
   amendments,
   refreshAmendments,
-  entity,
-  saveEntity,
+  entity, // Table name(company, branch, location...)
+  saveEntity, //  service(api) for saving the entity
   //   setStep,
 }) => {
   const { showRailLoader, hideLoader } = useLoader();
@@ -84,7 +84,7 @@ export const useSaveForm = ({
       console.log("Has Amend", isFirstAmend);
       // reset only on success
       if (!isFirstAmend) {
-        await refreshAmendments(companyId); // fetch the amendment data
+        await refreshAmendments(entityId); // fetch the amendment data
       } else {
         reset(); //form reset
       }

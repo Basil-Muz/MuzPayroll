@@ -1,18 +1,22 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { handleApiError } from "../utils/errorToastResolver";
 import { useLoader } from "../context/LoaderContext";
 import { ensureMinDuration } from "../utils/loaderDelay";
 
-export const useEntityAmendList = ({ entity, getEntityAmendList }) => {
+export const useEntityAmendList = ({
+  entity,
+  getEntityAmendList,
+  addingNewAmend,
+  setAddingNewAmend,
+}) => {
   const [amendments, setAmendments] = useState([]);
   const [selectedAmendment, setSelectedAmendment] = useState(null);
   const { showRailLoader, hideLoader } = useLoader();
 
   const fetchEntityAmendData = useCallback(
     async (entityId) => {
-
       const startTime = Date.now();
-      showRailLoader("Fetching " + entity +" details…");
+      showRailLoader("Fetching " + entity + "details…");
 
       try {
         const entityLogs = entity + "DtoLogs";
@@ -28,15 +32,16 @@ export const useEntityAmendList = ({ entity, getEntityAmendList }) => {
         // list[list.length - 1] ||
         // null;
         setSelectedAmendment(response.data);
+        setAddingNewAmend(false);
         // setSelectedAmendment(latest); //data form master table
         // // delete response.data.companyDtoLogs;
-        // console.log("Amend response", response.data)
+        console.log("Amend response", response.data);
       } catch (error) {
         handleApiError(error, {
           operation: "fetch", //    Opration name
           entity: entity, //      Table name
         });
-        // console.error("Error fetching branch data:", error);
+        console.error("Error fetching branch data:", error);
       } finally {
         await ensureMinDuration(startTime, 1200);
         hideLoader();
@@ -44,11 +49,16 @@ export const useEntityAmendList = ({ entity, getEntityAmendList }) => {
     },
     [setSelectedAmendment, setAmendments, getEntityAmendList, entity],
   );
+  const isVerifiedAmendment = useMemo(() => {
+    // Read-only VERIFIED mode
+    return selectedAmendment?.authorizationStatus === true && !addingNewAmend;
+  }, [selectedAmendment, addingNewAmend]);
   return {
     fetchEntityAmendData,
     amendments,
     setAmendments,
     selectedAmendment,
     setSelectedAmendment,
+    isVerifiedAmendment,
   };
 };

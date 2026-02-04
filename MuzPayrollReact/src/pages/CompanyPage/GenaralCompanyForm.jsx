@@ -1,60 +1,52 @@
-import { useState, useEffect, useRef } from "react";
-import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
-import Select from "react-select";
+// React & core libraries
 import { useParams } from "react-router-dom";
-// import axios from "axios";
-import { toast } from "react-hot-toast";
-import DatePicker from "react-datepicker";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 
+// Third-party UI libraries & icons
+import Select from "react-select";
+import DatePicker from "react-datepicker";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
-import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
-import AddressForm from "../Branch Page/Tabs/General Info/AddressForm";
-import ContactForm from "../Branch Page/Tabs/General Info/ContactForm";
-import DocumentsTab from "../Branch Page/Tabs/General Info/DocumentsTab";
-
-import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
-import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
-
 //Constants
-import { COMMON_COMPANY_FIELD_MAP } from "../../constants/companyFieldMap";
 import { steps } from "../../constants/FormSteps";
+import { COMMON_COMPANY_FIELD_MAP } from "../../constants/companyFieldMap";
+
+//Hook (flow control)
+import { useSaveForm } from "../../hooks/useSaveForm";
+import { useFormClear } from "../../hooks/useFormClear";
+import { useFormStepper } from "../../hooks/useFormStepper";
+import { useGenerateAmend } from "../../hooks/useGenerateAmend";
+import { useSmoothFormFocus } from "../../hooks/useSmoothFormFocus";
+import { useEntityAmendList } from "../../hooks/useEntityAmendList";
+import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
 
 //service
+import { saveCompany } from "../../services/company.service";
 import { getCompanyAmendList } from "../../services/company.service";
-import { saveCompany } from "../../services/company.service"
-//Hook (flow control)
-import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
-import { useEntityAmendList } from "../../hooks/useEntityAmendList";
-import { useSmoothFormFocus } from "../../hooks/useSmoothFormFocus";
-import { useGenerateAmend } from "../../hooks/useGenerateAmend";
-import { useFormStepper } from "../../hooks/useFormStepper";
-import { useSaveForm } from "../../hooks/useSaveForm";
 
 //Utils (Helpers)
 import { formatDate } from "../../utils/dateFormater";
 
+//  Components
+import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
+import AddressForm from "../Branch Page/Tabs/General Info/AddressForm";
+import ContactForm from "../Branch Page/Tabs/General Info/ContactForm";
+import DocumentsTab from "../Branch Page/Tabs/General Info/DocumentsTab";
+import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
+import GeneralInfoForm from "../Branch Page/Tabs/General Info/GeneralInfoForm";
+import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
+
+// Styles
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function GenaralCompanyForm() {
-  // const [submitStatus, setSubmitStatus] = useState(1);
-  // const [selectedAmendment, setSelectedAmendment] = useState(null);
-  // const [backendErrors, setBackendErrors] = useState([]);
-  //pass the back end error to front end
-
-  // const [addNewAmend, setAddNewAmend] = useState(false);
-  // true when latest amned is verified enables the genarate button
-
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
-
   // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
   const userObj = JSON.parse(UserData);
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
-
-  // const [isReadOnly, setIsReadOnly] = useState();
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
 
@@ -67,13 +59,16 @@ export default function GenaralCompanyForm() {
     selectedAmendment,
     setSelectedAmendment,
     fetchEntityAmendData,
+    // isVerifiedAmendment,
   } = useEntityAmendList({
     entity: "company",
     getEntityAmendList: getCompanyAmendList,
+    addingNewAmend,
+    setAddingNewAmend,
   });
 
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
-  // console.log("amends nmber", inputMode);
+
   const {
     register,
     handleSubmit,
@@ -149,10 +144,10 @@ export default function GenaralCompanyForm() {
     //   errors,
     userCode,
     reset,
-    companyId,
+    entityId: companyId, // compay id for fetch amendments data
     amendments, // SAME STATE
-    refreshAmendments: fetchEntityAmendData,
-    entity:"company",
+    refreshAmendments: fetchEntityAmendData, // amend api call for company
+    entity: "company",
     saveEntity: saveCompany,
   });
 
@@ -215,10 +210,11 @@ export default function GenaralCompanyForm() {
       },
     );
   }
-
-  const isVerifiedAmendment = // Read-only VERIFIED mode
-    selectedAmendment?.authorizationStatus === true && !addingNewAmend;
-
+  const isVerifiedAmendment = useMemo(() => {
+    // Read-only VERIFIED mode
+    return selectedAmendment?.authorizationStatus === true && !addingNewAmend;
+  }, [selectedAmendment, addingNewAmend]);
+  console.log("Is varified", isVerifiedAmendment);
   // const hasUserChanges = Object.keys(dirtyFields).length > 0;
   const isLastStep = step === steps.length - 1;
   // const documentsValid = submitStatus === 0;
@@ -297,7 +293,6 @@ export default function GenaralCompanyForm() {
   useEffect(() => {
     const date = new Date(); // current date
     const formattedDate = date.toISOString().split("T")[0]; //yyyy-mm-dd format
-    // console.log("Active date",formattedDate)
     setValue("activeDate", formattedDate);
   }, [setValue]);
 
@@ -323,23 +318,13 @@ export default function GenaralCompanyForm() {
     // });
   };
 
-  const handleClear = () => {
-    if (selectedAmendment) {
-      // Restore selected amendment values
-      setAmendmentData(selectedAmendment);
-
-      clearErrors();
-      toast.success("Changes cleared");
-    } else {
-      //  New record → reset to empty insert state
-      reset({
-        userCode,
-        authorizationStatus: 0,
-        withaffectdate: "",
-        activeDate: new Date().toISOString().split("T")[0],
-      });
-    }
-  };
+  const { handleClear } = useFormClear({
+    setAmendmentData,
+    selectedAmendment,
+    clearErrors,
+    reset,
+    userCode,
+  });
 
   return (
     <>

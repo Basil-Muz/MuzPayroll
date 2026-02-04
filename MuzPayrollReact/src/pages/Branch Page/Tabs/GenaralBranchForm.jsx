@@ -34,22 +34,13 @@ import { COMMON_BRANCH_FIELD_MAP } from "../../../constants/branchFieldMap";
 
 //Utils (Helpers)
 import { formatDate } from "../../../utils/dateFormater";
+import { useFormClear } from "../../../hooks/useFormClear";
 
 export default function GenaralBranchForm() {
-  //const [step, setStep] = useState(0); // switch steps
-
-  //const [companyList, setCompanyList] = useState([]); //fetch companys
-  // const [submitStatus, setSubmitStatus] = useState(1);
-  // true when latest amned is verified enables the genarate button
-  // const [addNewAmend, setAddNewAmend] = useState(false);
-
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
-  //const datePickerRef = useRef(null); //To focus the date picker
-  // const authDateInputRef = useRef(null);
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
   const generalInfoRef = useRef(null);
   const UserData = localStorage.getItem("loginData");
-  // console.log("User data",UserData);
   const userObj = JSON.parse(UserData);
 
   //Convert the JSON string to objects
@@ -66,6 +57,8 @@ export default function GenaralBranchForm() {
   } = useEntityAmendList({
     entity: "branch",
     getEntityAmendList: getBranchAmendList,
+    setAddingNewAmend,
+    addingNewAmend,
   });
 
   const { loadCompany, companyList } = useLoadCompany(); //  Fetch the company with company id
@@ -106,6 +99,8 @@ export default function GenaralBranchForm() {
     },
   });
 
+  const { branchId } = useParams(); // perameter from url
+
   const amendLenght = amendments.length;
 
   //seting amend data with selected amend pill
@@ -130,9 +125,9 @@ export default function GenaralBranchForm() {
     //   errors,
     userCode,
     reset,
-    companyId,
+    entityId: branchId, // branch id for fetch amendments data
     amendments, // SAME STATE
-    refreshAmendments: fetchEntityAmendData,
+    refreshAmendments: fetchEntityAmendData, // amend api call for branch
     entity: "branch",
     saveEntity: saveBranch,
   });
@@ -165,8 +160,6 @@ export default function GenaralBranchForm() {
   });
 
   const watchedDocuments = watch("documents");
-  // const watchedPincode = watch("branchPinCode");
-  const { branchId } = useParams();
 
   const authorizationStatusOptions = [
     { label: "ENTRY", value: 0 },
@@ -213,63 +206,6 @@ export default function GenaralBranchForm() {
     !isVerifiedAmendment &&
     ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
 
-  // const fetchEntityAmendData = useCallback(
-  //   async (branchId) => {
-  //     try {
-  //       const response = await axios.get(
-  //         `http://localhost:8087/branch/getamendlist/${branchId}`,
-  //       );
-
-  //       setAmendments(response.data.branchDtoLogs || []); // Use the amends data
-  //       // // delete response.data.companyDtoLogs;
-  //       // console.log("Amend response", amendments);
-  //       setSelectedAmendment(response.data); //data form master table
-  //       setValue("branchMstID", response.data.branchMstID);
-  //       // console.log("Selected response", selectedAmendment);
-  //     } catch (error) {
-  //       console.error("Error fetching company data:", error);
-  //     }
-  //   },
-  //   [setSelectedAmendment, setAmendments, setValue],
-  // );
-  // console.log("Locaked ", isUnlocked || isVerifiedAmendment); //true
-  // selected date to an ISO string (toISOString()), which applies UTC timezone conversion.
-
-  // const handleApiError = (error) => {
-  //   // console.error("API Error:", error);
-
-  //   // Network error (no response from server)
-  //   if (!error.response) {
-  //     toast.error("Unable to connect to server. Please check your network.");
-  //     return;
-  //   }
-  //   // console.log("Error", error);
-  //   const status = error.type;
-
-  //   switch (status) {
-  //     case 400:
-  //       toast.error(error.errors[0]);
-  //       break;
-  //     case 401:
-  //       toast.error("Session expired. Please login again.");
-  //       break;
-  //     case 403:
-  //       toast.error("You do not have permission.");
-  //       break;
-  //     case 404:
-  //       toast.error("Resource not found.");
-  //       break;
-  //     case 409:
-  //       toast.error("Duplicate record exists.");
-  //       break;
-  //     case 500:
-  //       toast.error("Server error. Please try again later.");
-  //       break;
-  //     default:
-  //       toast.error("Unexpected error occurred.");
-  //   }
-  // };
-
   const latestAmendmentId = amendments.length
     ? amendments
         .filter((a) => a.authorizationStatus === false)
@@ -286,33 +222,8 @@ export default function GenaralBranchForm() {
   useEffect(() => {
     const date = new Date(); // current date
     const formattedDate = date.toISOString().split("T")[0]; //yyyy-mm-dd format
-    // console.log("Active date",formattedDate)
     setValue("activeDate", formattedDate);
   }, [setValue]);
-
-  // const handleGenerateAmendment = () => {
-  //   setSelectedAmendment(null);
-  //   setAddingNewAmend(true);
-  //   setIsReadOnly(false);
-
-  //   reset({
-  //     ...getValues(), //  keep base data
-  //     authorizationStatus: 0, // ENTRY
-  //     // mode: "INSERT",
-  //     withaffectdate: "",
-  //     // documents: [
-  //     //   {
-  //     //     type: "",
-  //     //     number: "",
-  //     //     expiryDate: "",
-  //     //     file: null,
-  //     //     remarks: "",
-  //     //   },
-  //     // ],
-  //   });
-
-  //   clearErrors();
-  // };
 
   // useEffect(() => {
   //   if (watchedDocuments && watchedDocuments.length > 0) {
@@ -371,113 +282,11 @@ export default function GenaralBranchForm() {
     return () => clearTimeout(timer);
   }, [addingNewAmend, isVerifiedAmendment]);
 
-  // useEffect(() => {
-  //   console.log("Input ref:", authDateInputRef.current);
-  //   console.log("DatePicker ref:", datePickerRef.current);
-  // }, []);
-
   useEffect(() => {
     const date = new Date(); // current date
     const formattedDate = date.toISOString().slice(0, 10); //yyyy-mm-dd format
     setValue("activeDate", formattedDate);
   }, [setValue]);
-
-  // const setingData = useCallback(
-  //   (selectedAmendment) => {
-  //     setValue("shortName", selectedAmendment.shortName ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-
-  //     setValue("branchMstID", selectedAmendment.branchMstID);
-
-  //     setValue(
-  //       "authorizationStatus",
-  //       selectedAmendment.authorizationStatus ? 1 : 0, //  Status from back end is boolean(true/flase)
-  //       {
-  //         shouldDirty: false,
-  //         shouldValidate: true,
-  //       },
-  //     );
-
-  //     setValue("branch", selectedAmendment.branch ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-
-  //     setValue("withaffectdate", selectedAmendment.withaffectdate ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: false,
-  //     });
-
-  //     // setValue("companyImage", selectedAmendment.companyImage ?? "");
-
-  //     setValue(
-  //       "activeDate",
-  //       selectedAmendment.activeDate
-  //         ? selectedAmendment.activeDate
-  //         : toLocalDate(new Date()),
-  //       { shouldDirty: false },
-  //     );
-
-  //     setValue("pincode", selectedAmendment.pincode ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-
-  //     setValue("address", selectedAmendment.address ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-
-  //     setValue("country", selectedAmendment.country ?? "IN", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-
-  //     setValue("state", selectedAmendment.state ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("district", selectedAmendment.district ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("place", selectedAmendment.place ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("email", selectedAmendment.email ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("mobileNumber", selectedAmendment.mobileNumber ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("landlineNumber", selectedAmendment.landlineNumber ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("employerName", selectedAmendment.employerName ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("employerEmail", selectedAmendment.employerEmail ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("employerNumber", selectedAmendment.employerNumber ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //     setValue("designation", selectedAmendment.designation ?? "", {
-  //       shouldDirty: false,
-  //       shouldValidate: true,
-  //     });
-  //   },
-  //   [setValue],
-  // );
 
   useEffect(() => {
     //Api call should bo here
@@ -499,215 +308,31 @@ export default function GenaralBranchForm() {
     trigger,
     setStep,
   });
+  
+  const { handleClear } = useFormClear({
+    setAmendmentData,
+    selectedAmendment,
+    clearErrors,
+    reset,
+    userCode,
+  });
+  // const handleClear = () => {
+  //   if (selectedAmendment) {
+  //     // Restore selected amendment values
+  //     setAmendmentData(selectedAmendment);
 
-  // const saveBranch = async (formData) => {
-  //   const response = await fetch("http://localhost:8087/branch/save", {
-  //     method: "POST",
-  //     body: formData,
-  //   });
-
-  //   if (!response.ok) {
-  //     const text = await response.text();
-  //     throw {
-  //       type: "HTTP_ERROR",
-  //       status: response.status,
-  //       body: text,
-  //     };
-  //   }
-
-  //   const text = await response.text();
-  //   const result = text ? JSON.parse(text) : null;
-
-  //   if (!result?.success) {
-  //     throw {
-  //       type: "BUSINESS_ERROR",
-  //       result,
-  //     };
-  //   }
-
-  //   return result;
-  // };
-
-  // const onSubmit = async (data) => {
-  //   await trigger("documents"); //  validate all docs
-  //   if (errors?.documents) {
-  //     toast.error("Please complete the document details");
-  //     return;
-  //   }
-  //   const startTime = Date.now();
-  //   // show loader
-  //   const hasAmend = amendments.length === 0;
-  //   if (hasAmend) showRailLoader("Saving branch information…");
-  //   else showRailLoader("Updating branch details…");
-  //   try {
-  //     const payload = {
-  //       ...data,
+  //     clearErrors();
+  //     toast.success("Changes cleared");
+  //   } else {
+  //     //  New record → reset to empty insert state
+  //     reset({
   //       userCode,
-  //       authorizationDate: new Date().toISOString().split("T")[0],
-  //     };
-  //     // setValue("userCode", userCode);
-  //     // setValue("authorizationDate", new Date());
-  //     console.log("Submitting data", data);
-  //     const formData = new FormData();
-
-  //     Object.entries(payload).forEach(([key, value]) => {
-  //       if (key !== "companyImage") {
-  //         formData.append(key, value);
-  //       }
+  //       authorizationStatus: 0,
+  //       withaffectdate: "",
+  //       activeDate: new Date().toISOString().split("T")[0],
   //     });
-
-  //     if (data.companyImage) {
-  //       formData.append("companyImage", data.companyImage);
-  //     }
-
-  //     // console.log("FormData contents:");
-  //     // for (const [key, value] of formData.entries()) {
-  //     //   if (value instanceof File) {
-  //     //     console.log(key, {
-  //     //       name: value.name,
-  //     //       size: value.size,
-  //     //       type: value.type,
-  //     //     });
-  //     //   } else {
-  //     //     console.log(key, value);
-  //     //   }
-  //     // }
-
-  //     // const response = await fetch("http://localhost:8087/branch/save", {
-  //     //   method: "POST",
-  //     //   body: formData,
-  //     // });
-
-  //     // let result;
-  //     // try {
-  //     //   const responseText = await response.text();
-  //     //   if (responseText) {
-  //     //     console.log("response", responseText);
-  //     //     result = JSON.parse(responseText);
-  //     //   }
-  //     // } catch (parseError) {
-  //     //   toast.error("Error parsing response:", parseError);
-  //     // }
-  //     const result = await saveBranch(formData);
-  //     if (result && result.success === true) {
-  //       toast.success("Branch saved successfully!");
-
-  //       await loadCompany(companyId);
-  //       setStep(0); //Goes to step 1
-  //       // Load after save confirm only
-  //       if (!hasAmend) {
-  //         fetchEntityAmendData(branchId); //  fetch amendment data
-  //       } else {
-  //         reset(); // reset react-hook-form
-  //         datePickerRef.current?.setOpen(true);
-  //       }
-
-  //       // SAVE → VIEW → GENERATE AMENDMENT → SAVE AMENDMENT → VERIFY
-  //       //  isVerifiedAmendment(true); //  lock
-  //       // const status = getValues("authorizationStatus");
-  //       // console.log("Status ", status);
-  //       // const status1 = watch("authorizationStatus");
-  //       // console.log("Status1 ", status1);
-  //       // if (status === 1) {
-  //       //   //activate amend mode
-  //       //   setIsReadOnly(true);
-  //       //   setAddingNewAmend(true);
-  //       // } else {
-  //       //   setAddingNewAmend(false); // exit amend mode
-  //       //   //setMode("VIEW"); // optional state
-  //       // }
-
-  //       return;
-  //     }
-
-  //     /* -------------------------------
-  //         Prepare documents JSON
-  //       (NO FileList inside JSON)
-  //     -------------------------------- */
-  //     // const documentsPayload = data.documents.map((doc) => {
-  //     //   // Append file separately
-  //     //   if (doc.file && doc.file.length > 0) {
-  //     //     formData.append("files", doc.file[0]); //  backend handles array
-  //     //   }
-
-  //     //   return {
-  //     //     type: doc.type,
-  //     //     number: doc.number,
-  //     //     expiryDate: doc.expiryDate,
-  //     //     remarks: doc.remarks || "",
-  //     //   };
-  //     // });
-
-  //     /* -------------------------------
-  //         Prepare final JSON payload
-  //     -------------------------------- */
-  //     // const payload = {
-  //     //   ...data,
-  //     //   documents: documentsPayload,
-  //     // };
-
-  //     // console.log("payload:", payload);
-
-  //     //  VERY IMPORTANT: remove FileList from payload
-  //     // delete payload.documents?.file;
-
-  //     /* -------------------------------
-  //         Append JSON as Blob
-  //     -------------------------------- */
-  //     // formData.append(
-  //     //   "data",
-  //     //   new Blob([JSON.stringify(payload)], {
-  //     //     type: "application/json",
-  //     //   }),
-  //     // );
-
-  //     /* -------------------------------
-  //         Debug FormData (correct way)
-  //     -------------------------------- */
-  //     // console.log("FormData entries:");
-  //     // for (const [key, value] of formData.entries()) {
-  //     //   console.log(key, value instanceof File ? "FILE" : value);
-  //     // }
-
-  //     /* -------------------------------
-  //         API CALL (example)
-  //     -------------------------------- */
-  //     // await fetch("/api/branch/save", {
-  //     //   method: "POST",
-  //     //   body: formData
-  //     // });
-  //   } catch (err) {
-  //     // const apiErrors = err.response?.data?.errors;
-  //     // if (apiErrors) {
-  //     //   Object.entries(apiErrors).forEach(([field, message]) => {
-  //     //     setError(field, { type: "server", message });
-  //     //   });
-  //     // }
-  //     handleApiError(err);
-  //   } finally {
-  //     await ensureMinDuration(startTime, 1200);
-
-  //     hideLoader();
   //   }
   // };
-
-  const handleClear = () => {
-    if (selectedAmendment) {
-      // Restore selected amendment values
-      setAmendmentData(selectedAmendment);
-
-      clearErrors();
-      toast.success("Changes cleared");
-    } else {
-      //  New record → reset to empty insert state
-      reset({
-        userCode,
-        authorizationStatus: 0,
-        withaffectdate: "",
-        activeDate: new Date().toISOString().split("T")[0],
-      });
-    }
-  };
 
   return (
     <>
