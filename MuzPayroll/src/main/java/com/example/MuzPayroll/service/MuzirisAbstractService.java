@@ -45,25 +45,25 @@ public abstract class MuzirisAbstractService<D, E> {
         }
 
         // // 2. Entity Populate
-        Response<Boolean> r2 = entityPopulate(dtos,mode);
+        Response<Boolean> r2 = entityPopulate(dtos, mode);
         if (!r2.isSuccess()) {
             return Response.error(r2.getErrors(), r2.getStatusCode());
         }
 
         // 3. Business validation
-        Response<Boolean> r3 = businessValidate(dtos,mode);
+        Response<Boolean> r3 = businessValidate(dtos, mode);
         if (!r3.isSuccess()) {
             return Response.error(r3.getErrors(), r3.getStatusCode());
         }
 
         // 4. Generate PK
-        Response<Object> pkResult = generatePK(dtos,mode);
+        Response<Object> pkResult = generatePK(dtos, mode);
         if (!pkResult.isSuccess()) {
             return Response.error("PK generation failed: " + pkResult.getErrors(), pkResult.getStatusCode());
         }
 
         // 5. Generate serial code
-        Response<String> r5 = generateSerialNo(dtos,mode);
+        Response<String> r5 = generateSerialNo(dtos, mode);
 
         if (!r5.isSuccess()) {
             return Response.error(r5.getErrors(), r5.getStatusCode());
@@ -80,12 +80,16 @@ public abstract class MuzirisAbstractService<D, E> {
         E entity = r6.getData();
 
         // 7. Save entity
-        E savedEntity = saveEntity(entity, dtos,mode);
+        E savedEntity = saveEntity(entity, dtos, mode);
 
         // 8. Convert to DTO
         D savedDto = entityToDto(savedEntity);
 
         return Response.success(savedDto);
+    }
+
+    private boolean isEmpty(String str) {
+        return str == null || str.trim().isEmpty();
     }
 
 }

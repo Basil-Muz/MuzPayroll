@@ -678,6 +678,8 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
         dto.setActiveDate(entity.getActiveDate());
         dto.setActiveStatusYN(entity.getActiveStatusYN());
         dto.setInactiveDate(entity.getInactiveDate());
+        dto.setCompanyMstID(entity.getCompanyEntity().getCompanyMstID());
+        dto.setBranchMstID(entity.getBranchEntity().getBranchMstID());
 
         // ===== AUTHORIZATION MAPPING =====
         if (entity.getAuthorization() != null) {
