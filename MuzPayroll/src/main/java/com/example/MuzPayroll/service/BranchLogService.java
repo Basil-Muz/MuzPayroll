@@ -206,6 +206,8 @@ public class BranchLogService extends MuzirisAbstractService<BranchLogDTO, Branc
         dto.setWithaffectdate(entity.getWithaffectdate());
         dto.setBranchLogPK(entity.getBranchLogPK());
         dto.setAmendNo(entity.getAmendNo());
+        dto.setCompanyMstID(entity.getCompanyEntity().getCompanyMstID());
+
         if (entity.getAuthorization() != null) {
             dto.setAuthId(entity.getAuthorization().getAuthId());
             dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());

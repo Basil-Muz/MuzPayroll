@@ -93,7 +93,18 @@ public class BranchDTO {
     private LocalDate InactiveDate;
 
     private Boolean activeStatusYN;
+
+    private Long companyMstID;
+
     // Getters and setters
+
+    public Long getCompanyMstID() {
+        return companyMstID;
+    }
+
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
+    }
 
     public Boolean getActiveStatusYN() {
         return activeStatusYN;

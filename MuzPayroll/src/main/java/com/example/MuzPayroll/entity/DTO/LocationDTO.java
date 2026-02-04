@@ -33,6 +33,10 @@ public class LocationDTO {
     @JsonIgnore
     private CompanyMst companyEntity;
 
+    private Long companyMstID;
+
+    private Long branchMstID;
+
     @JsonIgnore
     private BranchMst branchEntity;
 
@@ -368,5 +372,21 @@ public class LocationDTO {
 
     public void setUserCode(String userCode) {
         this.userCode = userCode;
+    }
+
+    public Long getBranchMstID() {
+        return branchMstID;
+    }
+
+    public void setBranchMstID(Long branchMstID) {
+        this.branchMstID = branchMstID;
+    }
+
+    public Long getCompanyMstID() {
+        return companyMstID;
+    }
+
+    public void setCompanyMstID(Long companyMstID) {
+        this.companyMstID = companyMstID;
     }
 }
