@@ -240,7 +240,7 @@ export default function GenaralLocationForm() {
     reset,
     userCode,
   });
-  
+
   /* ------------------------------------------------------------------
    * 12. SIDE EFFECTS
    * ------------------------------------------------------------------ */
@@ -251,7 +251,7 @@ export default function GenaralLocationForm() {
     } catch (err) {
       if (!cancelledRef.current) handleApiError(err);
     }
-  }, [companyId]);
+  }, [companyId, loadBranches, loadCompany]);
 
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });

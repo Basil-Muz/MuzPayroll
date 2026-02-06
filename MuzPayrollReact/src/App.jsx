@@ -49,6 +49,7 @@ import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
 import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 
 import LoaderRenderer from "./components/Loaders/LoaderRenderer.jsx";
+import LocationGroupRightsMapping from "./pages/LocationGroupRightMaping/LocationGroupRightMapping.jsx";
 
 function App() {
   return (
@@ -154,6 +155,9 @@ function App() {
           <Route path="/usergroup" element={<UserGroup />} />
           <Route path="/locationgroup" element={<LocationGroup />} />
           <Route path="/shiftgroup" element={<ShiftGroup />} />
+
+            <Route path="/locationrights" element={<LocationGroupRightsMapping/>} />
+
         </Routes>
       </AuthProvider>
       <Toaster

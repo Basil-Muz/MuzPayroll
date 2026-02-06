@@ -74,7 +74,7 @@ input[type="radio"] {
 }
 /* ================= FLOATING ACTION BAR ================= */
 
-.floating-action-bar {
+.payroll-group-page .floating-action-bar {
   position: fixed;
   right: 18px;
   /*top: 290px;*/                 /*  BELOW HEADER + SEARCH */

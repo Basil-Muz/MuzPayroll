@@ -80,11 +80,11 @@
   background: none;
 }
 
-.location {
+.Companyform .location {
   display: flex;
 }
 .headertext {
-  background-color: rgb(85, 150, 235);
+  background-color: rgb(230, 85, 235);
   color: white;
   width: 390px;
   margin-left: -15px;

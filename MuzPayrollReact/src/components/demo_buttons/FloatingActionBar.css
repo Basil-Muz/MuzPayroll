@@ -82,8 +82,8 @@
   position: absolute;
   right: 58px;
   top: auto;
-  background: var(--primary-hover);
-  color: var(--background);
+  background: var(--brand-border);
+  color: var(--dark-background);
   padding: 6px 10px;
   border-radius: 8px;
   font-size: 12px;
