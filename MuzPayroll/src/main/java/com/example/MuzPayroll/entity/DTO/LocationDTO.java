@@ -366,7 +366,7 @@ public class LocationDTO {
         this.authorizationStatus = authorizationStatus;
     }
 
-    public String getUserCode() {
+    public String   getUserCode() {
         return userCode;
     }
 
