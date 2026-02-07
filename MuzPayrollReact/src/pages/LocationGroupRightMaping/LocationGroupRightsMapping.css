@@ -6,7 +6,9 @@
   grid-template-columns: minmax(0, 1fr) 78px; /* main + action bar */
   gap: 8px;
   align-items: start;
-  padding-left: 14px;
+  min-height: 500px;
+  padding-right: 2%;
+  padding-left: 2%;
 }
 
 .lgr-main {
@@ -56,6 +58,178 @@
   color: var(--text-muted);
 }
 
+/* ===============================
+   Filter Toggle Button
+================================ */
+.filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  height: 34px;
+  padding: 0 12px;
+
+  font-size: var(--text-sm);
+  font-weight: 500;
+
+  color: var(--text);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Icon size */
+.filter-toggle svg {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Hover */
+.filter-toggle:hover {
+  background: var(--option-light);
+  border-color: var(--brand-border);
+}
+
+/* Focus (keyboard accessibility) */
+.filter-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-border);
+}
+
+/* ===============================
+   Active (Filters Open)
+================================ */
+.filter-toggle.active {
+  background: var(--success-light);
+  border-color: var(--brand-border);
+  color: var(--brand-dark);
+}
+
+.filter-toggle.active svg {
+  color: var(--brand);
+}
+
+/* ===============================
+   Disabled (if ever needed)
+================================ */
+.filter-toggle:disabled {
+  background: var(--disabled-bg);
+  color: var(--text-muted);
+  border-color: var(--border-light);
+  cursor: not-allowed;
+  opacity: var(--disabled-opacity);
+}
+
+/* ===============================
+   Search Action Buttons
+================================ */
+.search-actions {
+  display: flex;
+  gap: 12px;
+  background: none;
+  border: none;
+  /* margin-top: 16px; */
+}
+
+/* Base button */
+.search-actions .btn {
+  height: 36px;
+  padding: 9px 18px;
+
+  font-size: var(--text-sm);
+  font-weight: 500;
+
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+/* ===============================
+   APPLY (Primary Action)
+   Meaning: Lock search & load data
+================================ */
+.lgr-filters .btn-apply {
+  background-color: var(--button-primary);
+  color: #ffffff;
+  border-color: var(--button-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.lgr-filters .btn-apply:hover {
+  background-color: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
+}
+
+.lgr-filters .btn-apply:active {
+  background-color: var(--brand-dark);
+  border-color: var(--brand-dark);
+}
+
+.lgr-filters .btn-apply:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--brand-border),
+    var(--shadow-sm);
+}
+
+/* Disabled Apply */
+.lgr-filters .btn-apply:disabled {
+  background-color: var(--disabled-bg);
+  border-color: var(--border);
+  color: var(--text-light);
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: var(--disabled-opacity);
+}
+
+/* ===============================
+   CHANGE SEARCH (Secondary)
+   Meaning: Unlock & re-query
+================================ */
+.lgr-filters.btn-change {
+  background-color: var(--background);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.lgr-filters .btn-change:hover {
+  background-color: var(--option-light);
+  border-color: var(--brand-border);
+}
+
+.lgr-filters .btn-change:active {
+  background-color: var(--primary-light);
+}
+
+.lgr-filters .btn-change:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-border);
+}
+
+/* Disabled Change */
+.lgr-filters .btn-change:disabled {
+  background-color: var(--disabled-bg);
+  color: var(--text-muted);
+  border-color: var(--border-light);
+  cursor: not-allowed;
+  opacity: var(--disabled-opacity);
+}
+
 .save-indicator {
   display: inline-flex;
   align-items: center;
@@ -84,7 +258,7 @@
 /* ======================================================
    BUTTONS & LINKS
 ====================================================== */
-.btn {
+.lgr-layout .btn {
   padding: 6px 14px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--brand-border);
@@ -94,13 +268,13 @@
   cursor: pointer;
 }
 
-.btn.primary {
+.lgr-layout .btn.primary {
   background: var(--button-primary);
   color: #fff;
   border: none;
 }
 
-.btn:disabled {
+.lgr-layout .btn:disabled {
   opacity: var(--disabled-opacity);
   cursor: not-allowed;
 }
@@ -196,6 +370,85 @@
   gap: 10px;
 }
 
+/* ===============================
+   Filter Bar (Branch + Location)
+================================ */
+.lgr-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 16px;
+  margin-bottom: 12px;
+
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Dropdown & Search Input */
+.lgr-filters select,
+.lgr-filters input[type="search"] {
+  height: 36px;
+  padding: 0 10px;
+
+  font-size: 14px;
+  color: #111827;
+
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+
+  outline: none;
+  min-width: 220px;
+}
+
+/* Search input slightly wider */
+.lgr-filters input[type="search"] {
+  min-width: 260px;
+}
+
+/* Focus states */
+.lgr-filters select:focus,
+.lgr-filters input[type="search"]:focus {
+  border-color: var(--brand, #6366f1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+/* Clear button */
+.lgr-filters .link {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+
+  font-size: 14px;
+  color: var(--brand, #6366f1);
+  cursor: pointer;
+
+  border-radius: 6px;
+}
+
+/* Clear hover */
+.lgr-filters .link:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* Disabled states */
+.lgr-filters select:disabled,
+.lgr-filters input:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.lgr-header .filter-save {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 /* ======================================================
    TABLE CARD
 ====================================================== */
@@ -216,7 +469,7 @@
 }
 
 th.group-fixed {
-  width: 350px;
+  width: 360px;
 }
 
 .grid th,
@@ -284,8 +537,16 @@ th.group-fixed {
 ====================================================== */
 .ms {
   position: relative;
-  max-width: 250px;
+  max-width: 260px;
   width: 100%;
+}
+
+.no-table-data {
+  text-align: center;
+  padding: 24px;
+  font-size: 14px;
+  color: #7d6b80; /* muted gray */
+  background: #fafafa;
 }
 
 .ms-control {

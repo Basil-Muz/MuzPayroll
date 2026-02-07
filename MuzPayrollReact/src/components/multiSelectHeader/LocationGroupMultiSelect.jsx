@@ -47,7 +47,7 @@ export function LocationGroupMultiSelect({
   /* Reset search on close */
   useEffect(() => {
     if (!open) setSearch("");
-  }, [open]);
+  }, [open, setSearch]);
 
   const isSelected = (opt) => value.some((v) => v.id === opt.id);
 
@@ -55,7 +55,7 @@ export function LocationGroupMultiSelect({
     ? options.filter((o) => o.name.toLowerCase().includes(search.toLowerCase()))
     : options;
 
-  const visibleOptions = search ? filtered : options.slice(0, 6);
+  // const visibleOptions = search ? filtered : options.slice(0, 6);
 
   const allSelected =
     options.length > 0 && options.every((opt) => isSelected(opt));
@@ -131,7 +131,7 @@ export function LocationGroupMultiSelect({
             Select all groups
           </div>
 
-          {visibleOptions.map((opt) => (
+          {filtered.map((opt) => (
             <div
               key={opt.id}
               className={`ms-option ${isSelected(opt) ? "active" : ""}`}
