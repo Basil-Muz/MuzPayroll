@@ -6,8 +6,8 @@
   grid-template-columns: minmax(0, 1fr) 78px; /* main + action bar */
   gap: 8px;
   align-items: start;
-  min-height: 500px;
-  padding-right: 2%;
+  /* min-height: 500px; */
+  padding-right: 1%;
   padding-left: 2%;
 }
 
@@ -163,7 +163,7 @@
    APPLY (Primary Action)
    Meaning: Lock search & load data
 ================================ */
-.lgr-filters .btn-apply {
+.lgr-layout .btn-apply {
   background-color: var(--button-primary);
   color: #ffffff;
   border-color: var(--button-primary);
@@ -180,7 +180,7 @@
   border-color: var(--brand-dark);
 }
 
-.lgr-filters .btn-apply:focus {
+.lgr-layout .btn-apply:focus {
   outline: none;
   box-shadow:
     0 0 0 3px var(--brand-border),
@@ -201,8 +201,9 @@
    CHANGE SEARCH (Secondary)
    Meaning: Unlock & re-query
 ================================ */
-.lgr-filters.btn-change {
+.lgr-filters .btn-change {
   background-color: var(--background);
+
   color: var(--text);
   border-color: var(--border);
 }
@@ -258,7 +259,7 @@
 /* ======================================================
    BUTTONS & LINKS
 ====================================================== */
-.lgr-layout .btn {
+/* .btn {
   padding: 6px 14px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--brand-border);
@@ -266,7 +267,7 @@
   color: var(--brand);
   font-size: var(--text-sm);
   cursor: pointer;
-}
+} */
 
 .lgr-layout .btn.primary {
   background: var(--button-primary);
@@ -376,6 +377,7 @@
 .lgr-filters {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
 
   padding: 12px 16px;
@@ -453,6 +455,7 @@
    TABLE CARD
 ====================================================== */
 .card {
+  padding: 2rem;
   background: var(--background);
   border-radius: var(--radius);
   box-shadow:
@@ -530,217 +533,6 @@ th.group-fixed {
   gap: 12px;
   margin-top: 20px;
   padding-bottom: 20px;
-}
-
-/* ======================================================
-   MULTI SELECT
-====================================================== */
-.ms {
-  position: relative;
-  max-width: 260px;
-  width: 100%;
-}
-
-.no-table-data {
-  text-align: center;
-  padding: 24px;
-  font-size: 14px;
-  color: #7d6b80; /* muted gray */
-  background: #fafafa;
-}
-
-.ms-control {
-  min-width: 200px; /* Stable minimum width */
-  width: 100%; /* Allows table cell to control max width */
-  /* width: clamp(212px, 100%, 260px); */
-  min-height: 32px;
-  padding: 4px 6px;
-  display: flex;
-  /* flex-wrap: wrap; */
-  flex-direction: row;
-  gap: 4px;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--background);
-}
-
-.ms-placeholder {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-}
-
-.ms-all-chip {
-  gap: 4px;
-  display: flex;
-}
-
-.ms-chip {
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 12px;
-  background: var(--option-light);
-}
-.ms-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.ms-chip-remove {
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--danger-dark);
-}
-
-.ms-chip-remove:hover {
-  color: var(--danger);
-}
-
-/* .ms-cancel {
-  margin-left: auto;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 14px;
-  cursor: pointer;
-  padding: 2px 4px;
-  padding-top: 3px;
-  border-radius: 50%;
-  line-height: 1;
-}
-
-.ms-cancel:hover {
-  color: var(--danger);
-  background: var(--danger-light);
-}
-
-.ms-cancel:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--brand-border);
-} */
-
-.ms-undo {
-  margin-left: auto;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  border-radius: 50%;
-  padding: 2px 4px;
-  color: var(--text-muted);
-  font-size: 14px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  transition:
-    color 0.15s ease,
-    background 0.15s ease-in-out;
-}
-
-.ms-undo:hover {
-  color: var(--brand);
-  /* transform: rotate(-40deg); */
-  background: var(--success-light);
-}
-
-.ms-undo:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--brand-border);
-}
-
-.ms-hint {
-  padding: 6px 8px;
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  background: var(--background-alt);
-  border-bottom: 1px solid var(--border-light);
-}
-
-.ms-dropdown {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  max-height: 290px;
-  overflow-y: auto;
-  z-index: 20;
-
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Open downward */
-.ms-dropdown.bottom {
-  top: calc(100% + 4px);
-}
-
-/* Open upward */
-.ms-dropdown.top {
-  bottom: calc(100% + 4px);
-}
-
-.ms-dropdown.bottom {
-  animation: slideDown 0.15s ease;
-}
-
-.ms-dropdown.top {
-  animation: slideUp 0.15s ease;
-}
-
-.ms-search {
-  width: 100%;
-  padding: 8px;
-  font-size: var(--text-sm);
-  color: var(--text);
-  border: none;
-  border-bottom: 1px solid var(--border-light);
-  background: var(--background);
-}
-
-.ms-search:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--brand-border);
-}
-
-.ms-option {
-  padding: 6px 8px;
-  display: flex;
-  gap: 6px;
-  cursor: pointer;
-  font-size: var(--text-sm);
-}
-
-.ms-option:hover {
-  background: var(--option-light);
-}
-
-.ms-option.active {
-  background: var(--success-light);
-}
-
-.ms-option.select-all {
-  font-weight: 600;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.ms-empty {
-  padding: 8px;
-  text-align: center;
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-}
-
-.ms-footer {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 8px;
-  font-size: var(--text-sm);
-  border-top: 1px solid var(--border-light);
 }
 
 /* ======================================================
@@ -886,7 +678,9 @@ input[type="checkbox"]:checked::after {
 ====================================================== */
 @media (max-width: 900px) {
   .lgr-layout {
-    grid-template-columns: 1fr;
+    display: block;
+    padding-bottom: 88px; /* space for floating actions */
+    padding-right: 2%;
   }
 
   .lgr-actions {
@@ -908,6 +702,57 @@ input[type="checkbox"]:checked::after {
   }
 
   .bulk-assign {
+    margin-left: 0;
+  }
+  .pager {
+    padding-bottom: 96px;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+  .ms-control {
+    min-height: auto; /* allow growth */
+    padding: 8px; /* breathing space */
+    align-items: flex-start; /* stack chips naturally */
+    min-width: 177px;
+  }
+  .ms-all-chip {
+    flex-direction: column;
+  }
+  .ms-undo {
+    margin-left: 0;
+  }
+
+  .ms-chip {
+    justify-content: center;
+  }
+
+  .lgr-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lgr-filters select,
+  .lgr-filters input[type="search"] {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .search-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .ms-chip {
+    max-width: 100%;
+  }
+
+  .ms-undo {
     margin-left: 0;
   }
 }

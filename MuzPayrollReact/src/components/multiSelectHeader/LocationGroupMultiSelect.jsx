@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { CgUndo } from "react-icons/cg";
+import "./LocationGroupMultiSelect.css";
 
 export function LocationGroupMultiSelect({
   options = [],
@@ -86,11 +87,11 @@ export function LocationGroupMultiSelect({
                   </button>
                 </span>
               ))}
-              {value.length > 2 && (
+             
+            </div>
+               {value.length > 2 && (
                 <span className="ms-chip muted">+{value.length - 2}</span>
               )}
-            </div>
-
             {onCancel && (
               <button
                 className="ms-undo"

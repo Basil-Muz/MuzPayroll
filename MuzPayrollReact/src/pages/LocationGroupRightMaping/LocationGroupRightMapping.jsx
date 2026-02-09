@@ -546,7 +546,7 @@ export default function LocationGroupRightsMapping() {
                   placeholder="Assign location groups"
                 />
                 <button
-                  className="btn"
+                  className="btn btn-apply"
                   disabled={!bulkGroup.length}
                   onClick={applyBulk}
                 >
