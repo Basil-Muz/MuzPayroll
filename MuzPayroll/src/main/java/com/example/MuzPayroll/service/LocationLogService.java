@@ -46,7 +46,7 @@ public class LocationLogService extends MuzirisAbstractService<LocationLogDTO, L
         return Response.success(true);
     }
 
-    // // =================== 2️⃣ ENTITY POPULATE ===================
+    // =================== 2️⃣ ENTITY POPULATE ===================
     @Override
     public Response<Boolean> entityPopulate(List<LocationLogDTO> dtos, String mode) {
         if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {

@@ -1,5 +1,7 @@
 package com.example.MuzPayroll.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -23,6 +25,7 @@ public class EntityMst {
     private String EtmShortName;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "EtmEntityTypeMccID", nullable = true)
     private MuzControlCodes muzControlCodes;
 
@@ -30,14 +33,17 @@ public class EntityMst {
     private String EtmImage;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "EtmCompanyInfoID", nullable = true)
     private CompanyMst companyMst;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "EtmBranchInfoID", nullable = true)
     private BranchMst branchMst;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "EtmLocationInfoID", nullable = true)
     private LocationMst locationMst;
 

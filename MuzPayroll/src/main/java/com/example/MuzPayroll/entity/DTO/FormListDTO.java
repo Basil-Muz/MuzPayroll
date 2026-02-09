@@ -13,8 +13,6 @@ public class FormListDTO {
 
     private LocalDate activeDate;
 
-    private Boolean status;
-
     private Boolean activeStatusYN;
 
     private LocalDate InactiveDate;
@@ -57,14 +55,6 @@ public class FormListDTO {
 
     public void setActiveDate(LocalDate activeDate) {
         this.activeDate = activeDate;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
     }
 
     public Boolean getActiveStatusYN() {

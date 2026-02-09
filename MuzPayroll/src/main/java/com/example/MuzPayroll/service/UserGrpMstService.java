@@ -13,29 +13,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.MuzPayroll.entity.Authorization;
-import com.example.MuzPayroll.entity.BranchMst;
-import com.example.MuzPayroll.entity.CompanyMst;
-import com.example.MuzPayroll.entity.LocationLog;
-import com.example.MuzPayroll.entity.LocationLogPK;
-import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.UserMst;
-import com.example.MuzPayroll.entity.DTO.LocationDTO;
-import com.example.MuzPayroll.entity.DTO.LocationLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
+import com.example.MuzPayroll.entity.DTO.UserGrpLogDTO;
+import com.example.MuzPayroll.entity.DTO.UserGrpMstDTO;
+import com.example.MuzPayroll.entity.EntityMst;
+import com.example.MuzPayroll.entity.UserGrpLog;
+import com.example.MuzPayroll.entity.UserGrpLogPK;
+import com.example.MuzPayroll.entity.UserGrpMst;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
-
-import com.example.MuzPayroll.repository.LocationLogRepository;
-import com.example.MuzPayroll.repository.LocationRepository;
+import com.example.MuzPayroll.repository.UserGrpLogRepo;
+import com.example.MuzPayroll.repository.UserGrpMstRepo;
 import com.example.MuzPayroll.repository.UserRepository;
 
 @Service
-public class LocationService extends MuzirisAbstractService<LocationDTO, LocationMst> {
+public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, UserGrpMst> {
 
     @Autowired
-    private LocationRepository locationRepository;
+    private UserGrpMstRepo userGrpMstRepo;
 
     @Autowired
-    private LocationLogService locationLogService;
+    private UserGrpLogService userGrpLogService;
 
     @Autowired
     private AuthorizationRepository authorizationRepository;
@@ -44,19 +42,19 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
     private UserRepository userRepository;
 
     @Autowired
-    private LocationLogRepository locationLogRepository;
+    private UserGrpLogRepo userGrpLogRepo;
 
     // ================= FINAL SAVE WRAPPER =================
     @Transactional
-    public Response<LocationDTO> saveWrapper(LocationDTO dto, String mode) {
-        List<LocationDTO> dtos = new ArrayList<>();
+    public Response<UserGrpMstDTO> saveWrapper(UserGrpMstDTO dto, String mode) {
+        List<UserGrpMstDTO> dtos = new ArrayList<>();
         dtos.add(dto);
         return save(dtos, mode);
     }
 
     // =================== 1️⃣ ENTITY VALIDATION ===================
     @Override
-    public Response<Boolean> entityValidate(List<LocationDTO> dtos, String mode) {
+    public Response<Boolean> entityValidate(List<UserGrpMstDTO> dtos, String mode) {
         if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {
 
             if (dtos == null || dtos.isEmpty()) {
@@ -69,7 +67,7 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
             if ("INSERT".equals(mode)) {
 
                 for (int rowIndex = 0; rowIndex < dtos.size(); rowIndex++) {
-                    LocationDTO dto = dtos.get(rowIndex);
+                    UserGrpMstDTO dto = dtos.get(rowIndex);
                     int rowNumber = rowIndex + 1;
 
                     List<String> rowErrors = new ArrayList<>();
@@ -82,40 +80,16 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                     }
 
                     // Collect ALL errors
-                    if (isEmpty(dto.getLocation()))
-                        rowErrors.add("Location is required");
-                    if (isEmpty(dto.getBranchEntity()))
-                        rowErrors.add("Branch is required");
-                    if (isEmpty(dto.getCompanyEntity()))
-                        rowErrors.add("Company is required");
-                    if (isEmpty(dto.getShortName()))
+                    if (isEmpty(dto.getUgmName()))
+                        rowErrors.add("Group Name is required");
+                    if (isEmpty(dto.getUgmDesc()))
+                        rowErrors.add("Desc is required");
+                    if (isEmpty(dto.getUgmShortName()))
                         rowErrors.add("Short name is required");
                     if (dto.getActiveDate() == null)
                         rowErrors.add("Active date is required");
-                    if (isEmpty(dto.getAddress()))
-                        rowErrors.add("Address is required");
-                    if (isEmpty(dto.getCountry()))
-                        rowErrors.add("Country is required");
-                    if (isEmpty(dto.getState()))
-                        rowErrors.add("State is required");
-                    if (isEmpty(dto.getDistrict()))
-                        rowErrors.add("District is required");
-                    if (isEmpty(dto.getPlace()))
-                        rowErrors.add("Place is required");
-                    if (isEmpty(dto.getPincode()))
-                        rowErrors.add("Pincode is required");
-                    if (isEmpty(dto.getMobileNumber()))
-                        rowErrors.add("Mobile number is required");
-                    if (isEmpty(dto.getEmail()))
-                        rowErrors.add("Email is required");
-                    if (dto.getWithaffectdate() == null)
-                        rowErrors.add("With affect date is required");
-                    if (dto.getAuthorizationDate() == null)
-                        rowErrors.add("Authorization date is required");
-                    if (dto.getAuthorizationStatus() == null)
-                        rowErrors.add("Authorization status is required");
-                    if (isEmpty(dto.getUserCode()))
-                        rowErrors.add("User code is required");
+                    if (isEmpty(dto.getEntityMst()))
+                        rowErrors.add("Enity ID is required");
 
                     // Add row errors to main error list with row number
                     if (!rowErrors.isEmpty()) {
@@ -123,8 +97,8 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
                         // Create a prefix for this row's errors
                         String rowPrefix = "Row " + rowNumber;
-                        if (!isEmpty(dto.getLocation())) {
-                            rowPrefix += " (Location: " + dto.getLocation() + ")";
+                        if (!isEmpty(dto.getUgmName())) {
+                            rowPrefix += " (Location: " + dto.getUgmName() + ")";
                         }
 
                         for (String error : rowErrors) {
@@ -141,7 +115,7 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
             if ("UPDATE".equals(mode)) {
 
                 for (int rowIndex = 0; rowIndex < dtos.size(); rowIndex++) {
-                    LocationDTO dto = dtos.get(rowIndex);
+                    UserGrpMstDTO dto = dtos.get(rowIndex);
                     int rowNumber = rowIndex + 1;
 
                     List<String> rowErrors = new ArrayList<>();
@@ -154,34 +128,18 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                     }
 
                     // Collect ALL errors
-                    if (dto.getLocationMstID() == null)
-                        rowErrors.add(("Location Id is required"));
-                    if (isEmpty(dto.getLocation()))
-                        rowErrors.add("Location is required");
-                    if (isEmpty(dto.getBranchEntity()))
-                        rowErrors.add("Branch is required");
-                    if (isEmpty(dto.getCompanyEntity()))
-                        rowErrors.add("Company is required");
-                    if (isEmpty(dto.getShortName()))
+                    if (dto.getUgmUserGroupID() == null)
+                        rowErrors.add(("User Id is required"));
+                    if (isEmpty(dto.getUgmName()))
+                        rowErrors.add("Group Name is required");
+                    if (isEmpty(dto.getUgmDesc()))
+                        rowErrors.add("Desc is required");
+                    if (isEmpty(dto.getUgmShortName()))
                         rowErrors.add("Short name is required");
                     if (dto.getActiveDate() == null)
                         rowErrors.add("Active date is required");
-                    if (isEmpty(dto.getAddress()))
-                        rowErrors.add("Address is required");
-                    if (isEmpty(dto.getCountry()))
-                        rowErrors.add("Country is required");
-                    if (isEmpty(dto.getState()))
-                        rowErrors.add("State is required");
-                    if (isEmpty(dto.getDistrict()))
-                        rowErrors.add("District is required");
-                    if (isEmpty(dto.getPlace()))
-                        rowErrors.add("Place is required");
-                    if (isEmpty(dto.getPincode()))
-                        rowErrors.add("Pincode is required");
-                    if (isEmpty(dto.getMobileNumber()))
-                        rowErrors.add("Mobile number is required");
-                    if (isEmpty(dto.getEmail()))
-                        rowErrors.add("Email is required");
+                    if (isEmpty(dto.getEntityMst()))
+                        rowErrors.add("Enity ID is required");
                     if (dto.getWithaffectdate() == null)
                         rowErrors.add("With affect date is required");
                     if (dto.getAuthorizationDate() == null)
@@ -197,8 +155,8 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
                         // Create a prefix for this row's errors
                         String rowPrefix = "Row " + rowNumber;
-                        if (!isEmpty(dto.getLocation())) {
-                            rowPrefix += " (Location: " + dto.getLocation() + ")";
+                        if (!isEmpty(dto.getUgmName())) {
+                            rowPrefix += " (Location: " + dto.getUgmName() + ")";
                         }
 
                         for (String error : rowErrors) {
@@ -214,8 +172,8 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
             }
         }
         // if log table present ---->
-        List<LocationLogDTO> logDtos = convertToLogDTO(dtos);
-        Response<Boolean> logEntityValidate = locationLogService.entityValidate(logDtos, mode);
+        List<UserGrpLogDTO> logDtos = convertToLogDTO(dtos);
+        Response<Boolean> logEntityValidate = userGrpLogService.entityValidate(logDtos, mode);
 
         // If log validation fails, return those errors
         if (!logEntityValidate.isSuccess()) {
@@ -228,9 +186,9 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
     // =================== 2️⃣ ENTITY POPULATE ===================
     @Override
-    public Response<Boolean> entityPopulate(List<LocationDTO> dtos, String mode) {
+    public Response<Boolean> entityPopulate(List<UserGrpMstDTO> dtos, String mode) {
         List<String> errors = new ArrayList<>();
-        LocationDTO dto = dtos.get(0);
+        UserGrpMstDTO dto = dtos.get(0);
 
         UserMst user = userRepository.findByUserCode(dto.getUserCode());
         if (user == null)
@@ -253,13 +211,13 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
         if ("UPDATE".equals(mode)) {
 
-            Long mstId = dto.getLocationMstID();
-
+            Long mstId = dto.getUgmUserGroupID();
             // Get the latest authId for the mstId
 
             Long authId = authorizationRepository
                     .findLatestAuthIdByMstId(mstId)
-                    .orElseThrow(() -> new IllegalStateException("AuthId not found for mstId " + mstId));
+                    .orElseThrow(
+                            () -> new IllegalStateException("AuthId not found for mstId [entityPopulate]" + mstId));
 
             Optional<Boolean> status = authorizationRepository.findStatusByAuthId(authId);
 
@@ -283,12 +241,12 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
         // if log table present ---->
         // ******* Populate Log Entity *********************
-        List<LocationLogDTO> LocationDtoLogs = populateLogEntityfromEntity(dto);
-        dto.setLocationDtoLogs(LocationDtoLogs);
+        List<UserGrpLogDTO> DtoLogs = populateLogEntityfromEntity(dto);
+        dto.setUserGrpLogDTOs(DtoLogs);
 
         // CALL LogService entityValidate
-        List<LocationLogDTO> logDtos = convertToLogDTO(dtos);
-        Response<Boolean> logEntityPopulate = locationLogService.entityPopulate(logDtos, mode);
+        List<UserGrpLogDTO> logDtos = convertToLogDTO(dtos);
+        Response<Boolean> logEntityPopulate = userGrpLogService.entityPopulate(logDtos, mode);
 
         // If log entityPopulate fails, return errors
         if (!logEntityPopulate.isSuccess()) {
@@ -301,7 +259,7 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
     // =================== 3️⃣ BUSINESS VALIDATION ===================
     @Override
-    public Response<Boolean> businessValidate(List<LocationDTO> dtos, String mode) {
+    public Response<Boolean> businessValidate(List<UserGrpMstDTO> dtos, String mode) {
         if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {
 
             List<String> errors = new ArrayList<>();
@@ -311,8 +269,8 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
             // if log table present ---->
 
-            List<LocationLogDTO> logDtos = convertToLogDTO(dtos);
-            Response<Boolean> logbusinessValidate = locationLogService.businessValidate(logDtos, mode);
+            List<UserGrpLogDTO> logDtos = convertToLogDTO(dtos);
+            Response<Boolean> logbusinessValidate = userGrpLogService.businessValidate(logDtos, mode);
 
             // If log businessValidate fails, return errors
             if (!logbusinessValidate.isSuccess()) {
@@ -326,7 +284,7 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
     // =================== 4️⃣ GENERATE PK ===================
     @Override
-    public Response<Object> generatePK(List<LocationDTO> dtos, String mode) {
+    public Response<Object> generatePK(List<UserGrpMstDTO> dtos, String mode) {
         List<String> errors = new ArrayList<>();
 
         if (dtos == null || dtos.isEmpty()) {
@@ -337,26 +295,26 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
             if ("INSERT".equals(mode)) {
 
                 // Process each DTO in the list
-                for (LocationDTO dto : dtos) {
+                for (UserGrpMstDTO dto : dtos) {
                     if (dto == null) {
                         errors.add("Null DTO found in list");
                         continue;
                     }
 
-                    Long transID = dto.getLocationMstID();
+                    Long transID = dto.getUgmUserGroupID();
                     Long generatedId = null;
 
                     // ID IS PROVIDED IN DTO
                     if (transID != null) {
                         // Check if this ID exists in database
-                        boolean existsInDB = locationRepository.existsById(transID);
+                        boolean existsInDB = userGrpMstRepo.existsById(transID);
 
                         if (existsInDB) {
                             // ID is present in DB
                             generatedId = transID;
                         } else {
                             // ID provided but NOT in DB - RETURN ERROR
-                            errors.add("Location ID " + transID + " does not exist in database");
+                            errors.add("User ID " + transID + " does not exist in database");
                             continue;
                         }
 
@@ -364,23 +322,24 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                     // ID IS NOT PROVIDED IN DTO (null)
                     else {
                         // Find maximum ID from database
-                        Long maxId = locationRepository.findMaxLocationMstID();
+                        Long maxId = userGrpMstRepo.findMaxUgmUserGroupID();
 
                         if (maxId == null) {
                             // No data in DB - start from 100000
-                            generatedId = 300000L;
+                            generatedId = 1100011L;
                         } else {
                             // Data exists - get latest data and increment
                             generatedId = maxId + 1;
 
                             if (generatedId > 399999L) {
                                 errors.add("Cannot generate ID. Maximum limit (399999) reached for Location: " +
-                                        (dto.getLocation() != null ? dto.getLocation() : "Unknown"));
+                                        (dto.getUgmName() != null ? dto.getUgmName() : "Unknown"));
                                 continue;
                             }
                         }
 
-                        dto.setLocationMstID(generatedId);
+                        dto.setUgmUserGroupID(generatedId);
+
                     }
 
                     // Process log rows for this DTO
@@ -389,7 +348,7 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                         Long logRowNo = 1L; // Default to 1
 
                         // Get max row number for this transaction
-                        Response<Long> responseLogMaxRowNo = locationLogService.getMaxRowNo(transID);
+                        Response<Long> responseLogMaxRowNo = userGrpLogService.getMaxRowNo(transID);
 
                         if (responseLogMaxRowNo.isSuccess() && responseLogMaxRowNo.getData() != null) {
                             logRowNo = responseLogMaxRowNo.getData() + 1;
@@ -404,26 +363,26 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
             if ("UPDATE".equals(mode)) {
 
                 // Process each DTO in the list
-                for (LocationDTO dto : dtos) {
+                for (UserGrpMstDTO dto : dtos) {
                     if (dto == null) {
                         errors.add("Null DTO found in list");
                         continue;
                     }
 
-                    Long transID = dto.getLocationMstID();
+                    Long transID = dto.getUgmUserGroupID();
                     Long generatedId = null;
 
                     // ID IS PROVIDED IN DTO
                     if (transID != null) {
                         // Check if this ID exists in database
-                        boolean existsInDB = locationRepository.existsById(transID);
+                        boolean existsInDB = userGrpMstRepo.existsById(transID);
 
                         if (existsInDB) {
                             // ID is present in DB
                             generatedId = transID;
                         } else {
                             // ID provided but NOT in DB - RETURN ERROR
-                            errors.add("Location ID " + transID + " does not exist in database");
+                            errors.add("UserGrp ID " + transID + " does not exist in database");
                             continue;
                         }
 
@@ -435,9 +394,10 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                         Long logRowNo = 1L; // Default to 1
 
                         // Get max row number for this transaction
-                        Response<Long> responseLogMaxRowNo = locationLogService.getMaxRowNo(transID);
+                        Response<Long> responseLogMaxRowNo = userGrpLogService.getMaxRowNo(transID);
 
-                        Long mstId = dto.getLocationMstID();
+                        Long mstId = dto.getUgmUserGroupID();
+                        System.out.println("Mstid " + mstId);
 
                         Long authId = authorizationRepository
                                 .findLatestAuthIdByMstId(mstId)
@@ -468,8 +428,8 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
             }
 
             // Process all log DTOs together
-            List<LocationLogDTO> logDtos = convertToLogDTO(dtos);
-            Response<Object> logGeneratePK = locationLogService.generatePK(logDtos, mode);
+            List<UserGrpLogDTO> logDtos = convertToLogDTO(dtos);
+            Response<Object> logGeneratePK = userGrpLogService.generatePK(logDtos, mode);
 
             if (!logGeneratePK.isSuccess()) {
                 return logGeneratePK;
@@ -485,106 +445,107 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
     // =================== 5️⃣ GENERATE SERIAL NO ===================
     @Override
-    public Response<String> generateSerialNo(List<LocationDTO> dtos, String mode) {
+    public Response<String> generateSerialNo(List<UserGrpMstDTO> dtos, String mode) {
 
         List<String> errors = new ArrayList<>();
-        LocationDTO dto = dtos.get(0);
+        UserGrpMstDTO dto = dtos.get(0);
 
-        try {
-            if ("INSERT".equals(mode)) {
+        // try {
+        // if ("INSERT".equals(mode)) {
 
-                String prefix = "LO";
+        // String prefix = "LO";
 
-                // Generate new code
-                Pageable pageable = PageRequest.of(0, 1);
-                List<LocationMst> ResponseData = locationRepository.findLatestLocationWithLOPrefix(pageable);
+        // // Generate new code
+        // Pageable pageable = PageRequest.of(0, 1);
+        // List<UserGrpMst> ResponseData =
+        // userGrpMstRepo.findLatestLocationWithLOPrefix(pageable);
 
-                String generatedCode;
+        // String generatedCode;
 
-                if (ResponseData == null || ResponseData.isEmpty()) {
-                    generatedCode = prefix + "01";
-                } else {
-                    LocationMst latestResponse = ResponseData.get(0);
-                    String latestCode = latestResponse.getCode();
+        // if (ResponseData == null || ResponseData.isEmpty()) {
+        // generatedCode = prefix + "01";
+        // } else {
+        // UserGrpMst latestResponse = ResponseData.get(0);
+        // String latestCode = latestResponse.getUgmCode();
 
-                    // Extract and increment
-                    String numberPart = latestCode.substring(prefix.length());
-                    String digits = numberPart.replaceAll("[^0-9]", "");
-                    int latestNumber = Integer.parseInt(digits);
-                    int nextNumber = latestNumber + 1;
+        // // Extract and increment
+        // String numberPart = latestCode.substring(prefix.length());
+        // String digits = numberPart.replaceAll("[^0-9]", "");
+        // int latestNumber = Integer.parseInt(digits);
+        // int nextNumber = latestNumber + 1;
 
-                    // Check limit
-                    if (nextNumber > 99) {
-                        errors.add("Location code limit reached (max: BR99)");
-                    }
+        // // Check limit
+        // if (nextNumber > 99) {
+        // errors.add("Location code limit reached (max: BR99)");
+        // }
 
-                    generatedCode = prefix + String.format("%02d", nextNumber);
-                }
+        // generatedCode = prefix + String.format("%02d", nextNumber);
+        // }
 
-                // SET CODE IN BOTH DTO AND ENTITY
-                dto.setCode(generatedCode);
-            }
-            // For UPDATE mode
-            else if ("UPDATE".equals(mode)) {
+        // // SET CODE IN BOTH DTO AND ENTITY
+        // dto.setUgmCode(generatedCode);
+        // }
+        // // For UPDATE mode
+        // else if ("UPDATE".equals(mode)) {
 
-                Long mstId = dto.getLocationMstID();
+        // Long mstId = dto.getUgmUserGroupID();
 
-                String code = locationRepository
-                        .findCodeByMstId(mstId)
-                        .orElseThrow(
-                                () -> new IllegalStateException("code not found for Location " + mstId));
+        // String code = userGrpMstRepo
+        // .findCodeByMstId(mstId)
+        // .orElseThrow(
+        // () -> new IllegalStateException("code not found for Location " + mstId));
 
-                // Check format
-                if (!code.startsWith("LO")) {
-                    errors.add("Invalid Location code format. Must start with 'BR'");
-                }
+        // // Check format
+        // if (!code.startsWith("LO")) {
+        // errors.add("Invalid Location code format. Must start with 'BR'");
+        // }
 
-                // Check if code already exists
-                Optional<LocationMst> exists = locationRepository.findByCode(code);
-                if (exists.isEmpty() || exists == null) {
-                    errors.add("Location code '" + code + "' not exists");
-                }
+        // // Check if code already exists
+        // Optional<UserGrpMst> exists = userGrpMstRepo.findByCode(code);
+        // if (exists.isEmpty() || exists == null) {
+        // errors.add("Location code '" + code + "' not exists");
+        // }
 
-                // SET CODE IN DTO
-                dto.setCode(code);
-            }
+        // // SET CODE IN DTO
+        // dto.getUgmCode(code);
+        // }
 
-            // if log table present ---->
+        // if log table present ---->
 
-            List<LocationLogDTO> logDtos = convertToLogDTO(dtos);
-            Response<String> loggenerateSerialNo = locationLogService.generateSerialNo(logDtos, mode);
-            dto.setAmendNo(loggenerateSerialNo.getData());
+        List<UserGrpLogDTO> logDtos = convertToLogDTO(dtos);
+        Response<String> loggenerateSerialNo = userGrpLogService.generateSerialNo(logDtos, mode);
+        dto.setAmendNo(loggenerateSerialNo.getData());
 
-            if (!loggenerateSerialNo.isSuccess()) {
-                // Return log service's error
-                return loggenerateSerialNo;
-            }
-            // <-----
-
-            if (!errors.isEmpty()) {
-                return Response.error(errors);
-            }
-            return Response.success(dto.getCode());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Last resort fallback
-            String fallbackCode = "BR01";
-            dto.setCode(fallbackCode);
-            return Response.success(fallbackCode);
+        if (!loggenerateSerialNo.isSuccess()) {
+            // Return log service's error
+            return loggenerateSerialNo;
         }
+        // <-----
+
+        if (!errors.isEmpty()) {
+            return Response.error(errors);
+        }
+        return Response.success(dto.getUgmCode());
+
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // // Last resort fallback
+        // String fallbackCode = "BR01";
+        // dto.getUgmCode(fallbackCode);
+        // return Response.success(fallbackCode);
+        // }
     }
 
     // =================== 6️⃣ converttoEntity ===================
     @Override
-    public Response<LocationMst> converttoEntity(List<LocationDTO> dtos) {
+    public Response<UserGrpMst> converttoEntity(List<UserGrpMstDTO> dtos) {
 
         // ===== CREATE ENTITY =====
-        LocationMst entity = dtoToEntity(dtos);
+        UserGrpMst entity = dtoToEntity(dtos);
 
         // if log table present ---->
-        List<LocationLogDTO> logDtos = convertToLogDTO(dtos);
-        Response<LocationLog> logconverttoEntity = locationLogService.converttoEntity(logDtos);
+        List<UserGrpLogDTO> logDtos = convertToLogDTO(dtos);
+        Response<UserGrpLog> logconverttoEntity = userGrpLogService.converttoEntity(logDtos);
 
         if (!logconverttoEntity.isSuccess()) {
             return Response.error("Location Log Dto is not converted");
@@ -597,43 +558,26 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
     // =================== DTO → ENTITY ===================
     @Override
-    protected LocationMst dtoToEntity(List<LocationDTO> dtos) {
+    protected UserGrpMst dtoToEntity(List<UserGrpMstDTO> dtos) {
         if (dtos == null || dtos.isEmpty()) {
             return null;
         }
 
         // Take the first DTO from the list
-        LocationDTO dto = dtos.get(0);
+        UserGrpMstDTO dto = dtos.get(0);
 
-        LocationMst entity = new LocationMst();
+        UserGrpMst entity = new UserGrpMst();
 
         // Set ALL fields from the first DTO
-        entity.setLocationMstID(dto.getLocationMstID());
-        entity.setLocation(dto.getLocation());
-        entity.setBranchEntity(dto.getBranchEntity());
-        entity.setCode(dto.getCode());
-        entity.setCompanyEntity(dto.getCompanyEntity());
-        entity.setShortName(dto.getShortName());
-        entity.setActiveDate(dto.getActiveDate());
-        entity.setAddress(dto.getAddress());
-        entity.setAddress1(dto.getAddress1());
-        entity.setAddress2(dto.getAddress2());
-        entity.setCountry(dto.getCountry());
-        entity.setState(dto.getState());
-        entity.setDistrict(dto.getDistrict());
-        entity.setPlace(dto.getPlace());
-        entity.setPincode(dto.getPincode());
-        entity.setLandlineNumber(dto.getLandlineNumber());
-        entity.setMobileNumber(dto.getMobileNumber());
-        entity.setEmail(dto.getEmail());
-        entity.setDesignation(dto.getDesignation());
-        entity.setEmployerName(dto.getEmployerName());
-        entity.setEmployerNumber(dto.getEmployerNumber());
-        entity.setEmployerEmail(dto.getEmployerEmail());
-        entity.setEsiRegion(dto.getEsiRegion());
+        entity.setUgmUserGroupID(dto.getUgmUserGroupID());
+        entity.setEntityMst(dto.getEntityMst());
+        entity.setUgmCode(dto.getUgmCode());
+        entity.setUgmDesc(dto.getUgmDesc());
+        entity.setUgmName(dto.getUgmName());
+        entity.setUgmShortName(dto.getUgmShortName());
         entity.setWithaffectdate(dto.getWithaffectdate());
         entity.setActiveDate(dto.getActiveDate());
-        entity.setActiveStatusYN(dto.getActiveStatusYN());
+        entity.setUgmActiveYN(dto.getUgmActiveYN());
         entity.setInactiveDate(dto.getInactiveDate());
 
         // Set authorization if available
@@ -646,44 +590,26 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
     // =================== ENTITY → DTO ===================
     @Override
-    public LocationDTO entityToDto(LocationMst entity) {
-        LocationDTO dto = new LocationDTO();
+    public UserGrpMstDTO entityToDto(UserGrpMst entity) {
+        UserGrpMstDTO dto = new UserGrpMstDTO();
 
-        dto.setLocationMstID(entity.getLocationMstID());
-        dto.setLocation(entity.getLocation());
-        dto.setBranchEntity(entity.getBranchEntity());
-        dto.setCode(entity.getCode());
-        dto.setCompanyEntity(entity.getCompanyEntity());
-        dto.setShortName(entity.getShortName());
-        dto.setActiveDate(entity.getActiveDate());
-        dto.setAddress(entity.getAddress());
-        dto.setAddress1(entity.getAddress1());
-        dto.setAddress2(entity.getAddress2());
-        dto.setCountry(entity.getCountry());
-        dto.setState(entity.getState());
-        dto.setDistrict(entity.getDistrict());
-        dto.setPlace(entity.getPlace());
-        dto.setPincode(entity.getPincode());
-        dto.setLandlineNumber(entity.getLandlineNumber());
-        dto.setMobileNumber(entity.getMobileNumber());
-        dto.setEmail(entity.getEmail());
-        dto.setDesignation(entity.getDesignation());
-        dto.setEmployerName(entity.getEmployerName());
-        dto.setEmployerNumber(entity.getEmployerNumber());
-        dto.setEmployerEmail(entity.getEmployerEmail());
-        dto.setEsiRegion(entity.getEsiRegion());
+        dto.setUgmUserGroupID(entity.getUgmUserGroupID());
         dto.setWithaffectdate(entity.getWithaffectdate());
         dto.setAuthorization(entity.getAuthorization());
         dto.setActiveDate(entity.getActiveDate());
-        dto.setActiveStatusYN(entity.getActiveStatusYN());
         dto.setInactiveDate(entity.getInactiveDate());
-        dto.setCompanyMstID(entity.getCompanyEntity().getCompanyMstID());
-        dto.setBranchMstID(entity.getBranchEntity().getBranchMstID());
+        dto.setEntityMst(entity.getEntityMst());
+        dto.setEntityMstID(entity.getEntityMst().getEtmEntityID());
+        dto.setUgmCode(entity.getUgmCode());
+        dto.setUgmDesc(entity.getUgmDesc());
+        dto.setUgmName(entity.getUgmName());
+        dto.setUgmShortName(entity.getUgmShortName());
+        dto.setUgmActiveYN(entity.getUgmActiveYN());
 
         // ===== AUTHORIZATION MAPPING =====
         if (entity.getAuthorization() != null) {
 
-            dto.setAuthId(entity.getAuthorization().getAuthId());
+            dto.setUgmAuthInfoID(entity.getAuthorization().getAuthId());
             dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
             dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
 
@@ -698,41 +624,43 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
     // =================== 8️⃣ SAVE ENTITY IN SERVICE ===================
     @Override
     @Transactional(rollbackFor = Exception.class)
-    protected LocationMst saveEntity(LocationMst entity, List<LocationDTO> dtos, String mode) {
-        LocationDTO dto = dtos.get(0);
-        LocationMst savedEntity = null;
+    protected UserGrpMst saveEntity(UserGrpMst entity, List<UserGrpMstDTO> dtos, String mode) {
+        UserGrpMstDTO dto = dtos.get(0);
+        UserGrpMst savedEntity = null;
 
         if ("INSERT".equalsIgnoreCase(mode)) {
-            // ===== SAVE MAIN FIRST =====
-            savedEntity = locationRepository.save(entity);
+            if (entity != null) {
+                // ===== SAVE MAIN FIRST =====
+                savedEntity = userGrpMstRepo.save(entity);
 
-            // ===== SAVE AUTHORIZATION WITH ID =====
-            // Get the authorization created in entityPopulate
-            Authorization auth = entity.getAuthorization();
+                // ===== SAVE AUTHORIZATION WITH ID =====
+                // Get the authorization created in entityPopulate
+                Authorization auth = entity.getAuthorization();
 
-            // Set the ID
-            auth.setMstId(savedEntity.getLocationMstID());
+                // Set the ID
+                auth.setMstId(savedEntity.getUgmUserGroupID());
 
-            // Save the authorization
-            Authorization savedAuth = authorizationRepository.save(auth);
-            // Set authId in DTO before passing to log service
-            dto.setAuthId(savedAuth.getAuthId());
+                // Save the authorization
+                Authorization savedAuth = authorizationRepository.save(auth);
+                // Set authId in DTO before passing to log service
+                dto.setUgmAuthInfoID(savedAuth.getAuthId());
+            }
         } else if ("UPDATE".equalsIgnoreCase(mode)) {
 
             if (Boolean.TRUE.equals(dto.getAuthorizationStatus())) {
 
                 // ===== SAVE COMPANY =====
-                savedEntity = locationRepository.save(entity);
+                savedEntity = userGrpMstRepo.save(entity);
 
                 // ===== SAVE AUTHORIZATION =====
                 Authorization auth = entity.getAuthorization();
-                auth.setMstId(savedEntity.getLocationMstID());
+                auth.setMstId(savedEntity.getUgmUserGroupID());
                 authorizationRepository.save(auth);
                 Authorization savedAuth = authorizationRepository.save(auth);
-                dto.setAuthId(savedAuth.getAuthId());
+                dto.setUgmAuthInfoID(savedAuth.getAuthId());
 
             } else {
-                Long mstId = dto.getLocationMstID();
+                Long mstId = dto.getUgmUserGroupID();
 
                 long count = authorizationRepository.countByMstId(mstId);
 
@@ -748,20 +676,20 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                             savedEntity = entity;
                             // ===== SAVE AUTHORIZATION =====
                             Authorization auth = entity.getAuthorization();
-                            auth.setMstId(savedEntity.getLocationMstID());
+                            auth.setMstId(savedEntity.getUgmUserGroupID());
                             authorizationRepository.save(auth);
                             Authorization savedAuth = authorizationRepository.save(auth);
-                            dto.setAuthId(savedAuth.getAuthId());
+                            dto.setUgmAuthInfoID(savedAuth.getAuthId());
                         } else {
                             // ===== SAVE =====
-                            savedEntity = locationRepository.save(entity);
+                            savedEntity = userGrpMstRepo.save(entity);
 
                             // ===== SAVE AUTHORIZATION =====
                             Authorization auth = entity.getAuthorization();
-                            auth.setMstId(savedEntity.getLocationMstID());
+                            auth.setMstId(savedEntity.getUgmUserGroupID());
                             authorizationRepository.save(auth);
                             Authorization savedAuth = authorizationRepository.save(auth);
-                            dto.setAuthId(savedAuth.getAuthId());
+                            dto.setUgmAuthInfoID(savedAuth.getAuthId());
 
                         }
                     }
@@ -772,10 +700,10 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                     savedEntity = entity;
                     // ===== SAVE AUTHORIZATION =====
                     Authorization auth = entity.getAuthorization();
-                    auth.setMstId(savedEntity.getLocationMstID());
+                    auth.setMstId(savedEntity.getUgmUserGroupID());
                     authorizationRepository.save(auth);
                     Authorization savedAuth = authorizationRepository.save(auth);
-                    dto.setAuthId(savedAuth.getAuthId());
+                    dto.setUgmAuthInfoID(savedAuth.getAuthId());
                 }
 
             }
@@ -788,11 +716,11 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
         // ===== SAVE LOG =====
 
         // Create a Log entity first
-        LocationLog logEntity = new LocationLog();
+        UserGrpLog logEntity = new UserGrpLog();
 
         // Now call saveEntity with the created entity
-        List<LocationLogDTO> logDtos = convertToLogDTO(dtos);
-        LocationLog savedLog = locationLogService.saveEntity(logEntity, logDtos, mode);
+        List<UserGrpLogDTO> logDtos = convertToLogDTO(dtos);
+        UserGrpLog savedLog = userGrpLogService.saveEntity(logEntity, logDtos, mode);
 
         // <------
 
@@ -806,114 +734,74 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
         return str == null || str.trim().isEmpty();
     }
 
-    private boolean isEmpty(CompanyMst company) {
-        if (company == null)
+    private boolean isEmpty(EntityMst entityMst) {
+        if (entityMst == null)
             return true;
-        return company.getCompanyMstID() == null ||
-                isEmpty(company.getCompany()) ||
-                isEmpty(company.getCode());
+        return entityMst.getEtmEntityID() == null ||
+                isEmpty(entityMst.getEtmName()) ||
+                isEmpty(entityMst.getEtmCode());
     }
 
-    private boolean isEmpty(BranchMst branch) {
-        if (branch == null)
-            return true;
-        return branch.getBranchMstID() == null ||
-                isEmpty(branch.getBranch()) ||
-                isEmpty(branch.getCode());
-    }
+    private List<UserGrpLogDTO> populateLogEntityfromEntity(UserGrpMstDTO dto) {
+        List<UserGrpLogDTO> DtoLogs = new ArrayList<>();
+        UserGrpLogDTO DtoLog = new UserGrpLogDTO();
 
-    private List<LocationLogDTO> populateLogEntityfromEntity(LocationDTO dto) {
-        List<LocationLogDTO> DtoLogs = new ArrayList<>();
-        LocationLogDTO DtoLog = new LocationLogDTO();
-
-        DtoLog.setLocationMstID(dto.getLocationMstID());
-        DtoLog.setLocation(dto.getLocation());
-        DtoLog.setCompanyEntity(dto.getCompanyEntity());
-        DtoLog.setBranchEntity(dto.getBranchEntity());
-        DtoLog.setCode(dto.getCode());
-        DtoLog.setShortName(dto.getShortName());
+        DtoLog.setUgmUserGroupID(dto.getUgmUserGroupID());
+        DtoLog.setUgmName(dto.getUgmName());
+        DtoLog.setUgmCode(dto.getUgmCode());
         DtoLog.setActiveDate(dto.getActiveDate());
-        DtoLog.setWithaffectdate(dto.getWithaffectdate());
-        DtoLog.setAddress(dto.getAddress());
-        DtoLog.setAddress1(dto.getAddress1());
-        DtoLog.setAddress2(dto.getAddress2());
-        DtoLog.setCountry(dto.getCountry());
-        DtoLog.setState(dto.getState());
-        DtoLog.setDistrict(dto.getDistrict());
-        DtoLog.setPlace(dto.getPlace());
-        DtoLog.setPincode(dto.getPincode());
-        DtoLog.setLandlineNumber(dto.getLandlineNumber());
-        DtoLog.setMobileNumber(dto.getMobileNumber());
-        DtoLog.setEmail(dto.getEmail());
-        DtoLog.setDesignation(dto.getDesignation());
-        DtoLog.setEmployerName(dto.getEmployerName());
-        DtoLog.setEmployerNumber(dto.getEmployerNumber());
-        DtoLog.setEmployerEmail(dto.getEmployerEmail());
-        DtoLog.setEsiRegion(dto.getEsiRegion());
         DtoLog.setAmendNo(dto.getAmendNo());
-        DtoLog.setAmendNo(dto.getAmendNo());
+        DtoLog.setUgmShortName(dto.getUgmShortName());
+        DtoLog.setUgmDesc(dto.getUgmDesc());
         DtoLog.setAuthorizationDate(dto.getAuthorizationDate());
         DtoLog.setAuthorizationStatus(dto.getAuthorizationStatus());
+        DtoLog.setUserGrpLogPK(dto.getUserGrpLogPK());
+        DtoLog.setEntityMst(dto.getEntityMst());
         DtoLogs.add(DtoLog);
         return DtoLogs;
     }
 
-    private List<LocationLogDTO> convertToLogDTO(List<LocationDTO> dtos) {
+    private List<UserGrpLogDTO> convertToLogDTO(List<UserGrpMstDTO> dtos) {
 
         if (dtos == null || dtos.isEmpty())
             return null;
 
-        List<LocationLogDTO> logDtos = new ArrayList<>();
+        List<UserGrpLogDTO> logDtos = new ArrayList<>();
 
-        for (LocationDTO dto : dtos) {
+        for (UserGrpMstDTO dto : dtos) {
             if (dto == null) {
                 continue; // Skip null DTOs
             }
 
-            LocationLogDTO logDto = new LocationLogDTO();
+            UserGrpLogDTO logDto = new UserGrpLogDTO();
 
-            logDto.setLocationMstID(dto.getLocationMstID());
-            logDto.setLocation(dto.getLocation());
-            logDto.setAuthId(dto.getAuthId());
-            logDto.setBranchEntity(dto.getBranchEntity());
-            logDto.setCode(dto.getCode());
-            logDto.setCompanyEntity(dto.getCompanyEntity());
-            logDto.setShortName(dto.getShortName());
-            logDto.setAddress(dto.getAddress());
-            logDto.setAddress1(dto.getAddress1());
-            logDto.setAddress2(dto.getAddress2());
-            logDto.setCountry(dto.getCountry());
-            logDto.setState(dto.getState());
-            logDto.setDistrict(dto.getDistrict());
-            logDto.setPlace(dto.getPlace());
-            logDto.setPincode(dto.getPincode());
-            logDto.setLandlineNumber(dto.getLandlineNumber());
-            logDto.setMobileNumber(dto.getMobileNumber());
-            logDto.setEmail(dto.getEmail());
+            logDto.setUgmUserGroupID(dto.getUgmUserGroupID());
+            logDto.setUgmAuthInfoID(dto.getUgmAuthInfoID());
+            logDto.setUgmName(dto.getUgmName());
+            logDto.setUgmCode(dto.getUgmCode());
+            logDto.setUgmShortName(dto.getUgmShortName());
+            logDto.setUgmDesc(dto.getUgmDesc());
             logDto.setActiveDate(dto.getActiveDate());
-            logDto.setDesignation(dto.getDesignation());
-            logDto.setEmployerName(dto.getEmployerName());
-            logDto.setEmployerNumber(dto.getEmployerNumber());
-            logDto.setEmployerEmail(dto.getEmployerEmail());
-            logDto.setEsiRegion(dto.getEsiRegion());
             logDto.setWithaffectdate(dto.getWithaffectdate());
             logDto.setAuthorizationDate(dto.getAuthorizationDate());
             logDto.setAuthorizationStatus(dto.getAuthorizationStatus());
             logDto.setUserCode(dto.getUserCode());
-            logDto.setLocatioinLogPK(dto.getLocationLogPK());
             logDto.setAmendNo(dto.getAmendNo());
+            logDto.setUserGrpLogPK(dto.getUserGrpLogPK());
+            logDto.setEntityMst(dto.getEntityMst());
+
             logDtos.add(logDto);
         }
         return logDtos;
     }
 
-    private void populateLogEntityPKfromEntity(Long logPk, Long logRowNo, LocationDTO entity) {
-        for (LocationLogDTO entityLog : entity.getLocationDtoLogs()) {
-            LocationLogPK LogPK = new LocationLogPK();
-            LogPK.setLocationMstID(logPk);
+    private void populateLogEntityPKfromEntity(Long logPk, Long logRowNo, UserGrpMstDTO entity) {
+        for (UserGrpLogDTO entityLog : entity.getUserGrpLogDTOs()) {
+            UserGrpLogPK LogPK = new UserGrpLogPK();
+            LogPK.setUgmUserGroupID(logPk);
             LogPK.setRowNo(logRowNo);
-            entityLog.setLocatioinLogPK(LogPK);
-            entity.setLocationLogPK(LogPK);
+            entityLog.setUserGrpLogPK(LogPK);
+            entity.setUserGrpLogPK(LogPK);
             logRowNo++;
         }
 
@@ -921,23 +809,23 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
 
     // To set the Log list in the entity to retrun to ui
     @Transactional(readOnly = true)
-    public LocationDTO getLocationWithLogs(@NonNull Long locationMstID) {
+    public UserGrpMstDTO getUserGrpWithLogs(@NonNull Long MstID) {
 
         // Fetch MST row
-        LocationMst entity = locationRepository.findById(locationMstID)
-                .orElseThrow(() -> new RuntimeException("Location not found"));
+        UserGrpMst entity = userGrpMstRepo.findById(MstID)
+                .orElseThrow(() -> new RuntimeException("User Grp not found"));
 
         // Convert MST → DTO
-        LocationDTO dto = entityToDto(entity);
+        UserGrpMstDTO dto = entityToDto(entity);
 
         // Fetch ALL logs related to this MST
-        List<LocationLog> Logs = locationLogRepository
-                .findByLocationLogPK_LocationMstIDOrderByLocationLogPK_RowNoDesc(
-                        locationMstID);
+        List<UserGrpLog> Logs = userGrpLogRepo
+                .findByUserGrpLogPK_UgmUserGroupIDOrderByUserGrpLogPK_RowNoDesc(
+                        MstID);
 
-        Optional<LocationLog> selectedLog = Logs.stream()
+        Optional<UserGrpLog> selectedLog = Logs.stream()
                 .filter(log -> log.getAuthorization() != null)
-                .max(Comparator.comparing(LocationLog::getAmendNo))
+                .max(Comparator.comparing(UserGrpLog::getAmendNo))
                 .flatMap(latestLog -> {
 
                     // Case 1: latest is TRUE → return it
@@ -951,7 +839,7 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                             .filter(log -> log.getAuthorization() != null)
                             .filter(log -> Boolean.TRUE.equals(
                                     log.getAuthorization().getAuthorizationStatus()))
-                            .max(Comparator.comparing(LocationLog::getAmendNo));
+                            .max(Comparator.comparing(UserGrpLog::getAmendNo));
                 });
 
         // Case 3: no TRUE exists → fallback to latest FALSE
@@ -960,14 +848,14 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
                     .filter(log -> log.getAuthorization() != null)
                     .filter(log -> Boolean.FALSE.equals(
                             log.getAuthorization().getAuthorizationStatus()))
-                    .max(Comparator.comparing(LocationLog::getAmendNo));
+                    .max(Comparator.comparing(UserGrpLog::getAmendNo));
         }
 
         // Apply mapping
         selectedLog.ifPresent(log -> {
 
             dto.setAmendNo(log.getAmendNo());
-            dto.setAuthId(log.getAuthorization().getAuthId());
+            dto.setUgmAuthInfoID(log.getAuthorization().getAuthId());
             dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
             dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
 
@@ -978,14 +866,13 @@ public class LocationService extends MuzirisAbstractService<LocationDTO, Locatio
         });
 
         // Convert ALL logs → DTO list
-        List<LocationLogDTO> logDtos = Logs.stream()
-                .map(locationLogService::entityToDto)
+        List<UserGrpLogDTO> logDtos = Logs.stream()
+                .map(userGrpLogService::entityToDto)
                 .toList();
 
         // Attach list to MST DTO
-        dto.setLocationDtoLogs(logDtos);
+        dto.setUserGrpLogDTOs(logDtos);
 
         return dto;
     }
-
 }

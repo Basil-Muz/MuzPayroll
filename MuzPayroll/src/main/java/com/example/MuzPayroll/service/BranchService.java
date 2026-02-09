@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -478,7 +479,6 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
             return Response.success(true);
 
         } catch (Exception e) {
-            e.printStackTrace();
             return Response.error("Error generating PK: " + e.getMessage());
         }
     }
@@ -568,8 +568,6 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
             return Response.success(dto.getCode());
 
         } catch (Exception e) {
-            e.printStackTrace();
-            // Last resort fallback
             String fallbackCode = "BR01";
             dto.setCode(fallbackCode);
             return Response.success(fallbackCode);
@@ -892,7 +890,7 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
 
     // To set the Log list in the entity to retrun to ui
     @Transactional(readOnly = true)
-    public BranchDTO getBranchWithLogs(Long branchMstID) {
+    public BranchDTO getBranchWithLogs(@NonNull Long branchMstID) {
 
         // Fetch MST row
         BranchMst entity = branchRepository.findById(branchMstID)
