@@ -144,7 +144,7 @@
 .search-actions .btn {
   height: 36px;
   padding: 9px 18px;
-
+  /* width:80px; */
   font-size: var(--text-sm);
   font-weight: 500;
 
@@ -157,6 +157,8 @@
     border-color 0.2s ease,
     box-shadow 0.2s ease,
     color 0.2s ease;
+        align-items: center;
+    justify-content: space-evenly;
 }
 
 /* ===============================
@@ -376,8 +378,8 @@
 ================================ */
 .lgr-filters {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  /* flex-wrap: wrap; */
   gap: 12px;
 
   padding: 12px 16px;
@@ -390,34 +392,33 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-/* Dropdown & Search Input */
-.lgr-filters select,
-.lgr-filters input[type="search"] {
-  height: 36px;
-  padding: 0 10px;
-
-  font-size: 14px;
-  color: #111827;
-
-  background: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-
-  outline: none;
-  min-width: 220px;
+/* Each filter behaves like a column */
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 200px;
+  min-width: 160px;
+  max-width: 240px;
 }
 
-/* Search input slightly wider */
-.lgr-filters input[type="search"] {
-  min-width: 260px;
+/* Make react-select match native select */
+.filter-item .form-control-select__control {
+  min-height: 36px;
+}
+
+/* Error message does not affect alignment */
+.error-message {
+  font-size: 12px;
+  color: var(--danger);
+  margin-top: 4px;
 }
 
 /* Focus states */
-.lgr-filters select:focus,
+/* .lgr-filters select:focus,
 .lgr-filters input[type="search"]:focus {
   border-color: var(--brand, #6366f1);
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
-}
+} */
 
 /* Clear button */
 .lgr-filters .link {
@@ -431,6 +432,34 @@
 
   border-radius: 6px;
 }
+
+/* .lgr-filters .form-control.input,
+.lgr-filters select,
+.lgr-filters .form-control-select__control {
+  width: clamp(160px, 22vw, 220px);
+} */
+.form-control-native-select {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.form-control-native-select option {
+  background-color: var(--background);
+  color: var(--text);
+  font-size: 14px;
+}
+.form-control-native-select option :focus {
+  outline: none;
+  background-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(210, 24, 216, 0.2);
+}
+
+.form-control-native-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 
 /* Clear hover */
 .lgr-filters .link:hover {
@@ -730,20 +759,29 @@ input[type="checkbox"]:checked::after {
     justify-content: center;
   }
 
+.search-actions .btn{
+  width: 200px;
+}
+
   .lgr-filters {
     flex-direction: column;
     align-items: stretch;
   }
 
   .lgr-filters select,
-  .lgr-filters input[type="search"] {
+  .lgr-filters input[type="search"],
+  .filter-item {
     min-width: 0;
     width: 100%;
   }
+  .lgr-filters .filter-item {
+    flex: none;
+    max-width: 100%;
 
+  }
   .search-actions {
     width: 100%;
-    justify-content: space-between;
+    justify-content: center;
   }
 }
 

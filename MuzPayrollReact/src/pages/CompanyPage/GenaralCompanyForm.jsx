@@ -147,7 +147,7 @@ export default function GenaralCompanyForm() {
     entityId: companyId, // compay id for fetch amendments data
     amendments, // SAME STATE
     refreshAmendments: fetchEntityAmendData, // amend api call for company
-    entity: "company",
+    entity: " company ",
     saveEntity: saveCompany,
   });
 

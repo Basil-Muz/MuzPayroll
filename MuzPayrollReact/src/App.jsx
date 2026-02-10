@@ -54,9 +54,9 @@ import LocationGroupRightsMapping from "./pages/LocationGroupRightMaping/Locatio
 function App() {
   return (
     <>
-    <AuthProvider>
-    <LoaderRenderer />
-      
+      <AuthProvider>
+        <LoaderRenderer />
+
         <Routes>
           {/* <Route path="/" element={<Page />} /> */}
           <Route path="/" element={<LoginPage />} />
@@ -66,7 +66,7 @@ function App() {
           <Route path="/documentsinfo" element={<DocumentsInfo />} />
           <Route path="/masters" element={<MasterPage />} />
           <Route path="/changepassword" element={<ChangePassword />} />
-        
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/settings" element={<Settings />} />
 
@@ -156,8 +156,10 @@ function App() {
           <Route path="/locationgroup" element={<LocationGroup />} />
           <Route path="/shiftgroup" element={<ShiftGroup />} />
 
-            <Route path="/locationrights" element={<LocationGroupRightsMapping/>} />
-
+          <Route
+            path="/locationrights"
+            element={<LocationGroupRightsMapping />}
+          />
         </Routes>
       </AuthProvider>
       <Toaster
@@ -166,41 +168,6 @@ function App() {
         reverseOrder={false}
         toastOptions={{
           duration: 2800,
-
-          style: {
-            background: "var(--glass-bg)",
-            color: "var(--text)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius-lg)",
-            boxShadow: "var(--shadow-lg)",
-            padding: "0",
-            maxWidth: "420px",
-            backdropFilter: "blur(10px)",
-          },
-
-          success: {
-            style: {
-              borderLeft: "3px solid var(--success)",
-              background:
-                "linear-gradient(135deg, var(--success-light), var(--glass-bg))",
-            },
-          },
-
-          error: {
-            style: {
-              borderLeft: "4px solid var(--danger)",
-              background:
-                "linear-gradient(135deg, var(--danger-light), var(--glass-bg))",
-            },
-          },
-
-          loading: {
-            style: {
-              borderLeft: "4px solid var(--brand)",
-              background:
-                "linear-gradient(135deg, var(--primary-light), var(--glass-bg))",
-            },
-          },
         }}
       >
         {(t) => (
@@ -208,6 +175,11 @@ function App() {
             className={`custom-toast ${t.type} ${
               t.visible ? "toast-enter" : "toast-exit"
             }`}
+            style={{
+              transition: "transform 0.3s ease, opacity 0.3s ease",
+              transform: t.visible ? "translateX(0)" : "translateX(100%)",
+              opacity: t.visible ? 1 : 0,
+            }}
           >
             <div className="toast-content">
               <div className="toast-icon">
@@ -237,6 +209,9 @@ function App() {
                 <CloseIcon />
               </button>
             </div>
+            <div className="toast-progress-container">
+              <div className="toast-progress"></div>
+            </div>
           </div>
         )}
       </Toaster>
@@ -254,7 +229,7 @@ const SuccessIcon = () => (
   >
     <path
       d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z"
-      fill="#10B981"
+      fill="#d01bd6"
     />
     <path
       d="M10 15.17L6.53 11.7C6.14 11.31 5.51 11.31 5.12 11.7C4.73 12.09 4.73 12.72 5.12 13.11L9.29 17.28C9.68 17.67 10.31 17.67 10.7 17.28L18.88 9.1C19.27 8.71 19.27 8.08 18.88 7.69C18.49 7.3 17.86 7.3 17.47 7.69L10 15.17Z"

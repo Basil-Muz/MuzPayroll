@@ -28,7 +28,7 @@ export function LocationGroupMultiSelect({
     setPlacement(
       spaceBelow < dropdownHeight && spaceAbove > spaceBelow ? "top" : "bottom",
     );
-  }, [open]);
+  }, [open, setPlacement]);
 
   /* Outside click */
   useEffect(() => {
@@ -48,7 +48,7 @@ export function LocationGroupMultiSelect({
   /* Reset search on close */
   useEffect(() => {
     if (!open) setSearch("");
-  }, [open, setSearch]);
+  }, [open]);
 
   const isSelected = (opt) => value.some((v) => v.id === opt.id);
 

@@ -1,6 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect} from "react";
 import { FaFilter } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
+import Select from "react-select";
+import { useForm, Controller } from "react-hook-form";
+
 // Components
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
 import Header from "../../components/Header/Header";
@@ -40,7 +43,7 @@ const BRANCHES = [
 
 const solutions = [
   { id: 1, name: "Employee portal" },
-  { id: 2, name: "Employee protal" },
+  { id: 2, name: "Employer portal" },
 ];
 
 const LOCATIONS = [
@@ -201,51 +204,140 @@ const PAGE_SIZE = 8;
 
 export default function LocationGroupRightsMapping() {
   const [rows, setRows] = useState(initData);
-  const [businessSolution, setBusinessSolution] = useState("");
-  const [branchFilter, setBranchFilter] = useState("");
-  const [locationQuery, setLocationQuery] = useState("");
+
+  // const [branchFilter, setBranchFilter] = useState("ALL");
+
+  // const [locationQuery, setLocationQuery] = useState("");
 
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
   const [saveSelection, setSaveSelection] = useState(new Set());
   const [originalMap, setOriginalMap] = useState(new Map()); // Capture the first state before edit
 
   const [bulkGroup, setBulkGroup] = useState([]);
+
+  const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
 
   const [showFilters, setShowFilters] = useState(true); // Toggle the filter component
   const [isSearchApplied, setIsSearchApplied] = useState(false); //  Load the table data
 
+  const {
+    register,
+    // handleSubmit,
+    trigger,
+    // setError,
+    // clearErrors,
+    // setValue,
+    // reset,
+    // setFocus,
+    // getValues,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      authorizationDate: new Date().toISOString().split("T")[0],
+      authorizationStatus: 0,
+      activeStatusYN: 1,
+    },
+  });
+  const branchFilter = watch("branches");
+  const locationQuery = watch("location");
+  const businessSolution = watch("businessSolution");
   // const totalPages = Math.ceil(rows.length / PAGE_SIZE);
   // const pageRows = useMemo(() => {
   //   const start = (page - 1) * PAGE_SIZE;
   //   return rows.slice(start, start + PAGE_SIZE);
   // }, [rows, page]);
 
-  const filteredRows = useMemo(() => {
-    if (!isSearchApplied) return [];
+  const solutionOptions = useMemo(
+    () =>
+      solutions.map((s) => ({
+        value: s.id,
+        label: s.name,
+      })),
+    [],
+  );
 
-    return rows.filter((r) => {
-      const branchMatch = !branchFilter || r.branch.id === Number(branchFilter);
+  const branchOptions = useMemo(() => {
+    return [
+      { value: "ALL", label: "All branches" },
+      ...BRANCHES.map((s) => ({
+        value: s.id,
+        label: s.name,
+      })),
+    ];
+  }, [BRANCHES]);
 
-      const businessMatch =
-        !businessSolution || r.businessSolution.id === Number(businessSolution);
+  // console.log("branches list", branchOptions);
 
-      const locationMatch =
-        !locationQuery ||
-        r.location.name.toLowerCase().includes(locationQuery.toLowerCase());
+  // const filteredRows = useMemo(() => {
+  //   if (!isSearchApplied) return [];
+  //   trigger();
+  //   // console.log("Branch: ", branchFilter);
+  //   return rows.filter((r) => {
+  //     const branchMatch =
+  //       branchFilter === "ALL" || r.branch.id === Number(branchFilter);
 
-      return branchMatch && businessMatch && locationMatch;
-    });
-  }, [rows, branchFilter, businessSolution, locationQuery, isSearchApplied]);
+  //     const businessMatch =
+  //       !businessSolution || r.businessSolution.id === Number(businessSolution);
 
-  const totalPages = isSearchApplied
-    ? Math.ceil(filteredRows.length / PAGE_SIZE) || 1
-    : 1;
+  //     const locationMatch =
+  //       !locationQuery ||
+  //       r.location.name.toLowerCase().includes(locationQuery.toLowerCase());
 
-  const pageRows = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return filteredRows.slice(start, start + PAGE_SIZE);
-  }, [filteredRows, page]);
+  //     return branchMatch && businessMatch && locationMatch;
+  //   });
+  // }, [rows, branchFilter, businessSolution, locationQuery, isSearchApplied]);
+
+  const buildFilterPayload = () => ({
+    businessSolutionId: businessSolution || null,
+    branchId: branchFilter === "ALL" ? null : Number(branchFilter),
+    location: locationQuery?.trim() || null,
+    page,
+    pageSize: PAGE_SIZE,
+  });
+
+  const fetchFilteredRows = async () => {
+    try {
+      const payload = buildFilterPayload();
+
+      // Replace with real API
+      // const res = await api.post("/location-group/filter", payload);
+
+      // MOCK (simulate backend pagination)
+      const start = (page - 1) * PAGE_SIZE;
+      const pagedData = initData.slice(start, start + PAGE_SIZE);
+
+      const res = {
+        data: {
+          rows: pagedData,
+          totalCount: initData.length,
+        },
+      };
+
+      setRows(res.data.rows);
+      setTotalCount(res.data.totalCount);
+    } catch (err) {
+      handleApiError(err);
+    }
+  };
+
+  const handleApplySearch = async () => {
+    const isValid = await trigger();
+    if (!isValid) return;
+
+    setIsSearchApplied(true);
+    setShowFilters(false);
+    setPage(1); // always reset page
+
+    await fetchFilteredRows();
+  };
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
+
+  const pageRows = useMemo(() => rows, [rows]);
 
   // useEffect(() => {
   //   setPage(1);
@@ -306,6 +398,8 @@ export default function LocationGroupRightsMapping() {
       selectedRowIds.forEach((id) => next.add(id));
       return next;
     });
+    // toast.success("Location groups updated. Previous groups were replaced.");
+    toast.success("Location groups changed to the new selection.");
   };
 
   // const undoRow = (id) => {
@@ -334,12 +428,18 @@ export default function LocationGroupRightsMapping() {
     setShowFilters(true);
 
     // Clear search inputs
-    setBusinessSolution("");
-    setBranchFilter("");
-    setLocationQuery("");
+    // setBusinessSolution("");
+    // setBranchFilter("");
+    // setLocationQuery("");
 
     //  RESET SELECT BOX IN TABLE DATA
-    setRows(initData);
+    setRows(
+      initData.map((r) => ({
+        ...r,
+        group: [...r.group],
+        _dirty: false,
+      })),
+    );
 
     // Reset table-related state
     setPage(1);
@@ -394,6 +494,12 @@ export default function LocationGroupRightsMapping() {
     }
   };
 
+  useEffect(() => {
+    if (isSearchApplied) {
+      fetchFilteredRows();
+    }
+  }, [page]);
+
   return (
     <>
       <div className="lgr-layout">
@@ -402,7 +508,7 @@ export default function LocationGroupRightsMapping() {
           <Header backendError={[]} />
           <div className="lgr-header">
             <div>
-              <h2>Location Group Mapping</h2>
+              <h2>Location and Group Permissions</h2>
               <p>Assign and manage location groups across branches</p>
             </div>
             <div className="filter-save">
@@ -433,50 +539,83 @@ export default function LocationGroupRightsMapping() {
 
           {showFilters && (
             <div className="lgr-filters">
-              <select
-                value={businessSolution}
-                disabled={isSearchApplied}
-                onChange={(e) => setBusinessSolution(e.target.value)}
-                required
-              >
-                <option value="">Select business solution</option>
-                {solutions.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={branchFilter}
-                disabled={isSearchApplied}
-                onChange={(e) => setBranchFilter(e.target.value)}
-              >
-                <option value="">All branches</option>
-                {BRANCHES.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <Controller
+                  name="businessSolution"
+                  control={control}
+                  rules={{ required: "Business solution is required" }}
+                  render={({ field }) => (
+                    <Select
+                      options={solutionOptions}
+                      placeholder="Select business solution"
+                      isSearchable={false}
+                      isDisabled={isSearchApplied}
+                      classNamePrefix="form-control-select"
+                      className={`
+  ${errors.businessSolution ? "error" : ""}
+  ${isSearchApplied ? "read-only" : ""}
+`}
+                      value={
+                        solutionOptions.find(
+                          (opt) => opt.value === field.value,
+                        ) || null
+                      }
+                      onChange={(option) => field.onChange(option?.value)}
+                    />
+                  )}
+                />
+                {errors.businessSolution && (
+                  <span className="error-message">
+                    {errors.businessSolution.message}
+                  </span>
+                )}
+              </div>
 
-              <input
-                type="search"
-                placeholder="Search location…"
-                value={locationQuery}
-                disabled={isSearchApplied}
-                onChange={(e) => setLocationQuery(e.target.value)}
-              />
+              <div className="filter-item">
+                <Controller
+                  name="branches"
+                  control={control}
+                  rules={{ required: "Branch is required" }}
+                  render={({ field }) => (
+                    <Select
+                      isDisabled={isSearchApplied}
+                      classNamePrefix="form-control-select"
+                      className={`
+        ${errors.branches ? "error" : ""}
+        ${isSearchApplied ? "read-only" : ""}
+      `}
+                      options={branchOptions}
+                      /* 🔥 IMPORTANT FIX */
+                      value={
+                        branchOptions.find(
+                          (opt) => opt.value === field.value,
+                        ) || null
+                      }
+                      onChange={(option) => field.onChange(option?.value)}
+                    />
+                  )}
+                />
+
+                {errors.branches && (
+                  <span className="error-message">
+                    {errors.branches.message}
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="search"
+                  disabled={isSearchApplied}
+                  className={`form-control input${errors.location ? "error" : ""} ${isSearchApplied ? "read-only" : ""}`}
+                  placeholder="Search by location"
+                  {...register("location")}
+                />
+              </div>
 
               <div className="search-actions">
                 {!isSearchApplied ? (
-                  <button
-                    className="btn btn-apply"
-                    onClick={() => {
-                      setIsSearchApplied(true);
-                      setShowFilters(false);
-                      setPage(1);
-                    }}
-                  >
+                  <button className="btn btn-apply" onClick={handleApplySearch}>
                     Apply
                   </button>
                 ) : (

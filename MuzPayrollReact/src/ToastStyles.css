@@ -1,25 +1,66 @@
 /* =========================================================
+   CSS VARIABLES - Define all variables first
+   ========================================================= */
+
+:root {
+
+  --danger: #ef4444;
+  --danger-light: #f87171;
+  --danger-dark: #dc2626;
+  
+  /* UI Colors */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: rgba(255, 255, 255, 0.2);
+  --border-light: #e5e7eb;
+  --text: #1f2937;
+  --text-dark: #111827;
+  --text-muted: #6b7280;
+  --text-light: #9ca3af;
+  
+  /* Spacing */
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --text-sm: 0.875rem;
+  
+  /* Shadows */
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================================================
    BASE TOAST
    ========================================================= */
 
 .custom-toast {
   position: relative;
   width: min(420px, 92vw);
-  min-height: 64px;
-  margin-bottom: 8px;
-
-  background: var(--bg);
+  min-height: 72px;
+  margin-bottom: 12px;
+  background: var(--glass-bg);
   color: var(--text);
-
   border: 1px solid var(--border);
   border-left: 4px solid var(--brand);
-  border-radius: var(--radius-sm);
-
-  box-shadow: var(--shadow);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  animation: toast-slide-in 0.3s cubic-bezier(0.21, 0.61, 0.35, 1);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
 
-  animation: toast-slide-in 0.25s ease-out;
+/* Toast visibility states */
+.custom-toast.toast-enter {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.custom-toast.toast-exit {
+  opacity: 0;
+  transform: translateX(100%);
 }
 
 /* =========================================================
@@ -28,15 +69,30 @@
 
 .custom-toast.success {
   border-left-color: var(--success);
+  background: linear-gradient(
+    135deg,
+    rgba(171, 16, 185, 0.1) 0%,
+    var(--glass-bg) 100%
+  );
 }
 
 .custom-toast.error {
   border-left-color: var(--danger);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1) 0%,
+    var(--glass-bg) 100%
+  );
 }
 
 .custom-toast.info,
 .custom-toast.loading {
   border-left-color: var(--brand);
+  background: linear-gradient(
+    135deg,
+    rgba(224, 59, 246, 0.1) 0%,
+    var(--glass-bg) 100%
+  );
 }
 
 /* =========================================================
@@ -45,60 +101,57 @@
 
 .toast-content {
   display: flex;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 16px;
+  padding: 18px 20px;
   align-items: flex-start;
+  position: relative;
+  z-index: 2;
 }
 
 /* =========================================================
-   ICON BASE
+   ICON
    ========================================================= */
 
 .toast-icon {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-radius: var(--radius-sm);
-  background: var(--background-alt);
-  border: 1px solid var(--border-light);
-
-  transition: color 0.2s ease, background 0.2s ease;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* =========================================================
-   ICON STATES + ANIMATIONS
-   ========================================================= */
-
-/* SUCCESS – brand pulse (positive reinforcement) */
 .custom-toast.success .toast-icon {
-  color: var(--brand);
-  background: var(--success-light);
-  border-color: var(--brand-border);
-  animation: icon-success 0.8s ease-out;
+  color: var(--success);
+  background: linear-gradient(135deg, #f5d1fa 0%, #eaa7f3 100%);
+  animation: icon-success 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
-/* ERROR – subtle shake (attention, not panic) */
 .custom-toast.error .toast-icon {
   color: var(--danger);
-  background: var(--danger-light);
-  animation: icon-error 0.6s ease-out;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  animation: icon-error 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
-/* INFO – soft fade-in */
 .custom-toast.info .toast-icon {
   color: var(--brand);
-  animation: icon-info 0.5s ease-out;
+  background: linear-gradient(135deg, #f4dbfe 0%, #f1bffe 100%);
+  animation: icon-info 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
-/* LOADING – continuous rotate */
 .custom-toast.loading .toast-icon {
   color: var(--brand);
-  animation: icon-loading 1.1s linear infinite;
+  background: linear-gradient(135deg, #f6dbfe 0%, #f3bffe 100%);
+  animation: icon-loading 1.2s linear infinite;
+}
+
+.toast-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* =========================================================
@@ -107,13 +160,17 @@
 
 .toast-message {
   flex: 1;
+  min-width: 0;
 }
 
 .toast-title {
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .toast-message p {
@@ -123,48 +180,13 @@
   margin: 0;
 }
 
-/* Payroll emphasis */
 .toast-message strong {
   font-weight: 600;
   color: var(--text-dark);
-}
-
-/* =========================================================
-   ACTIONS
-   ========================================================= */
-
-.toast-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
-}
-
-.toast-actions button {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  padding: 6px 12px;
-
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-
-  border: 1px solid var(--brand-border);
-  background: var(--button-primary);
-  color: #ffffff;
-
-  transition: background 0.2s ease;
-}
-
-.toast-actions button:hover {
-  background: var(--button-primary-hover);
-}
-
-.toast-actions button.secondary {
-  background: transparent;
-  color: var(--brand);
-}
-
-.toast-actions button.secondary:hover {
-  background: var(--background-alt);
+  background: linear-gradient(90deg, var(--brand), var(--success));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* =========================================================
@@ -172,58 +194,194 @@
    ========================================================= */
 
 .toast-close {
-  width: 28px;
-  height: 28px;
-
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background: transparent;
+  background: rgba(255, 255, 255, 0.9);
   border: none;
+  border-radius: 50%;
   color: var(--text-light);
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .toast-close:hover {
   color: var(--text-dark);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: rotate(90deg);
+}
+
+.toast-close:active {
+  transform: scale(0.95) rotate(90deg);
 }
 
 /* =========================================================
-   PROGRESS BAR
+   PROGRESS BAR SYSTEM
    ========================================================= */
 
-.toast-progress {
+.toast-progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.toast-progress {
+  height: 100%;
   width: 100%;
-  background: var(--brand);
+  background: linear-gradient(90deg, 
+    var(--brand) 0%,
+    var(--brand-light) 50%,
+    var(--brand) 100%
+  );
   animation: toast-progress 3s linear forwards;
+  transform-origin: left;
+  position: relative;
+  box-shadow: 0 0 10px rgba(215, 59, 246, 0.3);
+}
+
+.toast-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.8), 
+    transparent
+  );
+  animation: progress-pulse 1.5s ease-in-out infinite;
 }
 
 .custom-toast.success .toast-progress {
-  background: var(--success);
+  background: linear-gradient(90deg, 
+    var(--success) 0%,
+    var(--success-light) 50%,
+    var(--success) 100%
+  );
+  box-shadow: 0 0 10px rgba(165, 16, 185, 0.3);
 }
 
 .custom-toast.error .toast-progress {
-  background: var(--danger);
+  background: linear-gradient(90deg, 
+    var(--danger) 0%,
+    var(--danger-light) 50%,
+    var(--danger) 100%
+  );
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.custom-toast.loading .toast-progress {
+  background: linear-gradient(90deg, 
+    var(--brand) 0%,
+    var(--brand-light) 25%,
+    var(--brand) 50%,
+    var(--brand-light) 75%,
+    var(--brand) 100%
+  );
+  background-size: 200% 100%;
+  animation: loading-progress 2s linear infinite, 
+             toast-progress 6s linear forwards;
+}
+
+.custom-toast:hover .toast-progress {
+  animation-play-state: paused;
 }
 
 /* =========================================================
-   MOBILE
+   ACTIONS
+   ========================================================= */
+
+.toast-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  padding: 0 20px 16px;
+}
+
+.toast-actions button {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+  color: #ffffff;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.toast-actions button:hover {
+  background: linear-gradient(135deg, var(--brand-dark), var(--brand-darker));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.toast-actions button:active {
+  transform: translateY(0);
+}
+
+.toast-actions button.secondary {
+  background: transparent;
+  color: var(--brand);
+  border: 1px solid rgba(209, 213, 219, 0.5);
+  box-shadow: none;
+}
+
+.toast-actions button.secondary:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--brand);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   MOBILE RESPONSIVE
    ========================================================= */
 
 @media (max-width: 640px) {
   .custom-toast {
     width: calc(100vw - 24px);
     margin: 8px auto;
+    min-height: 68px;
   }
-
+  
+  .toast-content {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .toast-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
   .toast-actions {
     flex-direction: column;
+    padding: 0 16px 12px;
   }
-
+  
   .toast-actions button {
     width: 100%;
+  }
+  
+  .toast-progress-container {
+    height: 2px;
+  }
+  
+  .toast-progress {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.2);
   }
 }
 
@@ -238,54 +396,73 @@
   outline-offset: 2px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* =========================================================
    ANIMATIONS
    ========================================================= */
 
 @keyframes toast-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-/* Progress bar */
+@keyframes toast-slide-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(30px); }
+}
+
 @keyframes toast-progress {
-  from {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(0);
-  }
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
 
-/* SUCCESS */
+@keyframes progress-pulse {
+  0%, 100% { opacity: 0.5; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(-10px); }
+}
+
+@keyframes loading-progress {
+  0% { background-position: 200% 0; }
+  100% { background-position: 0 0; }
+}
+
+@keyframes progress-complete {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @keyframes icon-success {
-  0% { transform: scale(0.85); opacity: 0.6; }
-  60% { transform: scale(1.05); opacity: 1; }
-  100% { transform: scale(1); }
+  0% { transform: scale(0.5) rotate(-90deg); opacity: 0; }
+  60% { transform: scale(1.1) rotate(10deg); }
+  80% { transform: scale(0.95) rotate(-5deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-/* ERROR */
 @keyframes icon-error {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  50% { transform: translateX(2px); }
-  75% { transform: translateX(-1px); }
-  100% { transform: translateX(0); }
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.2) rotate(-5deg); }
+  40% { transform: scale(1.2) rotate(5deg); }
+  60% { transform: scale(1.1) rotate(-3deg); }
+  80% { transform: scale(1.1) rotate(3deg); }
 }
 
-/* INFO */
 @keyframes icon-info {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-/* LOADING */
 @keyframes icon-loading {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -298,7 +475,18 @@
 @media (prefers-reduced-motion: reduce) {
   .custom-toast,
   .toast-progress,
-  .toast-icon {
+  .toast-icon,
+  .toast-close,
+  .toast-actions button {
     animation: none !important;
+    transition: none !important;
+  }
+  
+  .custom-toast.toast-enter {
+    opacity: 1;
+  }
+  
+  .custom-toast.toast-exit {
+    opacity: 0;
   }
 }

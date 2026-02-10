@@ -155,7 +155,7 @@ export default function GenaralLocationForm() {
     entityId: locationId,
     amendments,
     refreshAmendments: fetchEntityAmendData,
-    entity: "location",
+    entity: " location ",
     saveEntity: saveLocation,
   });
 
