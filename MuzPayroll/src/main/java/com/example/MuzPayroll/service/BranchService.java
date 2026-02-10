@@ -36,7 +36,7 @@ public class BranchService extends MuzirisAbstractService<BranchDTO, BranchMst> 
     @Autowired
     private BranchLogService branchLogService;
 
-    @Autowired
+    @Autowired  
     private AuthorizationRepository authorizationRepository;
 
     @Autowired

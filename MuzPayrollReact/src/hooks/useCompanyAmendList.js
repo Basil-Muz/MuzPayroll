@@ -9,6 +9,7 @@ export const useCompanyAmendList = () => {
 
   const fetchCompanyAmendData = useCallback(
     async (companyId) => {
+      
       try {
         const response = await getCompanyAmendList(companyId);
 

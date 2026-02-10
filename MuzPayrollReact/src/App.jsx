@@ -1,5 +1,5 @@
 import "./App.css";
-import React from "react";
+// import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import { Toaster, toast } from "react-hot-toast";
@@ -51,6 +51,7 @@ import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 import LoaderRenderer from "./components/Loaders/LoaderRenderer.jsx";
 import LocationGroupRightsMapping from "./pages/LocationGroupRightMaping/LocationGroupRightMapping.jsx";
 
+
 function App() {
   return (
     <>
@@ -59,7 +60,8 @@ function App() {
 
         <Routes>
           {/* <Route path="/" element={<Page />} /> */}
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/payroll" element={<LoginPage />} />
+          <Route path="/payrollemp" element={<LoginPage/>}/>
           <Route path="/home" element={<LoggedPage />} />
           <Route path="/company" element={<Companyform />} />
           <Route path="/generalform" element={<GeneralForm />} />
@@ -79,29 +81,23 @@ function App() {
           <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
           <Route path="/designation" element={<Designation />} />
           <Route path="/branchform" element={<BranchPageForm />} />
-          <Route
-            path="/companyform"
-            element={
+          <Route path="/companyform" element={
               <ProtectedRoute>
-                <CompanyPageForm />
+              <CompanyPageForm />
               </ProtectedRoute>
             }
           />
           <Route path="/locationform" element={<LocationPageForm />} />
 
-          <Route
-            path="/companylist"
-            element={
+          <Route path="/companylist" element={
               <ProtectedRoute>
-                <CompanyList />
+              <CompanyList />
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/company/:companyId"
-            element={
+          <Route path="/company/:companyId" element={
               <ProtectedRoute>
-                <CompanyPageForm />
+              <CompanyPageForm />
               </ProtectedRoute>
             }
           />

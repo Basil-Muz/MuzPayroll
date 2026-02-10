@@ -7,9 +7,15 @@ import { RiAdminFill } from "react-icons/ri";
 import { TbPasswordUser } from "react-icons/tb";
 import { IoEye } from "react-icons/io5";
 import { IoEyeOff } from "react-icons/io5";
+import { normalizeUserCode } from "../../utils/userCodeUtils.js";
+import { loginUser } from "../../services/login.service.js";
+import { useLocation } from "react-router-dom";
+
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const { login } = useAuth();
 
   const [userCode, setUserCode] = useState("");
@@ -21,30 +27,18 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [commonError, setCommonError] = useState("");
 
-  // Handle typing: Allow only letters + numbers
-  const handleUserCodeChange = (e) => {
-    const value = e.target.value;
-    const cleaned = value.replace("@muziris", "");
+  const [attemptsLeft, setAttemptsLeft] = useState(null);
+  const [accountLocked, setAccountLocked] = useState(false);
 
-    if (/^[A-Za-z0-9]*$/.test(cleaned)) {
-      setUserCode(value);
-      setUserCodeError("");
-    } else {
-      setUserCodeError("User code must contain letters or numbers only.");
-    }
-  };
+  const [displayUserCode, setDisplayUserCode] = useState("");
 
-  // On blur add "@muziris"
-  const handleUserCodeBlur = () => {
-    let value = userCode.trim().replace("@muziris", "");
-    if (value) setUserCode(value + "@muziris");
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault(); // KEY FIX
-    handleLogin();
-  };
-
+  const solutionId = location.pathname.includes("emp") ? 2 : 1;
+ 
   const handleLogin = async () => {
+    setAttemptsLeft(null);
+    setAccountLocked(false);
+    setCommonError("");
+
     setUserCodeError("");
     setPasswordError("");
 
@@ -60,31 +54,52 @@ function LoginPage() {
     }
     if (!isValid) return;
 
-    try {
-      const response = await fetch("http://localhost:8087/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userCode: userCode, password }),
-      });
+    const { value, cleaned } = normalizeUserCode(userCode);
 
-      const data = await response.json();
+    try {
+      const data = await loginUser({
+        userCode: value,
+        password,
+
+      });
       console.log("LOGIN RESPONSE FROM BACKEND:", data);
 
       if (!data.success) {
-        setCommonError(data.errors || "Invalid credentials.");
+        const errorMsg = Array.isArray(data.errors)
+          ? data.errors[0]
+          : data.errors;
+
+        setCommonError(errorMsg);
+
+        // Account locked
+        if (errorMsg.includes("Maximum login attempts")) {
+          setAccountLocked(true);
+          setAttemptsLeft(0);
+        }
+
+        // Attempts left
+        if (errorMsg.includes("Attempts left")) {
+          const match = errorMsg.match(/\d+/);
+          if (match) {
+            setAttemptsLeft(Number(match[0]));
+          }
+        }
+
         return;
       }
-      const cleanUserCode = userCode.replace("@muziris", ""); //Removes the @muziris
+
+
       // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
-      const payload = data.data; //  IMPORTANT
+      const payload = data.data;
       const loginData = {
-        userCode: cleanUserCode,
+        userCode: cleaned,
         userName: payload.userName,
         companyId: payload.companyId,
         branchId: payload.branchId,
         locationId: payload.locationId,
         token: payload.token,
         sidebarOpen: false,
+        solutionId: solutionId,
       };
 
       login(loginData);
@@ -93,6 +108,37 @@ function LoginPage() {
       setCommonError("Server error.");
       console.error("Login error:", error);
     }
+
+  };
+
+  // Handle typing: Allow only letters + numbers
+  const handleUserCodeChange = (e) => {
+    const input = e.target.value;
+    const usercode = normalizeUserCode(input);
+
+    if (/^[A-Za-z0-9]*$/.test(usercode.cleaned)) {
+      setUserCode(usercode.cleaned);          // internal clean value
+      setDisplayUserCode(usercode.cleaned);
+      setUserCodeError("");
+    } else {
+      setUserCodeError("User code must contain letters or numbers only.");
+    }
+  };
+
+  // On blur add "@muziris"
+  const handleUserCodeBlur = () => {
+    const { value } = normalizeUserCode(userCode);
+    setDisplayUserCode(value);
+  };
+
+  const handleUserCodeFocus = () => {
+    setDisplayUserCode(userCode);
+  };
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleLogin();
   };
 
   return (
@@ -108,12 +154,12 @@ function LoginPage() {
             <label>User Code</label>
             <div className="input-wrapper">
               <RiAdminFill className="input-inside-icon" />
-
               <input
                 type="text"
-                value={userCode}
+                value={displayUserCode}
                 onChange={handleUserCodeChange}
                 onBlur={handleUserCodeBlur}
+                onFocus={handleUserCodeFocus}
                 placeholder="e.g. abc, not abc@muziris"
                 className={userCodeError ? "input-error" : ""}
                 autoFocus
@@ -154,10 +200,25 @@ function LoginPage() {
             {/* Common Error */}
             {commonError && <p className="common-error-msg">{commonError}</p>}
 
+            {/* Attempt warning
+            {attemptsLeft !== null && !accountLocked && (
+              <p className="warning-msg">
+                Attempts left: {attemptsLeft}
+              </p>
+            )} */}
+
+            {/* Account locked */}
+            {/* {accountLocked && (
+              <p className="error-msg">
+               Please contact admin or reset password.
+              </p>
+            )} */}
+
             {/* Login Button */}
-            <button type="submit" className="login-btn">
+            <button type="submit" className="login-btn" disabled={accountLocked}>
               Submit
             </button>
+
 
             {/* Forgot Password */}
             <p

@@ -57,37 +57,29 @@ public class EntityHierarchyInfo {
 
     @ManyToOne
     @JoinColumn(name = "EhiCompanyID", nullable = true)
-    private CompanyMst companyMst;
-
-    public CompanyMst getCompanyMst() {
-        return companyMst;
-    }
-
-    public void setCompanyMst(CompanyMst companyMst) {
-        this.companyMst = companyMst;
-    }
+    private EntityMst companyMst;
 
     @ManyToOne
     @JoinColumn(name = "EhiBranchID", nullable = true)
-    private BranchMst branchMst;
+    private EntityMst branchMst;
 
-    public BranchMst getBranchMst() {
+    public EntityMst getBranchMst() {
         return branchMst;
     }
 
-    public void setBranchMst(BranchMst branchMst) {
+    public void setBranchMst(EntityMst branchMst) {
         this.branchMst = branchMst;
     }
 
     @ManyToOne
     @JoinColumn(name = "EhiLocationID", nullable = true)
-    private LocationMst locationMst;
+    private EntityMst locationMst;
 
-    public LocationMst getLocationMst() {
+    public EntityMst getLocationMst() {
         return locationMst;
     }
 
-    public void setLocationMst(LocationMst locationMst) {
+    public void setLocationMst(EntityMst locationMst) {
         this.locationMst = locationMst;
     }
 
@@ -123,6 +115,14 @@ public class EntityHierarchyInfo {
 
     public void setMuzControlCodes(MuzControlCodes muzControlCodes) {
         this.muzControlCodes = muzControlCodes;
+    }
+
+    public EntityMst getCompanyMst() {
+        return companyMst;
+    }
+
+    public void setCompanyMst(EntityMst companyMst) {
+        this.companyMst = companyMst;
     }
 
 }

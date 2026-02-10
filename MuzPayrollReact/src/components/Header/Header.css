@@ -38,7 +38,7 @@
   height: 46px; */
   padding-right: 16px;
 
-  border-right: 1px solid var(--border-light);
+  /* border-right: 1px solid var(--border-light); */
   flex-shrink: 0;
 }
 
@@ -518,7 +518,7 @@
 }
 
 /* Error Message */
-.error-msg {
+.header .error-msg {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -751,4 +751,36 @@
   to {
     transform: translateY(-50%) rotate(360deg);
   }
+
 }
+
+/* Brand accent line */
+.header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--brand)
+}
+/* ==============================================
+   HEADER LOGO WIDTH = SIDEBAR WIDTH
+   ============================================== */
+/* 
+.logo {
+  width: 92px;
+  min-width: 72px;
+
+  justify-content: center;
+  padding-right: 0;
+  border-right: 1px solid var(--border-light);
+} */
+/* ===============================
+   HEADER – PINK GRADIENT
+   =============================== */
+
+
+
+
+

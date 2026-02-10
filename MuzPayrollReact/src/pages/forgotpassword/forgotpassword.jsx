@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../LoginPage/loginpage.css"
+import "../LoginPage/loginpage.css";
 import { RiAdminFill } from "react-icons/ri";
 
 function ForgotPassword() {
@@ -10,76 +10,127 @@ function ForgotPassword() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(1);
+  const [otp, setOtp] = useState("");
 
+
+  // Normalize user code (append @muziris if missing)
   const normalizeUserCode = () => {
     const value = userCode.trim();
-    if (!value) return false;
+    if (!value) {
+      setError("User code is required");
+      return null;
+    }
 
     const username = value.replace("@muziris", "");
-
     const isValid = /^[a-zA-Z0-9]+$/.test(username);
+
     if (!isValid) {
       setError("User code must contain only letters and numbers");
-      return false;
+      return null;
     }
 
+    const finalUserCode = value.endsWith("@muziris")
+      ? value
+      : username + "@muziris";
+
+    setUserCode(finalUserCode); // UI update
     setError("");
 
-    if (!value.endsWith("@muziris")) {
-      setUserCode(username + "@muziris");
-    }
-
-    return true;
+    return finalUserCode; //  THIS IS THE KEY
   };
 
-
-  const handleBlur = () => {
-    normalizeUserCode();
-  };
-
-
-  const handleSubmit = async () => {
+  // STEP 1️⃣ : SEND OTP
+  const sendOtp = async () => {
     setMessage("");
     setError("");
 
-    const isValid = normalizeUserCode();
-    if (!isValid) return;
+    const finalUserCode = normalizeUserCode(); // ✅ STORE IT
+    if (!finalUserCode) return;
 
-    if (!userCode.trim()) {
-      setError("User code is required");
-      return;
-    }
+    console.log("Sending userCode:", finalUserCode);
+
+    setLoading(true);
 
     try {
-      setLoading(true);
-
-      const response = await fetch("http://localhost:8087/forgot-password", {
+      const response = await fetch("http://localhost:8087/forgot-password/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userCode: userCode.trim() }),
+        body: JSON.stringify({
+          userCode: finalUserCode,
+        }),
       });
 
-      const data = await response.json();
-      console.log("API RESPONSE:", data);
+      // const data = await response.json();
+      console.log("Sending userCode:", finalUserCode);
+      //  error case
+      if (!response.ok) {
+        const text = await response.text(); // 👈 VERY IMPORTANT
+        console.error("Backend error raw:", text);
 
-      if (!response.ok || data.success === false) {
-        setError(
-          (data.errors && data.errors[0]) ||
-          data.message ||
-          "Failed to send password"
-        );
+        try {
+          const json = JSON.parse(text);
+          setError(json.errors?.[0] || "Request failed");
+        } catch {
+          setError(text || "Request failed");
+        }
         return;
       }
 
-      setMessage("Password sent to registered email");
-      setUserCode("");
-    } catch (err) {
+      // ✅ SUCCESS
+      const data = await response.json();
+      setMessage("OTP sent to registered email");
+      setStep(2)
+    } catch (e) {
       setError("Server error. Try again later.");
     } finally {
       setLoading(false);
     }
   };
 
+  const verifyOtp = async () => {
+    if (!otp) {
+      setError("OTP is required");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const res = await fetch(
+        "http://localhost:8087/forgot-password/verify-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userCode: userCode.trim(),
+            otp: otp.trim(),
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log("Sending userCode:", userCode.trim());
+
+      // ✅ HANDLE INVALID OTP HERE
+      if (!res.ok || data.success === false) {
+        setError(data.errors?.[0] || "Invalid OTP");
+        return;
+      }
+
+      // ✅ SUCCESS → GO NEXT
+      navigate("/changepassword", {
+        state: { userCode: userCode.trim(), forgotFlow: true },
+      });
+
+    } catch (e) {
+      setError("Server error. Try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="login-container">
@@ -87,49 +138,86 @@ function ForgotPassword() {
         <div className="logo-section">
           <h2>Forgot Password</h2>
         </div>
+
         <form
           onSubmit={(e) => {
-            e.preventDefault(); // 🔥 IMPORTANT
-            handleSubmit();
+            e.preventDefault(); // 
+            if (step === 1) {
+              sendOtp();
+            } else if (step === 2) {
+              verifyOtp();
+            }
           }}
         >
 
-          <div className="form-group1">
-            <label>User Code</label>
-            <div className="input-wrapper">
-              <RiAdminFill className="input-inside-icon" />
-              <input
-                type="text"
-                placeholder="e.g.abc, not abc@muziris"
-                value={userCode}
-                onChange={(e) => setUserCode(e.target.value)}
-                onBlur={handleBlur}
-                autoFocus
-                className={error ? "input-error" : ""}
-              />
-            </div>
-          </div>
+          {/* STEP 1 : USER CODE */}
+          {step === 1 && (
+            <>
+              <div className="form-group1">
+                <label>User Code</label>
+                <div className="input-wrapper">
+                  <RiAdminFill className="input-inside-icon" />
+                  <input
+                    type="text"
+                    placeholder="e.g. abc (not abc@muziris)"
+                    value={userCode}
+                    onChange={(e) => setUserCode(e.target.value)}
+                    onBlur={normalizeUserCode}
+                    disabled={loading}
+                    autoFocus
+                  />
+                </div>
+              </div>
+              {error && <p className="error-msg">{error}</p>}
+              {message && <p className="success-msg">{message}</p>}
 
-          {error && <p className="error-msg">{error}</p>}
-          {message && <p className="success-msg">{message}</p>}
+              <button
+                type="submit"
+                className="login-btn"
+                // onClick={sendOtp}
+                disabled={loading}
+              >
+                {loading ? "SENDING OTP..." : "SEND OTP"}
+              </button>
+            </>
+          )}
 
-          <button
-            type="submit"
-            className="login-btn"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? "SENDING..." : "SEND PASSWORD"}
-          </button>
+
+          {/* STEP 2 : OTP */}
+          {step === 2 && (
+            <>
+              <div className="form-group1">
+                <label>Enter OTP</label>
+                <div className="input-wrapper">
+                  <input
+                    type="text"
+                    placeholder="Enter OTP"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    disabled={loading}
+                    autoFocus
+                  />
+                </div>
+              </div>
+              {error && <p className="error-msg">{error}</p>}
+              {message && <p className="success-msg">{message}</p>}
+
+              <button
+                type="submit"
+                className="login-btn"
+                // onClick={verifyOtp}
+                disabled={loading}
+              >
+                {loading ? "VERIFYING..." : "VERIFY OTP"}
+              </button>
+            </>
+          )}
         </form>
-
         <p className="forgot-link" onClick={() => navigate("/")}>
           Back to Login
         </p>
       </div>
     </div>
   );
-
 }
-
 export default ForgotPassword;

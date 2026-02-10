@@ -5,7 +5,7 @@ import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.LocationMst;
 
-public class LoginResponse {
+public class LoginResponseDTO {
 
     private boolean success;
     private String message;
@@ -17,6 +17,10 @@ public class LoginResponse {
 
     private String userName;
     private String locationName;
+
+    private Integer attemptCount;
+    private Integer maxAttempts;
+    private Boolean accountLocked;
 
     private CompanyMst companyList;
     private List<BranchMst> branchList;
@@ -84,6 +88,28 @@ public class LoginResponse {
 
     public void setCompany(CompanyMst companyList) {
         this.companyList = companyList;
+    }
+
+    public Integer getAttemptCount() {
+        return attemptCount;
+    }
+
+    public void setAttemptCount(Integer attemptCount) {
+        this.attemptCount = attemptCount;
+    }   
+    public Integer getMaxAttempts() {
+        return maxAttempts;
+    }
+
+    public void setMaxAttempts(Integer maxAttempts) {
+        this.maxAttempts = maxAttempts;
+    }
+    public Boolean getAccountLocked() {
+        return accountLocked;
+    }
+
+    public void setAccountLocked(Boolean accountLocked) {
+        this.accountLocked = accountLocked;
     }
 
     public List<BranchMst> getBranchList() {

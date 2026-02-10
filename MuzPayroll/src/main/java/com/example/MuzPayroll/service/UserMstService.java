@@ -11,12 +11,13 @@ import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.ChangePasswordRequest;
+ 
 // import com.example.MuzPayroll.entity.DTO.CompanyDTO;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordRequest;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordResponse;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordOtpRequestDTO;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequestDTO;
 import com.example.MuzPayroll.entity.DTO.JwtUtil;
-import com.example.MuzPayroll.entity.DTO.LoginRequest;
-import com.example.MuzPayroll.entity.DTO.LoginResponse;
+import com.example.MuzPayroll.entity.DTO.LoginRequestDTO;
+import com.example.MuzPayroll.entity.DTO.LoginResponseDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.BranchRepository;
 import com.example.MuzPayroll.repository.CompanyRepository;
@@ -46,8 +47,7 @@ public class UserMstService {
 
     // ============================
     // LOGIN (AUTHENTICATION ONLY)
-    // ============================
-    public Response<LoginResponse> login(LoginRequest request) {
+      public Response<LoginResponseDTO> login(LoginRequestDTO request) {
 
         List<String> errors = new ArrayList<>();
 
@@ -59,6 +59,7 @@ public class UserMstService {
         if (userCode != null) {
             userCode = userCode.replace("@muziris", "");
         }
+
         if (userCode == null || userCode.isBlank()) {
             errors.add("User code is required");
         }
@@ -67,53 +68,93 @@ public class UserMstService {
             errors.add("Password is required");
         }
 
-        UserMst user = userRepo.findByUserCode(userCode);
-
-        if (user == null || !user.getPassword().equals(request.getPassword())) {
-            errors.add("Invalid user code or password");
-
-        }
         if (!errors.isEmpty()) {
             return Response.error(errors);
         }
-        LoginResponse resp = new LoginResponse();
+
+        UserMst user = userRepo.findByUserCode(userCode);
+
+        if (user == null) {
+            return Response.error("Invalid user code or password");
+        }
+
+        int maxAttempts = 3;
+        int currentAttempt = user.getUserAttempt() == null ? 0 : user.getUserAttempt();
+
+        // Account already locked
+        if (currentAttempt >= maxAttempts) {
+            return Response.error(
+                "Maximum login attempts exceeded. Please use Forgot Password."
+            );
+        }
+
+        // Password mismatch
+        if (!user.getPassword().equals(request.getPassword())) {
+
+            currentAttempt++;
+            user.setUserAttempt(currentAttempt);
+            userRepo.save(user);
+
+            int remaining = maxAttempts - currentAttempt;
+
+            if (remaining > 0) {
+                return Response.error(
+                    "Invalid password. Attempts left: " + remaining
+                );
+            } else {
+                return Response.error(
+                    "Maximum login attempts exceeded. Please use Forgot Password."
+                );
+            }
+        }
+
+        // SUCCESS → RESET ATTEMPT
+        user.setUserAttempt(0);
+        userRepo.save(user);
+
+        LoginResponseDTO resp = new LoginResponseDTO();
         resp.setSuccess(true);
         resp.setMessage("Login successful");
-
-        // SEND ONLY IDs
+        resp.setUserName(user.getUserName());
         resp.setCompanyId(user.getCompanyEntity().getCompanyMstID());
         resp.setBranchId(user.getBranchEntity().getBranchMstID());
         resp.setLocationId(user.getLocationEntity().getLocationMstID());
-        resp.setUserName(user.getUserName());
 
         String token = jwtUtil.generateToken(user.getUserCode());
         resp.setToken(token);
-        // resp.setLocationName(user.getLocationEntity().getLocation());
 
         return Response.success(resp);
     }
 
-    public Response<LoginResponse> getUserContext(Long companyId, Long branchId, Long locationId, String userCode) {
+    // ============================
+    // USER CONTEXT
+    // ============================
+    public Response<LoginResponseDTO> getUserContext(
+            Long companyId,
+            Long branchId,
+            Long locationId,
+            String userCode) {
+
         List<String> errors = new ArrayList<>();
 
         if (userCode == null || userCode.isBlank()) {
             errors.add("User code is required");
         }
-
         if (companyId == null) {
             errors.add("Company ID is required");
         }
-
         if (branchId == null) {
             errors.add("Branch ID is required");
         }
-
         if (locationId == null) {
             errors.add("Location ID is required");
         }
 
-        UserMst user = userRepo.findByUserCode(userCode.replace("@muziris", ""));
+        if (!errors.isEmpty()) {
+            return Response.error(errors);
+        }
 
+        UserMst user = userRepo.findByUserCode(userCode.replace("@muziris", ""));
         if (user == null) {
             return Response.error("User not found");
         }
@@ -124,18 +165,9 @@ public class UserMstService {
         }
 
         List<BranchMst> branches = getAllBranches(companyId);
-        if (branches == null || branches.isEmpty()) {
-            return Response.error("No branches found for company");
-        }
-
         List<LocationMst> locations = getAllLocations(branchId);
-        if (locations == null || locations.isEmpty()) {
-            return Response.error("No locations found for branch");
-        }
-        if (!errors.isEmpty()) {
-            return Response.error(errors);
-        }
-        LoginResponse resp = new LoginResponse();
+
+        LoginResponseDTO resp = new LoginResponseDTO();
         resp.setSuccess(true);
         resp.setUserName(user.getUserName());
         resp.setLocationName(user.getLocationEntity().getLocation());
@@ -150,9 +182,7 @@ public class UserMstService {
     }
 
     public CompanyMst getCompany(Long companyId) {
-        return companyRepo.findById(companyId)
-                .orElse(null);
-
+        return companyRepo.findById(companyId).orElse(null);
     }
 
     public List<BranchMst> getAllBranches(Long companyId) {
@@ -162,83 +192,9 @@ public class UserMstService {
     public List<LocationMst> getAllLocations(Long branchId) {
         return locationRepo.findAll()
                 .stream()
-                .filter(loc -> loc.getBranchEntity().getBranchMstID().equals(branchId))
+                .filter(l -> l.getBranchEntity().getBranchMstID().equals(branchId))
                 .toList();
     }
 
-    // CHANGE PASSWORD
-    public Response<Boolean> changePassword(ChangePasswordRequest request) {
-
-        List<String> errors = new ArrayList<>();
-
-        if (request == null) {
-            return Response.error("Request cannot be null");
-        }
-
-        String userCode = request.getUserCode();
-        if (userCode != null) {
-            userCode = userCode.replace("@muziris", "");
-        }
-
-        if (userCode == null || userCode.isBlank()) {
-            errors.add("User code is required");
-        }
-
-        if (request.getCurrentPassword() == null) {
-            errors.add("Current password is required");
-        }
-
-        if (request.getNewPassword() == null) {
-            errors.add("New password is required");
-        }
-
-        UserMst user = userRepo.findByUserCode(userCode);
-
-        if (user == null) {
-            return Response.error("User not found");
-        }
-
-        if (!user.getPassword().equals(request.getCurrentPassword())) {
-            return Response.error("Current password is incorrect");
-        }
-        if (!errors.isEmpty()) {
-            return Response.error(errors);
-        }
-
-        user.setPassword(request.getNewPassword());
-        userRepo.save(user);
-
-        return Response.success(true);
-    }
-
-    // FORGOT PASSWORD
-    // ============================
-    public Response<ForgotPasswordResponse> forgotPassword(ForgotPasswordRequest request) {
-
-        if (request == null || request.getUserCode() == null) {
-            return Response.error("User code is required");
-        }
-
-        String userCode = request.getUserCode().replace("@muziris", "");
-
-        UserMst user = userRepo.findByUserCode(userCode);
-
-        if (user == null) {
-            return Response.error("Invalid user code");
-        }
-        try {
-            emailService.sendPassword(user.getEmail(), user.getPassword());
-        } catch (Exception e) {
-            return Response.error("Email service failed. Try again later", 500);
-        }
-
-        // emailService.sendPassword(user.getEmail(), user.getPassword());
-
-        ForgotPasswordResponse resp = new ForgotPasswordResponse();
-        resp.setSuccess(true);
-        resp.setMessage("Password sent to registered email");
-
-        return Response.success(resp);
-    }
-
+    
 }
