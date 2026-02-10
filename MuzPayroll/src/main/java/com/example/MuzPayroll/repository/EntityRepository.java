@@ -28,4 +28,25 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
     List<Object[]> getUserEntities(
             @Param("userId") Integer userId,
             @Param("mccId") Integer mccId);
+
+    @Query(value = """
+            SELECT
+                uel.uel_entity_hierarchyid,
+                em.etm_name,
+                mcc.mcc_name
+            FROM user_and_entity_link uel
+            JOIN entity_mst em
+                ON uel.uel_entity_hierarchyid = em.etm_entityid
+            JOIN muz_control_codes mcc
+                ON mcc.mccid = em.etm_entity_type_mccid
+            JOIN entity_hierarchy_info
+                ON entity_hierarchy_info.ehi_entity_hierarchyid = entity_mst.etm_entityid
+            WHERE mcc.mccid = :mccId
+            AND uel.uel_userid = :userId
+            AND entity_hierarchy_info.ehi_branchid =:branchId
+            """, nativeQuery = true)
+    List<Object[]> getUserLocation(
+            @Param("userId") Integer userId,
+            @Param("branchId") Integer branchId,
+            @Param("mccId") Integer mccId);
 }

@@ -1,5 +1,7 @@
 package com.example.MuzPayroll.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -32,11 +34,11 @@ public class EntityRightsGrpMst {
     @JoinColumn(name = "ErmEntityHierarchyID", nullable = true)
     private EntityHierarchyInfo entityHierarchyInfo;
 
-    @Column(nullable = false)
-    private Long ErmAuthInfoID;
+    @Column(name = "ErmActiveDate", nullable = false)
+    private LocalDate activeDate;
 
-    @Column(nullable = false)
-    private Boolean ErmTransValidYN;
+    @Column(name = "ErmInActiveDate", nullable = true)
+    private LocalDate InactiveDate;
 
     public Long getErmEntityGroupID() {
         return ErmEntityGroupID;
@@ -94,19 +96,19 @@ public class EntityRightsGrpMst {
         this.entityHierarchyInfo = entityHierarchyInfo;
     }
 
-    public Long getErmAuthInfoID() {
-        return ErmAuthInfoID;
+    public LocalDate getActiveDate() {
+        return activeDate;
     }
 
-    public void setErmAuthInfoID(Long ErmAuthInfoID) {
-        this.ErmAuthInfoID = ErmAuthInfoID;
+    public void setActiveDate(LocalDate activeDate) {
+        this.activeDate = activeDate;
     }
 
-    public Boolean getErmTransValidYN() {
-        return ErmTransValidYN;
+    public LocalDate getInactiveDate() {
+        return InactiveDate;
     }
 
-    public void setErmTransValidYN(Boolean ErmTransValidYN) {
-        this.ErmTransValidYN = ErmTransValidYN;
+    public void setInactiveDate(LocalDate InactiveDate) {
+        this.InactiveDate = InactiveDate;
     }
 }

@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.MuzPayroll.entity.SolutionMst;
 import com.example.MuzPayroll.entity.DTO.UserEntityDTO;
 import com.example.MuzPayroll.service.EntityService;
+import com.example.MuzPayroll.service.SolutionService;
 
 @RestController
 @RequestMapping("/entity")
@@ -36,9 +38,10 @@ public class EntityController {
 
     @GetMapping("/fetchLocation")
     public List<UserEntityDTO> getUserLocation(
-            @RequestParam Integer userId) {
+            @RequestParam Integer userId,
+            @RequestParam Integer branchId) {
 
-        return entityService.getUserEntities(userId, 15);
+        return entityService.getUserLocation(userId, branchId, 15);
     }
 
 }
