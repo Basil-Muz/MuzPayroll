@@ -61,20 +61,26 @@ function ForgotPassword() {
         }),
       });
 
-      const data = await response.json();
+      // const data = await response.json();
       console.log("Sending userCode:", finalUserCode);
       //  error case
-      if (!response.ok || data.success === false) {
-        setError(
-          (data.errors && data.errors[0]) ||
-          data.data?.message ||
-          "Failed to send password"
-        );
+      if (!response.ok) {
+        const text = await response.text(); // 👈 VERY IMPORTANT
+        console.error("Backend error raw:", text);
+
+        try {
+          const json = JSON.parse(text);
+          setError(json.errors?.[0] || "Request failed");
+        } catch {
+          setError(text || "Request failed");
+        }
         return;
       }
 
+      // ✅ SUCCESS
+      const data = await response.json();
       setMessage("OTP sent to registered email");
-      setStep(2); // move to OTP step
+      setStep(2)
     } catch (e) {
       setError("Server error. Try again later.");
     } finally {
@@ -162,7 +168,8 @@ function ForgotPassword() {
                   />
                 </div>
               </div>
-
+              {error && <p className="error-msg">{error}</p>}
+              {message && <p className="success-msg">{message}</p>}
 
               <button
                 type="submit"

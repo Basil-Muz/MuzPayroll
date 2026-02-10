@@ -5,7 +5,7 @@ import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.LocationMst;
 
-public class LoginResponse {
+public class LoginResponseDTO {
 
     private boolean success;
     private String message;

@@ -1,6 +1,6 @@
 package com.example.MuzPayroll.entity.DTO;
 
-public class LoginRequest {
+public class LoginRequestDTO {
     private String userCode;
     private String password;
 

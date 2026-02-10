@@ -2,7 +2,7 @@ package com.example.MuzPayroll.entity.DTO;
 
 // import com.example.MuzPayroll.entity.UserMst;
 
-public class ForgotPasswordOtpRequest {
+public class ForgotPasswordOtpRequestDTO {
 
     private String userCode;
     private String email;

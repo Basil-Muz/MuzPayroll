@@ -13,11 +13,11 @@ import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.ChangePasswordRequest;
  
 // import com.example.MuzPayroll.entity.DTO.CompanyDTO;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordOtpRequest;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequest;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordOtpRequestDTO;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequestDTO;
 import com.example.MuzPayroll.entity.DTO.JwtUtil;
-import com.example.MuzPayroll.entity.DTO.LoginRequest;
-import com.example.MuzPayroll.entity.DTO.LoginResponse;
+import com.example.MuzPayroll.entity.DTO.LoginRequestDTO;
+import com.example.MuzPayroll.entity.DTO.LoginResponseDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.BranchRepository;
 import com.example.MuzPayroll.repository.CompanyRepository;
@@ -47,7 +47,7 @@ public class UserMstService {
 
     // ============================
     // LOGIN (AUTHENTICATION ONLY)
-      public Response<LoginResponse> login(LoginRequest request) {
+      public Response<LoginResponseDTO> login(LoginRequestDTO request) {
 
         List<String> errors = new ArrayList<>();
 
@@ -112,7 +112,7 @@ public class UserMstService {
         user.setUserAttempt(0);
         userRepo.save(user);
 
-        LoginResponse resp = new LoginResponse();
+        LoginResponseDTO resp = new LoginResponseDTO();
         resp.setSuccess(true);
         resp.setMessage("Login successful");
         resp.setUserName(user.getUserName());
@@ -129,7 +129,7 @@ public class UserMstService {
     // ============================
     // USER CONTEXT
     // ============================
-    public Response<LoginResponse> getUserContext(
+    public Response<LoginResponseDTO> getUserContext(
             Long companyId,
             Long branchId,
             Long locationId,
@@ -167,7 +167,7 @@ public class UserMstService {
         List<BranchMst> branches = getAllBranches(companyId);
         List<LocationMst> locations = getAllLocations(branchId);
 
-        LoginResponse resp = new LoginResponse();
+        LoginResponseDTO resp = new LoginResponseDTO();
         resp.setSuccess(true);
         resp.setUserName(user.getUserName());
         resp.setLocationName(user.getLocationEntity().getLocation());

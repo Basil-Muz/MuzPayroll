@@ -9,22 +9,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.MuzPayroll.entity.PasswordOtp;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequest;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequestDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.PasswordOtpRepository;
 
 @Service
 public class ForgotPasswordVerifyOtpService
-        extends MuzirisAbstractService<ForgotPasswordVerifyRequest, PasswordOtp> {
+        extends MuzirisAbstractService<ForgotPasswordVerifyRequestDTO, PasswordOtp> {
 
     @Autowired
     private PasswordOtpRepository otpRepo;
 
     @Transactional
     public Response<Boolean> verifyOtp(
-            ForgotPasswordVerifyRequest request) {
+            ForgotPasswordVerifyRequestDTO request) {
 
-        Response<ForgotPasswordVerifyRequest> resp = save(List.of(request), "VERIFY_OTP");
+        Response<ForgotPasswordVerifyRequestDTO> resp = save(List.of(request), "VERIFY_OTP");
 
         return resp.isSuccess()
                 ? Response.success(true)
@@ -33,10 +33,10 @@ public class ForgotPasswordVerifyOtpService
 
     @Override
     public Response<Boolean> entityValidate(
-            List<ForgotPasswordVerifyRequest> dtos,
+            List<ForgotPasswordVerifyRequestDTO> dtos,
             String mode) {
 
-        ForgotPasswordVerifyRequest req = dtos.get(0);
+        ForgotPasswordVerifyRequestDTO req = dtos.get(0);
 
         if (req.getUserCode() == null || req.getOtp() == null) {
             return Response.error("User code and OTP required");
@@ -47,10 +47,10 @@ public class ForgotPasswordVerifyOtpService
 
     @Override
     public Response<Boolean> entityPopulate(
-            List<ForgotPasswordVerifyRequest> dtos,
+            List<ForgotPasswordVerifyRequestDTO> dtos,
             String mode) {
 
-        ForgotPasswordVerifyRequest req = dtos.get(0);
+        ForgotPasswordVerifyRequestDTO req = dtos.get(0);
 
         Optional<PasswordOtp> otpOptional = otpRepo.findTopByUserCodeAndOtpAndUsedFalseOrderByIdDesc(
                 req.getUserCode().replace("@muziris", ""), req.getOtp());
@@ -68,10 +68,10 @@ public class ForgotPasswordVerifyOtpService
 
     @Override
     public Response<Boolean> businessValidate(
-            List<ForgotPasswordVerifyRequest> dtos,
+            List<ForgotPasswordVerifyRequestDTO> dtos,
             String mode) {
 
-        ForgotPasswordVerifyRequest req = dtos.get(0);
+        ForgotPasswordVerifyRequestDTO req = dtos.get(0);
 
         Optional<PasswordOtp> otpOptional = otpRepo.findTopByUserCodeAndOtpAndUsedFalseOrderByIdDesc(
                 req.getUserCode().replace("@muziris", ""),
@@ -92,7 +92,7 @@ public class ForgotPasswordVerifyOtpService
 
     @Override
     public Response<Object> generatePK(
-            List<ForgotPasswordVerifyRequest> dtos,
+            List<ForgotPasswordVerifyRequestDTO> dtos,
             String mode) {
 
         // No PK generation required
@@ -101,7 +101,7 @@ public class ForgotPasswordVerifyOtpService
 
     @Override
     public Response<String> generateSerialNo(
-            List<ForgotPasswordVerifyRequest> dtos,
+            List<ForgotPasswordVerifyRequestDTO> dtos,
             String mode) {
 
         // No serial number required
@@ -110,9 +110,9 @@ public class ForgotPasswordVerifyOtpService
 
     @Override
     public Response<PasswordOtp> converttoEntity(
-            List<ForgotPasswordVerifyRequest> dtos) {
+            List<ForgotPasswordVerifyRequestDTO> dtos) {
 
-        ForgotPasswordVerifyRequest req = dtos.get(0);
+        ForgotPasswordVerifyRequestDTO req = dtos.get(0);
 
         Optional<PasswordOtp> otpOptional = otpRepo.findTopByUserCodeAndOtpAndUsedFalseOrderByIdDesc(
                 req.getUserCode().replace("@muziris", ""),
@@ -130,14 +130,14 @@ public class ForgotPasswordVerifyOtpService
     @Override
     protected PasswordOtp saveEntity(
             PasswordOtp entity,
-            List<ForgotPasswordVerifyRequest> dtos,
+            List<ForgotPasswordVerifyRequestDTO> dtos,
             String mode) {
 
         return otpRepo.save(entity);
     }
 
     @Override
-    public ForgotPasswordVerifyRequest entityToDto(PasswordOtp entity) {
+    public ForgotPasswordVerifyRequestDTO entityToDto(PasswordOtp entity) {
         return null;
     }
 }

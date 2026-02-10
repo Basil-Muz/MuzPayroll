@@ -218,7 +218,8 @@ input:-webkit-autofill:active {
 /* ===========================
    ERROR MESSAGE
    =========================== */
-.error-msg {
+.error-msg ,
+.common-error-msg{
   color: #e11d48;
   margin-top: 3px;
   margin-bottom: 10px;

@@ -10,14 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.MuzPayroll.entity.PasswordOtp;
 import com.example.MuzPayroll.entity.UserMst;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordChangeRequest;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordChangeRequestDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.PasswordOtpRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
 @Service
 public class ForgotChangePasswordService
-        extends MuzirisAbstractService<ForgotPasswordChangeRequest, UserMst> {
+        extends MuzirisAbstractService<ForgotPasswordChangeRequestDTO, UserMst> {
 
     @Autowired
     private UserRepository userRepo;
@@ -27,9 +27,9 @@ public class ForgotChangePasswordService
 
     @Transactional
     public Response<Boolean> changePassword(
-            ForgotPasswordChangeRequest request) {
+            ForgotPasswordChangeRequestDTO request) {
 
-        Response<ForgotPasswordChangeRequest> resp = save(List.of(request), "FORGOT_PASSWORD_CHANGE");
+        Response<ForgotPasswordChangeRequestDTO> resp = save(List.of(request), "FORGOT_PASSWORD_CHANGE");
 
         return resp.isSuccess()
                 ? Response.success(true)
@@ -38,10 +38,10 @@ public class ForgotChangePasswordService
 
     @Override
     public Response<Boolean> entityValidate(
-            List<ForgotPasswordChangeRequest> dtos,
+            List<ForgotPasswordChangeRequestDTO> dtos,
             String mode) {
 
-        ForgotPasswordChangeRequest req = dtos.get(0);
+        ForgotPasswordChangeRequestDTO req = dtos.get(0);
 
         if (req.getUserCode() == null || req.getUserCode().isBlank()) {
             return Response.error("User code required");
@@ -72,10 +72,10 @@ public class ForgotChangePasswordService
 
     @Override
     public Response<Boolean> entityPopulate(
-            List<ForgotPasswordChangeRequest> dtos,
+            List<ForgotPasswordChangeRequestDTO> dtos,
             String mode) {
 
-        ForgotPasswordChangeRequest req = dtos.get(0);
+        ForgotPasswordChangeRequestDTO req = dtos.get(0);
 
         UserMst user = userRepo.findByUserCode(
                 req.getUserCode().replace("@muziris", ""));
@@ -88,9 +88,9 @@ public class ForgotChangePasswordService
     }
 
     @Override
-    public Response<Boolean> businessValidate(List<ForgotPasswordChangeRequest> dtos, String mode) {
+    public Response<Boolean> businessValidate(List<ForgotPasswordChangeRequestDTO> dtos, String mode) {
 
-        ForgotPasswordChangeRequest req = dtos.get(0);
+        ForgotPasswordChangeRequestDTO req = dtos.get(0);
 
         UserMst user = userRepo.findByUserCode(
                 req.getUserCode().replace("@muziris", ""));
@@ -121,7 +121,7 @@ public class ForgotChangePasswordService
 
     @Override
     public Response<Object> generatePK(
-            List<ForgotPasswordChangeRequest> dtos,
+            List<ForgotPasswordChangeRequestDTO> dtos,
             String mode) {
 
         // No PK generation needed here
@@ -130,7 +130,7 @@ public class ForgotChangePasswordService
 
     @Override
     public Response<String> generateSerialNo(
-            List<ForgotPasswordChangeRequest> dtos,
+            List<ForgotPasswordChangeRequestDTO> dtos,
             String mode) {
 
         // No serial number needed
@@ -139,14 +139,15 @@ public class ForgotChangePasswordService
 
     @Override
     public Response<UserMst> converttoEntity(
-            List<ForgotPasswordChangeRequest> dtos) {
+            List<ForgotPasswordChangeRequestDTO> dtos) {
 
-        ForgotPasswordChangeRequest req = dtos.get(0);
+        ForgotPasswordChangeRequestDTO req = dtos.get(0);
 
         UserMst user = userRepo.findByUserCode(
                 req.getUserCode().replace("@muziris", ""));
 
         user.setPassword(req.getNewPassword());
+        user.setUserAttempt(0);
 
         return Response.success(user);
     }
@@ -154,16 +155,16 @@ public class ForgotChangePasswordService
     @Override
     protected UserMst saveEntity(
             UserMst entity,
-            List<ForgotPasswordChangeRequest> dtos,
+            List<ForgotPasswordChangeRequestDTO> dtos,
             String mode) {
 
         return userRepo.save(entity);
     }
 
     @Override
-    public ForgotPasswordChangeRequest entityToDto(UserMst entity) {
+    public ForgotPasswordChangeRequestDTO entityToDto(UserMst entity) {
         // We don't need to return anything to frontend
         // Just prevent framework crash
-        return new ForgotPasswordChangeRequest();
+        return new ForgotPasswordChangeRequestDTO();
     }
 }

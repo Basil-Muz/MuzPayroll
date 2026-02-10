@@ -1,11 +1,11 @@
 package com.example.MuzPayroll.controller;
 
 import com.example.MuzPayroll.entity.DTO.ChangePasswordRequest;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordChangeRequest;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordOtpRequest;
-import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequest;
-import com.example.MuzPayroll.entity.DTO.LoginRequest;
-import com.example.MuzPayroll.entity.DTO.LoginResponse;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordChangeRequestDTO;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordOtpRequestDTO;
+import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequestDTO;
+import com.example.MuzPayroll.entity.DTO.LoginRequestDTO;
+import com.example.MuzPayroll.entity.DTO.LoginResponseDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.service.ChangePasswordService;
 import com.example.MuzPayroll.service.ForgotChangePasswordService;
@@ -37,10 +37,10 @@ public class UserLoginController {
     private ForgotPasswordVerifyOtpService VerifyOtpService;
 
     @PostMapping("/login")
-    public ResponseEntity<Response<LoginResponse>> login(
-            @RequestBody LoginRequest request) {
+    public ResponseEntity<Response<LoginResponseDTO>> login(
+            @RequestBody LoginRequestDTO request) {
 
-        Response<LoginResponse> response = service.login(request);
+        Response<LoginResponseDTO> response = service.login(request);
 
         return ResponseEntity
                 .status(response.getStatusCode())
@@ -49,13 +49,13 @@ public class UserLoginController {
 
     // ================= USER CONTEXT =================
     @GetMapping("/user-context")
-    public ResponseEntity<Response<LoginResponse>> getUserContext(
+    public ResponseEntity<Response<LoginResponseDTO>> getUserContext(
             @RequestParam Long companyId,
             @RequestParam Long branchId,
             @RequestParam Long locationId,
             @RequestParam String userCode) {
 
-        Response<LoginResponse> response = service.getUserContext(companyId, branchId, locationId, userCode);
+        Response<LoginResponseDTO> response = service.getUserContext(companyId, branchId, locationId, userCode);
 
         return ResponseEntity
                 .status(response.getStatusCode())
@@ -79,7 +79,7 @@ public class UserLoginController {
 
     @PostMapping("/forgot-password/change-password")
     public ResponseEntity<Response<Boolean>> forgotChangePassword(
-            @RequestBody ForgotPasswordChangeRequest request) {
+            @RequestBody ForgotPasswordChangeRequestDTO request) {
 
         Response<Boolean> response = passwordservice.changePassword(request);
 
@@ -90,28 +90,32 @@ public class UserLoginController {
 
     @PostMapping("/forgot-password/send-otp")
     public ResponseEntity<Response<Boolean>> sendOtp(
-            @RequestBody ForgotPasswordOtpRequest request) {
+            @RequestBody ForgotPasswordOtpRequestDTO request) {
 
         Response<Boolean> response = otpservice.generateOtp(request);
 
-        return ResponseEntity
-                .status(response.getStatusCode())
-                .body(response);
+        if (!response.isSuccess()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(response);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/forgot-password/verify-otp")
     public ResponseEntity<Response<Boolean>> verifyOtp(
-            @RequestBody ForgotPasswordVerifyRequest request) {
+            @RequestBody ForgotPasswordVerifyRequestDTO request) {
 
         Response<Boolean> response = VerifyOtpService.verifyOtp(request);
 
         if (!response.isSuccess()) {
             return ResponseEntity
-                    .badRequest() 
+                    .badRequest()
                     .body(response);
         }
 
-         return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response);
     }
 
 }

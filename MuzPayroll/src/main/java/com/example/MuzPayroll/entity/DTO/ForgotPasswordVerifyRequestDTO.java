@@ -1,6 +1,6 @@
 package com.example.MuzPayroll.entity.DTO;
 
-public class ForgotPasswordVerifyRequest {
+public class ForgotPasswordVerifyRequestDTO {
 
     private String userCode;
     private String otp;

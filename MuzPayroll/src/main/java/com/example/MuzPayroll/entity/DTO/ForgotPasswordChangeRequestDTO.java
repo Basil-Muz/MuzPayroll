@@ -1,6 +1,6 @@
 package com.example.MuzPayroll.entity.DTO;
 
-public class ForgotPasswordChangeRequest {
+public class ForgotPasswordChangeRequestDTO {
 
     private String userCode;
     private String newPassword;

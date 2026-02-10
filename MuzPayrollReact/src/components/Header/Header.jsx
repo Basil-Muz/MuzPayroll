@@ -647,8 +647,10 @@ const Header = ({ backendError = [] }) => {
             <IoMdSettings size={20} aria-hidden="true" />
           </div>
         )}
+        
       </div>
     </header>
+
   );
 };
 

@@ -50,22 +50,24 @@ import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 
 import LoaderRenderer from "./components/Loaders/LoaderRenderer.jsx";
 
+
 function App() {
   return (
     <>
-    <AuthProvider>
-    <LoaderRenderer />
-      
+      <AuthProvider>
+        <LoaderRenderer />
+
         <Routes>
           {/* <Route path="/" element={<Page />} /> */}
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/payroll" element={<LoginPage />} />
+          <Route path="/payrollemp" element={<LoginPage/>}/>
           <Route path="/home" element={<LoggedPage />} />
           <Route path="/company" element={<Companyform />} />
           <Route path="/generalform" element={<GeneralForm />} />
           <Route path="/documentsinfo" element={<DocumentsInfo />} />
           <Route path="/masters" element={<MasterPage />} />
           <Route path="/changepassword" element={<ChangePassword />} />
-        
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/settings" element={<Settings />} />
 
@@ -78,29 +80,23 @@ function App() {
           <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
           <Route path="/designation" element={<Designation />} />
           <Route path="/branchform" element={<BranchPageForm />} />
-          <Route
-            path="/companyform"
-            element={
+          <Route path="/companyform" element={
               <ProtectedRoute>
-                <CompanyPageForm />
+              <CompanyPageForm />
               </ProtectedRoute>
             }
           />
           <Route path="/locationform" element={<LocationPageForm />} />
 
-          <Route
-            path="/companylist"
-            element={
+          <Route path="/companylist" element={
               <ProtectedRoute>
-                <CompanyList />
+              <CompanyList />
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/company/:companyId"
-            element={
+          <Route path="/company/:companyId" element={
               <ProtectedRoute>
-                <CompanyPageForm />
+              <CompanyPageForm />
               </ProtectedRoute>
             }
           />
@@ -154,6 +150,7 @@ function App() {
           <Route path="/usergroup" element={<UserGroup />} />
           <Route path="/locationgroup" element={<LocationGroup />} />
           <Route path="/shiftgroup" element={<ShiftGroup />} />
+
         </Routes>
       </AuthProvider>
       <Toaster
@@ -201,9 +198,8 @@ function App() {
       >
         {(t) => (
           <div
-            className={`custom-toast ${t.type} ${
-              t.visible ? "toast-enter" : "toast-exit"
-            }`}
+            className={`custom-toast ${t.type} ${t.visible ? "toast-enter" : "toast-exit"
+              }`}
           >
             <div className="toast-content">
               <div className="toast-icon">

@@ -74,10 +74,10 @@
 }
 
 .sidebar.collapsed {
-  width: 78px;
+  width: 72px;
   /* padding-top: 1.8rem; */
   /* padding-left: 9px; */
-  min-width: 72px;
+  min-width: 70px;
   /* height: auto; */
 }
 
@@ -85,7 +85,7 @@
 .sidebar-top {
   display: flex;
   align-items: center;
-  background-color: var(--background-alt);
+  background-color: var(--background-alt); 
   /* background: linear-gradient(90deg, rgba(240, 43, 230, 0.247), rgba(208, 89, 224, 0.192));  */
   /* gap: 12px; */
   padding: 12px;
