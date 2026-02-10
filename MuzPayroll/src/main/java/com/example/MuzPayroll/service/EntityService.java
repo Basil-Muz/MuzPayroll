@@ -26,6 +26,18 @@ public class EntityService {
                                 .toList();
         }
 
+        public List<UserEntityDTO> getUserBranch(Integer userId, Integer companyId, Integer mccId) {
+
+                List<Object[]> rows = entityRepository.getUserBranch(userId, companyId, mccId);
+
+                return rows.stream()
+                                .map(r -> new UserEntityDTO(
+                                                ((Number) r[0]).intValue(), // entityHierarchyId
+                                                (String) r[1], // entityName
+                                                (String) r[2]))
+                                .toList();
+        }
+
         public List<UserEntityDTO> getUserLocation(Integer userId, Integer branchId, Integer mccId) {
 
                 List<Object[]> rows = entityRepository.getUserLocation(userId, branchId, mccId);
