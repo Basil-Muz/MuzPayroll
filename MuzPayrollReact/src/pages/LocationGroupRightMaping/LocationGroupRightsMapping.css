@@ -1,0 +1,768 @@
+/* ======================================================
+   PAGE LAYOUT
+====================================================== */
+.lgr-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 78px; /* main + action bar */
+  gap: 8px;
+  align-items: start;
+  /* min-height: 500px; */
+  padding-right: 1%;
+  padding-left: 2%;
+}
+
+.lgr-main {
+  min-width: 0; /* prevents table overflow */
+}
+
+.lgr-actions {
+  position: sticky;
+  top: calc(var(--header-padding) + 72px);
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  padding-left: 1px;
+  /* background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); */
+}
+
+.lgr-actions .floating-action-bar {
+  position: static; /* or relative */
+  right: 0;
+  top: 0;
+  transform: none;
+}
+/* ======================================================
+   HEADER
+====================================================== */
+.lgr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding-top: var(--header-padding);
+}
+
+.lgr-header h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.lgr-header p {
+  margin: 4px 0 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* ===============================
+   Filter Toggle Button
+================================ */
+.filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  height: 34px;
+  padding: 0 12px;
+
+  font-size: var(--text-sm);
+  font-weight: 500;
+
+  color: var(--text);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Icon size */
+.filter-toggle svg {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Hover */
+.filter-toggle:hover {
+  background: var(--option-light);
+  border-color: var(--brand-border);
+}
+
+/* Focus (keyboard accessibility) */
+.filter-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-border);
+}
+
+/* ===============================
+   Active (Filters Open)
+================================ */
+.filter-toggle.active {
+  background: var(--success-light);
+  border-color: var(--brand-border);
+  color: var(--brand-dark);
+}
+
+.filter-toggle.active svg {
+  color: var(--brand);
+}
+
+/* ===============================
+   Disabled (if ever needed)
+================================ */
+.filter-toggle:disabled {
+  background: var(--disabled-bg);
+  color: var(--text-muted);
+  border-color: var(--border-light);
+  cursor: not-allowed;
+  opacity: var(--disabled-opacity);
+}
+
+/* ===============================
+   Search Action Buttons
+================================ */
+.search-actions {
+  display: flex;
+  gap: 12px;
+  background: none;
+  border: none;
+  /* margin-top: 16px; */
+}
+
+/* Base button */
+.search-actions .btn {
+  height: 36px;
+  padding: 9px 18px;
+
+  font-size: var(--text-sm);
+  font-weight: 500;
+
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+/* ===============================
+   APPLY (Primary Action)
+   Meaning: Lock search & load data
+================================ */
+.lgr-layout .btn-apply {
+  background-color: var(--button-primary);
+  color: #ffffff;
+  border-color: var(--button-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.lgr-filters .btn-apply:hover {
+  background-color: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
+}
+
+.lgr-filters .btn-apply:active {
+  background-color: var(--brand-dark);
+  border-color: var(--brand-dark);
+}
+
+.lgr-layout .btn-apply:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--brand-border),
+    var(--shadow-sm);
+}
+
+/* Disabled Apply */
+.lgr-filters .btn-apply:disabled {
+  background-color: var(--disabled-bg);
+  border-color: var(--border);
+  color: var(--text-light);
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: var(--disabled-opacity);
+}
+
+/* ===============================
+   CHANGE SEARCH (Secondary)
+   Meaning: Unlock & re-query
+================================ */
+.lgr-filters .btn-change {
+  background-color: var(--background);
+
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.lgr-filters .btn-change:hover {
+  background-color: var(--option-light);
+  border-color: var(--brand-border);
+}
+
+.lgr-filters .btn-change:active {
+  background-color: var(--primary-light);
+}
+
+.lgr-filters .btn-change:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-border);
+}
+
+/* Disabled Change */
+.lgr-filters .btn-change:disabled {
+  background-color: var(--disabled-bg);
+  color: var(--text-muted);
+  border-color: var(--border-light);
+  cursor: not-allowed;
+  opacity: var(--disabled-opacity);
+}
+
+.save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  background: var(--background-alt);
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
+}
+
+.save-indicator.active {
+  background: var(--success-light);
+  color: var(--success-dark);
+  border-color: var(--success);
+}
+
+.save-indicator .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+/* ======================================================
+   BUTTONS & LINKS
+====================================================== */
+/* .btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--brand-border);
+  background: var(--background);
+  color: var(--brand);
+  font-size: var(--text-sm);
+  cursor: pointer;
+} */
+
+.lgr-layout .btn.primary {
+  background: var(--button-primary);
+  color: #fff;
+  border: none;
+}
+
+.lgr-layout .btn:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+.link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--text-sm);
+  color: var(--brand);
+  cursor: pointer;
+}
+
+.link.danger {
+  color: var(--danger);
+}
+
+/* ======================================================
+   BULK CONTEXT BAR (STICKY)
+====================================================== */
+
+.bulk-hint {
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  background: var(--background-alt);
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius);
+}
+
+.bulk-bar {
+  position: relative;
+  top: 0;
+  /* z-index: 10; */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.bulk-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 14px;
+}
+
+.bulk-actions .link {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.bulk-actions .link:hover {
+  background: var(--option-light);
+}
+
+.bulk-actions .link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-border);
+}
+
+.bulk-actions .link[data-scope="global"] {
+  font-weight: 600;
+  color: var(--brand-dark);
+}
+
+.bulk-actions .link.danger:hover {
+  background: var(--danger-light);
+}
+
+.pager button:focus-visible {
+  box-shadow: 0 0 0 3px var(--brand-border);
+}
+
+.bulk-assign {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===============================
+   Filter Bar (Branch + Location)
+================================ */
+.lgr-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  padding: 12px 16px;
+  margin-bottom: 12px;
+
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Dropdown & Search Input */
+.lgr-filters select,
+.lgr-filters input[type="search"] {
+  height: 36px;
+  padding: 0 10px;
+
+  font-size: 14px;
+  color: #111827;
+
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+
+  outline: none;
+  min-width: 220px;
+}
+
+/* Search input slightly wider */
+.lgr-filters input[type="search"] {
+  min-width: 260px;
+}
+
+/* Focus states */
+.lgr-filters select:focus,
+.lgr-filters input[type="search"]:focus {
+  border-color: var(--brand, #6366f1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+/* Clear button */
+.lgr-filters .link {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+
+  font-size: 14px;
+  color: var(--brand, #6366f1);
+  cursor: pointer;
+
+  border-radius: 6px;
+}
+
+/* Clear hover */
+.lgr-filters .link:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* Disabled states */
+.lgr-filters select:disabled,
+.lgr-filters input:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.lgr-header .filter-save {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ======================================================
+   TABLE CARD
+====================================================== */
+.card {
+  padding: 2rem;
+  background: var(--background);
+  border-radius: var(--radius);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 6px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-light);
+  /*overflow: hidden;  important */
+}
+
+.grid {
+  /* table-layout: fixed; */
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th.group-fixed {
+  width: 360px;
+}
+
+.grid th,
+.grid td {
+  padding: 10px 12px;
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.grid th {
+  background: var(--glass-bg);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 600;
+}
+
+.grid tr:hover {
+  background: var(--option-light);
+}
+
+/* .grid tr.dirty {
+  border-left: 3px solid var(--warning);
+} */
+
+.grid tr {
+  position: relative;
+}
+
+.grid tr.selected {
+  font-weight: 500;
+  background: var(--success-light);
+}
+
+.grid tr.selected::before {
+  content: "✓";
+  position: absolute;
+  left: 6px;
+  color: var(--brand);
+  font-size: 12px;
+}
+
+.grid td:last-child {
+  opacity: 0.6;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+/* ======================================================
+   PAGINATION
+====================================================== */
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* ======================================================
+   CHECKBOX (Modern, Accessible)
+====================================================== */
+input[type="checkbox"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--background);
+  cursor: pointer;
+  position: relative;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.ms-dropdown {
+  max-height: 290px;
+  overflow-y: auto;
+}
+
+/* Hover */
+input[type="checkbox"]:hover {
+  border-color: var(--brand);
+}
+
+/* :focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-border);
+} */
+.ms-chip {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Checked */
+input[type="checkbox"]:checked {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+/* Checkmark */
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -55%) rotate(45deg);
+}
+
+/* Focus (Keyboard users) */
+.lgr-layout input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-border);
+}
+
+/* Disabled */
+.lgr-layout input[type="checkbox"]:disabled {
+  background: var(--disabled-bg);
+  border-color: var(--border-light);
+  cursor: not-allowed;
+  opacity: var(--disabled-opacity);
+}
+/* ======================================================
+   PAGINATION BUTTONS
+====================================================== */
+.pager button {
+  min-width: 72px;
+  padding: 6px 14px;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--brand-border);
+  background: var(--background);
+  color: var(--brand);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* Hover */
+.pager button:hover:not(:disabled) {
+  background: var(--option-light);
+  border-color: var(--brand);
+}
+
+/* Disabled */
+.pager button:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+  background: var(--disabled-bg);
+}
+
+/* Page Indicator Text */
+.pager span {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* ======================================================
+   MODAL (CONFIRM BULK APPLY)
+====================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  width: 420px;
+  max-width: 90%;
+  background: var(--background);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+.modal h3 {
+  margin: 0 0 8px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+@media (max-width: 900px) {
+  .lgr-layout {
+    display: block;
+    padding-bottom: 88px; /* space for floating actions */
+    padding-right: 2%;
+  }
+
+  .lgr-actions {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    top: auto;
+    z-index: 100;
+  }
+
+  .grid th:nth-child(2),
+  .grid td:nth-child(2) {
+    display: none;
+  }
+
+  .bulk-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .bulk-assign {
+    margin-left: 0;
+  }
+  .pager {
+    padding-bottom: 96px;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+  .ms-control {
+    min-height: auto; /* allow growth */
+    padding: 8px; /* breathing space */
+    align-items: flex-start; /* stack chips naturally */
+    min-width: 177px;
+  }
+  .ms-all-chip {
+    flex-direction: column;
+  }
+  .ms-undo {
+    margin-left: 0;
+  }
+
+  .ms-chip {
+    justify-content: center;
+  }
+
+  .lgr-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lgr-filters select,
+  .lgr-filters input[type="search"] {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .search-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .ms-chip {
+    max-width: 100%;
+  }
+
+  .ms-undo {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 1023px) {
+  .lgr-actions .floating-action-bar {
+    position: fixed;
+    right: 25px;
+    bottom: 6rem;
+    top: auto;
+    transform: none;
+  }
+}

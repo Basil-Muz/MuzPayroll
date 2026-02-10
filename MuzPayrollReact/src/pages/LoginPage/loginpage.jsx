@@ -33,8 +33,7 @@ function LoginPage() {
   const [displayUserCode, setDisplayUserCode] = useState("");
 
   const solutionId = location.pathname.includes("emp") ? 2 : 1;
-  // console.log("solutionId",solutionId);
-
+ 
   const handleLogin = async () => {
     setAttemptsLeft(null);
     setAccountLocked(false);
@@ -61,7 +60,7 @@ function LoginPage() {
       const data = await loginUser({
         userCode: value,
         password,
-      
+
       });
       console.log("LOGIN RESPONSE FROM BACKEND:", data);
 
@@ -100,6 +99,7 @@ function LoginPage() {
         locationId: payload.locationId,
         token: payload.token,
         sidebarOpen: false,
+        solutionId: solutionId,
       };
 
       login(loginData);

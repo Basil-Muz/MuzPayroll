@@ -1,5 +1,7 @@
 package com.example.MuzPayroll.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,6 +23,32 @@ public class UserMst {
 
     @Column(nullable = false, length = 255)
     private String password;
+
+    @ManyToOne
+    @JoinColumn(name = "UsmEntityHierarchyID", nullable = false)
+    private EntityHierarchyInfo entityHierarchyInfo;
+
+    @ManyToOne
+    @JoinColumn(name = "UsmUserTypeID", nullable = false)
+    private UserTypeMst userTypeMst;
+
+    @Column(nullable = true)
+    private LocalDate UsmPasswordLastChangedDate;
+
+    @Column(nullable = false)
+    private Boolean UsmChangePasswordOnNextLogin;
+
+    @Column(nullable = false)
+    private Long UsmDefaultEntityHierarchyID;
+
+    @Column(nullable = false)
+    private Boolean UsmActiveYN;
+
+    @Column(nullable = false)
+    private Long UsmAuthInfoID;
+
+    @Column(nullable = false)
+    private Boolean UsmTransValidYN;
 
     @Column(length = 150)
     private String email;
@@ -121,6 +149,70 @@ public class UserMst {
 
     public void setLocationEntity(LocationMst locationEntity) {
         this.locationEntity = locationEntity;
+    }
+
+    public EntityHierarchyInfo getEntityHierarchyInfo() {
+        return entityHierarchyInfo;
+    }
+
+    public void setEntityHierarchyInfo(EntityHierarchyInfo entityHierarchyInfo) {
+        this.entityHierarchyInfo = entityHierarchyInfo;
+    }
+
+    public UserTypeMst getUserTypeMst() {
+        return userTypeMst;
+    }
+
+    public void setUserTypeMst(UserTypeMst userTypeMst) {
+        this.userTypeMst = userTypeMst;
+    }
+
+    public LocalDate getUsmPasswordLastChangedDate() {
+        return UsmPasswordLastChangedDate;
+    }
+
+    public void setUsmPasswordLastChangedDate(LocalDate UsmPasswordLastChangedDate) {
+        this.UsmPasswordLastChangedDate = UsmPasswordLastChangedDate;
+    }
+
+    public Boolean getUsmChangePasswordOnNextLogin() {
+        return UsmChangePasswordOnNextLogin;
+    }
+
+    public void setUsmChangePasswordOnNextLogin(Boolean UsmChangePasswordOnNextLogin) {
+        this.UsmChangePasswordOnNextLogin = UsmChangePasswordOnNextLogin;
+    }
+
+    public Long getUsmDefaultEntityHierarchyID() {
+        return UsmDefaultEntityHierarchyID;
+    }
+
+    public void setUsmDefaultEntityHierarchyID(Long UsmDefaultEntityHierarchyID) {
+        this.UsmDefaultEntityHierarchyID = UsmDefaultEntityHierarchyID;
+    }
+
+    public Boolean getUsmActiveYN() {
+        return UsmActiveYN;
+    }
+
+    public void setUsmActiveYN(Boolean UsmActiveYN) {
+        this.UsmActiveYN = UsmActiveYN;
+    }
+
+    public Long getUsmAuthInfoID() {
+        return UsmAuthInfoID;
+    }
+
+    public void setUsmAuthInfoID(Long UsmAuthInfoID) {
+        this.UsmAuthInfoID = UsmAuthInfoID;
+    }
+
+    public Boolean getUsmTransValidYN() {
+        return UsmTransValidYN;
+    }
+
+    public void setUsmTransValidYN(Boolean UsmTransValidYN) {
+        this.UsmTransValidYN = UsmTransValidYN;
     }
 
 }

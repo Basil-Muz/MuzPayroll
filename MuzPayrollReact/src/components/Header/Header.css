@@ -245,7 +245,7 @@
   font-size: 13px;
   padding: 5px 0 8px 0;
 }
-.location {
+.header .location {
   color: var(--brand);
   display: flex;
   justify-content: center;

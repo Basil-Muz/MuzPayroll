@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.MuzPayroll.entity.LocationLog;
-import com.example.MuzPayroll.entity.LocationLogPK;
-import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.DTO.AmendListDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.LocationDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
+import com.example.MuzPayroll.entity.LocationLog;
+import com.example.MuzPayroll.entity.LocationLogPK;
+import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.repository.LocationLogRepository;
 import com.example.MuzPayroll.repository.LocationRepository;
 import com.example.MuzPayroll.service.LocationService;
@@ -56,7 +56,7 @@ public class LocationController {
 
     // TO get the companyMst and the List of Logs y using MstID
     @GetMapping("/getamendlist/{locationMstID}")
-    public ResponseEntity<LocationDTO> getLocationByMstId(@PathVariable Long locationMstID) {
+    public ResponseEntity<LocationDTO> getLocationByMstId(@NonNull @PathVariable Long locationMstID) {
 
         LocationDTO dto = locationService.getLocationWithLogs(locationMstID);
         return ResponseEntity.ok(dto);
@@ -76,7 +76,6 @@ public class LocationController {
                     dto.setName(entity.getLocation());
                     dto.setShortName(entity.getShortName());
                     dto.setActiveDate(entity.getActiveDate());
-                    dto.setStatus(entity.getActiveStatusYN());
                     dto.setInactiveDate(entity.getInactiveDate());
                     dto.setActiveStatusYN(entity.getActiveStatusYN());
                     return dto;
@@ -100,7 +99,6 @@ public class LocationController {
                     dto.setName(entity.getLocation());
                     dto.setShortName(entity.getShortName());
                     dto.setActiveDate(entity.getActiveDate());
-                    dto.setStatus(entity.getActiveStatusYN());
                     dto.setInactiveDate(entity.getInactiveDate());
                     dto.setActiveStatusYN(entity.getActiveStatusYN());
                     return dto;
@@ -123,7 +121,6 @@ public class LocationController {
                     dto.setName(entity.getLocation());
                     dto.setShortName(entity.getShortName());
                     dto.setActiveDate(entity.getActiveDate());
-                    dto.setStatus(entity.getActiveStatusYN());
                     dto.setInactiveDate(entity.getInactiveDate());
                     dto.setActiveStatusYN(entity.getActiveStatusYN());
                     return dto;

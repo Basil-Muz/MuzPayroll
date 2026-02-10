@@ -82,7 +82,6 @@ public class BranchController {
                     dto.setName(entity.getBranch());
                     dto.setShortName(entity.getShortName());
                     dto.setActiveDate(entity.getActiveDate());
-                    dto.setStatus(entity.getActiveStatusYN());
                     dto.setInactiveDate(entity.getInactiveDate());
                     dto.setActiveStatusYN(entity.getActiveStatusYN());
                     return dto;
@@ -106,7 +105,6 @@ public class BranchController {
                     dto.setName(entity.getBranch());
                     dto.setShortName(entity.getShortName());
                     dto.setActiveDate(entity.getActiveDate());
-                    dto.setStatus(entity.getActiveStatusYN());
                     dto.setInactiveDate(entity.getInactiveDate());
                     dto.setActiveStatusYN(entity.getActiveStatusYN());
                     return dto;
@@ -129,7 +127,6 @@ public class BranchController {
                     dto.setName(entity.getBranch());
                     dto.setShortName(entity.getShortName());
                     dto.setActiveDate(entity.getActiveDate());
-                    dto.setStatus(entity.getActiveStatusYN());
                     dto.setInactiveDate(entity.getInactiveDate());
                     dto.setActiveStatusYN(entity.getActiveStatusYN());
                     return dto;
