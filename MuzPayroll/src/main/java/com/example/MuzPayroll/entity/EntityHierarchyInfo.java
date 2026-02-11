@@ -2,6 +2,8 @@ package com.example.MuzPayroll.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -10,6 +12,9 @@ import jakarta.persistence.ManyToOne;
 public class EntityHierarchyInfo {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long InfoID;
+
     @ManyToOne
     @JoinColumn(name = "EhiEntityHierarchyID", nullable = true)
     private EntityMst entityMst;
@@ -123,6 +128,14 @@ public class EntityHierarchyInfo {
 
     public void setCompanyMst(EntityMst companyMst) {
         this.companyMst = companyMst;
+    }
+
+    public Long getInfoID() {
+        return InfoID;
+    }
+
+    public void setInfoID(Long InfoID) {
+        this.InfoID = InfoID;
     }
 
 }

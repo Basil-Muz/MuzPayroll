@@ -6,7 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.MuzPayroll.entity.DTO.UserEntityDTO;
+import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.repository.EntityRepository;
+import com.example.MuzPayroll.repository.UserRepository;
+
+import io.micrometer.common.lang.NonNull;
 
 @Service
 public class EntityService {
@@ -14,9 +18,44 @@ public class EntityService {
         @Autowired
         private EntityRepository entityRepository;
 
-        public List<UserEntityDTO> getUserEntities(Integer userId, Integer mccId) {
+        @Autowired
+        private UserRepository userRepository;
 
-                List<Object[]> rows = entityRepository.getUserEntities(userId, mccId);
+        public List<UserEntityDTO> getCompany(Long userId, Long mccId) {
+
+                UserMst user = userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                Long userType = user.getUserTypeMst().getUgmUserGroupID();
+
+                List<Object[]> rows;
+
+                if (userType == 100011) {
+                        rows = entityRepository.getAdminCompany(mccId);
+                } else {
+                        rows = entityRepository.getUserCompany(userId, mccId);
+                }
+                return rows.stream()
+                                .map(r -> new UserEntityDTO(
+                                                ((Number) r[0]).intValue(), // entityHierarchyId
+                                                (String) r[1], // entityName
+                                                (String) r[2]))
+                                .toList();
+        }
+
+        public List<UserEntityDTO> getUserBranch(Long userId, Long companyId, Long mccId) {
+                UserMst user = userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                Long userType = user.getUserTypeMst().getUgmUserGroupID();
+
+                List<Object[]> rows;
+
+                if (userType == 100012) {
+                        rows = entityRepository.getAdminBranch(companyId, mccId);
+                } else {
+                        rows = entityRepository.getUserBranch(userId, companyId, mccId);
+                }
 
                 return rows.stream()
                                 .map(r -> new UserEntityDTO(
@@ -26,21 +65,19 @@ public class EntityService {
                                 .toList();
         }
 
-        public List<UserEntityDTO> getUserBranch(Integer userId, Integer companyId, Integer mccId) {
+        public List<UserEntityDTO> getUserLocation(Long userId, Long companyId, Long branchId, Long mccId) {
+                UserMst user = userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
 
-                List<Object[]> rows = entityRepository.getUserBranch(userId, companyId, mccId);
+                Long userType = user.getUserTypeMst().getUgmUserGroupID();
 
-                return rows.stream()
-                                .map(r -> new UserEntityDTO(
-                                                ((Number) r[0]).intValue(), // entityHierarchyId
-                                                (String) r[1], // entityName
-                                                (String) r[2]))
-                                .toList();
-        }
+                List<Object[]> rows;
 
-        public List<UserEntityDTO> getUserLocation(Integer userId, Integer branchId, Integer mccId) {
-
-                List<Object[]> rows = entityRepository.getUserLocation(userId, branchId, mccId);
+                if (userType == 100012) {
+                        rows = entityRepository.getAdminLocation(companyId, branchId, mccId);
+                } else {
+                        rows = entityRepository.getUserLocation(userId, branchId, mccId);
+                }
 
                 return rows.stream()
                                 .map(r -> new UserEntityDTO(

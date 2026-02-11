@@ -14,6 +14,21 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
 
     @Query(value = """
             SELECT
+                uel.ehi_entity_hierarchyid,
+                em.etm_name,
+                mcc.mcc_name
+            FROM entity_mst em
+            JOIN entity_hierarchy_info uel
+                ON em.etm_entityid =uel.ehi_entity_hierarchyid
+            JOIN muz_control_codes mcc
+                ON mcc.mccid = em.etm_entity_type_mccid
+            WHERE mcc.mccid = :mccId
+            """, nativeQuery = true)
+    List<Object[]> getAdminCompany(
+            @Param("mccId") Long mccId);
+
+    @Query(value = """
+            SELECT
                 uel.uel_entity_hierarchyid,
                 em.etm_name,
                 mcc.mcc_name
@@ -25,9 +40,9 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
             WHERE mcc.mccid = :mccId
             AND uel.uel_userid = :userId
             """, nativeQuery = true)
-    List<Object[]> getUserEntities(
-            @Param("userId") Integer userId,
-            @Param("mccId") Integer mccId);
+    List<Object[]> getUserCompany(
+            @Param("userId") Long userId,
+            @Param("mccId") Long mccId);
 
     @Query(value = """
              SELECT
@@ -46,9 +61,26 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
             AND entity_hierarchy_info.ehi_companyid = :companyId
             """, nativeQuery = true)
     List<Object[]> getUserBranch(
-            @Param("userId") Integer userId,
-            @Param("companyId") Integer companyId,
-            @Param("mccId") Integer mccId);
+            @Param("userId") Long userId,
+            @Param("companyId") Long companyId,
+            @Param("mccId") Long mccId);
+
+    @Query(value = """
+              SELECT
+                 uel.ehi_entity_hierarchyid,
+                 em.etm_name,
+                 mcc.mcc_name
+             FROM entity_mst em
+             JOIN entity_hierarchy_info uel
+                 ON em.etm_entityid =uel.ehi_entity_hierarchyid
+             JOIN muz_control_codes mcc
+                 ON mcc.mccid = em.etm_entity_type_mccid
+             WHERE mcc.mccid = :mccId
+            AND uel.ehi_companyid = :companyId
+             """, nativeQuery = true)
+    List<Object[]> getAdminBranch(
+            @Param("companyId") Long companyId,
+            @Param("mccId") Long mccId);
 
     @Query(value = """
             SELECT
@@ -67,7 +99,26 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
             AND entity_hierarchy_info.ehi_branchid =:branchId
             """, nativeQuery = true)
     List<Object[]> getUserLocation(
-            @Param("userId") Integer userId,
-            @Param("branchId") Integer branchId,
-            @Param("mccId") Integer mccId);
+            @Param("userId") Long userId,
+            @Param("branchId") Long branchId,
+            @Param("mccId") Long mccId);
+
+    @Query(value = """
+            SELECT
+                uel.ehi_entity_hierarchyid,
+                em.etm_name,
+                mcc.mcc_name
+            FROM entity_mst em
+            JOIN entity_hierarchy_info uel
+                ON em.etm_entityid =uel.ehi_entity_hierarchyid
+            JOIN muz_control_codes mcc
+                ON mcc.mccid = em.etm_entity_type_mccid
+            WHERE mcc.mccid =:mccId
+            AND uel.ehi_companyid = :companyId
+            AND uel.ehi_branchid =:branchId
+            """, nativeQuery = true)
+    List<Object[]> getAdminLocation(
+            @Param("companyId") Long companyId,
+            @Param("branchId") Long branchId,
+            @Param("mccId") Long mccId);
 }

@@ -22,25 +22,25 @@ public class EntityController {
 
     @GetMapping("/fetchCompany")
     public List<UserEntityDTO> getUserCompany(
-            @RequestParam Integer userId) {
+            @RequestParam Long userId) {
 
-        return entityService.getUserEntities(userId, 13);
+        return entityService.getCompany(userId, 13L);
     }
 
     @GetMapping("/fetchBranch")
     public List<UserEntityDTO> getUserBranch(
-            @RequestParam Integer userId,
-            @RequestParam Integer companyId) {
+            @RequestParam Long userId,
+            @RequestParam Long companyId) {
 
-        return entityService.getUserBranch(userId, companyId, 14);
+        return entityService.getUserBranch(userId, companyId, 14L);
     }
 
     @GetMapping("/fetchLocation")
     public List<UserEntityDTO> getUserLocation(
-            @RequestParam Integer userId,
-            @RequestParam Integer branchId) {
+            @RequestParam Long userId,
+            @RequestParam Long branchId,
+            @RequestParam Long companyId) {
 
-        return entityService.getUserLocation(userId, branchId, 15);
+        return entityService.getUserLocation(userId, companyId, branchId, 15L);
     }
-
 }
