@@ -2,7 +2,7 @@
 
 .usergroup-page {
     padding: var(--header-padding) 13px 21px 12px;
-    padding-top: 72px;
+    /* padding-top: 72px; */
     font-family: sans-serif;
     background-color: #f9f3f9;
     padding-left: 10px;
@@ -148,7 +148,7 @@
 .usergroup-page .card-title {
     font-size: 14.5px;
     font-weight: 600;
-    color: var(--primary);
+    color: var(--text-dark);
 }
 
 .usergroup-page .card-shortname,
@@ -163,6 +163,54 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* ================= STATUS ================= */
+
+.usergroup-page .status {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Inactive: stacked dates */
+.usergroup-page .status-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.usergroup-page .status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.usergroup-page .status-item.active {
+  color: var(--brand);
+}
+
+.status-item.inactive {
+  color: var(--danger);
+}
+
+.status-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+.check-icon {
+  font-size: 13px;
+}
+
+.check-icon.muted {
+  color: var(--text-muted);
 }
 
 /* ================= HEADER ================= */

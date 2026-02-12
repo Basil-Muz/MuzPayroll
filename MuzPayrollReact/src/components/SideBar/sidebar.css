@@ -474,8 +474,8 @@
 }
 @media (min-width: 1024px) {
   .sidebar {
-    /* position: sticky;
-    top: 0; */
+    /* position: sticky;*/
+    /* top: 77px; */
     transform: translateX(0);
   }
 
@@ -517,6 +517,7 @@
 @media (max-width: 900px) {
   .sidebar {
     width: 72px;
+
   }
   .sidebar.expanded {
     width: 126px;

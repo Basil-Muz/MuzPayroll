@@ -6,30 +6,61 @@ import axios from "axios";
 import { Controller } from "react-hook-form";
 import Select from "react-select";
 import { useForm } from "react-hook-form";
-import { useAuth } from "../../context/AuthProvider";
+
 import "./Header.css";
 import { IoMdSettings } from "react-icons/io";
 import { IoNotificationsSharp } from "react-icons/io5";
 import { BiSolidCollection } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
 import { ImUser } from "react-icons/im";
+import { HiOutlineSwitchHorizontal } from "react-icons/hi";
 
-import ThemeToggle from "../ThemeToggle/ThemeToggle";
+// Context / hooks
+import { useLoader } from "../../context/LoaderContext";
+import { useAuth } from "../../context/AuthProvider";
+
+// Utils
+import { ensureMinDuration } from "../../utils/loaderDelay";
+import { handleApiError } from "../../utils/errorToastResolver";
+
+//service
+import { fetchBranchesByCompany } from "../../services/branch.service";
+
+//component
+import { ContextSwitcher } from "./ContextSwitcher";
 
 const BLOCKED_PATHS = ["/masters", "/home", "/settings"];
 const CONTEXT_SWITCHER = ["/home"];
-const INITIAL_NOTIFICATIONS = [];
+
 const HOVER_DELAY = 200; // Delay before closing on mouse leave
+
+// Update your initial notifications to include type
+const INITIAL_NOTIFICATIONS = [
+  {
+    id: 1,
+    msg: "New payroll batch ready for processing",
+    type: "info",
+    time: "10 min ago",
+  },
+  {
+    id: 2,
+    msg: "Tax calculation error detected",
+    type: "error",
+    time: "25 min ago",
+  },
+];
 
 const Header = ({ backendError = [] }) => {
   const [notOpen, setNotOpen] = useState(false);
   const [dashOpen, setDashOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
+
+  const [isContextOpen, setIsContextOpen] = useState(false);
   // const [contextBranch, setContextBranch] = useState(null);
   // const [contextLocation, setContextLocation] = useState(null);
 
-  const [companyName, setCompanyName] = useState("");
+  const [companyList, setCompanyList] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
   const [branchList, setBranchList] = useState([]);
@@ -41,8 +72,9 @@ const Header = ({ backendError = [] }) => {
 
   const location = useLocation();
 
+  //Import functions from context
   const { user, logout, updateUser } = useAuth();
-
+  const { showRailLoader, hideLoader } = useLoader();
   const navigate = useNavigate();
 
   const handleLogOut = () => {
@@ -52,8 +84,9 @@ const Header = ({ backendError = [] }) => {
 
   const { control, setValue, watch } = useForm({
     defaultValues: {
-      branch: "",
-      location: "",
+      company: null,
+      branch: null,
+      location: null,
     },
   });
 
@@ -80,50 +113,83 @@ const Header = ({ backendError = [] }) => {
 
   const shouldRenderDashboard = !BLOCKED_PATHS.includes(currentPath);
   const shouldRenderProfile = BLOCKED_PATHS.includes(currentPath);
-  const shouldRenderHome = CONTEXT_SWITCHER.includes(currentPath)
-  const handleApiError = (error) => {
-    if (!error.response) {
-      toast.error("Unable to connect to server.");
-      return;
-    }
-
-    const status = error.status;
-    const errorMessages = {
-      400: error.errors?.[0] || "Bad request",
-      401: "Session expired. Please login again.",
-      403: "You do not have permission.",
-      404: "Resource not found.",
-      409: "Duplicate record exists.",
-      500: "Server error. Please try again later.",
-    };
-
-    toast.error(errorMessages[status] || "Unexpected error occurred.");
-  };
-
+  // const shouldRenderHome = CONTEXT_SWITCHER.includes(currentPath);
+  const toggleContext = useCallback(() => {
+    setIsContextOpen(true);
+    // console.log("context", isContextOpen);
+  }, []);
   /* ================= API ================= */
   const fetchContextData = useCallback(
     async (branchId, userCode) => {
       //User code for user base access
-      if (!companyId || !branchId) return;
-
+      if (!companyId) return;
+      const entityId = 4;
+      const userId = 3;
       try {
         const [companyRes, branchRes] = await Promise.all([
-          axios.get(`http://localhost:8087/company/${companyId}`),
-          axios.get(`http://localhost:8087/branch/company/${companyId}`),
+          axios.get("http://localhost:8087/entity/fetchCompany", {
+            params: {
+              userId: userId,
+              // companyId: entityId, // make sure this matches your variable
+            },
+          }),
+          axios.get("http://localhost:8087/entity/fetchBranch", {
+            params: {
+              userId: userId,
+              companyId: entityId, // make sure this matches your variable
+            },
+          }),
         ]);
+        console.log("Branch response", branchRes.data);
 
-        setCompanyName(companyRes.data.company);
+        const companyData = Array.isArray(companyRes.data)
+          ? companyRes.data
+          : [companyRes.data]; //if the API returns one company
+
+        setCompanyList(
+          companyData.map((company) => ({
+            value: company.entityHierarchyId,
+            label: company.entityName,
+          })),
+        );
+
         setBranchList(
           branchRes.data.map((branch) => ({
+            value: branch.entityHierarchyId,
+            label: branch.entityName,
+          })),
+        );
+      } catch (err) {
+        handleApiError(err, { entity: "company" });
+        console.log("company error", err);
+      }
+    },
+    [companyId],
+  );
+
+  const fetchBranchesByCompanyList = useCallback(
+    async (companyId) => {
+      const startTime = Date.now();
+      // console.log("companys :");
+      // show loader
+      showRailLoader("Retrieving available branches…");
+      try {
+        const res = await fetchBranchesByCompany(companyId);
+        console.log("companys :", res);
+        setBranchList(
+          res.data.map((branch) => ({
             value: branch.branchMstID,
             label: branch.branch,
           })),
         );
-      } catch (err) {
-        handleApiError(err);
+      } catch (error) {
+        handleApiError(error);
+      } finally {
+        await ensureMinDuration(startTime, 1200);
+        hideLoader();
       }
     },
-    [companyId],
+    [setBranchList],
   );
 
   const fetchLocationsByBranch = useCallback(
@@ -166,6 +232,44 @@ const Header = ({ backendError = [] }) => {
   }, []);
 
   useEffect(() => {
+    if (companyList.length === 0) return;
+
+    const companyOption = companyList.find(
+      (c) => c.value === Number(user.companyId),
+    );
+
+    if (companyOption) {
+      setValue("company", companyOption, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+    }
+  }, [companyList, user.companyId, setValue]);
+
+  const contextInitialData = {
+    company: user.companyId
+      ? {
+          value: user.companyId,
+          label: user.companyName,
+        }
+      : null,
+
+    branch: user.branchId
+      ? {
+          value: user.branchId,
+          label: user.branchName,
+        }
+      : null,
+
+    location: user.locationId
+      ? {
+          value: user.locationId,
+          label: user.locationName,
+        }
+      : null,
+  };
+
+  useEffect(() => {
     if (branchList.length === 0) return;
 
     const branchOption = branchList.find(
@@ -198,10 +302,9 @@ const Header = ({ backendError = [] }) => {
   }, [locationList, setValue]);
 
   useEffect(() => {
-    if (!companyId || !user?.branchId) return;
-
+    if (!companyId) return;
     fetchContextData(user.branchId, user.userCode);
-  }, [companyId, user?.branchId, user?.userCode,user?.locationId, fetchContextData]);
+  }, [companyId, user?.branchId, fetchContextData]);
 
   //Listen to trigger on user changes
   // useEffect(() => {
@@ -337,321 +440,298 @@ const Header = ({ backendError = [] }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeAllDropdowns]);
 
+  // Replace the existing JSX return statement with this enhanced version
   return (
-    <header className="header" role="banner">
-      <div className="header-left">
-        <div className="logo">
-          <img
-            src="/muziris-png.ico"
-            alt="Muziris Logo"
-            width="120px"
-            height="46"
-            loading="lazy"
-          />
-        </div>
-
-        {/* Context Switcher */}
-        { !shouldRenderHome && <div className="context-switcher" aria-label="Working context">
-          {/* Company (Read-only) */}
-          <div className="company-pill" title={companyName}>
-            {companyName}
+    <>
+      <header className="header" role="banner">
+        <div className="header-left">
+          <div className="logo">
+            <img
+              src="/muziris-png.ico"
+              alt="Muziris Logo"
+              width="120px"
+              height="46"
+              loading="lazy"
+            />
+          </div>
+          {/* Enhanced Context Summary */}
+          {/* Desktop: Full context summary */}
+          <div
+            className="context-summary desktop-only"
+            role="button"
+            tabIndex={0}
+            onClick={toggleContext}
+            onKeyDown={(e) => handleKeyDown(e, toggleContext)}
+            aria-label="Change company context"
+          >
+            <div className="context-summary-content">
+              <span className="context-company">
+                {user.companyName || "Company"}
+              </span>
+              <span className="context-separator">|</span>
+              <span className="context-branch">
+                {user.branchName || "Branch"}
+              </span>
+              <span className="context-separator">|</span>
+              <span className="context-location">
+                {user.locationName || "Location"}
+              </span>
+            </div>
+            <div className="context-edit-icon">
+              <HiOutlineSwitchHorizontal size={12} aria-hidden="true" />
+            </div>
           </div>
 
-          {/* Branch */}
-          <Controller
-            name="branch"
-            control={control}
-            rules={{ required: "Branch is required" }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={branchList}
-                placeholder="Branch"
-                isSearchable
-                isClearable={false}
-                classNamePrefix="form-control-select"
-                value={field.value}
-                onChange={(option, actionMeta) => {
-                  if (!option) return;
-                  if (actionMeta.action !== "select-option") return;
-
-                  // STORE OBJECT ONLY
-                  field.onChange(option);
-
-                  const newBranchId = option.value;
-
-                  // RESET LOCATION CORRECTLY
-                  setValue("location", null);
-                  setLocationList([]);
-
-                  // FETCH
-                  fetchLocationsByBranch(newBranchId);
-
-                  // UPDATE CONTEXT
-                  updateUser({
-                    branchId: newBranchId,
-                    locationId: null,
-                  });
-                }}
-              />
-            )}
-          />
-
-          {/* Location */}
-          <Controller
-            name="location"
-            control={control}
-            rules={{ required: "Location is required" }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={locationList}
-                placeholder="Location"
-                isSearchable
-                isClearable={false}
-                isDisabled={!watch("branch") || loadingLocation}
-                classNamePrefix="form-control-select"
-                value={field.value}
-                onChange={(option, actionMeta) => {
-                  if (!option) return;
-                  if (actionMeta.action !== "select-option") return;
-
-                  //  STORE OBJECT ONLY
-                  field.onChange(option);
-
-                  //  UPDATE CONTEXT
-                  updateUser({
-                    locationId: option.value,
-                  });
-                }}
-              />
-            )}
-          />
-        </div>}
-      </div>
-
-      <div className="header-right">
-        {/* Notifications */}
-        <div
-          className={`notification ${currentPath !== "/masters" ? "" : "no-dashboard"}`}
-          onClick={() => toggleDropdown("notification")}
-          onMouseEnter={handleNotifEnter}
-          onMouseLeave={handleNotifLeave}
-          role="button"
-          tabIndex="0"
-          aria-label="Notifications"
-          aria-expanded={notOpen}
-          onKeyDown={(e) =>
-            handleKeyDown(e, () => toggleDropdown("notification"))
-          }
-        >
-          <IoNotificationsSharp size={20} aria-hidden="true" />
-
-          {notifications.length > 0 && (
-            <div
-              className="msgs"
-              role="status"
-              aria-label={`${notifications.length} unread notifications`}
-            >
-              {notifications.length}
-            </div>
-          )}
-
-          {notOpen && (
-            <div
-              className="notification-dropdown"
-              role="menu"
-              onMouseEnter={handleNotifEnter}
-              onMouseLeave={handleNotifLeave}
-            >
-              {notifications.length > 0 && (
-                <div className="dropdown-header">
-                  <button
-                    onClick={clearAllNotifications}
-                    className="clear-all-btn"
-                    aria-label="Clear all notifications"
-                  >
-                    Clear All
-                  </button>
-                </div>
-              )}
-
-              {notifications.length > 0 ? (
-                <div className="notifications-list">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`notification-item ${
-                        notification.status ? "error" : "info"
-                      }`}
-                      role="menuitem"
-                    >
-                      <p className="notification-msg">{notification.msg}</p>
-                      <button
-                        onClick={() => removeNotification(notification.id)}
-                        className="remove-btn"
-                        aria-label="Remove"
-                      >
-                        <RxCross2 size={16} aria-hidden="true" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="no-msg">No notifications</p>
-              )}
-            </div>
-          )}
+          {/* Mobile: Context switcher button */}
+          <button
+            className="context-switcher-button mobile-only"
+            onClick={toggleContext}
+            aria-label="Switch context"
+          >
+            <HiOutlineSwitchHorizontal size={20} />
+          </button>
         </div>
 
-        {/* Dashboard */}
-        {shouldRenderDashboard && (
-          <div
-            className="dashboard"
-            onClick={() => toggleDropdown("dashboard")}
-            onMouseEnter={handleDashEnter}
-            onMouseLeave={handleDashLeave}
-            role="button"
-            tabIndex="0"
-            aria-label="Dashboard"
-            aria-expanded={dashOpen}
-            onKeyDown={(e) =>
-              handleKeyDown(e, () => toggleDropdown("dashboard"))
-            }
-          >
-            <BiSolidCollection size={20} aria-hidden="true" />
+        <div className="header-right">
+          {/* Enhanced Notifications */}
+          <div className="dropdown-container">
+            <button
+              className={`header-action ${currentPath !== "/masters" ? "" : "no-dashboard"}`}
+              onClick={() => toggleDropdown("notification")}
+              onMouseEnter={handleNotifEnter}
+              onMouseLeave={handleNotifLeave}
+              aria-label="Notifications"
+              aria-expanded={notOpen}
+            >
+              <IoNotificationsSharp size={20} aria-hidden="true" />
+              {notifications.length > 0 && (
+                <div className="notification-badge" role="status">
+                  {notifications.length}
+                </div>
+              )}
+            </button>
 
-            {dashNotifications.length > 0 && (
-              <div
-                className="msgs"
-                role="status"
-                aria-label={`${dashNotifications.length} alerts`}
-              >
-                {dashNotifications.length}
-              </div>
-            )}
-
-            {dashOpen && (
+            {notOpen && (
               <div
                 className="notification-dropdown"
                 role="menu"
-                onMouseEnter={handleDashEnter}
-                onMouseLeave={handleDashLeave}
+                onMouseEnter={handleNotifEnter}
+                onMouseLeave={handleNotifLeave}
               >
-                {dashNotifications.length > 0 && (
-                  <div className="dropdown-header">
+                <div className="dropdown-header">
+                  <h4>Notifications</h4>
+                  {notifications.length > 0 && (
                     <button
-                      onClick={clearAllDashNotifications}
+                      onClick={clearAllNotifications}
                       className="clear-all-btn"
-                      aria-label="Clear all alerts"
+                      aria-label="Clear all notifications"
                     >
                       Clear All
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
 
-                {dashNotifications.length > 0 ? (
-                  <div className="notifications-list">
-                    {dashNotifications.map((notification) => (
+                <div className="notifications-list">
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`notification-item ${
-                          notification.status ? "error" : "info"
-                        }`}
+                        className={`notification-item ${notification.type || "info"}`}
                         role="menuitem"
                       >
-                        <p className="notification-msg">{notification.msg}</p>
+                        <div className="notification-content">
+                          <p className="notification-message">
+                            {notification.msg}
+                          </p>
+                          <div className="notification-time">
+                            {notification.time || "Just now"}
+                          </div>
+                        </div>
                         <button
-                          onClick={() =>
-                            removeDashNotification(notification.id)
-                          }
-                          className="remove-btn"
-                          aria-label="Remove"
+                          onClick={() => removeNotification(notification.id)}
+                          className="enhanced-remove-btn"
+                          aria-label="Remove notification"
                         >
-                          <RxCross2 size={16} aria-hidden="true" />
+                          <RxCross2 size={14} aria-hidden="true" />
                         </button>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="no-msg">No alerts</p>
-                )}
+                    ))
+                  ) : (
+                    <div className="no-notifications">
+                      <p>No new notifications</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
-        )}
 
-        {/* User Profile */}
-        <div
-          className="user-profile"
-          onClick={() => toggleDropdown("profile")}
-          onMouseEnter={handleProfileEnter}
-          onMouseLeave={handleProfileLeave}
-          role="button"
-          tabIndex="0"
-          aria-label="User profile"
-          aria-expanded={profileOpen}
-          onKeyDown={(e) => handleKeyDown(e, () => toggleDropdown("profile"))}
-        >
-          <ImUser size={20} aria-hidden="true" />
+          {/* Enhanced Dashboard */}
+          {shouldRenderDashboard && (
+            <div className="dropdown-container">
+              <button
+                className="header-action"
+                onClick={() => toggleDropdown("dashboard")}
+                onMouseEnter={handleDashEnter}
+                onMouseLeave={handleDashLeave}
+                aria-label="Dashboard alerts"
+                aria-expanded={dashOpen}
+              >
+                <BiSolidCollection size={20} aria-hidden="true" />
+                {dashNotifications.length > 0 && (
+                  <div className="notification-badge alert" role="status">
+                    {dashNotifications.length}
+                  </div>
+                )}
+              </button>
 
-          { profileOpen && (
-            <div
-              className="profile-dropdown"
-              role="menu"
-              onMouseEnter={handleProfileEnter}
-              onMouseLeave={handleProfileLeave}
-            >
-              <div className="profile-user">
-                <ImUser size={18} aria-hidden="true" />
-                <div className="profile-names">
-                  <strong>{user.userName || "User"}</strong>
-                  <span>{user.role || "Admin"}</span>
+              {dashOpen && (
+                <div
+                  className="notification-dropdown"
+                  role="menu"
+                  onMouseEnter={handleDashEnter}
+                  onMouseLeave={handleDashLeave}
+                >
+                  <div className="dropdown-header">
+                    <h4>Alerts</h4>
+                    {dashNotifications.length > 0 && (
+                      <button
+                        onClick={clearAllDashNotifications}
+                        className="clear-all-btn"
+                        aria-label="Clear all alerts"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="notifications-list">
+                    {dashNotifications.length > 0 ? (
+                      dashNotifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`notification-item ${notification.type || "warning"}`}
+                          role="menuitem"
+                        >
+                          <div className="notification-content">
+                            <p className="notification-message">
+                              {notification.msg}
+                            </p>
+                            <div className="notification-time">
+                              {notification.time || "Just now"}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() =>
+                              removeDashNotification(notification.id)
+                            }
+                            className="enhanced-remove-btn"
+                            aria-label="Remove alert"
+                          >
+                            <RxCross2 size={14} aria-hidden="true" />
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-notifications">
+                        <p>No active alerts</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              
-              {shouldRenderProfile && <div><div className="profile-divider" />
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="profile-link"
-                  onClick={() => navigate("/changepassword")}
-                >
-                  Change Password
-                </button>
-
-                <div className="profile-divider" />
-
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="profile-link logout"
-                  onClick={() => handleLogOut()}
-                >
-                  Logout
-                </button>
-              </div>}
+              )}
             </div>
           )}
-        </div>
 
-        {/* Settings */}
-        {currentPath === "/masters/" && (
-          <div
-            className="settings"
-            role="button"
-            tabIndex="0"
-            aria-label="Settings"
-          >
-            <IoMdSettings size={20} aria-hidden="true" />
+          {/* Enhanced User Profile */}
+          <div className="dropdown-container">
+            <button
+              className="header-action user-profile"
+              onClick={() => toggleDropdown("profile")}
+              onMouseEnter={handleProfileEnter}
+              onMouseLeave={handleProfileLeave}
+              aria-label="User profile"
+              aria-expanded={profileOpen}
+            >
+              <div className="user-avatar">
+                {user.userName?.charAt(0) || "U"}
+              </div>
+            </button>
+
+            {profileOpen && (
+              <div
+                className="profile-dropdown"
+                role="menu"
+                onMouseEnter={handleProfileEnter}
+                onMouseLeave={handleProfileLeave}
+              >
+                <div className="profile-header">
+                  <div className="profile-avatar">
+                    {user.userName?.charAt(0) || "U"}
+                  </div>
+                  <div className="profile-info">
+                    <h4>{user.userName || "User"}</h4>
+                    <p>{user.role || "Admin"}</p>
+                  </div>
+                </div>
+
+                <div className="profile-menu">
+                  {shouldRenderProfile && (
+                    <>
+                      <button
+                        type="button"
+                        className="enhanced-profile-menu-item"
+                        onClick={() => navigate("/changepassword")}
+                        role="menuitem"
+                      >
+                        <IoMdSettings size={16} aria-hidden="true" />
+                        Change Password
+                      </button>
+
+                      <div className="menu-divider" />
+                    </>
+                  )}
+
+                  <button
+                    type="button"
+                    className="enhanced-profile-menu-item logout"
+                    onClick={handleLogOut}
+                    role="menuitem"
+                  >
+                    <RxCross2 size={16} aria-hidden="true" />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        
-      </div>
-    </header>
 
+          {/* Enhanced Settings */}
+          {currentPath === "/masters/" && (
+            <button
+              className="header-action settings-btn"
+              aria-label="Settings"
+            >
+              <IoMdSettings size={20} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/* Enhanced Context Switcher */}
+      <ContextSwitcher
+        isOpen={isContextOpen}
+        initialData={contextInitialData}
+        onClose={() => setIsContextOpen(false)}
+        onApply={(data) => {
+          updateUser({
+            companyId: data.company.value,
+            branchId: data.branch.value,
+            locationId: data.location?.value || null,
+          });
+        }}
+      />
+    </>
   );
 };
-
 export default Header;

@@ -11,6 +11,12 @@ export const saveBranch = (data) => {
 };
 
 // Fetch branches by company
-export const fetchBranchesByCompany = (companyId) => {
-  return api.get(`branch/company/${companyId}`);
+export const fetchBranchesByCompany = (userId, companyId) => {
+  return api.get(`/entity/fetchBranch`, {
+    params: {
+      userId,
+      companyId
+    }
+  });
 };
+;
