@@ -1,5 +1,6 @@
 package com.example.MuzPayroll.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,6 +124,9 @@ public class ChangePasswordService
         UserMst user = req.getUserEntity();
 
         user.setPassword(req.getNewPassword());
+        user.setUsmPasswordLastChangedDate(LocalDate.now());
+        user.setUserAttempt(0);
+
         return Response.success(user);
     }
 

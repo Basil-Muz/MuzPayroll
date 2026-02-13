@@ -213,7 +213,7 @@ function ForgotPassword() {
             </>
           )}
         </form>
-        <p className="forgot-link" onClick={() => navigate("/")}>
+        <p className="forgot-link" onClick={() => navigate(solutionId === 1 ? "/payroll" : "/payrollemp")}>
           Back to Login
         </p>
       </div>

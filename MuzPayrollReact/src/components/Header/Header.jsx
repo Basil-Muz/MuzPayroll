@@ -46,8 +46,16 @@ const Header = ({ backendError = [] }) => {
   const navigate = useNavigate();
 
   const handleLogOut = () => {
+    const currentSolution = user?.solutionId;;
+
     logout();
-    navigate("/");
+
+    if (currentSolution === 1) {
+      navigate("/payroll", { replace: true });
+    } else if (currentSolution === 2) {
+      navigate("/payrollemp", { replace: true });
+    };
+
   };
 
   const { control, setValue, watch } = useForm({
@@ -74,7 +82,8 @@ const Header = ({ backendError = [] }) => {
   // };
 
   // const loginData = getLoginData();
-  const companyId = user.companyId;
+  const companyId = user?.companyId;
+  ;
 
   const currentPath = location.pathname;
 
@@ -169,7 +178,7 @@ const Header = ({ backendError = [] }) => {
     if (branchList.length === 0) return;
 
     const branchOption = branchList.find(
-      (b) => b.value === Number(user.branchId),
+      (b) => b.value === Number(user?.branchId),
     ); //stored ID is in string
     // console.log("Brqanch steed", branchOption);
     if (branchOption) {
@@ -179,14 +188,14 @@ const Header = ({ backendError = [] }) => {
         shouldTouch: false,
       });
     }
-    fetchLocationsByBranch(Number(user.branchId));
+    fetchLocationsByBranch(Number(user?.branchId));
   }, [branchList]);
 
   useEffect(() => {
     if (locationList.length === 0) return;
 
     const locationOption = locationList.find(
-      (l) => l.value === Number(user.locationId), //stored ID is in string
+      (l) => l.value === Number(user?.locationId), //stored ID is in string
     );
     // console.log("location steed", locationList);
     if (locationOption) {
@@ -200,8 +209,8 @@ const Header = ({ backendError = [] }) => {
   useEffect(() => {
     if (!companyId || !user?.branchId) return;
 
-    fetchContextData(user.branchId, user.userCode);
-  }, [companyId, user?.branchId, user?.userCode,user?.locationId, fetchContextData]);
+    fetchContextData(user?.branchId, user?.userCode);
+  }, [companyId, user?.branchId, user?.userCode, user?.locationId, fetchContextData]);
 
   //Listen to trigger on user changes
   // useEffect(() => {
@@ -351,7 +360,7 @@ const Header = ({ backendError = [] }) => {
         </div>
 
         {/* Context Switcher */}
-        { !shouldRenderHome && <div className="context-switcher" aria-label="Working context">
+        {!shouldRenderHome && <div className="context-switcher" aria-label="Working context">
           {/* Company (Read-only) */}
           <div className="company-pill" title={companyName}>
             {companyName}
@@ -481,9 +490,8 @@ const Header = ({ backendError = [] }) => {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`notification-item ${
-                        notification.status ? "error" : "info"
-                      }`}
+                      className={`notification-item ${notification.status ? "error" : "info"
+                        }`}
                       role="menuitem"
                     >
                       <p className="notification-msg">{notification.msg}</p>
@@ -555,9 +563,8 @@ const Header = ({ backendError = [] }) => {
                     {dashNotifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`notification-item ${
-                          notification.status ? "error" : "info"
-                        }`}
+                        className={`notification-item ${notification.status ? "error" : "info"
+                          }`}
                         role="menuitem"
                       >
                         <p className="notification-msg">{notification.msg}</p>
@@ -595,7 +602,7 @@ const Header = ({ backendError = [] }) => {
         >
           <ImUser size={20} aria-hidden="true" />
 
-          { profileOpen && (
+          {profileOpen && (
             <div
               className="profile-dropdown"
               role="menu"
@@ -605,12 +612,12 @@ const Header = ({ backendError = [] }) => {
               <div className="profile-user">
                 <ImUser size={18} aria-hidden="true" />
                 <div className="profile-names">
-                  <strong>{user.userName || "User"}</strong>
-                  <span>{user.role || "Admin"}</span>
+                  <strong>{user?.userName || "User"}</strong>
+                  {/* <span>{user?.role || "Admin"}</span> */}
                 </div>
               </div>
 
-              
+
               {shouldRenderProfile && <div><div className="profile-divider" />
                 <button
                   type="button"
@@ -647,7 +654,7 @@ const Header = ({ backendError = [] }) => {
             <IoMdSettings size={20} aria-hidden="true" />
           </div>
         )}
-        
+
       </div>
     </header>
 

@@ -1,5 +1,6 @@
 package com.example.MuzPayroll.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -102,17 +103,17 @@ public class ForgotChangePasswordService
         String newPassword = req.getNewPassword();
         String oldPassword = user.getPassword();
 
-        //  SAME AS OLD PASSWORD
+        // SAME AS OLD PASSWORD
         if (newPassword.equals(oldPassword)) {
             return Response.error("New password cannot be same as old password");
         }
 
-        //  Password length rule
+        // Password length rule
         if (newPassword.length() < 2) {
             return Response.error("Password must be at least 2 characters long");
         }
 
-        //  No spaces
+        // No spaces
         if (newPassword.contains(" ")) {
             return Response.error("Password must not contain spaces");
         }
@@ -147,6 +148,7 @@ public class ForgotChangePasswordService
                 req.getUserCode().replace("@muziris", ""));
 
         user.setPassword(req.getNewPassword());
+        user.setUsmPasswordLastChangedDate(LocalDate.now());
         user.setUserAttempt(0);
 
         return Response.success(user);
