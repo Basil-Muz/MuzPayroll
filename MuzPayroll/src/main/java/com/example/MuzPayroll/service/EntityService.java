@@ -10,8 +10,6 @@ import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.repository.EntityRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
-import io.micrometer.common.lang.NonNull;
-
 @Service
 public class EntityService {
 
@@ -51,7 +49,7 @@ public class EntityService {
 
                 List<Object[]> rows;
 
-                if (userType == 100012) {
+                if ( userType == 100011 || userType == 100012) {
                         rows = entityRepository.getAdminBranch(companyId, mccId);
                 } else {
                         rows = entityRepository.getUserBranch(userId, companyId, mccId);
@@ -73,7 +71,7 @@ public class EntityService {
 
                 List<Object[]> rows;
 
-                if (userType == 100012) {
+                if ( userType == 100011 || userType == 100012) {
                         rows = entityRepository.getAdminLocation(companyId, branchId, mccId);
                 } else {
                         rows = entityRepository.getUserLocation(userId, branchId, mccId);
