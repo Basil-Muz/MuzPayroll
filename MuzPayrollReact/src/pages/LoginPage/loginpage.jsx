@@ -97,8 +97,11 @@ function LoginPage() {
         userMstId: payload.userMstId,
 
         userEntityHierarchyId: payload.userEntityHierarchyId,
+        companyName: payload.companyName, 
         defaultEntityHierarchyId: payload.defaultEntityHierarchyId,
+        locationName: payload.locationName,   
         branchEntityHierarchyId: payload.branchEntityHierarchyId,
+        branchName: payload.branchName,
 
         token: payload.token,
         sidebarOpen: false,

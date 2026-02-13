@@ -154,7 +154,7 @@ function App() {
           <Route path="/shiftgroup" element={<ShiftGroup />} />
 
           <Route
-            path="/locationrights"
+            path="/locationrightsmapping"
             element={<LocationGroupRightsMapping />}
           />
         </Routes>

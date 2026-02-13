@@ -1,14 +1,19 @@
-import { useMemo, useState, useEffect} from "react";
+import { useMemo, useState, useEffect } from "react";
 import { FaFilter } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
+import { useLoader } from "../../context/LoaderContext.jsx";
+import { ensureMinDuration } from "../../utils/loaderDelay";
 
 // Components
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
+//service
+import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
+import { getBranchList } from "../../services/LocationGroupRightsMapping.service.js";
 // Utils(Helpers)
 import { handleApiError } from "../../utils/errorToastResolver";
 
@@ -34,23 +39,6 @@ const GROUPS = [
   { id: 1018, name: "THRISSUR" },
   { id: 1028, name: "TRIVANDRUM" },
   { id: 1027, name: "WAYANAD" },
-];
-
-const BRANCHES = [
-  { id: 1, name: "Norms Management Pvt Ltd" },
-  { id: 2, name: "Norms Tech Solutions" },
-];
-
-const solutions = [
-  { id: 1, name: "Employee portal" },
-  { id: 2, name: "Employer portal" },
-];
-
-const LOCATIONS = [
-  { id: "1002", name: "ALAPPUZHA" },
-  { id: "103", name: "CALICUT" },
-  { id: "201", name: "BANGALORE" },
-  { id: "202", name: "MYSORE" },
 ];
 
 const initData = [
@@ -208,7 +196,7 @@ export default function LocationGroupRightsMapping() {
   // const [branchFilter, setBranchFilter] = useState("ALL");
 
   // const [locationQuery, setLocationQuery] = useState("");
-
+  const { showRailLoader, hideLoader } = useLoader();
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
   const [saveSelection, setSaveSelection] = useState(new Set());
   const [originalMap, setOriginalMap] = useState(new Map()); // Capture the first state before edit
@@ -221,13 +209,42 @@ export default function LocationGroupRightsMapping() {
   const [showFilters, setShowFilters] = useState(true); // Toggle the filter component
   const [isSearchApplied, setIsSearchApplied] = useState(false); //  Load the table data
 
+  const [solutions, setSolutions] = useState([]);
+  const [branches, setBranches] = useState([]);
+
+  const userId = 3;
+  const companyId = 4;
+
+  useEffect(() => {
+    fetchDropDown();
+  }, []);
+
+  const fetchDropDown = async () => {
+    const startTime = Date.now();
+    showRailLoader("Fetching details…");
+    try {
+      const solutions = await getSolutionList();
+      setSolutions(solutions.data);
+
+      const branchs = await getBranchList(userId, companyId);
+      // const branchdata = Array.isArray(branchs.data)
+      //   ? branchs.data
+      //   : [branchs.data];
+      setBranches(branchs.data);
+    } catch (error) {
+      console.error("Error fetching solutions:", error);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
+    }
+  };
   const {
     register,
     // handleSubmit,
     trigger,
     // setError,
     // clearErrors,
-    // setValue,
+    setValue,
     // reset,
     // setFocus,
     // getValues,
@@ -254,24 +271,22 @@ export default function LocationGroupRightsMapping() {
   const solutionOptions = useMemo(
     () =>
       solutions.map((s) => ({
-        value: s.id,
-        label: s.name,
+        value: s.somSolutionID,
+        label: s.somSolutionName,
       })),
-    [],
+    [solutions],
   );
 
   const branchOptions = useMemo(() => {
     return [
       { value: "ALL", label: "All branches" },
-      ...BRANCHES.map((s) => ({
-        value: s.id,
-        label: s.name,
+      ...branches.map((s) => ({
+        value: s.entityHierarchyId,
+        label: s.entityName,
       })),
     ];
-  }, [BRANCHES]);
-
-  // console.log("branches list", branchOptions);
-
+  }, [branches]);
+  console.log("branches listaedfwef", branchOptions);
   // const filteredRows = useMemo(() => {
   //   if (!isSearchApplied) return [];
   //   trigger();
@@ -414,8 +429,13 @@ export default function LocationGroupRightsMapping() {
   //     return n;
   //   });
   // };
-
+  const handleRefresh = () => {
+    fetchDropDown();
+  };
   const handleClear = () => {
+    fetchDropDown();
+    setValue("businessSolution", null);
+    setValue("branches", null);
     // Warn but DO NOT block
     if (saveSelection.size) {
       toast("You have unsaved changes", {
@@ -603,7 +623,7 @@ export default function LocationGroupRightsMapping() {
                 )}
               </div>
 
-              <div>
+              {/* <div>
                 <input
                   type="search"
                   disabled={isSearchApplied}
@@ -611,7 +631,7 @@ export default function LocationGroupRightsMapping() {
                   placeholder="Search by location"
                   {...register("location")}
                 />
-              </div>
+              </div> */}
 
               <div className="search-actions">
                 {!isSearchApplied ? (
@@ -873,7 +893,7 @@ export default function LocationGroupRightsMapping() {
               //    onClick: toggleForm, //to toggle the designation form
               // },
               refresh: {
-                //   onClick: () => window.location.reload(),  // Refresh the page
+                onClick: handleRefresh,
               },
             }}
           />
