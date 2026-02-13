@@ -17,17 +17,17 @@ public class MenuRepository {
     private EntityManager entityManager;
 
     public List<MenuDTO> getMenu(
-            // String transtype,
-            // String subtype,
+            String transtype,
+            String transsubtype,
             Integer userid,
             Integer solutionid,
             Integer entityid) {
 
         Query query = entityManager.createNativeQuery(
-                "SELECT * FROM menufunction(:userid,:solutionid,:entityid)");
+                "SELECT * FROM menufunction(:transtype,:transsubtype,:userid,:solutionid,:entityid)");
 
-        // query.setParameter("transtype", transtype);
-        // query.setParameter("subtype", subtype);
+        query.setParameter("transtype", transtype);
+        query.setParameter("transsubtype", transsubtype);
         query.setParameter("userid", userid);
         query.setParameter("solutionid", solutionid);
         query.setParameter("entityid", entityid);
