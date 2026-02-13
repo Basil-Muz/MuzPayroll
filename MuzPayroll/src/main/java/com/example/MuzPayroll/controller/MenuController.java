@@ -24,10 +24,12 @@ public class MenuController {
 
     @GetMapping("/mainmenu")
     public List<MenuDTO> getMenu(
+            @RequestParam String transtype,
+            @RequestParam String transsubtype,
             @RequestParam Integer userId,
             @RequestParam Integer solutionId,
             @RequestParam Integer entityHierarchyId) {
 
-        return menuService.getMenu(userId, solutionId, entityHierarchyId);
+        return menuService.getMenu(transtype, transsubtype, userId, solutionId, entityHierarchyId);
     }
 }
