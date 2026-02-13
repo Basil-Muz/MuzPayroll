@@ -6,6 +6,7 @@ import axios from "axios";
 import { Controller } from "react-hook-form";
 import Select from "react-select";
 import { useForm } from "react-hook-form";
+import { FaUser } from "react-icons/fa";
 
 import "./Header.css";
 import { IoMdSettings } from "react-icons/io";
@@ -14,6 +15,17 @@ import { BiSolidCollection } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
 import { ImUser } from "react-icons/im";
 import { HiOutlineSwitchHorizontal } from "react-icons/hi";
+
+// Import the icons at the top
+import {
+  IoAlertCircle,
+  IoCheckmarkCircle,
+  IoInformationCircle,
+  IoTimeOutline,
+} from "react-icons/io5";
+import { BsBell, BsExclamationTriangle, BsInbox } from "react-icons/bs";
+import { MdError, MdWarning, MdInfo, MdCheckCircle } from "react-icons/md";
+import { FaRegBell, FaRegCheckCircle } from "react-icons/fa";
 
 // Context / hooks
 import { useLoader } from "../../context/LoaderContext";
@@ -41,12 +53,28 @@ const INITIAL_NOTIFICATIONS = [
     msg: "New payroll batch ready for processing",
     type: "info",
     time: "10 min ago",
+    title: "Payroll Ready",
   },
   {
     id: 2,
     msg: "Tax calculation error detected",
     type: "error",
     time: "25 min ago",
+    title: "Error Detected",
+  },
+  {
+    id: 3,
+    msg: "Employee timesheets pending approval",
+    type: "warning",
+    time: "1 hour ago",
+    title: "Pending Approval",
+  },
+  {
+    id: 4,
+    msg: "Monthly payroll completed successfully",
+    type: "success",
+    time: "2 hours ago",
+    title: "Completed",
   },
 ];
 
@@ -166,6 +194,37 @@ const Header = ({ backendError = [] }) => {
     },
     [companyId],
   );
+
+  // Helper function to get notification icon based on type
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case "error":
+        return <MdError size={18} />;
+      case "warning":
+        return <MdWarning size={18} />;
+      case "success":
+        return <MdCheckCircle size={18} />;
+      case "info":
+      default:
+        return <MdInfo size={18} />;
+    }
+  };
+
+  // Helper function to get notification title
+  const getNotificationTitle = (type) => {
+    switch (type) {
+      case "error":
+        return "Error";
+      case "warning":
+        return "Warning";
+      case "success":
+        return "Success";
+      case "info":
+        return "Information";
+      default:
+        return "Notification";
+    }
+  };
 
   const fetchBranchesByCompanyList = useCallback(
     async (companyId) => {
@@ -503,7 +562,7 @@ const Header = ({ backendError = [] }) => {
               aria-label="Notifications"
               aria-expanded={notOpen}
             >
-              <IoNotificationsSharp size={20} aria-hidden="true" />
+              <IoNotificationsSharp size={20} className="header-icons" aria-hidden="true" />
               {notifications.length > 0 && (
                 <div className="notification-badge" role="status">
                   {notifications.length}
@@ -539,11 +598,21 @@ const Header = ({ backendError = [] }) => {
                         className={`notification-item ${notification.type || "info"}`}
                         role="menuitem"
                       >
+                        <div className="notification-icon">
+                          {getNotificationIcon(notification.type)}
+                        </div>
                         <div className="notification-content">
+                          <div className="notification-header">
+                            <span className="notification-title">
+                              {notification.title ||
+                                getNotificationTitle(notification.type)}
+                            </span>
+                          </div>
                           <p className="notification-message">
                             {notification.msg}
                           </p>
                           <div className="notification-time">
+                            <IoTimeOutline size={12} />
                             {notification.time || "Just now"}
                           </div>
                         </div>
@@ -558,6 +627,7 @@ const Header = ({ backendError = [] }) => {
                     ))
                   ) : (
                     <div className="no-notifications">
+                      <BsInbox size={48} />
                       <p>No new notifications</p>
                     </div>
                   )}
@@ -577,7 +647,7 @@ const Header = ({ backendError = [] }) => {
                 aria-label="Dashboard alerts"
                 aria-expanded={dashOpen}
               >
-                <BiSolidCollection size={20} aria-hidden="true" />
+                <BiSolidCollection size={20} className="header-icons" aria-hidden="true" />
                 {dashNotifications.length > 0 && (
                   <div className="notification-badge alert" role="status">
                     {dashNotifications.length}
@@ -613,11 +683,30 @@ const Header = ({ backendError = [] }) => {
                           className={`notification-item ${notification.type || "warning"}`}
                           role="menuitem"
                         >
+                          <div className="notification-icon">
+                            {notification.type === "error" ? (
+                              <MdError size={18} />
+                            ) : notification.type === "warning" ? (
+                              <MdWarning size={18} />
+                            ) : (
+                              <BsExclamationTriangle size={18} />
+                            )}
+                          </div>
                           <div className="notification-content">
+                            <div className="notification-header">
+                              <span className="notification-title">
+                                {notification.type === "error"
+                                  ? "Error"
+                                  : notification.type === "warning"
+                                    ? "Warning"
+                                    : "Alert"}
+                              </span>
+                            </div>
                             <p className="notification-message">
                               {notification.msg}
                             </p>
                             <div className="notification-time">
+                              <IoTimeOutline size={12} />
                               {notification.time || "Just now"}
                             </div>
                           </div>
@@ -634,7 +723,8 @@ const Header = ({ backendError = [] }) => {
                       ))
                     ) : (
                       <div className="no-notifications">
-                        <p>No active alerts</p>
+                        <BsInbox size={48} />
+                        <p>No new notifications</p>
                       </div>
                     )}
                   </div>
@@ -655,6 +745,7 @@ const Header = ({ backendError = [] }) => {
             >
               <div className="user-avatar">
                 {user.userName?.charAt(0) || "U"}
+                {/* <FaUser /> */}
               </div>
             </button>
 
@@ -668,6 +759,7 @@ const Header = ({ backendError = [] }) => {
                 <div className="profile-header">
                   <div className="profile-avatar">
                     {user.userName?.charAt(0) || "U"}
+                    {/* <FaUser /> */}
                   </div>
                   <div className="profile-info">
                     <h4>{user.userName || "User"}</h4>

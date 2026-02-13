@@ -22,15 +22,16 @@
 
 /* Brand accent line */
 .header::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, 
-    var(--brand) 0%, 
-    rgba(210, 24, 216, 0.8) 50%, 
+  background: linear-gradient(
+    90deg,
+    var(--brand) 0%,
+    rgba(210, 24, 216, 0.8) 50%,
     var(--brand) 100%
   );
   opacity: 0.9;
@@ -118,41 +119,30 @@
   min-width: 0;
   overflow: hidden;
 }
-
-.context-company,
-.context-branch,
-.context-location {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100px;
-}
-
 .context-company {
   color: var(--brand);
-  font-weight: 600;
-  font-size: 13px;
-  padding: 2px 6px;
+  font-weight: 700;
+  padding: 2px 8px;
   background: rgba(210, 24, 216, 0.08);
   border-radius: 6px;
   border: 1px solid rgba(210, 24, 216, 0.2);
 }
 
-.context-branch {
-  color: var(--text-dark);
+.context-branch,
+.context-location {
+  color: var(--text-primary, #111827);
   font-weight: 500;
-  padding: 2px 6px;
-  background: rgba(59, 130, 246, 0.08);
-  border-radius: 6px;
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  padding: 2px 8px;
+  background: transparent; /* No background */
+  border: none;
+  border-radius: 0;
 }
 
-.context-location {
-  color: var(--text);
-  padding: 2px 6px;
-  background: rgba(16, 185, 129, 0.08);
-  border-radius: 6px;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+.context-separator {
+  color: var(--border-strong, #e5e7eb);
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 1;
 }
 
 .context-separator {
@@ -195,7 +185,11 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark, #a510b9) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--brand) 0%,
+    var(--brand-dark, #a510b9) 100%
+  );
   border: 2px solid var(--background);
   border-radius: 10px;
   color: white;
@@ -306,12 +300,13 @@
 }
 
 @keyframes badgePulse {
-  0%, 100% { 
-    transform: scale(1); 
+  0%,
+  100% {
+    transform: scale(1);
     box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
   }
-  50% { 
-    transform: scale(1.1); 
+  50% {
+    transform: scale(1.1);
     box-shadow: 0 3px 8px rgba(239, 68, 68, 0.6);
   }
 }
@@ -320,27 +315,29 @@
 .header-action.user-profile {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, 
-    var(--success-light) 0%, 
+  /* background: linear-gradient(
+    135deg,
+    var(--success-light) 0%,
     rgba(16, 185, 129, 0.8) 100%
-  );
-  border: 2px solid var(--background);
+  ); */
+  /* border: 2px solid var(--background); */
   border-radius: 12px;
   color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  /* box-shadow: 0 4px 12px rgba(171, 16, 185, 0.3); */
   position: relative;
   overflow: hidden;
 }
 
 .header-action.user-profile::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.1) 0%, 
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
     rgba(255, 255, 255, 0) 100%
   );
   opacity: 0;
@@ -349,7 +346,7 @@
 
 .header-action.user-profile:hover {
   transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 16px rgba(157, 16, 185, 0.4);
 }
 
 .header-action.user-profile:hover::before {
@@ -360,7 +357,7 @@
   transform: scale(1) translateY(0);
 }
 
-.user-avatar {
+/* .user-avatar {
   width: 32px;
   height: 32px;
   background: white;
@@ -372,7 +369,7 @@
   font-weight: 700;
   font-size: 14px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+} */
 
 /* =========================================================
    ENHANCED DROPDOWNS - Mobile First
@@ -381,13 +378,13 @@
 .notification-dropdown,
 .profile-dropdown {
   position: absolute;
-  top: calc(100% + 3px);
+  top: calc(100% + 13px);
   right: 0;
   background: var(--background);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  z-index: 101;
+  z-index: 2000;
   overflow: hidden;
   animation: dropdownSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 300px;
@@ -412,8 +409,9 @@
 .dropdown-header {
   padding: 16px 20px;
   border-bottom: 1px solid var(--border-light);
-  background: linear-gradient(135deg, 
-    rgba(210, 24, 216, 0.05) 0%, 
+  background: linear-gradient(
+    135deg,
+    rgba(210, 24, 216, 0.05) 0%,
     rgba(210, 24, 216, 0.02) 100%
   );
   display: flex;
@@ -462,7 +460,7 @@
   .context-summary {
     display: flex !important;
   }
-  
+
   .context-switcher-button {
     display: none !important;
   }
@@ -473,50 +471,50 @@
   .context-summary {
     display: none !important;
   }
-  
+
   .context-switcher-button {
     display: flex !important;
   }
-  
+
   /* Adjust header layout for mobile */
   .header {
     padding: 0 16px;
     min-height: 60px;
   }
-  
+
   .header-left {
     gap: 12px;
     flex: 1;
   }
-  
+
   .logo {
     padding-right: 12px;
     height: 36px;
   }
-  
+
   .logo img {
     height: 30px;
   }
-  
+
   .context-switcher-button {
     width: 40px;
     height: 40px;
   }
-  
+
   .context-switcher-button svg {
     width: 18px;
     height: 18px;
   }
-  
+
   .header-right {
     gap: 12px;
   }
-  
+
   .header-action {
     width: 40px;
     height: 40px;
   }
-  
+
   .notification-badge {
     top: -5px;
     right: -5px;
@@ -524,7 +522,7 @@
     height: 18px;
     font-size: 9px;
   }
-  
+
   .notification-dropdown,
   .profile-dropdown {
     position: fixed;
@@ -543,7 +541,7 @@
     width: 36px;
     height: 36px;
   }
-  
+
   .context-switcher-button svg {
     width: 16px;
     height: 16px;
@@ -555,7 +553,7 @@
   .logo {
     display: none;
   }
-  
+
   .context-switcher-button {
     margin-left: 0;
   }
@@ -619,7 +617,10 @@
   background: var(--brand);
 }
 
-/* Enhanced Notification Item */
+/* =========================================================
+   ENHANCED NOTIFICATION ITEM - With React Icons
+   ========================================================= */
+
 .notification-item {
   padding: 14px 20px;
   border-bottom: 1px solid var(--border-light);
@@ -635,40 +636,102 @@
 }
 
 .notification-item:hover {
-  background: linear-gradient(90deg, 
-    rgba(210, 24, 216, 0.03) 0%, 
+  background: linear-gradient(
+    90deg,
+    rgba(210, 24, 216, 0.03) 0%,
     rgba(210, 24, 216, 0.01) 100%
   );
   padding-left: 24px;
 }
 
+/* Type-specific styling with React Icons */
 .notification-item.error {
   border-left: 4px solid var(--danger);
-  background: linear-gradient(90deg, 
-    rgba(212, 66, 66, 0.08) 0%, 
+  background: linear-gradient(
+    90deg,
+    rgba(212, 66, 66, 0.08) 0%,
     rgba(212, 66, 66, 0.02) 100%
   );
 }
 
 .notification-item.info {
   border-left: 4px solid var(--brand);
-  background: linear-gradient(90deg, 
-    rgba(210, 24, 216, 0.08) 0%, 
+  background: linear-gradient(
+    90deg,
+    rgba(210, 24, 216, 0.08) 0%,
     rgba(210, 24, 216, 0.02) 100%
   );
 }
 
 .notification-item.warning {
   border-left: 4px solid var(--warning, #f59e0b);
-  background: linear-gradient(90deg, 
-    rgba(245, 158, 11, 0.08) 0%, 
+  background: linear-gradient(
+    90deg,
+    rgba(245, 158, 11, 0.08) 0%,
     rgba(245, 158, 11, 0.02) 100%
   );
+}
+
+.notification-item.success {
+  border-left: 4px solid var(--success, #10b981);
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.08) 0%,
+    rgba(16, 185, 129, 0.02) 100%
+  );
+}
+
+/* Icon container for notification types */
+.notification-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  flex-shrink: 0;
+  color: white;
+  font-size: 16px;
+}
+
+.notification-item.error .notification-icon {
+  background: rgba(212, 66, 66, 0.2);
+  color: var(--danger);
+}
+
+.notification-item.info .notification-icon {
+  background: rgba(210, 24, 216, 0.2);
+  color: var(--brand);
+}
+
+.notification-item.warning .notification-icon {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--warning, #f59e0b);
+}
+
+.notification-item.success .notification-icon {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--success, #10b981);
 }
 
 .notification-content {
   flex: 1;
   min-width: 0;
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.notification-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .notification-message {
@@ -677,13 +740,21 @@
   color: var(--text);
   line-height: 1.5;
   font-weight: 500;
+  word-break: break-word;
 }
 
 .notification-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
   color: var(--text-muted);
   font-weight: 600;
   letter-spacing: 0.3px;
+}
+
+.notification-time svg {
+  opacity: 0.6;
 }
 
 .enhanced-remove-btn {
@@ -713,18 +784,20 @@
   transform: rotate(90deg);
 }
 
-/* No Notifications */
+/* No Notifications with React Icon */
 .no-notifications {
   padding: 48px 20px;
   text-align: center;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
-.no-notifications::before {
-  content: '📭';
-  font-size: 32px;
-  display: block;
-  margin-bottom: 12px;
+.no-notifications svg {
+  font-size: 48px;
+  color: var(--border-strong, #e5e7eb);
   opacity: 0.6;
 }
 
@@ -735,6 +808,45 @@
   font-weight: 500;
 }
 
+/* Notification badge with icon */
+.notification-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--danger);
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--background);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  z-index: 1;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+.notification-badge.alert {
+  background: var(--warning, #f59e0b);
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+}
+
+@keyframes badgePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.6);
+  }
+}
+
 /* Enhanced Profile Dropdown */
 .profile-dropdown {
   min-width: 260px;
@@ -742,9 +854,10 @@
 
 .profile-header {
   padding: 20px;
-  background: linear-gradient(135deg, 
-    var(--success-light) 0%, 
-    rgba(16, 185, 129, 0.1) 100%
+  background: linear-gradient(
+    135deg,
+    var(--success-light) 0%,
+    rgba(171, 16, 185, 0.1) 100%
   );
   border-bottom: 1px solid var(--border-light);
   display: flex;
@@ -755,8 +868,9 @@
 .profile-avatar {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, 
-    var(--success) 0%, 
+  background: linear-gradient(
+    135deg,
+    var(--success) 0%,
     var(--success-light) 100%
   );
   border-radius: 12px;
@@ -766,7 +880,7 @@
   color: white;
   font-weight: 700;
   font-size: 18px;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(171, 16, 185, 0.3);
 }
 
 .profile-info {
@@ -816,7 +930,7 @@
 }
 
 .enhanced-profile-menu-item::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -828,8 +942,9 @@
 }
 
 .enhanced-profile-menu-item:hover {
-  background: linear-gradient(90deg, 
-    rgba(210, 24, 216, 0.06) 0%, 
+  background: linear-gradient(
+    90deg,
+    rgba(210, 24, 216, 0.06) 0%,
     transparent 100%
   );
   color: var(--text-dark);
@@ -845,8 +960,9 @@
 }
 
 .enhanced-profile-menu-item.logout:hover {
-  background: linear-gradient(90deg, 
-    rgba(239, 68, 68, 0.08) 0%, 
+  background: linear-gradient(
+    90deg,
+    rgba(239, 68, 68, 0.08) 0%,
     transparent 100%
   );
 }
@@ -854,9 +970,10 @@
 .menu-divider {
   height: 1px;
   margin: 8px 20px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--border-light) 50%, 
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-light) 50%,
     transparent 100%
   );
 }
@@ -891,8 +1008,12 @@
 }
 
 @keyframes backdropFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .context-modal-content {
@@ -925,8 +1046,9 @@
 .context-modal-header {
   padding: 20px 24px;
   border-bottom: 1px solid var(--border-light);
-  background: linear-gradient(135deg, 
-    rgba(210, 24, 216, 0.08) 0%, 
+  background: linear-gradient(
+    135deg,
+    rgba(210, 24, 216, 0.08) 0%,
     transparent 100%
   );
   display: flex;
@@ -944,7 +1066,7 @@
   gap: 10px;
 }
 
-.context-modal-header .icon{
+.context-modal-header .icon {
   /* content: '🌐'; */
   color: var(--brand);
   font-size: 18px;
@@ -998,7 +1120,7 @@
 }
 
 .form-field label::before {
-  content: '→';
+  content: "→";
   font-size: 10px;
   color: var(--brand);
 }
@@ -1064,8 +1186,9 @@
 }
 
 .enhanced-form-select__option:hover {
-  background: linear-gradient(90deg, 
-    rgba(210, 24, 216, 0.08) 0%, 
+  background: linear-gradient(
+    90deg,
+    rgba(210, 24, 216, 0.08) 0%,
     transparent 100%
   ) !important;
   color: var(--text-dark) !important;
@@ -1073,8 +1196,9 @@
 }
 
 .enhanced-form-select__option--is-selected {
-  background: linear-gradient(90deg, 
-    var(--brand) 0%, 
+  background: linear-gradient(
+    90deg,
+    var(--brand) 0%,
     var(--brand) 100%
   ) !important;
   color: white !important;
@@ -1106,8 +1230,9 @@
 }
 
 .enhanced-btn-primary {
-  background: linear-gradient(135deg, 
-    var(--brand) 0%, 
+  background: linear-gradient(
+    135deg,
+    var(--brand) 0%,
     var(--brand-dark, #a510b9) 100%
   );
   color: white;
@@ -1149,11 +1274,11 @@
   .header {
     padding: 0 20px;
   }
-  
+
   .context-summary {
     min-width: 220px;
   }
-  
+
   .notification-badge {
     top: -4px;
     right: -4px;
@@ -1165,47 +1290,47 @@
     padding: 0 16px;
     min-height: 60px;
   }
-  
+
   .header-left {
     gap: 16px;
   }
-  
+
   .logo {
     padding-right: 16px;
     height: 36px;
   }
-  
+
   .logo img {
     height: 32px;
   }
-  
+
   .context-summary {
     min-width: 180px;
     padding: 8px 12px;
   }
-  
+
   .context-company,
   .context-branch,
   .context-location {
     font-size: 12px;
     padding: 1px 4px;
   }
-  
+
   .header-right {
     gap: 12px;
   }
-  
+
   .header-action {
     width: 40px;
     height: 40px;
   }
-  
+
   .notification-badge {
     min-width: 18px;
     height: 18px;
     font-size: 9px;
   }
-  
+
   .notification-dropdown,
   .profile-dropdown {
     position: fixed;
@@ -1221,32 +1346,36 @@
     padding: 0 12px;
     min-height: 56px;
   }
-  
+
   .context-summary {
     min-width: 150px;
     max-width: 180px;
     padding: 6px 10px;
   }
-  
+
   .context-summary-content {
     gap: 4px;
   }
-  
+
   .context-company,
   .context-branch,
   .context-location {
     font-size: 11px;
   }
-  
+
   .header-action {
     width: 36px;
     height: 36px;
   }
-  
+
   .user-avatar {
     width: 28px;
     height: 28px;
     font-size: 12px;
+  }
+  .header-icons{
+    width:16px;
+    height:16px;
   }
 }
 
@@ -1266,11 +1395,11 @@
     transition: none !important;
     animation: none !important;
   }
-  
+
   .notification-badge {
     animation: none;
   }
-  
+
   .context-summary:hover,
   .header-action:hover,
   .enhanced-btn-primary:hover {
@@ -1297,11 +1426,11 @@
     position: static;
     box-shadow: none;
   }
-  
+
   .header::after {
     display: none;
   }
-  
+
   .context-summary,
   .header-action {
     display: none;
@@ -1310,7 +1439,7 @@
 
 /* Loading state indicator */
 .enhanced-form-select__control--is-disabled::after {
-  content: '';
+  content: "";
   position: absolute;
   right: 36px;
   top: 50%;
