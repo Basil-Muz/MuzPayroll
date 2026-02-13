@@ -7,8 +7,9 @@ import com.example.MuzPayroll.entity.DTO.MenuDTO;
 public interface MenuService {
 
     List<MenuDTO> getMenu(
+            String transtype,
+            String transsubtype,
             Integer userId,
             Integer solutionId,
             Integer entityHierarchyId);
-
 }
