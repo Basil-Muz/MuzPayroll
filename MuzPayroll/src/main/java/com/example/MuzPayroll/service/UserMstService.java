@@ -112,8 +112,6 @@ public class UserMstService {
 
         Long userEntityHierarchyId = userRepo.findBranchIdByUserCode(userCode);
         Long defaultEntityHierarchyId = userRepo.findLocationIdByUserCode(userCode);
-
-        // Fetch branchId using defaultEntityHierarchyId from entity_hierarchy_info
         Long branchId = entityinfoRepository.findBranchIdByLocationId(defaultEntityHierarchyId);
 
         // -------------------------
@@ -130,6 +128,9 @@ public class UserMstService {
         resp.setUserEntityHierarchyId(userEntityHierarchyId);
         resp.setDefaultEntityHierarchyId(defaultEntityHierarchyId);
         resp.setBranchEntityHierarchyId(branchId);
+        resp.setCompanyName(entityinfoRepository.findEntityNameByEntityId(userEntityHierarchyId));
+        resp.setBranchName(entityinfoRepository.findEntityNameByEntityId(branchId));
+        resp.setLocationName(entityinfoRepository.findEntityNameByEntityId(defaultEntityHierarchyId));
 
         // JWT token
         String token = jwtUtil.generateToken(user.getUserCode());
