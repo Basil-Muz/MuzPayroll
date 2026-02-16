@@ -96,15 +96,14 @@ function LoginPage() {
         userName: payload.userName,
         userMstId: payload.userMstId,
 
-        userEntityHierarchyId: payload.userEntityHierarchyId,
+        userEntityHierarchyId: payload.userEntityHierarchyId ?? "",
         companyName: payload.companyName, 
-        defaultEntityHierarchyId: payload.defaultEntityHierarchyId,
+        defaultEntityHierarchyId: payload.defaultEntityHierarchyId ?? "",
         locationName: payload.locationName,   
-        branchEntityHierarchyId: payload.branchEntityHierarchyId,
+        branchEntityHierarchyId: payload.branchEntityHierarchyId ?? "",
         branchName: payload.branchName,
 
         token: payload.token,
-        sidebarOpen: false,
         solutionId: solutionId,
       };
 

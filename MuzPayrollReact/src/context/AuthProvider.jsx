@@ -5,12 +5,8 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
 
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem("userData");
-    return stored ? JSON.parse(stored) : null;
-  });
 
-
+  const [user, setUser] = useState(() => getLoginData());
 
   //   useEffect(() => {
   //     if (user) {
@@ -34,6 +30,7 @@ export const AuthProvider = ({ children }) => {
   //     );
   //         console.log("Data from Auth Provider After update",user)
   //   };
+
   const updateUser = (updates) => {
     setUser((prev) => {
       const next = { ...prev, ...updates };

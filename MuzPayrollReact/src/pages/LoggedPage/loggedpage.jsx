@@ -1,56 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
-import "./loggedpage.css";
-import muzLogo from "../../assets/muzlogo_transparent.png";
-import Sidebar from "../../components/SideBar/Sidebar";
-
-import { toast } from "react-hot-toast";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
+import { toast } from "react-hot-toast";
+
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import Sidebar from "../../components/SideBar/Sidebar";
+import muzLogo from "../../assets/muzlogo_transparent.png";
 
 import { useLoader } from "../../context/LoaderContext";
-import { ensureMinDuration } from "../../utils/loaderDelay";
 import { useAuth } from "../../context/AuthProvider";
-
+import { ensureMinDuration } from "../../utils/loaderDelay";
 import { getCurrentFinYear, getFinYearOptions } from "../../utils/finyearUtils";
-import { fetchCompanies, fetchBranch, fetchLocation, } from "../../services/home.service";
-import { useSearchParams } from "react-router-dom";
+import { fetchCompanies, fetchBranch, fetchLocation } from "../../services/home.service";
+import { useLocation } from "react-router-dom";
 
 
+import "./loggedpage.css";
 
 function LoggedPage() {
-  /* ================= HOOKS ================= */
+
   const navigate = useNavigate();
   const { user, updateUser } = useAuth();
   const { showRailLoader, hideLoader } = useLoader();
-
   const { control, setValue } = useForm();
+  const [searchParams] = useSearchParams();
+  const solutionId = searchParams.get("solutionId");
+  const location = useLocation();
 
-  /* ================= USER ID MAPPING ================= */
-  const {
-    userEntityHierarchyId: companyId = "",
-    branchEntityHierarchyId: branchId = "",
-    defaultEntityHierarchyId: locationId = "",
-  } = user || {};
-
-  /* ================= STATE ================= */
   const [companyList, setCompanyList] = useState([]);
-  // const [companyName, setCompanyName] = useState("");
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
+  const [selectedLocationId, setSelectedLocationId] = useState(
+    user?.defaultEntityHierarchyId || ""
+  );
+
 
   const currentFinYear = getCurrentFinYear();
   const [finYear, setFinYear] = useState(currentFinYear);
   const finYearOptions = getFinYearOptions(currentFinYear);
 
-  const [searchParams] = useSearchParams();
-  const solutionId = searchParams.get("solutionId");
-
-  const [selectedCompanyId, setSelectedCompanyId] = useState(companyId || "");
-  const [selectedBranchId, setSelectedBranchId] = useState(branchId || "");
-  const [selectedLocationId, setSelectedLocationId] = useState(locationId || "");
+  const [selectedCompanyId, setSelectedCompanyId] = useState(user?.userEntityHierarchyId || "");
+  const [selectedBranchId, setSelectedBranchId] = useState(user?.branchEntityHierarchyId || "");
+  // const selectedLocation = locationList.find(
+  //   l => String(l.entityHierarchyId) === selectedLocationId
+  // );
 
 
 
@@ -59,199 +54,154 @@ function LoggedPage() {
   const okEnabled = user?.okEnabled ?? true;
   const changeEnabled = user?.changeEnabled ?? false;
 
-  /* ================= SYNC LOCAL STATE WITH USER ================= */
+
+
+  // ================= Sync form with user context =================
   useEffect(() => {
     if (!user) return;
 
-    // Sync selected IDs with user context
     setSelectedCompanyId(user.userEntityHierarchyId || "");
     setSelectedBranchId(user.branchEntityHierarchyId || "");
     setSelectedLocationId(user.defaultEntityHierarchyId || "");
+    setFinYear(user.finYear || currentFinYear);
 
-    // Update react-hook-form fields
     setValue("companyId", user.userEntityHierarchyId || "");
     setValue("branchId", user.branchEntityHierarchyId || "");
     setValue("locationId", user.defaultEntityHierarchyId || "");
+  }, [user, location.pathname, setValue]);
 
-    // Sync finYear
-    setFinYear(user.finYear || getCurrentFinYear());
-  }, [user, setValue]);
-
-  /* ================= SYNC FORM WITH LOCAL STATE ================= */
+  // ================= Redirect if no user =================
   useEffect(() => {
-    setValue("branchId", selectedBranchId);
-    setValue("locationId", selectedLocationId);
-  }, [selectedBranchId, selectedLocationId, setValue]);
-
-
-  /* ================= USER INIT ================= */
-  useEffect(() => {
-    if (user) {
-      setFinYear(user.finYear || getCurrentFinYear());
-      return;
-    }
-
+    if (user) return;
     const finalSolutionId = Number(solutionId);
     if (!finalSolutionId) return;
-
     navigate(finalSolutionId === 1 ? "/payroll" : "/payrollemp", { replace: true });
   }, [user, solutionId, navigate]);
 
-
-  /* ================= LOAD COMPANIES ================= */
+  // ================= Load companies =================
   useEffect(() => {
     if (!user?.userMstId) return;
 
     const loadCompanies = async () => {
       try {
         const data = await fetchCompanies(user.userMstId);
-        const companyArray = Array.isArray(data) ? data : [];
+        const companies = Array.isArray(data) ? data : [];
+        setCompanyList(companies);
 
-        setCompanyList(companyArray);
-
-        if (companyArray.length > 0) {
-          // Pick company: first matching user's companyId, else first
-          const firstCompany =
-            companyArray.find(
-              (c) => String(c.entityHierarchyId) === String(companyId)
-            ) || companyArray[0];
-
-          const newCompanyId = String(firstCompany.entityHierarchyId);
-
-          setSelectedCompanyId(newCompanyId);
-          setValue("companyId", newCompanyId);
-
-          // Clear branch and location because company changed
-          setBranchList([]);
-          setSelectedBranchId("");
-          setValue("branchId", "");
-
-          // setLocationList([]);
-          // setSelectedLocationId("");
-          // setValue("locationId", "");
-
-          // // Update user context to reflect selected company
-          // updateUser({
-          //   ...user,
-          //   userEntityHierarchyId: newCompanyId,
-          //   branchEntityHierarchyId: "",
-          //   defaultEntityHierarchyId: "",
-          // });
+        if (companies.length > 0) {
+          const firstCompany = companies.find(c => String(c.entityHierarchyId) === String(selectedCompanyId)) || companies[0];
+          setSelectedCompanyId(String(firstCompany.entityHierarchyId));
+          setValue("companyId", String(firstCompany.entityHierarchyId));
         }
-      } catch (error) {
-        toast.error("Failed to load company");
+      } catch {
+        toast.error("Failed to load companies");
         setCompanyList([]);
       }
     };
-
     loadCompanies();
-  }, [user?.userMstId]);
+}, [user?.userMstId]);
 
-  /* ================= LOAD BRANCHES ================= */
+
+  // ================= Load branches =================
   useEffect(() => {
     if (!user?.userMstId || !selectedCompanyId) return;
 
     const loadBranches = async () => {
-      const branchArray = await fetchBranch(user.userMstId, selectedCompanyId);
-      const branches = Array.isArray(branchArray) ? branchArray : [];
-      setBranchList(branches);
-
-      if (branches.length > 0) {
-        // pick user's branch or first
-        const userBranch = branches.find(b => String(b.entityHierarchyId) === String(user.branchEntityHierarchyId));
-        const firstBranch = userBranch || branches[0];
-
-        const newBranchId = String(firstBranch.entityHierarchyId);
-        setSelectedBranchId(newBranchId);       // << branch selected
-        setValue("branchId", newBranchId);
-
-        const updatedUser = { ...user, branchEntityHierarchyId: newBranchId, defaultEntityHierarchyId: "" };
-        updateUser(updatedUser);
-      }
-    };
-
-    loadBranches();
-  }, [user?.userMstId, selectedCompanyId]);
-
-  /* ================= LOAD LOCATIONS ================= */
-  useEffect(() => {
-    if (!user?.userMstId || !selectedCompanyId || !selectedBranchId) return;
-
-    const loadLocations = async () => {
       try {
-        const locationArray = await fetchLocation(user.userMstId, selectedCompanyId, selectedBranchId);
-        const locations = Array.isArray(locationArray) ? locationArray : [];
-        setLocationList(locations);
+        const data = await fetchBranch(user.userMstId, selectedCompanyId);
+        const branches = Array.isArray(data) ? data : [];
+        setBranchList(branches);
 
-        if (locations.length > 0) {
-          // pick user's saved location or first in list
-          const userLocation = locations.find(
-            (l) => String(l.userEntityHierarchyId) === String(user.defaultEntityHierarchyId)
-          );
-          const firstLocation = userLocation || locations[0];
-
-          const newLocationId = String(firstLocation.userEntityHierarchyId);
-          setSelectedLocationId(newLocationId);
-          setValue("locationId", newLocationId);
-
-          // Update user context **only if it’s empty**
-          if (!user.defaultEntityHierarchyId) {
-            const updatedUser = { ...user, defaultEntityHierarchyId: newLocationId };
-            updateUser(updatedUser);
-          }
+        if (branches.length > 0) {
+          const firstBranch = branches.find(b => String(b.entityHierarchyId) === String(selectedBranchId)) || branches[0];
+          setSelectedBranchId(String(firstBranch.entityHierarchyId));
+          setValue("branchId", String(firstBranch.entityHierarchyId));
         }
       } catch {
-        toast.error("Failed to load locations");
-        setLocationList([]);
+        toast.error("Failed to load branches");
+        setBranchList([]);
       }
     };
+    loadBranches();
+ }, [user?.userMstId, selectedCompanyId]);
 
-    loadLocations();
-  }, [user?.userMstId, selectedCompanyId, selectedBranchId, user, setValue, updateUser]);
 
 
-  /* ================= SELECT OPTIONS ================= */
-  const branchOptions = Array.isArray(branchList)
-    ? branchList.map((b) => ({
-      value: String(b.entityHierarchyId), // <-- use entityHierarchyId
-      label: b.entityName,
-    }))
-    : [];
+  /* ================= Load locations ================= */
+  useEffect(() => {
+  if (!user?.userMstId) return;
+  if (!selectedCompanyId) return;
+  if (!selectedBranchId) return; //  wait until branch state is ready
 
-  const locationOptions = Array.isArray(locationList)
-    ? locationList.map((l) => ({
-      value: String(l.userEntityHierarchyId),
-      label: l.entityName,
-    }))
-    : [];
+  let isMounted = true;
 
-  // const companyOption = companyName
-  //   ? { value: companyId, label: companyName }
-  //   : null;
+  const fetchLocations = async () => {
+    const startTime = Date.now();
+    showRailLoader("Loading locations…");
 
-  const loginDate = new Date().toISOString().split("T")[0];
-  const finYearOption = finYearOptions.find(
-    (opt) => opt.value === finYear
-  );
+    try {
+      const data = await fetchLocation(
+        user.userMstId,
+        selectedCompanyId,
+        selectedBranchId
+      );
 
-  /* ================= VALIDATION ================= */
+      if (!isMounted) return;
+
+      const locations = Array.isArray(data) ? data : [];
+      setLocationList(locations);
+
+      if (locations.length === 0) return;
+
+      const userLocId = user?.defaultEntityHierarchyId;
+
+      const savedLocation =
+        locations.find(l => String(l.entityHierarchyId) === String(userLocId)) ||
+        locations[0];
+
+      setSelectedLocationId(String(savedLocation.entityHierarchyId));
+      setValue("locationId", String(savedLocation.entityHierarchyId), {
+        shouldValidate: false,
+      });
+    } catch {
+      if (isMounted) setLocationList([]);
+      toast.error("Failed to load locations");
+    } finally {
+      await ensureMinDuration(startTime, 600);
+      hideLoader();
+    }
+  };
+
+  fetchLocations();
+
+  return () => {
+    isMounted = false;
+  };
+}, [selectedCompanyId, selectedBranchId, user?.userMstId]);
+
+
+
+
+  // ================= Select options =================
+  const companyOptions = companyList.map(c => ({ value: String(c.entityHierarchyId), label: c.entityName }));
+  const branchOptions = branchList.map(b => ({ value: String(b.entityHierarchyId), label: b.entityName }));
+  const locationOptions = locationList.map(l => ({
+    value: String(l.entityHierarchyId),
+    label: l.entityName
+  }));
+
+
+  const finYearOption = finYearOptions.find(opt => opt.value === finYear);
+
+  // ================= Validation =================
   const validateForm = () => {
     if (fieldsLocked) return true;
-
-    if (!selectedBranchId) {
-      toast.error("Please select Branch");
-      return false;
-    }
-
-    if (!selectedLocationId) {
-      toast.error("Please select Location");
-      return false;
-    }
-
+    if (!selectedBranchId) { toast.error("Please select Branch"); return false; }
+    if (!selectedLocationId) { toast.error("Please select Location"); return false; }
     return true;
   };
 
-  /* ================= ACTIONS ================= */
+  // ================= Actions =================
   const handleOk = async () => {
     if (!validateForm()) return;
 
@@ -259,10 +209,17 @@ function LoggedPage() {
     showRailLoader("Applying branch and location changes…");
 
     try {
-      const selectedBranch = branchList.find(b => String(b.entityHierarchyId) === selectedBranchId);
-      const selectedLocation = locationList.find(l => String(l.userEntityHierarchyId) === selectedLocationId);
+      const selectedBranch = branchList.find(
+        b => String(b.entityHierarchyId) === selectedBranchId
+      );
 
-      const updatedUser = {
+      //  ADD THIS BACK HERE (correct place)
+      const selectedLocation = locationList.find(
+        l => String(l.entityHierarchyId) === selectedLocationId
+      );
+
+
+      updateUser({
         ...user,
         userEntityHierarchyId: selectedCompanyId,
         branchEntityHierarchyId: selectedBranchId,
@@ -274,83 +231,50 @@ function LoggedPage() {
         fieldsLocked: true,
         okEnabled: false,
         changeEnabled: true,
-      };
-
-      updateUser(updatedUser);
-      localStorage.setItem("userData", JSON.stringify(updatedUser)); // persist
+      });
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
     }
   };
-
-
   const handleChangeCredentials = () => {
-    updateUser({
+    updateUser(prev => ({
+      ...prev,
       fieldsLocked: false,
       okEnabled: true,
       changeEnabled: false,
-    });
+    }));
   };
-  const companyOptions = Array.isArray(companyList)
-  ? companyList.map((c) => ({
-      value: String(c.entityHierarchyId),
-      label: c.entityName,
-    }))
-  : [];
 
 
-  /* ================= UI ================= */
+  const loginDate = new Date().toISOString().split("T")[0];
+
+  // ================= UI =================
   return (
     <>
       <Header />
       <div className="main-section">
-
         <Sidebar sidebarOpen={sidebarOpen} />
-
         <div className="logo-homesection">
           <div className="left-section">
-            <img
-              src={muzLogo}
-              alt="logo"
-              className="home-logo"
-            />
+            <img src={muzLogo} alt="logo" className="home-logo" />
           </div>
 
           <div className="logged-container">
             <div className="logged-box">
-              <h2 className="logged-heading">
-                Login Credentials
-              </h2>
+              <h2 className="logged-heading">Login Credentials</h2>
 
               <div className="logged-details">
                 <label>Company</label>
                 <Select
-                  value={
-                    companyOptions.find(
-                      (opt) => opt.value === String(selectedCompanyId)
-                    ) || null
-                  }
+                  value={companyOptions.find(opt => opt.value === selectedCompanyId) || null}
                   options={companyOptions}
-                  onChange={(opt) => {
-                    const newCompanyId = opt?.value || "";
-
-                    setSelectedCompanyId(newCompanyId);
+                  onChange={opt => {
+                    const newId = opt?.value || "";
+                    setSelectedCompanyId(newId);
                     setSelectedBranchId("");
-                    setSelectedLocationId("");
-
                     setBranchList([]);
-                    setLocationList([]);
-
                     setValue("branchId", "");
-                    setValue("locationId", "");
-
-                    updateUser({
-                      ...user,
-                      userEntityHierarchyId: newCompanyId,
-                      branchEntityHierarchyId: "",
-                      defaultEntityHierarchyId: "",
-                    });
                   }}
                   isDisabled={fieldsLocked}
                   classNamePrefix="form-control-select"
@@ -360,21 +284,12 @@ function LoggedPage() {
               <div className="logged-details">
                 <label>Login Date</label>
                 <Select
-                  value={{
-                    value: loginDate,
-                    label: loginDate,
-                  }}
+                  value={{ value: loginDate, label: loginDate }}
+                  options={[{ value: loginDate, label: loginDate }]}
                   isDisabled
-                  options={[
-                    {
-                      value: loginDate,
-                      label: loginDate,
-                    },
-                  ]}
                   classNamePrefix="form-control-select"
                 />
               </div>
-
 
               <div className="logged-details">
                 <label>FinYear</label>
@@ -382,9 +297,7 @@ function LoggedPage() {
                   value={finYearOption}
                   options={finYearOptions}
                   isDisabled={fieldsLocked}
-                  onChange={(opt) =>
-                    setFinYear(opt.value)
-                  }
+                  onChange={opt => setFinYear(opt.value)}
                   classNamePrefix="form-control-select"
                 />
               </div>
@@ -396,27 +309,15 @@ function LoggedPage() {
                   control={control}
                   render={({ field }) => (
                     <Select
+                      value={branchOptions.find(opt => opt.value === field.value) || null}
                       options={branchOptions}
-                      value={branchOptions.find(
-                        (opt) => opt.value === String(field.value)
-                      ) || null
-                      }
-                      onChange={(opt) => {
-                        const newBranchId = opt?.value || "";
-                        field.onChange(newBranchId);
-                        setSelectedBranchId(newBranchId);
-
-                        // Clear previous location
+                      onChange={opt => {
+                        const newId = opt?.value || "";
+                        field.onChange(newId);
+                        setSelectedBranchId(newId);
                         setSelectedLocationId("");
-                        setLocationList([]);
                         setValue("locationId", "");
-
-                        updateUser({
-                          branchEntityHierarchyId: newBranchId,
-                          defaultEntityHierarchyId: "", // clear location in user context
-                        });
                       }}
-
                       isDisabled={fieldsLocked}
                       classNamePrefix="form-control-select"
                     />
@@ -431,50 +332,29 @@ function LoggedPage() {
                   control={control}
                   render={({ field }) => (
                     <Select
-                      options={locationOptions}
                       value={
-                        locationOptions.find(
-                          (opt) => opt.value === String(field.value)
-                        ) || null
+                        locationOptions.find(opt => opt.value === field.value) ||
+                        locationOptions.find(opt => opt.value === selectedLocationId) ||
+                        null
                       }
-                      onChange={(opt) => {
-                        const newLocationId = opt?.value || "";
 
-                        field.onChange(newLocationId);
-                        setSelectedLocationId(newLocationId);
-
-                        updateUser({
-                          defaultEntityHierarchyId: newLocationId,
-                        });
+                      options={locationOptions}
+                      onChange={opt => {
+                        const newId = opt?.value || "";
+                        field.onChange(newId);
+                        setSelectedLocationId(newId);
                       }}
-
-                      isDisabled={fieldsLocked}
+                      isDisabled={fieldsLocked || locationOptions.length === 0}
+                      placeholder={locationOptions.length === 0 ? "Loading..." : "Select Location"}
                       classNamePrefix="form-control-select"
                     />
                   )}
                 />
               </div>
 
-              <div
-                className="button-group"
-                style={{ textAlign: "center" }}
-              >
-                <button
-                  className="logged-btn"
-                  onClick={handleOk}
-                  disabled={!okEnabled}
-                >
-                  OK
-                </button>
-
-                <button
-                  className="logged-btn"
-                  onClick={handleChangeCredentials}
-                  disabled={!changeEnabled}
-                >
-                  Change Credentials
-                </button>
-
+              <div className="button-group" style={{ textAlign: "center" }}>
+                <button className="logged-btn" onClick={handleOk} disabled={!okEnabled}>OK</button>
+                <button className="logged-btn" onClick={handleChangeCredentials} disabled={!changeEnabled}>Change Credentials</button>
               </div>
             </div>
           </div>

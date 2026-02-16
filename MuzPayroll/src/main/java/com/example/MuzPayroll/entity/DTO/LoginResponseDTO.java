@@ -20,9 +20,9 @@ public class LoginResponseDTO {
     // =========================
     // Entity Hierarchy IDs
     // =========================
-    private Long userEntityHierarchyId;        // From UserMst
-    private Long defaultEntityHierarchyId;     // From UserMst
-    private Long branchEntityHierarchyId;      // From entity_hierarchy_info
+    private Long userEntityHierarchyId; // From UserMst
+    private Long defaultEntityHierarchyId; // From UserMst
+    private Long branchEntityHierarchyId; // From entity_hierarchy_info
 
     // =========================
     // JWT token
@@ -36,6 +36,10 @@ public class LoginResponseDTO {
     private Integer maxAttempts;
     private Boolean accountLocked;
 
+    private String companyName;
+    private String branchName;
+    private String locationName;
+
     // =========================
     // Getters and Setters
     // =========================
@@ -43,6 +47,7 @@ public class LoginResponseDTO {
     public boolean isSuccess() {
         return success;
     }
+
     public void setSuccess(boolean success) {
         this.success = success;
     }
@@ -50,6 +55,7 @@ public class LoginResponseDTO {
     public String getMessage() {
         return message;
     }
+
     public void setMessage(String message) {
         this.message = message;
     }
@@ -57,6 +63,7 @@ public class LoginResponseDTO {
     public Long getUserMstId() {
         return userMstId;
     }
+
     public void setUserMstId(Long userMstId) {
         this.userMstId = userMstId;
     }
@@ -64,6 +71,7 @@ public class LoginResponseDTO {
     public String getUserCode() {
         return userCode;
     }
+
     public void setUserCode(String userCode) {
         this.userCode = userCode;
     }
@@ -71,6 +79,7 @@ public class LoginResponseDTO {
     public String getUserName() {
         return userName;
     }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -78,6 +87,7 @@ public class LoginResponseDTO {
     public Long getUserEntityHierarchyId() {
         return userEntityHierarchyId;
     }
+
     public void setUserEntityHierarchyId(Long userEntityHierarchyId) {
         this.userEntityHierarchyId = userEntityHierarchyId;
     }
@@ -85,6 +95,7 @@ public class LoginResponseDTO {
     public Long getDefaultEntityHierarchyId() {
         return defaultEntityHierarchyId;
     }
+
     public void setDefaultEntityHierarchyId(Long defaultEntityHierarchyId) {
         this.defaultEntityHierarchyId = defaultEntityHierarchyId;
     }
@@ -92,6 +103,7 @@ public class LoginResponseDTO {
     public Long getBranchEntityHierarchyId() {
         return branchEntityHierarchyId;
     }
+
     public void setBranchEntityHierarchyId(Long branchEntityHierarchyId) {
         this.branchEntityHierarchyId = branchEntityHierarchyId;
     }
@@ -99,6 +111,7 @@ public class LoginResponseDTO {
     public String getToken() {
         return token;
     }
+
     public void setToken(String token) {
         this.token = token;
     }
@@ -106,6 +119,7 @@ public class LoginResponseDTO {
     public Integer getAttemptCount() {
         return attemptCount;
     }
+
     public void setAttemptCount(Integer attemptCount) {
         this.attemptCount = attemptCount;
     }
@@ -113,6 +127,7 @@ public class LoginResponseDTO {
     public Integer getMaxAttempts() {
         return maxAttempts;
     }
+
     public void setMaxAttempts(Integer maxAttempts) {
         this.maxAttempts = maxAttempts;
     }
@@ -120,7 +135,26 @@ public class LoginResponseDTO {
     public Boolean getAccountLocked() {
         return accountLocked;
     }
+
     public void setAccountLocked(Boolean accountLocked) {
         this.accountLocked = accountLocked;
     }
+    public String getCompanyName() {
+        return companyName;
+    } 
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+    public String getBranchName() {
+        return branchName;
+    }
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
+    }
+    public String getLocationName() {
+        return locationName;
+    }
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }   
 }

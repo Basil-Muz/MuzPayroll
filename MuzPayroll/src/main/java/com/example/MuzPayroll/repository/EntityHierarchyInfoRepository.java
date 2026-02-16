@@ -16,4 +16,14 @@ public interface EntityHierarchyInfoRepository extends JpaRepository<EntityHiera
             WHERE ehi_locationid = :locationId
             """, nativeQuery = true)
     Long findBranchIdByLocationId(@Param("locationId") Long locationId);
+
+        @Query(value = """
+                SELECT em.etm_name
+                FROM entity_hierarchy_info eh
+				JOIN entity_mst em
+				ON eh.ehi_entity_hierarchyid = em.etm_entityid
+                WHERE eh.ehi_entity_hierarchyid = :entityId
+                """, nativeQuery = true)
+    String findEntityNameByEntityId(@Param("entityId") Long entityId);
+    
 }
