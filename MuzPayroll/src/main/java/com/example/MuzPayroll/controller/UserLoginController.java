@@ -47,20 +47,20 @@ public class UserLoginController {
                 .body(response);
     }
 
-    // ================= USER CONTEXT =================
-    @GetMapping("/user-context")
-    public ResponseEntity<Response<LoginResponseDTO>> getUserContext(
-            @RequestParam Long companyId,
-            @RequestParam Long branchId,
-            @RequestParam Long locationId,
-            @RequestParam String userCode) {
+    // // ================= USER CONTEXT =================
+    // @GetMapping("/user-context")
+    // public ResponseEntity<Response<LoginResponseDTO>> getUserContext(
+    //         @RequestParam Long companyId,
+    //         @RequestParam Long branchId,
+    //         @RequestParam Long locationId,
+    //         @RequestParam String userCode) {
 
-        Response<LoginResponseDTO> response = service.getUserContext(companyId, branchId, locationId, userCode);
+    //     Response<LoginResponseDTO> response = service.getUserContext(companyId, branchId, locationId, userCode);
 
-        return ResponseEntity
-                .status(response.getStatusCode())
-                .body(response);
-    }
+    //     return ResponseEntity
+    //             .status(response.getStatusCode())
+    //             .body(response);
+    // }
 
     @PostMapping("/change-password")
     public ResponseEntity<Response<Boolean>> changePassword(

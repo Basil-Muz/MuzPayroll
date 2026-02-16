@@ -10,26 +10,39 @@ public class LoginResponseDTO {
     private boolean success;
     private String message;
 
-    private Long companyId;
-    private Long branchId;
-    private Long locationId;
+    // =========================
+    // User Info
+    // =========================
+    private Long userMstId;
+    private String userCode;
+    private String userName;
+
+    // =========================
+    // Entity Hierarchy IDs
+    // =========================
+    private Long userEntityHierarchyId;        // From UserMst
+    private Long defaultEntityHierarchyId;     // From UserMst
+    private Long branchEntityHierarchyId;      // From entity_hierarchy_info
+
+    // =========================
+    // JWT token
+    // =========================
     private String token;
 
-    private String userName;
-    private String locationName;
-
+    // =========================
+    // Login attempt info
+    // =========================
     private Integer attemptCount;
     private Integer maxAttempts;
     private Boolean accountLocked;
 
-    private CompanyMst companyList;
-    private List<BranchMst> branchList;
-    private List<LocationMst> locationList;
+    // =========================
+    // Getters and Setters
+    // =========================
 
     public boolean isSuccess() {
         return success;
     }
-
     public void setSuccess(boolean success) {
         this.success = success;
     }
@@ -37,102 +50,77 @@ public class LoginResponseDTO {
     public String getMessage() {
         return message;
     }
-
     public void setMessage(String message) {
         this.message = message;
     }
 
-    public Long getCompanyId() {
-        return companyId;
+    public Long getUserMstId() {
+        return userMstId;
+    }
+    public void setUserMstId(Long userMstId) {
+        this.userMstId = userMstId;
     }
 
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
+    public String getUserCode() {
+        return userCode;
     }
-
-    public Long getBranchId() {
-        return branchId;
-    }
-
-    public void setBranchId(Long branchId) {
-        this.branchId = branchId;
-    }
-
-    public Long getLocationId() {
-        return locationId;
-    }
-
-    public void setLocationId(Long locationId) {
-        this.locationId = locationId;
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 
     public String getUserName() {
         return userName;
     }
-
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
-    public String getLocationName() {
-        return locationName;
+    public Long getUserEntityHierarchyId() {
+        return userEntityHierarchyId;
+    }
+    public void setUserEntityHierarchyId(Long userEntityHierarchyId) {
+        this.userEntityHierarchyId = userEntityHierarchyId;
     }
 
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
+    public Long getDefaultEntityHierarchyId() {
+        return defaultEntityHierarchyId;
+    }
+    public void setDefaultEntityHierarchyId(Long defaultEntityHierarchyId) {
+        this.defaultEntityHierarchyId = defaultEntityHierarchyId;
     }
 
-    public CompanyMst getCompany() {
-        return companyList;
+    public Long getBranchEntityHierarchyId() {
+        return branchEntityHierarchyId;
     }
-
-    public void setCompany(CompanyMst companyList) {
-        this.companyList = companyList;
-    }
-
-    public Integer getAttemptCount() {
-        return attemptCount;
-    }
-
-    public void setAttemptCount(Integer attemptCount) {
-        this.attemptCount = attemptCount;
-    }   
-    public Integer getMaxAttempts() {
-        return maxAttempts;
-    }
-
-    public void setMaxAttempts(Integer maxAttempts) {
-        this.maxAttempts = maxAttempts;
-    }
-    public Boolean getAccountLocked() {
-        return accountLocked;
-    }
-
-    public void setAccountLocked(Boolean accountLocked) {
-        this.accountLocked = accountLocked;
-    }
-
-    public List<BranchMst> getBranchList() {
-        return branchList;
-    }
-
-    public void setBranchList(List<BranchMst> branchList) {
-        this.branchList = branchList;
-    }
-
-    public List<LocationMst> getLocationList() {
-        return locationList;
-    }
-
-    public void setLocationList(List<LocationMst> locationList) {
-        this.locationList = locationList;
+    public void setBranchEntityHierarchyId(Long branchEntityHierarchyId) {
+        this.branchEntityHierarchyId = branchEntityHierarchyId;
     }
 
     public String getToken() {
         return token;
     }
-
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Integer getAttemptCount() {
+        return attemptCount;
+    }
+    public void setAttemptCount(Integer attemptCount) {
+        this.attemptCount = attemptCount;
+    }
+
+    public Integer getMaxAttempts() {
+        return maxAttempts;
+    }
+    public void setMaxAttempts(Integer maxAttempts) {
+        this.maxAttempts = maxAttempts;
+    }
+
+    public Boolean getAccountLocked() {
+        return accountLocked;
+    }
+    public void setAccountLocked(Boolean accountLocked) {
+        this.accountLocked = accountLocked;
     }
 }

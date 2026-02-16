@@ -10,6 +10,7 @@ import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.repository.EntityRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
+
 @Service
 public class EntityService {
 

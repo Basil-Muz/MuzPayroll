@@ -1,6 +1,6 @@
 import "./App.css";
 // import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import { Toaster, toast } from "react-hot-toast";
 import "./ToastStyles.css";
@@ -53,15 +53,16 @@ import LocationGroupRightsMapping from "./pages/LocationGroupRightMaping/Locatio
 
 
 function App() {
+ 
   return (
     <>
       <AuthProvider>
         <LoaderRenderer />
 
         <Routes>
-          {/* <Route path="/" element={<Page />} /> */}
+          <Route path="/" element={<Navigate to="/payroll" replace />} />
           <Route path="/payroll" element={<LoginPage />} />
-          <Route path="/payrollemp" element={<LoginPage/>}/>
+          <Route path="/payrollemp" element={<LoginPage />} />
           <Route path="/home" element={<LoggedPage />} />
           <Route path="/company" element={<Companyform />} />
           <Route path="/generalform" element={<GeneralForm />} />
@@ -82,24 +83,24 @@ function App() {
           <Route path="/designation" element={<Designation />} />
           <Route path="/branchform" element={<BranchPageForm />} />
           <Route path="/companyform" element={
-              <ProtectedRoute>
+            <ProtectedRoute>
               <CompanyPageForm />
-              </ProtectedRoute>
-            }
+            </ProtectedRoute>
+          }
           />
           <Route path="/locationform" element={<LocationPageForm />} />
 
           <Route path="/companylist" element={
-              <ProtectedRoute>
+            <ProtectedRoute>
               <CompanyList />
-              </ProtectedRoute>
-            }
+            </ProtectedRoute>
+          }
           />
           <Route path="/company/:companyId" element={
-              <ProtectedRoute>
+            <ProtectedRoute>
               <CompanyPageForm />
-              </ProtectedRoute>
-            }
+            </ProtectedRoute>
+          }
           />
 
           <Route
@@ -168,9 +169,8 @@ function App() {
       >
         {(t) => (
           <div
-            className={`custom-toast ${t.type} ${
-              t.visible ? "toast-enter" : "toast-exit"
-            }`}
+            className={`custom-toast ${t.type} ${t.visible ? "toast-enter" : "toast-exit"
+              }`}
             style={{
               transition: "transform 0.3s ease, opacity 0.3s ease",
               transform: t.visible ? "translateX(0)" : "translateX(100%)",

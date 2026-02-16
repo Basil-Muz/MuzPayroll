@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
+// import { toast } from "react-hot-toast";
 import axios from "axios";
 import { Controller } from "react-hook-form";
 import Select from "react-select";
@@ -28,15 +28,11 @@ import { MdError, MdWarning, MdInfo, MdCheckCircle } from "react-icons/md";
 import { FaRegBell, FaRegCheckCircle } from "react-icons/fa";
 
 // Context / hooks
-import { useLoader } from "../../context/LoaderContext";
+
 import { useAuth } from "../../context/AuthProvider";
 
 // Utils
-import { ensureMinDuration } from "../../utils/loaderDelay";
 import { handleApiError } from "../../utils/errorToastResolver";
-
-//service
-import { fetchBranchesByCompany } from "../../services/branch.service";
 
 //component
 import { ContextSwitcher } from "./ContextSwitcher";
@@ -102,15 +98,22 @@ const Header = ({ backendError = [] }) => {
 
   //Import functions from context
   const { user, logout, updateUser } = useAuth();
-  const { showRailLoader, hideLoader } = useLoader();
+  // const { showRailLoader, hideLoader } = useLoader();
   const navigate = useNavigate();
 
   const handleLogOut = () => {
+    const currentSolution = user?.solutionId;
+
     logout();
-    navigate("/");
+
+    if (currentSolution === 1) {
+      navigate("/payroll", { replace: true });
+    } else if (currentSolution === 2) {
+      navigate("/payrollemp", { replace: true });
+    }
   };
 
-  const { control, setValue, watch } = useForm({
+  const {  setValue } = useForm({
     defaultValues: {
       company: null,
       branch: null,
@@ -135,13 +138,12 @@ const Header = ({ backendError = [] }) => {
   // };
 
   // const loginData = getLoginData();
-  const companyId = user.companyId;
-
+  const companyId = user?.companyId
   const currentPath = location.pathname;
 
   const shouldRenderDashboard = !BLOCKED_PATHS.includes(currentPath);
   const shouldRenderProfile = BLOCKED_PATHS.includes(currentPath);
-  // const shouldRenderHome = CONTEXT_SWITCHER.includes(currentPath);
+  const shouldRenderHome = !CONTEXT_SWITCHER.includes(currentPath);
   const toggleContext = useCallback(() => {
     setIsContextOpen(true);
     // console.log("context", isContextOpen);
@@ -226,30 +228,30 @@ const Header = ({ backendError = [] }) => {
     }
   };
 
-  const fetchBranchesByCompanyList = useCallback(
-    async (companyId) => {
-      const startTime = Date.now();
-      // console.log("companys :");
-      // show loader
-      showRailLoader("Retrieving available branches…");
-      try {
-        const res = await fetchBranchesByCompany(companyId);
-        console.log("companys :", res);
-        setBranchList(
-          res.data.map((branch) => ({
-            value: branch.branchMstID,
-            label: branch.branch,
-          })),
-        );
-      } catch (error) {
-        handleApiError(error);
-      } finally {
-        await ensureMinDuration(startTime, 1200);
-        hideLoader();
-      }
-    },
-    [setBranchList],
-  );
+  // const fetchBranchesByCompanyList = useCallback(
+  //   async (companyId) => {
+  //     const startTime = Date.now();
+  //     // console.log("companys :");
+  //     // show loader
+  //     showRailLoader("Retrieving available branches…");
+  //     try {
+  //       const res = await fetchBranchesByCompany(companyId);
+  //       console.log("companys :", res);
+  //       setBranchList(
+  //         res.data.map((branch) => ({
+  //           value: branch.branchMstID,
+  //           label: branch.branch,
+  //         })),
+  //       );
+  //     } catch (error) {
+  //       handleApiError(error);
+  //     } finally {
+  //       await ensureMinDuration(startTime, 1200);
+  //       hideLoader();
+  //     }
+  //   },
+  //   [setBranchList],
+  // );
 
   const fetchLocationsByBranch = useCallback(
     async (branchId) => {
@@ -294,7 +296,7 @@ const Header = ({ backendError = [] }) => {
     if (companyList.length === 0) return;
 
     const companyOption = companyList.find(
-      (c) => c.value === Number(user.companyId),
+      (c) => c.value === Number(user.userEntityHierarchyId),
     );
 
     if (companyOption) {
@@ -303,12 +305,12 @@ const Header = ({ backendError = [] }) => {
         shouldTouch: false,
       });
     }
-  }, [companyList, user.companyId, setValue]);
+  }, [companyList, user.userEntityHierarchyId, setValue]);
 
   const contextInitialData = {
-    company: user.companyId
+    company: user.userEntityHierarchyId
       ? {
-          value: user.companyId,
+          value: user.userEntityHierarchyId,
           label: user.companyName,
         }
       : null,
@@ -327,12 +329,12 @@ const Header = ({ backendError = [] }) => {
         }
       : null,
   };
-
+  console.log("sdfsdfgs", user);
   useEffect(() => {
     if (branchList.length === 0) return;
 
     const branchOption = branchList.find(
-      (b) => b.value === Number(user.branchId),
+      (b) => b.value === Number(user?.branchId),
     ); //stored ID is in string
     // console.log("Brqanch steed", branchOption);
     if (branchOption) {
@@ -342,14 +344,14 @@ const Header = ({ backendError = [] }) => {
         shouldTouch: false,
       });
     }
-    fetchLocationsByBranch(Number(user.branchId));
+    fetchLocationsByBranch(Number(user?.branchId));
   }, [branchList]);
 
   useEffect(() => {
     if (locationList.length === 0) return;
 
     const locationOption = locationList.find(
-      (l) => l.value === Number(user.locationId), //stored ID is in string
+      (l) => l.value === Number(user?.locationId), //stored ID is in string
     );
     // console.log("location steed", locationList);
     if (locationOption) {
@@ -361,9 +363,16 @@ const Header = ({ backendError = [] }) => {
   }, [locationList, setValue]);
 
   useEffect(() => {
-    if (!companyId) return;
-    fetchContextData(user.branchId, user.userCode);
-  }, [companyId, user?.branchId, fetchContextData]);
+    if (!companyId || !user?.branchId) return;
+
+    fetchContextData(user?.branchId, user?.userCode);
+  }, [
+    companyId,
+    user?.branchId,
+    user?.userCode,
+    user?.locationId,
+    fetchContextData,
+  ]);
 
   //Listen to trigger on user changes
   // useEffect(() => {
@@ -504,7 +513,7 @@ const Header = ({ backendError = [] }) => {
     <>
       <header className="header" role="banner">
         <div className="header-left">
-          <div className="logo">
+          <div className={`logo ${shouldRenderHome? "logo-border" : "" }`}>
             <img
               src="/muziris-png.ico"
               alt="Muziris Logo"
@@ -515,40 +524,44 @@ const Header = ({ backendError = [] }) => {
           </div>
           {/* Enhanced Context Summary */}
           {/* Desktop: Full context summary */}
-          <div
-            className="context-summary desktop-only"
-            role="button"
-            tabIndex={0}
-            onClick={toggleContext}
-            onKeyDown={(e) => handleKeyDown(e, toggleContext)}
-            aria-label="Change company context"
-          >
-            <div className="context-summary-content">
-              <span className="context-company">
-                {user.companyName || "Company"}
-              </span>
-              <span className="context-separator">|</span>
-              <span className="context-branch">
-                {user.branchName || "Branch"}
-              </span>
-              <span className="context-separator">|</span>
-              <span className="context-location">
-                {user.locationName || "Location"}
-              </span>
-            </div>
-            <div className="context-edit-icon">
-              <HiOutlineSwitchHorizontal size={12} aria-hidden="true" />
-            </div>
-          </div>
+          {shouldRenderHome && (
+            <>
+              <div
+                className="context-summary desktop-only"
+                role="button"
+                tabIndex={0}
+                onClick={toggleContext}
+                onKeyDown={(e) => handleKeyDown(e, toggleContext)}
+                aria-label="Change company context"
+              >
+                <div className="context-summary-content">
+                  <span className="context-company">
+                    {user.companyName || "Company"}
+                  </span>
+                  <span className="context-separator">|</span>
+                  <span className="context-branch">
+                    {user.branchName || "Branch"}
+                  </span>
+                  <span className="context-separator">|</span>
+                  <span className="context-location">
+                    {user.locationName || "Location"}
+                  </span>
+                </div>
+                <div className="context-edit-icon">
+                  <HiOutlineSwitchHorizontal size={12} aria-hidden="true" />
+                </div>
+              </div>
 
-          {/* Mobile: Context switcher button */}
-          <button
-            className="context-switcher-button mobile-only"
-            onClick={toggleContext}
-            aria-label="Switch context"
-          >
-            <HiOutlineSwitchHorizontal size={20} />
-          </button>
+              {/* Mobile: Context switcher button */}
+              <button
+                className="context-switcher-button mobile-only"
+                onClick={toggleContext}
+                aria-label="Switch context"
+              >
+                <HiOutlineSwitchHorizontal size={20} />
+              </button>
+            </>
+          )}
         </div>
 
         <div className="header-right">
@@ -562,7 +575,11 @@ const Header = ({ backendError = [] }) => {
               aria-label="Notifications"
               aria-expanded={notOpen}
             >
-              <IoNotificationsSharp size={20} className="header-icons" aria-hidden="true" />
+              <IoNotificationsSharp
+                size={20}
+                className="header-icons"
+                aria-hidden="true"
+              />
               {notifications.length > 0 && (
                 <div className="notification-badge" role="status">
                   {notifications.length}
@@ -647,7 +664,11 @@ const Header = ({ backendError = [] }) => {
                 aria-label="Dashboard alerts"
                 aria-expanded={dashOpen}
               >
-                <BiSolidCollection size={20} className="header-icons" aria-hidden="true" />
+                <BiSolidCollection
+                  size={20}
+                  className="header-icons"
+                  aria-hidden="true"
+                />
                 {dashNotifications.length > 0 && (
                   <div className="notification-badge alert" role="status">
                     {dashNotifications.length}
