@@ -13,11 +13,7 @@ import { useLoader } from "../../context/LoaderContext";
 import { useAuth } from "../../context/AuthProvider";
 import { ensureMinDuration } from "../../utils/loaderDelay";
 import { getCurrentFinYear, getFinYearOptions } from "../../utils/finyearUtils";
-import {
-  fetchCompanies,
-  fetchBranch,
-  fetchLocation,
-} from "../../services/home.service";
+import { fetchCompanies, fetchBranch, fetchLocation, } from "../../services/home.service";
 import { fetchMainMenu } from "../../services/menu.service";
 
 import { useLocation } from "react-router-dom";
@@ -53,9 +49,6 @@ function LoggedPage() {
   const [selectedBranchId, setSelectedBranchId] = useState(
     user?.branchEntityHierarchyId || "",
   );
-  // const selectedLocation = locationList.find(
-  //   l => String(l.entityHierarchyId) === selectedLocationId
-  // );
 
   const fieldsLocked = user?.fieldsLocked ?? true;
   const sidebarOpen = user?.sidebarOpen ?? false;
@@ -142,7 +135,12 @@ function LoggedPage() {
   useEffect(() => {
     if (!user?.userMstId) return;
     if (!selectedCompanyId) return;
-    if (!selectedBranchId) return; //  wait until branch state is ready
+    if (!selectedBranchId) {
+      setLocationList([]);
+      setSelectedLocationId("");
+      setValue("locationId", "");
+      return;
+    }
 
     let isMounted = true;
 
@@ -209,17 +207,20 @@ function LoggedPage() {
 
   // ================= Validation =================
   const validateForm = () => {
-    if (fieldsLocked) return true;
+    // ✅ ALWAYS validate before saving
     if (!selectedBranchId) {
       toast.error("Please select Branch");
       return false;
     }
+
     if (!selectedLocationId) {
       toast.error("Please select Location");
       return false;
     }
+
     return true;
   };
+
   console.log("Menu", menus);
   // ================= Actions =================
   const handleOk = async () => {
@@ -272,14 +273,16 @@ function LoggedPage() {
       hideLoader();
     }
   };
+  //CHANGE HERE — pass object instead of function
   const handleChangeCredentials = () => {
-    updateUser((prev) => ({
-      ...prev,
+    updateUser({
+      ...user,
       fieldsLocked: false,
       okEnabled: true,
       changeEnabled: false,
-    }));
+    });
   };
+
 
   const loginDate = new Date().toISOString().split("T")[0];
 
@@ -392,7 +395,7 @@ function LoggedPage() {
                       isDisabled={fieldsLocked || locationOptions.length === 0}
                       placeholder={
                         locationOptions.length === 0
-                          ? "Loading..."
+                          ? "Select..."
                           : "Select Location"
                       }
                       classNamePrefix="form-control-select"

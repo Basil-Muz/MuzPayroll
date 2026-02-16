@@ -1,15 +1,14 @@
-export const loginUser = async({userCode,password})=>
-{
-    const response = await fetch("http://localhost:8087/login",{
-        method : "POST",
-        headers : {"content-Type":"application/json"},
-        body : JSON.stringify({userCode,password}),
-    });
+// services/auth.service.js
+import api from "../api/axiosInstance";
 
-    const data = await response.json();
-
-    if(!response.ok && response.status >= 500){
-        throw new Error("Server Error");
+export const loginUser = async ({ userCode, password }) => {
+  try {
+    const response = await api.post("/login", { userCode, password });
+    return response.data; // ✅ return only data (like fetch)
+  } catch (error) {
+    if (error.response?.status >= 500) {
+      throw new Error("Server Error");
     }
-    return data;
+    throw error;
+  }
 };

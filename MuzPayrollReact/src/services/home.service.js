@@ -1,20 +1,26 @@
-const BASE_URL = "http://localhost:8087/entity";
+// services/entity.service.js
+import api from "../api/axiosInstance";
 
+// Fetch companies
 export const fetchCompanies = async (userId) => {
-  const res = await fetch(`${BASE_URL}/fetchCompany?userId=${userId}`);
-  return res.json();
+  const response = await api.get("/entity/fetchCompany", {
+    params: { userId },
+  });
+  return response.data; //same as fetch().json()
 };
 
+// Fetch branches
 export const fetchBranch = async (userId, companyId) => {
-  const res = await fetch(
-    `${BASE_URL}/fetchBranch?userId=${userId}&companyId=${companyId}`
-  );
-  return res.json();
+  const response = await api.get("/entity/fetchBranch", {
+    params: { userId, companyId },
+  });
+  return response.data;
 };
 
+// Fetch locations
 export const fetchLocation = async (userId, companyId, branchId) => {
-  const res = await fetch(
-    `${BASE_URL}/fetchLocation?userId=${userId}&companyId=${companyId}&branchId=${branchId}`
-  );
-  return res.json();
+  const response = await api.get("/entity/fetchLocation", {
+    params: { userId, companyId, branchId },
+  });
+  return response.data;
 };
