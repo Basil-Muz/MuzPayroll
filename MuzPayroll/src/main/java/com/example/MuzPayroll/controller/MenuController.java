@@ -30,6 +30,6 @@ public class MenuController {
             @RequestParam Integer solutionId,
             @RequestParam Integer entityHierarchyId) {
 
-        return menuService.getMenu(transtype, transsubtype, userId, solutionId, entityHierarchyId);
+         return menuService.getMenu(transtype, transsubtype, userId, solutionId, entityHierarchyId);
     }
 }

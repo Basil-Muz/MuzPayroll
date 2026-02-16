@@ -1,13 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState} from "react";
 import { getLoginData, setLoginData } from "../utils/loginstorageUtils";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-
-
   const [user, setUser] = useState(() => getLoginData());
-
+  const [menus, setMenus] = useState(null);
+  const [isMenuLoaded, setIsMenuLoaded] = useState(false);
   //   useEffect(() => {
   //     if (user) {
   //       localStorage.setItem("loginData", JSON.stringify(user));
@@ -41,18 +40,37 @@ export const AuthProvider = ({ children }) => {
 
   const login = (loginData) => {
     setUser(loginData);
+    setMenus(null);
+    setIsMenuLoaded(false);
     setLoginData(loginData);
   };
 
   const logout = () => {
     setUser(null);
+    setMenus(null);
+    setIsMenuLoaded(false);
     localStorage.clear();
     sessionStorage.clear();
   };
 
+  const updateMenus = (menuData) => {
+    setMenus(menuData);
+    setIsMenuLoaded(true);
+  };
+
   return (
     <>
-      <AuthContext.Provider value={{ user, login, logout, updateUser }}>
+      <AuthContext.Provider
+        value={{
+          user,
+          login,
+          logout,
+          updateUser,
+          menus,
+          isMenuLoaded,
+          updateMenus,
+        }}
+      >
         {children}
       </AuthContext.Provider>
     </>

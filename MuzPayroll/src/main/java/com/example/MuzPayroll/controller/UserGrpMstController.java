@@ -76,6 +76,7 @@ public class UserGrpMstController {
                     dto.setActiveDate(entity.getActiveDate());
                     dto.setInactiveDate(entity.getInactiveDate());
                     dto.setActiveStatusYN(entity.getUgmActiveYN());
+                    dto.setDescription(entity.getUgmDesc());
                     return dto;
                 })
                 .toList();

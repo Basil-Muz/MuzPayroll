@@ -27,7 +27,7 @@ import { useAuth } from "../../context/AuthProvider";
 
 // Utils
 import { ensureMinDuration } from "../../utils/loaderDelay";
-import {handleApiError} from "../../utils/errorToastResolver"
+import { handleApiError } from "../../utils/errorToastResolver";
 
 // Services
 import { getUserGroupsList } from "../../services/user.service";
@@ -36,28 +36,28 @@ function UserGroup() {
   const { showRailLoader, hideLoader } = useLoader(); //Import functions from context
 
   const [userGroupList, setUserGroupList] = useState([
-    {
-      GroupCode: "UG001",
-      GroupName: "Admin Group",
-      ShortName: "Admin",
-      Description: "Group with all admin rights",
-      ActiveDate: "01-01-2024",
-    },
-    {
-      GroupCode: "UG002",
-      GroupName: "HR Group",
-      ShortName: "HR",
-      Description: "Group with HR related rights",
-      ActiveDate: "12-03-2024",
-      inActiveDate :"12-03-2028",
-    },
-    {
-      GroupCode: "UG003",
-      GroupName: "Accounts Group",
-      ShortName: "Accounts",
-      Description: "Group with finance related rights",
-      ActiveDate: "15-02-2024",
-    },
+    // {
+    //   code: "UG001",
+    //   name: "Admin Group",
+    //   shortname: "Admin",
+    //   description: "Group with all admin rights",
+    //   ActiveDate: "01-01-2024",
+    // },
+    // {
+    //   code: "UG002",
+    //   name: "HR Group",
+    //   shortname: "HR",
+    //   description: "Group with HR related rights",
+    //   ActiveDate: "12-03-2024",
+    //   inActiveDate :"12-03-2028",
+    // },
+    // {
+    //   code: "UG003",
+    //   name: "Accounts Group",
+    //   shortname: "Accounts",
+    //   description: "Group with finance related rights",
+    //   ActiveDate: "15-02-2024",
+    // },
   ]);
 
   const [boxView, setBoxView] = useState(true);
@@ -71,8 +71,10 @@ function UserGroup() {
   //   const [[], set[]] = useState([]);
 
   const { user } = useAuth();
-  console.log("Entutirjgfdg",user);
-  const entityId=user.entityHirakeyId
+  // console.log("Entutirjgfdg", user);
+
+  const entityId = user.userEntityHierarchyId;
+
   const getAllUserGroups = async () => {
     const startTime = Date.now();
     // show loader
@@ -89,19 +91,19 @@ function UserGroup() {
     // .catch(console.error);
     // }
     try {
-      await getUserGroupsList(entityId);
+      const response = await getUserGroupsList(entityId);
+      setUserGroupList(response.data);
+      console.log("user Group",response)
     } catch (error) {
       handleApiError(error);
-    }finally{
-        await ensureMinDuration(startTime, 1200);
-    hideLoader();
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
-
-    
   };
 
   const handleSave = () => {
-    console.log("Save clicked");
+    // console.log("Save clicked");
     // API call / form submit logic
   };
 
@@ -225,34 +227,34 @@ function UserGroup() {
         <div className={`card-grid ${listView ? "list" : "tile"}`}>
           {userGroupList.map((item) => (
             <div
-              className={`advance-card ${item.inActiveDate ? "inactive" : "active"}`}
-              key={item.GroupCode}
+              className={`advance-card ${item.inactiveDate ? "inactive" : "active"}`}
+              key={item.mstID}
             >
               <div className="card-header">
                 <span className="code" onClick={() => hanbleSearchChange(item)}>
-                  {item.GroupCode}
+                  {item.code}
                 </span>
 
                 <div className="status">
-                  {item.inActiveDate ? (
+                  {item.inactiveDate ? (
                     <div className="status-stack inactive">
                       <div className="status-item inactive">
                         <RxCross2 className="check-icon" />
                         <span className="status-text">Inactive</span>
-                        <span className="date">{item.inActiveDate}</span>
+                        <span className="date">{item.inactiveDate}</span>
                       </div>
 
                       <div className="status-sub">
                         <TiTick className="check-icon muted" />
                         <span className="status-text muted">Active from</span>
-                        <span className="date muted">{item.ActiveDate}</span>
+                        <span className="date muted">{item.activeDate}</span>
                       </div>
                     </div>
                   ) : (
                     <div className="status-item active">
                       <TiTick className="check-icon" />
                       <span className="status-text">Active</span>
-                      <span className="date">{item.ActiveDate}</span>
+                      <span className="date">{item.activeDate}</span>
                     </div>
                   )}
                 </div>
@@ -263,21 +265,21 @@ function UserGroup() {
                 style={listView ? containerStyle : null}
                 onClick={() => hanbleSearchChange(item)}
               >
-                {item.GroupName}
+                {item.name}
               </div>
 
               <div
                 className="card-shortname"
                 style={listView ? containerStyle : null}
               >
-                {item.ShortName}
+                {item.shortName}
               </div>
 
               <div
                 className="card-description"
                 style={listView ? containerStyle : null}
               >
-                {item.Description}
+                {item.description}
               </div>
             </div>
           ))}

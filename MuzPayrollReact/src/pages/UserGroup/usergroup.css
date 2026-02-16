@@ -5,7 +5,7 @@
     /* padding-top: 72px; */
     font-family: sans-serif;
     background-color: #f9f3f9;
-    padding-left: 10px;
+    padding-left: 18px;
 }
 
 .usergroup-page h2 {
@@ -215,11 +215,11 @@
 
 /* ================= HEADER ================= */
 
-.header-section {
+.usergroup-page .header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 7px;
 }
 
 .header-actions {
@@ -323,11 +323,17 @@
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     }
 }
+/* @media (max-width: 900px) {
+    .usergroup-page {
+        padding-left: 15px;
+    }
+} */
 
 @media (max-width: 768px) {
     .usergroup-page {
         padding: 55px 10px;
         padding-top: var(--header-padding);
+        
     }
 
     .header-section {
