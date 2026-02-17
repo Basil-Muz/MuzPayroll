@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.MuzPayroll.entity.UserGrpMst;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
-import com.example.MuzPayroll.entity.DTO.LocationDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.entity.DTO.UserGrpMstDTO;
 import com.example.MuzPayroll.repository.UserGrpLogRepo;
@@ -38,7 +37,7 @@ public class UserGrpMstController {
     private UserGrpLogRepo userGrpLogRepo;
 
     @PostMapping("/save")
-    public Response<UserGrpMstDTO> saveLocation(@ModelAttribute UserGrpMstDTO dto, @RequestParam String mode) {
+    public Response<UserGrpMstDTO> saveUserGrp(@ModelAttribute UserGrpMstDTO dto, @RequestParam String mode) {
         return userGrpMstService.saveWrapper(dto, mode);
     }
 

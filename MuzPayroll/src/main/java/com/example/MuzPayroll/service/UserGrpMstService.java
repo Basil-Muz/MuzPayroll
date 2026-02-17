@@ -288,7 +288,7 @@ public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, Use
         List<String> errors = new ArrayList<>();
 
         if (dtos == null || dtos.isEmpty()) {
-            return Response.error("No location data provided");
+            return Response.error("No User Grp data provided");
         }
 
         try {

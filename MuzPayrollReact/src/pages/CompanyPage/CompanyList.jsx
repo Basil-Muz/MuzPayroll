@@ -39,7 +39,7 @@ const CompanyList = () => {
 
   /* ================= API ================= */
   const fetchAllCompanies = () =>
-    axios.get("http://localhost:8087/company/companylist");
+    axios.get("http://localhost:8087/entity/companylist");
 
   const fetchActiveCompanies = () =>
     axios.get("http://localhost:8087/company/activecompanylist");
