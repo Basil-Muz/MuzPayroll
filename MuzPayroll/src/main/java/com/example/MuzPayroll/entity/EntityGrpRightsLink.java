@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,6 +14,9 @@ import jakarta.persistence.ManyToOne;
 public class EntityGrpRightsLink {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long EntityGrpRightsLinkID;
+
     @ManyToOne
     @JoinColumn(name = "EglSolutionID", nullable = false)
     private SolutionMst solutionMst;
@@ -69,6 +74,14 @@ public class EntityGrpRightsLink {
 
     public void setEntityRightsGrpMst(EntityRightsGrpMst entityRightsGrpMst) {
         this.entityRightsGrpMst = entityRightsGrpMst;
+    }
+
+    public Long getEntityGrpRightsLinkID() {
+        return EntityGrpRightsLinkID;
+    }
+
+    public void setEntityGrpRightsLinkID(Long EntityGrpRightsLinkID) {
+        this.EntityGrpRightsLinkID = EntityGrpRightsLinkID;
     }
 
 }

@@ -52,7 +52,7 @@ public class UserGrpMst {
     @JoinColumn(name = "UgmEntityHierarchyID", nullable = true)
     private EntityMst entityMst;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate withaffectdate;
 
     public Long getUgmUserGroupID() {

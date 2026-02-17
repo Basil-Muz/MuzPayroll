@@ -121,4 +121,41 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
             @Param("companyId") Long companyId,
             @Param("branchId") Long branchId,
             @Param("mccId") Long mccId);
+
+    @Query(value = """
+            SELECT *
+            FROM entity_mst c
+            WHERE c.etm_entity_type_mccid = 13
+            AND (:activeStatusYN IS NULL OR c.etm_activeyn = :activeStatusYN)
+            """, nativeQuery = true)
+    List<EntityMst> findCompanyByStatus(
+            @Param("activeStatusYN") Boolean activeStatusYN);
+
+    @Query(value = """
+            SELECT *
+            FROM entity_mst
+            JOIN entity_hierarchy_info
+            ON entity_hierarchy_info.ehi_entity_hierarchyid = entity_mst.etm_entityid
+            WHERE etm_entity_type_mccid = 14
+            AND entity_hierarchy_info.ehi_companyid = :companyId
+            AND (:activeStatusYN IS NULL OR entity_mst.etm_activeyn = :activeStatusYN)
+            """, nativeQuery = true)
+    List<EntityMst> findBranchByStatus(
+            @Param("activeStatusYN") Boolean activeStatusYN,
+            @Param("companyId") Long companyId);
+
+    @Query(value = """
+            SELECT *
+            FROM entity_mst
+            JOIN entity_hierarchy_info
+            ON entity_hierarchy_info.ehi_entity_hierarchyid = entity_mst.etm_entityid
+            WHERE etm_entity_type_mccid = 15
+            AND (:activeStatusYN IS NULL OR entity_mst.etm_activeyn = :activeStatusYN)
+            AND entity_hierarchy_info.ehi_companyid = :companyId
+            AND (:branchId IS NULL OR entity_hierarchy_info.ehi_branchid = :branchId)
+            """, nativeQuery = true)
+    List<EntityMst> findLocationByStatus(
+            @Param("activeStatusYN") Boolean activeStatusYN,
+            @Param("companyId") Long companyId,
+            @Param("branchId") Long branchId);
 }

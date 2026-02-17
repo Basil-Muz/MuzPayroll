@@ -1,9 +1,13 @@
 package com.example.MuzPayroll.entity;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,7 +16,7 @@ import jakarta.persistence.ManyToOne;
 public class EntityMst {
 
     @Id
-    @Column(name = "EtmEntityID", unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long EtmEntityID;
 
     @Column(nullable = false)
@@ -64,6 +68,12 @@ public class EntityMst {
 
     @Column(nullable = false)
     private Boolean EtmTransValidYN;
+
+    @Column(name = "ActiveDate", nullable = false)
+    private LocalDate activeDate;
+
+    @Column(name = "InActiveDate", nullable = true)
+    private LocalDate InactiveDate;
 
     // =========================
     // Getters and Setters
@@ -187,5 +197,21 @@ public class EntityMst {
 
     public void setEtmTransValidYN(Boolean etmTransValidYN) {
         EtmTransValidYN = etmTransValidYN;
+    }
+
+    public LocalDate getActiveDate() {
+        return activeDate;
+    }
+
+    public void setActiveDate(LocalDate activeDate) {
+        this.activeDate = activeDate;
+    }
+
+    public LocalDate getInactiveDate() {
+        return InactiveDate;
+    }
+
+    public void setInactiveDate(LocalDate InactiveDate) {
+        this.InactiveDate = InactiveDate;
     }
 }

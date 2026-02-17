@@ -9,3 +9,12 @@ export const getBranchList = (userId, companyId) => {
     params: { userId, companyId },
   });
 };
+
+export const getInitDataList = (solutionId, branchIds) => {
+  return api.get(`/entity-rights/linkData`, {
+    params: {
+      solutionId,
+      branchIds,
+    },
+  });
+};

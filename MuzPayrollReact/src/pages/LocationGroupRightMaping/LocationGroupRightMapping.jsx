@@ -57,135 +57,135 @@ const initData = [
     // _original: [],
     _dirty: false,
   },
-  {
-    id: 7,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 2,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "103",
-      name: "CALICUT",
-    },
-    group: [
-      { id: 1022, name: "KOLLAM" },
-      { id: 1004, name: "ERNAKULAM" },
-    ],
+  // {
+  //   id: 7,
+  //   businessSolution: { id: 2, name: "Employee portal" },
+  //   branch: {
+  //     id: 1,
+  //     name: "Norms Management Pvt Ltd",
+  //   },
+  //   location: {
+  //     id: "1002",
+  //     name: "ALAPPUZHA",
+  //   },
+  //   group: [{ id: 1027, name: "WAYANAD" }],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
+  // {
+  //   id: 2,
+  //   businessSolution: { id: 2, name: "Employee portal" },
+  //   branch: {
+  //     id: 1,
+  //     name: "Norms Management Pvt Ltd",
+  //   },
+  //   location: {
+  //     id: "103",
+  //     name: "CALICUT",
+  //   },
+  //   group: [
+  //     { id: 1022, name: "KOLLAM" },
+  //     { id: 1004, name: "ERNAKULAM" },
+  //   ],
 
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 3,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 2,
-      name: "Norms Tech Solutions",
-    },
-    location: {
-      id: "201",
-      name: "BANGALORE",
-    },
-    group: [{ id: 1003, name: "CALICUT" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 4,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 2,
-      name: "Norms Tech Solutions",
-    },
-    location: {
-      id: "202",
-      name: "MYSORE",
-    },
-    group: [
-      { id: 1019, name: "PATHANAMTHITTA" },
-      { id: 1018, name: "THRISSUR" },
-    ],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 10,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 18,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 16,
+  //   // _original: [],
+  //   _dirty: false,
+  // },
+  // {
+  //   id: 3,
+  //   businessSolution: { id: 2, name: "Employee portal" },
+  //   branch: {
+  //     id: 2,
+  //     name: "Norms Tech Solutions",
+  //   },
+  //   location: {
+  //     id: "201",
+  //     name: "BANGALORE",
+  //   },
+  //   group: [{ id: 1003, name: "CALICUT" }],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
+  // {
+  //   id: 4,
+  //   businessSolution: { id: 1, name: "Employee portal" },
+  //   branch: {
+  //     id: 2,
+  //     name: "Norms Tech Solutions",
+  //   },
+  //   location: {
+  //     id: "202",
+  //     name: "MYSORE",
+  //   },
+  //   group: [
+  //     { id: 1019, name: "PATHANAMTHITTA" },
+  //     { id: 1018, name: "THRISSUR" },
+  //   ],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
+  // {
+  //   id: 10,
+  //   businessSolution: { id: 2, name: "Employee portal" },
+  //   branch: {
+  //     id: 1,
+  //     name: "Norms Management Pvt Ltd",
+  //   },
+  //   location: {
+  //     id: "1002",
+  //     name: "ALAPPUZHA",
+  //   },
+  //   group: [{ id: 1027, name: "WAYANAD" }],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
+  // {
+  //   id: 18,
+  //   businessSolution: { id: 1, name: "Employee portal" },
+  //   branch: {
+  //     id: 1,
+  //     name: "Norms Management Pvt Ltd",
+  //   },
+  //   location: {
+  //     id: "1002",
+  //     name: "ALAPPUZHA",
+  //   },
+  //   group: [{ id: 1027, name: "WAYANAD" }],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
+  // {
+  //   id: 16,
 
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
+  //   businessSolution: { id: 1, name: "Employee portal" },
+  //   branch: {
+  //     id: 1,
+  //     name: "Norms Management Pvt Ltd",
+  //   },
+  //   location: {
+  //     id: "1002",
+  //     name: "ALAPPUZHA",
+  //   },
+  //   group: [{ id: 1027, name: "WAYANAD" }],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
 
-  {
-    id: 12,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
+  // {
+  //   id: 12,
+  //   businessSolution: { id: 1, name: "Employee portal" },
+  //   branch: {
+  //     id: 1,
+  //     name: "Norms Management Pvt Ltd",
+  //   },
+  //   location: {
+  //     id: "1002",
+  //     name: "ALAPPUZHA",
+  //   },
+  //   group: [{ id: 1027, name: "WAYANAD" }],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
 ];
 
 const PAGE_SIZE = 8;
