@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import { BsGrid3X3GapFill } from "react-icons/bs";
@@ -18,6 +17,7 @@ import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
 
 import { useAuth } from "../../context/AuthProvider";
+import { fetchAllLocation, fetchActiveLocation, fetchInactiveLocation } from "../../services/locationlist.service";
 
 const LocationList = () => {
   /* ================= STATE ================= */
@@ -37,34 +37,17 @@ const LocationList = () => {
 
   const navigate = useNavigate();
   const { user } = useAuth();
-  const UserData = localStorage.getItem("loginData");
-  const userObj = JSON.parse(UserData);
 
-  //Convert the JSON string to objects
-  const branchId = userObj.branchId;
-  const token = userObj.token;
+  const token = user.token;
 
-  /* ================= API ================= */
-
-  const fetchAllLocation = () =>
-    axios.get(`http://localhost:8087/location/locationlist/${branchId}`);
-
-  const fetchActiveLocation = () =>
-    axios.get(`http://localhost:8087/location/activelocationlist/${branchId}`);
-
-  const fetchInactiveLocation = () =>
-    axios.get(
-      `http://localhost:8087/location/inactivelocationlist/${branchId}`,
-    );
-
-  /* ================= NAVIGATION ================= */
+   /* ================= NAVIGATION ================= */
   const handleCardClick = (mstID) => {
     navigate(`/location/${mstID}`);
   };
 
   /* ================= INITIAL LOAD ================= */
   useEffect(() => {
-    if (!userObj?.token) {
+    if (!user?.token) {
       navigate("/");
     }
   }, []);
@@ -79,9 +62,12 @@ const LocationList = () => {
     setGroupByStatus(false);
 
     try {
-      const res = await fetchAllLocation();
+      const res = await fetchAllLocation(
+        user.userEntityHierarchyId,
+        user.branchEntityHierarchyId
+      );
       setTimeout(() => {
-        setAllLocation(res.data);
+        setAllLocation(res);
         setActiveLocation([]);
         setInactiveLocation([]);
       }, 800);
@@ -106,13 +92,19 @@ const LocationList = () => {
     showRailLoader("Retrieving available location…");
     try {
       const [activeRes, inactiveRes] = await Promise.all([
-        fetchActiveLocation(),
-        fetchInactiveLocation(),
+        fetchActiveLocation(
+          user.userEntityHierarchyId,
+          user.branchEntityHierarchyId
+        ),
+        fetchInactiveLocation(
+          user.userEntityHierarchyId,
+          user.branchEntityHierarchyId
+        ),
       ]);
 
       setTimeout(() => {
-        setActiveLocation(activeRes.data);
-        setInactiveLocation(inactiveRes.data);
+        setActiveLocation(activeRes);
+        setInactiveLocation(inactiveRes);
         setLoading(false);
       }, 800);
     } catch (err) {

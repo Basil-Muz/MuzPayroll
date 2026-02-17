@@ -131,7 +131,7 @@ function ChangePassword() {
           <h2>Change Password</h2>
         </div>
 
-        {/* 🔐 CURRENT PASSWORD (only normal flow) */}
+        {/*CURRENT PASSWORD (only normal flow) */}
         {!isForgotFlow && (
           <div className="form-group1">
             <label>Current Password</label>

@@ -97,9 +97,9 @@ function LoginPage() {
         userMstId: payload.userMstId,
 
         userEntityHierarchyId: payload.userEntityHierarchyId ?? "",
-        companyName: payload.companyName, 
+        companyName: payload.companyName,
         defaultEntityHierarchyId: payload.defaultEntityHierarchyId ?? "",
-        locationName: payload.locationName,   
+        locationName: payload.locationName,
         branchEntityHierarchyId: payload.branchEntityHierarchyId ?? "",
         branchName: payload.branchName,
 
@@ -110,9 +110,25 @@ function LoginPage() {
       login(loginData);
       navigate("/home");
     } catch (error) {
-      setCommonError("Server error.");
       console.error("Login error:", error);
+
+      if (error?.errors) {
+        const errorMsg = Array.isArray(error.errors)
+          ? error.errors[0]
+          : error.errors;
+
+        setCommonError(errorMsg);
+        return;
+      }
+
+      if (error?.message) {
+        setCommonError(error.message);
+        return;
+      }
+
+      setCommonError("Something went wrong.");
     }
+
 
   };
 

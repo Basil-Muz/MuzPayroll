@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import { BsGrid3X3GapFill } from "react-icons/bs";
@@ -15,6 +14,8 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import Loading from "../../components/Loaders/Loading";
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
+import { useAuth } from "../../context/AuthProvider";
+import {fetchAllBranch, fetchActiveBranch, fetchInactiveBranch} from "../../services/branchlist.service";
 const BranchList = () => {
   /* ================= STATE ================= */
   const [listView, setListView] = useState(false);
@@ -28,25 +29,13 @@ const BranchList = () => {
 
   const [loading, setLoading] = useState(false);
   const { showRailLoader, hideLoader } = useLoader();
+  
 
   const navigate = useNavigate();
 
-  const UserData = localStorage.getItem("loginData");
-  const userObj = JSON.parse(UserData);
+  const { user } = useAuth();
 
-  //Convert the JSON string to objects
-  const companyId = userObj.companyId;
-  const token = userObj.token;
-
-  /* ================= API ================= */
-  const fetchAllBranch = () =>
-    axios.get(`http://localhost:8087/branch/branchlist/${companyId}`);
-
-  const fetchActiveBranch = () =>
-    axios.get(`http://localhost:8087/branch/activebranchlist/${companyId}`);
-
-  const fetchInactiveBranch = () =>
-    axios.get(`http://localhost:8087/branch/inactivebranchlist/${companyId}`);
+  const token = user.token;
 
   /* ================= NAVIGATION ================= */
   const handleCardClick = (mstID) => {
@@ -56,7 +45,7 @@ const BranchList = () => {
   /* ================= INITIAL LOAD ================= */
 
   useEffect(() => {
-    if (!userObj?.token) {
+    if (!user?.token) {
       navigate("/");
     }
   }, []);
@@ -71,9 +60,9 @@ const BranchList = () => {
     setGroupByStatus(false);
 
     try {
-      const res = await fetchAllBranch();
+      const res = await fetchAllBranch(user.userEntityHierarchyId);
       setTimeout(() => {
-        setAllBranch(res.data);
+        setAllBranch(res);
         setActiveBranch([]);
         setInactiveBranch([]);
         setLoading(false);
@@ -100,13 +89,13 @@ const BranchList = () => {
     showRailLoader("Retrieving available branch…");
     try {
       const [activeRes, inactiveRes] = await Promise.all([
-        fetchActiveBranch(),
-        fetchInactiveBranch(),
+        fetchActiveBranch(user.userEntityHierarchyId),
+        fetchInactiveBranch(user.userEntityHierarchyId),
       ]);
 
       setTimeout(() => {
-        setActiveBranch(activeRes.data);
-        setInactiveBranch(inactiveRes.data);
+        setActiveBranch(activeRes);
+        setInactiveBranch(inactiveRes);
         setLoading(false);
       }, 800);
     } catch (err) {

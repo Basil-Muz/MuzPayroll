@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import { BsGrid3X3GapFill } from "react-icons/bs";
@@ -15,6 +14,10 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import Loading from "../../components/Loaders/Loading";
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
+import { useAuth } from "../../context/AuthProvider";
+import {fetchAllCompanies,fetchActiveCompanies,fetchInactiveCompanies,} from "../../services/companylist.service";
+
+
 
 const CompanyList = () => {
   const [listView, setListView] = useState(false);
@@ -27,26 +30,13 @@ const CompanyList = () => {
   const [inactiveCompanies, setInactiveCompanies] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
-  const UserData = localStorage.getItem("loginData");
-  const userObj = JSON.parse(UserData);
-
-  const token = userObj.token;
-
+  const token = user.token;
   const navigate = useNavigate();
-
   const { showRailLoader, hideLoader } = useLoader(); //Import functions from context
 
-  /* ================= API ================= */
-  const fetchAllCompanies = () =>
-    axios.get("http://localhost:8087/entity/companylist");
-
-  const fetchActiveCompanies = () =>
-    axios.get("http://localhost:8087/company/activecompanylist");
-
-  const fetchInactiveCompanies = () =>
-    axios.get("http://localhost:8087/company/inactivecompanylist");
-
+ 
   /* ================= NAVIGATION ================= */
   const handleCardClick = (mstID) => {
     navigate(`/company/${mstID}`);
@@ -54,7 +44,7 @@ const CompanyList = () => {
 
   /* ================= INITIAL LOAD ================= */
   useEffect(() => {
-    if (!userObj?.token) {
+    if (!user?.token) {
       navigate("/");
     }
   }, []);
@@ -72,7 +62,7 @@ const CompanyList = () => {
     try {
       const res = await fetchAllCompanies();
       setTimeout(() => {
-        setAllCompanies(res.data);
+        setAllCompanies(res);
         setActiveCompanies([]);
         setInactiveCompanies([]);
       }, 800);
@@ -105,8 +95,8 @@ const CompanyList = () => {
       ]);
 
       setTimeout(() => {
-        setActiveCompanies(activeRes.data);
-        setInactiveCompanies(inactiveRes.data);
+        setActiveCompanies(activeRes);
+        setInactiveCompanies(inactiveRes);
       }, 800);
     } catch (err) {
       console.error(err);
