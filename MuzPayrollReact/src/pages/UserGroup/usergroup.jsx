@@ -35,30 +35,7 @@ import { getUserGroupsList } from "../../services/user.service";
 function UserGroup() {
   const { showRailLoader, hideLoader } = useLoader(); //Import functions from context
 
-  const [userGroupList, setUserGroupList] = useState([
-    // {
-    //   code: "UG001",
-    //   name: "Admin Group",
-    //   shortname: "Admin",
-    //   description: "Group with all admin rights",
-    //   ActiveDate: "01-01-2024",
-    // },
-    // {
-    //   code: "UG002",
-    //   name: "HR Group",
-    //   shortname: "HR",
-    //   description: "Group with HR related rights",
-    //   ActiveDate: "12-03-2024",
-    //   inActiveDate :"12-03-2028",
-    // },
-    // {
-    //   code: "UG003",
-    //   name: "Accounts Group",
-    //   shortname: "Accounts",
-    //   description: "Group with finance related rights",
-    //   ActiveDate: "15-02-2024",
-    // },
-  ]);
+  const [userGroupList, setUserGroupList] = useState([]);
 
   const [boxView, setBoxView] = useState(true);
   const [listView, setListView] = useState(false);
@@ -68,7 +45,6 @@ function UserGroup() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [flag, setFlag] = useState(false); // new state for flag from child
-  //   const [[], set[]] = useState([]);
 
   const { user } = useAuth();
   // console.log("Entutirjgfdg", user);
@@ -93,7 +69,7 @@ function UserGroup() {
     try {
       const response = await getUserGroupsList(entityId);
       setUserGroupList(response.data);
-      console.log("user Group",response)
+      // console.log("user Group", response);
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -158,9 +134,14 @@ function UserGroup() {
 
   const toggleForm = () => {
     setShowForm((prev) => !prev);
-    if (showForm) {
+    if (!showForm) {
+     
       setSelectedItem(null);
     }
+
+    //Api call for fetching the usergroup with mstId
+
+    //  console.log("slecteditem",selectedItem)
   };
   const containerStyle = { display: "flex" };
 

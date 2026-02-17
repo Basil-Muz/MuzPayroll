@@ -170,7 +170,7 @@ const Header = ({ backendError = [] }) => {
             },
           }),
         ]);
-        console.log("Branch response", branchRes.data);
+        // console.log("Branch response", branchRes.data);
 
         const companyData = Array.isArray(companyRes.data)
           ? companyRes.data
@@ -329,7 +329,7 @@ const Header = ({ backendError = [] }) => {
         }
       : null,
   };
-  console.log("sdfsdfgs", user);
+  // console.log("sdfsdfgs", user);
   useEffect(() => {
     if (branchList.length === 0) return;
 

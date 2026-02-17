@@ -216,7 +216,7 @@ margin-top: 5px;
     align-items: flex-start;
     padding-left: 15px;
 } */
-.modal-usergroup-form .form-row {
+.modal-usergroup-form .group-form-field {
     display: flex;
     /* grid-template-columns: 150px 1fr; */
     align-items: center;
@@ -407,7 +407,7 @@ select#status {
 
     }
 
-    .modal-usergroup-form .form-row {
+    .modal-usergroup-form .group-form-field {
         width: 100%;
     }
 
@@ -429,7 +429,7 @@ select#status {
     flex-direction: column;
     gap: 11px;
     }
-.modal-usergroup-form .form-row {
+.modal-usergroup-form .group-form-field {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -452,7 +452,7 @@ select#status {
     /* Modal wrapper */
     .modal-usergroup-form {}
 
-    .modal-usergroup-form .form-row {
+    .modal-usergroup-form .group-form-field {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -497,7 +497,7 @@ select#status {
     }
 
     /* Stack form rows */
-    .modal-usergroup-form .form-row {
+    .modal-usergroup-form .group-form-field {
         flex-direction: column;
         align-items: flex-start;
         gap: 2px;

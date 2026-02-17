@@ -32,7 +32,7 @@ public class UserGrpMstDTO {
 
     private EntityMst entityMst;
 
-    private Long entityMstID;
+    // private Long entityMstID;
 
     private Long UgmAuthInfoID;
 
@@ -194,12 +194,12 @@ public class UserGrpMstDTO {
         this.userGrpLogPK = userGrpLogPK;
     }
 
-    public Long getEntityMstID() {
-        return entityMstID;
-    }
+    // public Long getEntityMstID() {
+    //     return entityMstID;
+    // }
 
-    public void setEntityMstID(Long entityMstID) {
-        this.entityMstID = entityMstID;
-    }
+    // public void setEntityMstID(Long entityMstID) {
+    //     this.entityMstID = entityMstID;
+    // }
 
 }
