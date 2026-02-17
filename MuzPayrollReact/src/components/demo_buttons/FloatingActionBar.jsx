@@ -12,7 +12,7 @@ import "./FloatingActionBar.css";
 import { IoMenu } from "react-icons/io5";
 const FloatingActionBar = ({ actions = {} }) => {
   const [fabOpen, setFabOpen] = useState(false);
-  console.log("Save disabled:", actions.save.disabled);
+  // console.log("Save disabled:", actions.save.disabled);
 
   return (
     <div className={`floating-action-bar ${fabOpen ? "open" : ""}`}>

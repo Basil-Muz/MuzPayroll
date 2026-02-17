@@ -200,9 +200,7 @@ export default function Sidebar({ forceOpen }) {
 
   const sidebarEnabled = user.sidebarOpen || forceOpen; //opens navigation
 
-  const [active, setActive] = useState(
-    user.activeMenu || "",
-  );
+  const [active, setActive] = useState(user.activeMenu || "");
 
   const getSidebarClass = () => {
     if (isMobile) {
@@ -300,11 +298,11 @@ export default function Sidebar({ forceOpen }) {
       let top = itemRect.top - submenuHeight / 2 + itemRect.height / 2;
 
       top = Math.max(20, Math.min(top, viewportHeight - submenuHeight));
-
+      // console.log("Top",top);
       let left;
 
       if (isMobile) {
-        left = sidebarRect.left + 12; //  near sidebar
+        left = sidebarRect.left + 20; //  near sidebar
       } else if (!sidebarOpen) {
         left = sidebarRect.width + 8;
       } else {
@@ -646,8 +644,11 @@ export default function Sidebar({ forceOpen }) {
                             >
                               {child.label}
                             </span>
-                            <span style={{ color: "#9ca3af", fontSize: 12 }}>
-                              &gt;
+                            <span
+                              className="submenu-arrow"
+                              style={{ color: "#9ca3af", fontSize: 12 ,  transition: "transform 0.2s ease",   }}
+                            >
+                              <IoIosArrowForward size={14} />
                             </span>
                           </button>
                         ))}

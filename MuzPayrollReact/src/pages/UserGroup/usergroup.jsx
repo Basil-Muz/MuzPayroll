@@ -1,43 +1,41 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import "./usergroup.css";
-// import axios from 'axios';
+// React & hooks
+import React, { useEffect, useState } from "react";
+
+// Third-party libraries
 import { BsGrid3X3GapFill } from "react-icons/bs";
-import { FaListUl } from "react-icons/fa";
-import { FaRegObjectGroup } from "react-icons/fa";
+import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
+import { RxCross2 } from "react-icons/rx";
 import { TiTick } from "react-icons/ti";
+
+// Styles
+import "./usergroup.css";
+
+// Shared components
 import Search from "../../components/search/Search";
-import UserGroupForm from "./usergroupform";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import Loading from "../../components/Loaders/Loading";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
+// Local components
+import UserGroupForm from "./usergroupform";
+
+// Context / hooks
+import { useLoader } from "../../context/LoaderContext";
+import { useAuth } from "../../context/AuthProvider";
+
+// Utils
+import { ensureMinDuration } from "../../utils/loaderDelay";
+import { handleApiError } from "../../utils/errorToastResolver";
+
+// Services
+import { getUserGroupsList } from "../../services/user.service";
+
 function UserGroup() {
-  const [advanceTypes, setAdvanceTypes] = useState([
-    {
-      GroupCode: "UG001",
-      GroupName: "Admin Group",
-      ShortName: "Admin",
-      Description: "Group with all admin rights",
-      ActiveDate: "01-01-2024",
-    },
-    {
-      GroupCode: "UG002",
-      GroupName: "HR Group",
-      ShortName: "HR",
-      Description: "Group with HR related rights",
-      ActiveDate: "12-03-2024",
-    },
-    {
-      GroupCode: "UG003",
-      GroupName: "Accounts Group",
-      ShortName: "Accounts",
-      Description: "Group with finance related rights",
-      ActiveDate: "15-02-2024",
-    },
-  ]);
+  const { showRailLoader, hideLoader } = useLoader(); //Import functions from context
+
+  const [userGroupList, setUserGroupList] = useState([]);
 
   const [boxView, setBoxView] = useState(true);
   const [listView, setListView] = useState(false);
@@ -47,16 +45,47 @@ function UserGroup() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [flag, setFlag] = useState(false); // new state for flag from child
-  const [headerError, setHeaderError] = useState([]);
+
+  const { user } = useAuth();
+  // console.log("Entutirjgfdg", user);
+
+  const entityId = user.userEntityHierarchyId;
+
+  const getAllUserGroups = async () => {
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Retrieving available user groups…");
+
+    // if (showForm) {
+    //
+
+    //   // hide loader ONLY at the end
+
+    // } else {
+    //       axios.get("http://localhost:9082/userGrp/userGrplist/{ugmEntityHierarchyID}")
+    // .then((res) => setUserGroupList(res.data))
+    // .catch(console.error);
+    // }
+    try {
+      const response = await getUserGroupsList(entityId);
+      setUserGroupList(response.data);
+      // console.log("user Group", response);
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
+    }
+  };
 
   const handleSave = () => {
-    console.log("Save clicked");
+    // console.log("Save clicked");
     // API call / form submit logic
   };
 
-  const handleSearch = () => {
-    console.log("Search clicked");
-  };
+  //   const handleSearch = () => {
+  //     console.log("Search clicked");
+  //   };
 
   const handleClear = () => {
     console.log("Clear clicked");
@@ -70,16 +99,16 @@ function UserGroup() {
     console.log("Print clicked");
   };
 
-  const handleNewPage = () => {
-    console.log("New page clicked");
-  };
+  //   const handleNewPage = () => {
+  //     console.log("New page clicked");
+  //   };
 
-  const handleFlagChange = (newFlag) => {
-    setFlag(newFlag); // update parent state
-    setTimeout(() => {
-      setFlag(false); // reset flag after 2 seconds
-    }, 1000);
-  };
+  //   const handleFlagChange = (newFlag) => {
+  //     setFlag(newFlag); // update parent state
+  //     setTimeout(() => {
+  //       setFlag(false); // reset flag after 2 seconds
+  //     }, 1000);
+  //   };
   const handleSearchChange = (e) => {
     setSearchdata(e.target.value);
   };
@@ -87,12 +116,12 @@ function UserGroup() {
     const delayDebounceFn = setTimeout(() => {
       if (searchData.trim()) {
         // axios.get(`http://localhost:9082/searchAdvanceType?data=${searchData}`)
-        // .then((res) => setAdvanceTypes(res.data))
+        // .then((res) => setUserGroupList(res.data))
         // .catch(console.error);
       } else {
         // If searchData is empty, get all advance types
         // axios.get("http://localhost:9082/viewAdvanceType")
-        // .then((res) => setAdvanceTypes(res.data))
+        // .then((res) => setUserGroupList(res.data))
         // .catch(console.error);
       }
     }, 200); // debounce delay
@@ -100,25 +129,19 @@ function UserGroup() {
   }, [searchData]);
 
   useEffect(() => {
-    if (showForm) {
-      setLoading(true);
-      // reset loading
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-
-      return () => clearTimeout(timer); // clean up on unmount
-    } else {
-      //       axios.get("http://localhost:9082/viewAdvanceType")
-      // .then((res) => setAdvanceTypes(res.data))
-      // .catch(console.error);
-    }
+    getAllUserGroups();
   }, [showForm]);
+
   const toggleForm = () => {
     setShowForm((prev) => !prev);
-    if (showForm) {
+    if (!showForm) {
+     
       setSelectedItem(null);
     }
+
+    //Api call for fetching the usergroup with mstId
+
+    //  console.log("slecteditem",selectedItem)
   };
   const containerStyle = { display: "flex" };
 
@@ -129,7 +152,7 @@ function UserGroup() {
 
   return (
     <>
-      <Header backendError={headerError} />
+      <Header backendError={[]} />
       <div className="usergroup-page">
         <div className="header-section">
           <h2 className="page-title">User Group</h2>
@@ -183,19 +206,38 @@ function UserGroup() {
         </div>
 
         <div className={`card-grid ${listView ? "list" : "tile"}`}>
-          {advanceTypes.map((item) => (
+          {userGroupList.map((item) => (
             <div
-              className={`advance-card ${item.inActiveDate ? "inactive" : "active"}`}
-              key={item.GroupCode}
+              className={`advance-card ${item.inactiveDate ? "inactive" : "active"}`}
+              key={item.mstID}
             >
               <div className="card-header">
                 <span className="code" onClick={() => hanbleSearchChange(item)}>
-                  {item.GroupCode}
+                  {item.code}
                 </span>
 
                 <div className="status">
-                  <TiTick className="check-icon" />
-                  <span className="date">{item.ActiveDate}</span>
+                  {item.inactiveDate ? (
+                    <div className="status-stack inactive">
+                      <div className="status-item inactive">
+                        <RxCross2 className="check-icon" />
+                        <span className="status-text">Inactive</span>
+                        <span className="date">{item.inactiveDate}</span>
+                      </div>
+
+                      <div className="status-sub">
+                        <TiTick className="check-icon muted" />
+                        <span className="status-text muted">Active from</span>
+                        <span className="date muted">{item.activeDate}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="status-item active">
+                      <TiTick className="check-icon" />
+                      <span className="status-text">Active</span>
+                      <span className="date">{item.activeDate}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -204,21 +246,21 @@ function UserGroup() {
                 style={listView ? containerStyle : null}
                 onClick={() => hanbleSearchChange(item)}
               >
-                {item.GroupName}
+                {item.name}
               </div>
 
               <div
                 className="card-shortname"
                 style={listView ? containerStyle : null}
               >
-                {item.ShortName}
+                {item.shortName}
               </div>
 
               <div
                 className="card-description"
                 style={listView ? containerStyle : null}
               >
-                {item.Description}
+                {item.description}
               </div>
             </div>
           ))}
@@ -259,7 +301,7 @@ function UserGroup() {
           }}
         />
 
-        {showForm && selectedItem && loading && <Loading />}
+        {/* {showForm && selectedItem && loading && <Loading />} */}
         {showForm && !loading && selectedItem && (
           <UserGroupForm data={selectedItem} toggleForm={toggleForm} />
         )}

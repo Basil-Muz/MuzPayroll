@@ -16,6 +16,7 @@ import Sidebar from "../../components/SideBar/Sidebar";
 export default function HomePage() {
   // const [open, setOpen] = useState(false);    //sidebar state
   // const [backendError, setBackendError] = useState([]);
+  console.log("Menu")
   const sitemapData = [
     {
       title: "System Management/Masters",

@@ -11,6 +11,8 @@ public class FormListDTO {
 
     private String shortName;
 
+    private String description;
+
     private LocalDate activeDate;
 
     private Boolean activeStatusYN;
@@ -47,6 +49,14 @@ public class FormListDTO {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+ public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String UgmDesc) {
+        this.description = UgmDesc;
     }
 
     public LocalDate getActiveDate() {

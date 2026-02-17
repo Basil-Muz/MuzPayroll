@@ -33,7 +33,7 @@ function LoginPage() {
   const [displayUserCode, setDisplayUserCode] = useState("");
 
   const solutionId = location.pathname.includes("emp") ? 2 : 1;
- 
+
   const handleLogin = async () => {
     setAttemptsLeft(null);
     setAccountLocked(false);
@@ -94,11 +94,16 @@ function LoginPage() {
       const loginData = {
         userCode: cleaned,
         userName: payload.userName,
-        companyId: payload.companyId,
-        branchId: payload.branchId,
-        locationId: payload.locationId,
+        userMstId: payload.userMstId,
+
+        userEntityHierarchyId: payload.userEntityHierarchyId ?? "",
+        companyName: payload.companyName, 
+        defaultEntityHierarchyId: payload.defaultEntityHierarchyId ?? "",
+        locationName: payload.locationName,   
+        branchEntityHierarchyId: payload.branchEntityHierarchyId ?? "",
+        branchName: payload.branchName,
+
         token: payload.token,
-        sidebarOpen: false,
         solutionId: solutionId,
       };
 

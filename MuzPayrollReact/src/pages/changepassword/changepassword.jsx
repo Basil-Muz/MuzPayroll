@@ -98,10 +98,21 @@ function ChangePassword() {
         response.data?.message || "Password changed successfully"
       );
 
-      // 🔓 Logout after success
-      localStorage.clear();
-      setTimeout(() => navigate("/"), 2000);
+      //  Logout after success
+      const solutionId = user?.solutionId;  // read first
 
+      localStorage.clear();
+
+      setTimeout(() => {
+        if (solutionId === 1) {
+          navigate("/payroll", { replace: true });
+        } else if (solutionId === 2) {
+          navigate("/payrollemp", { replace: true });
+        } else {
+          navigate("/payroll", { replace: true }); // default fallback
+        }
+      }, 2000);
+      
     } catch (err) {
       setError(
         err.response?.data?.errors?.[0] ||
@@ -188,7 +199,7 @@ function ChangePassword() {
           {loading ? "SUBMITTING..." : "SUBMIT"}
         </button>
 
-        <p className="forgot-link" onClick={() => navigate("/")}>
+        <p className="forgot-link" onClick={() => navigate(solutionId === 1 ? "/payroll" : "/payrollemp")}>
           Back to Login
         </p>
       </form>

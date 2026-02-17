@@ -11,6 +11,10 @@ export const handleApiError = (
 
   const defaultMessage = "Something went wrong";
 
+  if (error.code == "ERR_NETWORK") {
+    toast.error("Invalid request.");
+    return;
+  }
   // Network / connection issue
   if (!error.response) {
     toast.error("Unable to connect to server. Please check your network.");
@@ -18,10 +22,12 @@ export const handleApiError = (
   }
 
   // HTTP errors
-  const status = error.type;
+  const status = error.type || error.status;
+  const message = error?.errors?.[0] || error?.message;
+
   switch (status) {
     case 400:
-      toast.error(error.errors[0] ?? "Invalid request.");
+      toast.error(message || "Invalid request.");
       break;
     case 401:
       toast.error("Session expired. Please login again.");
@@ -44,7 +50,7 @@ export const handleApiError = (
       toast.error("Server error. Please try again later.");
       break;
     default:
-      toast.error(error.errors[0] || defaultMessage);
+      toast.error(error.errors[0] || defaultMessage || error.message);
   }
   return;
 };

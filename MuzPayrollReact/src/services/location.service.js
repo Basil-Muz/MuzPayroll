@@ -9,3 +9,13 @@ export const getLocationAmendList = (locationId) => {
 export const saveLocation = (data) => {
   return api.post("/location/save", data);
 };
+
+export const fetchLocaion = (userId, companyId, branchId) => {
+  return api.get("http://localhost:8087/entity/fetchLocation", {
+    params: {
+      userId: userId,
+      branchId: branchId,
+      companyId: companyId,
+    },
+  });
+};

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -24,11 +25,12 @@ public class UserMst {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @ManyToOne
+   @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UsmEntityHierarchyID", nullable = false)
-    private EntityHierarchyInfo entityHierarchyInfo;
+    private EntityHierarchyInfo UsmEntityHierarchyID;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UsmUserTypeID", nullable = false)
     private UserTypeMst userTypeMst;
 
@@ -38,8 +40,10 @@ public class UserMst {
     @Column(nullable = false)
     private Boolean UsmChangePasswordOnNextLogin;
 
-    @Column(nullable = false)
-    private Long UsmDefaultEntityHierarchyID;
+
+    @ManyToOne
+    @JoinColumn(name = "UsmDefaultEntityHierarchyID", nullable = false)
+    private EntityHierarchyInfo UsmDefaultEntityHierarchyID;
 
     @Column(nullable = false)
     private Boolean UsmActiveYN;
@@ -59,15 +63,15 @@ public class UserMst {
     @Column(nullable = false)
     private Integer userAttempt = 0;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CompanyID", nullable = false)
     private CompanyMst companyEntity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BranchID", nullable = false)
     private BranchMst branchEntity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "LocationID", nullable = false)
     private LocationMst locationEntity;
 
@@ -151,13 +155,14 @@ public class UserMst {
         this.locationEntity = locationEntity;
     }
 
-    public EntityHierarchyInfo getEntityHierarchyInfo() {
-        return entityHierarchyInfo;
+    public EntityHierarchyInfo getUsmEntityHierarchyID() {
+        return UsmEntityHierarchyID;
     }
 
-    public void setEntityHierarchyInfo(EntityHierarchyInfo entityHierarchyInfo) {
-        this.entityHierarchyInfo = entityHierarchyInfo;
+    public void setUsmEntityHierarchyID(EntityHierarchyInfo usmEntityHierarchyID) {
+        UsmEntityHierarchyID = usmEntityHierarchyID;
     }
+
 
     public UserTypeMst getUserTypeMst() {
         return userTypeMst;
@@ -183,14 +188,6 @@ public class UserMst {
         this.UsmChangePasswordOnNextLogin = UsmChangePasswordOnNextLogin;
     }
 
-    public Long getUsmDefaultEntityHierarchyID() {
-        return UsmDefaultEntityHierarchyID;
-    }
-
-    public void setUsmDefaultEntityHierarchyID(Long UsmDefaultEntityHierarchyID) {
-        this.UsmDefaultEntityHierarchyID = UsmDefaultEntityHierarchyID;
-    }
-
     public Boolean getUsmActiveYN() {
         return UsmActiveYN;
     }
@@ -214,5 +211,11 @@ public class UserMst {
     public void setUsmTransValidYN(Boolean UsmTransValidYN) {
         this.UsmTransValidYN = UsmTransValidYN;
     }
+    public EntityHierarchyInfo getUsmDefaultEntityHierarchyID() {
+        return UsmDefaultEntityHierarchyID;
+    }
 
+    public void setUsmDefaultEntityHierarchyID(EntityHierarchyInfo usmDefaultEntityHierarchyID) {
+        UsmDefaultEntityHierarchyID = usmDefaultEntityHierarchyID;
+    }
 }

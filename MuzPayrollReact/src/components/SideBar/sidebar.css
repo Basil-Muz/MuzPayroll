@@ -274,6 +274,12 @@
   color: inherit;
 }
 
+.submenu-item:hover .submenu-arrow {
+  transform: translateX(4px);
+  color: #c71ebeff;
+}
+
+
 /* badge */
 .nav-badge {
   background: #ef4444;
@@ -336,7 +342,7 @@
   align-items: center;
   gap: 13px;
 }
-.user-avatar {
+ .user-avatar {
   width: 36px;
   height: 36px;
   border-radius: 8px;
@@ -474,8 +480,8 @@
 }
 @media (min-width: 1024px) {
   .sidebar {
-    /* position: sticky;
-    top: 0; */
+    /* position: sticky;*/
+    /* top: 77px; */
     transform: translateX(0);
   }
 
@@ -517,6 +523,7 @@
 @media (max-width: 900px) {
   .sidebar {
     width: 72px;
+
   }
   .sidebar.expanded {
     width: 126px;
@@ -583,6 +590,9 @@
   }
   .submenu.floating {
     animation: submenuEnterMobile 180ms ease-out forwards;
+    left: 5.2rem !important;
+    top:96px !important;
+    width: max-content; 
   }
 
   @keyframes submenuEnterMobile {

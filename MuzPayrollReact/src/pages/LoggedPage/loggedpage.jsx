@@ -1,261 +1,219 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
-import "./loggedpage.css";
-import muzLogo from "../../assets/muzlogo_transparent.png";
-import Sidebar from "../../components/SideBar/Sidebar";
-
-import { toast } from "react-hot-toast";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import Select from "react-select";
-import LoadingPage from "../../components/Loaders/Loading";
+import { toast } from "react-hot-toast";
+
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import Sidebar from "../../components/SideBar/Sidebar";
+import muzLogo from "../../assets/muzlogo_transparent.png";
 
 import { useLoader } from "../../context/LoaderContext";
-import { ensureMinDuration } from "../../utils/loaderDelay";
-
 import { useAuth } from "../../context/AuthProvider";
-
+import { ensureMinDuration } from "../../utils/loaderDelay";
 import { getCurrentFinYear, getFinYearOptions } from "../../utils/finyearUtils";
+import { fetchCompanies, fetchBranch, fetchLocation, } from "../../services/home.service";
+import { fetchMainMenu } from "../../services/menu.service";
 
+import { useLocation } from "react-router-dom";
 
+import "./loggedpage.css";
+import { handleApiError } from "../../utils/errorToastResolver";
 
 function LoggedPage() {
-
-  /* ================= HOOKS ================= */
   const navigate = useNavigate();
-  const { user, updateUser } = useAuth();
 
-  const {
-    control,
-    setValue,
-    // getValues,
-    formState: { errors },
-  } = useForm();
-
-
-
-  /* ================= STATE ================= */
-
-  const [companyName, setCompanyName] = useState("");
+  const { user, updateUser, updateMenus, menus } = useAuth();
 
   const { showRailLoader, hideLoader } = useLoader();
+  const { control, setValue } = useForm();
+  const [searchParams] = useSearchParams();
+  const solutionId = searchParams.get("solutionId");
+  const location = useLocation();
+
+  const [companyList, setCompanyList] = useState([]);
+  const [branchList, setBranchList] = useState([]);
+  const [locationList, setLocationList] = useState([]);
+  const [selectedLocationId, setSelectedLocationId] = useState(
+    user?.defaultEntityHierarchyId || "",
+  );
+
+  const currentFinYear = getCurrentFinYear();
+  const [finYear, setFinYear] = useState(currentFinYear);
+  const finYearOptions = getFinYearOptions(currentFinYear);
+
+  const [selectedCompanyId, setSelectedCompanyId] = useState(
+    user?.userEntityHierarchyId || "",
+  );
+  const [selectedBranchId, setSelectedBranchId] = useState(
+    user?.branchEntityHierarchyId || "",
+  );
 
   const fieldsLocked = user?.fieldsLocked ?? true;
   const sidebarOpen = user?.sidebarOpen ?? false;
   const okEnabled = user?.okEnabled ?? true;
   const changeEnabled = user?.changeEnabled ?? false;
 
-
-  const [companyId, setCompanyId] = useState("");
-  const [branchId, setBranchId] = useState("");
-  const [locationId, setLocationId] = useState("");
-  const currentFinYear = getCurrentFinYear();
-  const [finYear, setFinYear] = useState(currentFinYear);
-  const finYearOptions = getFinYearOptions(currentFinYear);
-
-  const [backendError] = useState([]);
-
-  const [branchList, setBranchList] = useState([]);
-  const [locationList, setLocationList] = useState([]);
-
-  /* ================= EFFECTS ================= */
-
-  useEffect(() => {
-
-
-    if (!user) {
-      navigate("/");
-      return;
-    }
-
-
-
-    setCompanyId(String(user.companyId || ""));
-    setBranchId(String(user.branchId || ""));
-    setLocationId(String(user.locationId || ""));
-
-    setFinYear(user.finYear || getCurrentFinYear());
-
-    setValue("branchId", user.branchId ? String(user.branchId) : "");
-    setValue("locationId", user.locationId ? String(user.locationId) : "");
-
-
-    if (!user?.companyId || !user?.branchId) return;
-
-
-    fetchContextData(
-      user.companyId,
-      user.branchId,
-      user.locationId,
-      user.userCode,
-    );
-  }, [user]);
-
+  // ================= Sync form with user context =================
   useEffect(() => {
     if (!user) return;
-    if (user.fieldsLocked) return;
-    if (!branchId) return;
 
-    fetchContextData(
-      user.companyId,
-      branchId,
-      locationId || user.locationId,
-      user.userCode
-    );
-  }, [branchId, locationId, user?.fieldsLocked, user?.companyId]);
+    setSelectedCompanyId(user.userEntityHierarchyId || "");
+    setSelectedBranchId(user.branchEntityHierarchyId || "");
+    setSelectedLocationId(user.defaultEntityHierarchyId || "");
+    setFinYear(user.finYear || currentFinYear);
 
+    setValue("companyId", user.userEntityHierarchyId || "");
+    setValue("branchId", user.branchEntityHierarchyId || "");
+    setValue("locationId", user.defaultEntityHierarchyId || "");
+  }, [user, location.pathname, setValue]);
 
+  // ================= Redirect if no user =================
+  useEffect(() => {
+    if (user) return;
+    const finalSolutionId = Number(solutionId);
+    if (!finalSolutionId) return;
+    navigate(finalSolutionId === 1 ? "/payroll" : "/payrollemp", {
+      replace: true,
+    });
+  }, [user, solutionId, navigate]);
 
+  // ================= Load companies =================
+  useEffect(() => {
+    if (!user?.userMstId) return;
 
-  /* ================= API ================= */
-  const fetchContextData = async (
-    companyId,
-    branchId,
-    locationId,
-    userCode,
-  ) => {
-    // console.log("fetchContextData called");
+    const loadCompanies = async () => {
+      try {
+        const data = await fetchCompanies(user.userMstId);
+        const companies = Array.isArray(data) ? data : [];
+        setCompanyList(companies);
 
-    if (!companyId || !branchId) {
-      // console.log(" Missing companyId / branchId");
-      return;
-    }
-
-    const res = await fetch(
-      `http://localhost:8087/user-context?companyId=${companyId}&branchId=${branchId}&locationId=${locationId}&userCode=${userCode}`,
-    );
-    // console.log("API URL:", res.url);
-
-    const response = await res.json();
-    // console.log("API raw response:", response);
-
-    if (response.statusCode === 400) {
-      const errorMsg = response.errors?.[0] || "Invalid context";
-      toast.error(errorMsg);
-
-
-
-      // CASE: Branch exists but NO location
-      if (
-        errorMsg.toLowerCase().includes("location") ||
-        errorMsg.toLowerCase().includes("no location")
-      ) {
-        // clear location ONLY if it exists
-        if (user.locationId) {
-          updateUser({
-            locationId: "",
-            locationName: "",
-          });
+        if (companies.length > 0) {
+          const firstCompany =
+            companies.find(
+              (c) => String(c.entityHierarchyId) === String(selectedCompanyId),
+            ) || companies[0];
+          setSelectedCompanyId(String(firstCompany.entityHierarchyId));
+          setValue("companyId", String(firstCompany.entityHierarchyId));
         }
-        return;
+      } catch {
+        toast.error("Failed to load companies");
+        setCompanyList([]);
       }
+    };
+    loadCompanies();
+  }, [user?.userMstId]);
 
-      //  CASE: Company / Branch invalid → clear both
-      setBranchList([]);
+  // ================= Load branches =================
+  useEffect(() => {
+    if (!user?.userMstId || !selectedCompanyId) return;
+
+    const loadBranches = async () => {
+      try {
+        const data = await fetchBranch(user.userMstId, selectedCompanyId);
+        const branches = Array.isArray(data) ? data : [];
+        setBranchList(branches);
+
+        if (branches.length > 0) {
+          const firstBranch =
+            branches.find(
+              (b) => String(b.entityHierarchyId) === String(selectedBranchId),
+            ) || branches[0];
+          setSelectedBranchId(String(firstBranch.entityHierarchyId));
+          setValue("branchId", String(firstBranch.entityHierarchyId));
+        }
+      } catch {
+        toast.error("Failed to load branches");
+        setBranchList([]);
+      }
+    };
+    loadBranches();
+  }, [user?.userMstId, selectedCompanyId]);
+
+  /* ================= Load locations ================= */
+  useEffect(() => {
+    if (!user?.userMstId) return;
+    if (!selectedCompanyId) return;
+    if (!selectedBranchId) {
       setLocationList([]);
-
-      setBranchId("");
-      setLocationId("");
-
-      setValue("branchId", "");
+      setSelectedLocationId("");
       setValue("locationId", "");
-
-      updateUser({
-
-        branchId: "",
-        branchName: "",
-        locationId: "",
-        locationName: "",
-      });
-
       return;
     }
 
+    let isMounted = true;
 
-    const data = response.data;
+    const fetchLocations = async () => {
+      const startTime = Date.now();
+      showRailLoader("Loading locations…");
 
-    /* ================= BRANCH (✅ FIX HERE) ================= */
-    const branchListFromApi =
-      data.branchList || data.branches || data.branchMstList || [];
+      try {
+        const data = await fetchLocation(
+          user.userMstId,
+          selectedCompanyId,
+          selectedBranchId,
+        );
 
-    if (branchListFromApi.length === 0) {
-      // console.error(" No branches from backend");
-      setBranchList([]);
-      setLocationList([]);
-      toast.error("No branches found");
-      return;
-    }
+        if (!isMounted) return;
 
-    setBranchList(branchListFromApi);
+        const locations = Array.isArray(data) ? data : [];
+        setLocationList(locations);
 
-    if (data.company && data.company.company) {
-      setCompanyName(data.company.company);
-    }
+        if (locations.length === 0) return;
 
-    /* ================= LOCATION (FIX HERE) ================= */
-    const locationListFromApi =
-      data.locationList || data.locations || data.locationMstList || [];
+        const userLocId = user?.defaultEntityHierarchyId;
 
-    if (locationListFromApi.length === 0) {
-      // console.error(" No locations from backend");
-      setLocationList([]);
-      toast.error("No locations registered for this branch");
-      return;
-    }
+        const savedLocation =
+          locations.find(
+            (l) => String(l.entityHierarchyId) === String(userLocId),
+          ) || locations[0];
 
-    setLocationList(locationListFromApi);
+        setSelectedLocationId(String(savedLocation.entityHierarchyId));
+        setValue("locationId", String(savedLocation.entityHierarchyId), {
+          shouldValidate: false,
+        });
+      } catch {
+        if (isMounted) setLocationList([]);
+        toast.error("Failed to load locations");
+      } finally {
+        await ensureMinDuration(startTime, 600);
+        hideLoader();
+      }
+    };
 
-    const selectedLocation =
-      locationListFromApi.find(
-        (l) => String(l.locationMstID) === String(locationId),
-      ) || locationListFromApi[0];
+    fetchLocations();
 
-    // console.log("selectedLocation:", selectedLocation);
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCompanyId, selectedBranchId, user?.userMstId]);
 
-    setLocationId(String(selectedLocation.locationMstID));
-    setValue("locationId", String(selectedLocation.locationMstID));
-
-    if (
-      String(user.locationId) !== String(selectedLocation.locationMstID)
-    ) {
-      updateUser({
-        userCode: user.userCode || userCode,
-        locationId: selectedLocation.locationMstID,
-        locationName: selectedLocation.location,
-      });
-    }
-  };
-
-  /* ================= SELECT OPTIONS ================= */
+  // ================= Select options =================
+  const companyOptions = companyList.map((c) => ({
+    value: String(c.entityHierarchyId),
+    label: c.entityName,
+  }));
   const branchOptions = branchList.map((b) => ({
-    value: String(b.branchMstID),
-    label: b.branch,
+    value: String(b.entityHierarchyId),
+    label: b.entityName,
   }));
-
   const locationOptions = locationList.map((l) => ({
-    value: String(l.locationMstID),
-    label: l.location,
+    value: String(l.entityHierarchyId),
+    label: l.entityName,
   }));
-
-  const companyOption = companyName
-    ? { value: companyId, label: companyName }
-    : null;
-
-  const loginDate = new Date().toISOString().split("T")[0];
 
   const finYearOption = finYearOptions.find((opt) => opt.value === finYear);
 
-  /* ================= VALIDATION ================= */
+  // ================= Validation =================
   const validateForm = () => {
-    if (fieldsLocked) return true;
-
-    if (!branchId) {
+    // ✅ ALWAYS validate before saving
+    if (!selectedBranchId) {
       toast.error("Please select Branch");
       return false;
     }
 
-    if (!locationId) {
+    if (!selectedLocationId) {
       toast.error("Please select Location");
       return false;
     }
@@ -263,66 +221,77 @@ function LoggedPage() {
     return true;
   };
 
-
+  console.log("Menu", menus);
+  // ================= Actions =================
   const handleOk = async () => {
     if (!validateForm()) return;
+
     const startTime = Date.now();
-    // show loader
     showRailLoader("Applying branch and location changes…");
 
     try {
+      // console.log("Api menu called");
+      const response = await fetchMainMenu(
+        "MAIN_MENU",
+        "LIST",
+        user.userMstId,
+        user.solutionId,
+        user.userEntityHierarchyId,
+      );
+      // console.log("response ", response);
+      updateMenus(response.data);
+      // console.log("Menu", menus);
       const selectedBranch = branchList.find(
-        (b) => String(b.branchMstID) === String(branchId),
+        (b) => String(b.entityHierarchyId) === selectedBranchId,
       );
 
+      //  ADD THIS BACK HERE (correct place)
       const selectedLocation = locationList.find(
-        (l) => String(l.locationMstID) === String(locationId),
+        (l) => String(l.entityHierarchyId) === selectedLocationId,
       );
 
-      // await global update
-      await updateUser({
-
-        branchId,
-        branchName: selectedBranch?.branch || "",
-        locationId,
-        locationName: selectedLocation?.location || "",
+      updateUser({
+        ...user,
+        userEntityHierarchyId: selectedCompanyId,
+        branchEntityHierarchyId: selectedBranchId,
+        branchName: selectedBranch?.entityName || "",
+        defaultEntityHierarchyId: selectedLocationId,
+        locationName: selectedLocation?.entityName || "",
         finYear,
         sidebarOpen: true,
         fieldsLocked: true,
         okEnabled: false,
         changeEnabled: true,
       });
-
+    } catch (error) {
+      console.log("Error" + error);
+      handleApiError(error, {
+        entity: "menu",
+      });
     } finally {
       await ensureMinDuration(startTime, 1200);
-      // hide loader ONLY at the end
       hideLoader();
     }
   };
-
+  //CHANGE HERE — pass object instead of function
   const handleChangeCredentials = () => {
-
-
     updateUser({
-
+      ...user,
       fieldsLocked: false,
       okEnabled: true,
       changeEnabled: false,
     });
-
-
   };
 
 
+  const loginDate = new Date().toISOString().split("T")[0];
 
-  /* ================= UI ================= */
-
+  // ================= UI =================
   return (
     <>
-      <Header backendError={backendError} />
+      <Header />
       <div className="main-section">
-        <Sidebar forceOpen={sidebarOpen} />
-
+        <Sidebar sidebarOpen={sidebarOpen} />
         <div className="logo-homesection">
           <div className="left-section">
             <img src={muzLogo} alt="logo" className="home-logo" />
@@ -335,9 +304,20 @@ function LoggedPage() {
               <div className="logged-details">
                 <label>Company</label>
                 <Select
-                  value={companyOption}
-                  isDisabled
-                  options={companyOption ? [companyOption] : []}
+                  value={
+                    companyOptions.find(
+                      (opt) => opt.value === selectedCompanyId,
+                    ) || null
+                  }
+                  options={companyOptions}
+                  onChange={(opt) => {
+                    const newId = opt?.value || "";
+                    setSelectedCompanyId(newId);
+                    setSelectedBranchId("");
+                    setBranchList([]);
+                    setValue("branchId", "");
+                  }}
+                  isDisabled={fieldsLocked}
                   classNamePrefix="form-control-select"
                 />
               </div>
@@ -346,40 +326,9 @@ function LoggedPage() {
                 <label>Login Date</label>
                 <Select
                   value={{ value: loginDate, label: loginDate }}
-                  isDisabled
                   options={[{ value: loginDate, label: loginDate }]}
+                  isDisabled
                   classNamePrefix="form-control-select"
-                />
-              </div>
-
-              <div className="logged-details">
-                <label>Branch</label>
-                <Controller
-                  name="branchId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      options={branchOptions}
-                      value={
-                        branchOptions.find((opt) => opt.value === branchId) ||
-                        null
-                      }
-                      onChange={(opt) => {
-                        if (!opt) {
-                          field.onChange("");
-                          setBranchId("");
-                          return;
-                        }
-                        field.onChange(opt.value);
-                        setBranchId(opt.value);
-                        setValue("branchId", opt.value);
-                        setLocationList([]);
-                        setValue("locationId", "");
-                      }}
-                      isDisabled={fieldsLocked}
-                      classNamePrefix="form-control-select"
-                    />
-                  )}
                 />
               </div>
 
@@ -395,26 +344,24 @@ function LoggedPage() {
               </div>
 
               <div className="logged-details">
-                <label>Location</label>
+                <label>Branch</label>
                 <Controller
-                  name="locationId"
+                  name="branchId"
                   control={control}
                   render={({ field }) => (
                     <Select
-                      options={locationOptions}
                       value={
-                        locationOptions.find(
-                          (opt) => opt.value === locationId,
+                        branchOptions.find(
+                          (opt) => opt.value === field.value,
                         ) || null
                       }
+                      options={branchOptions}
                       onChange={(opt) => {
-                        if (!opt) {
-                          field.onChange("");
-                          setLocationId("");
-                          return;
-                        }
-                        field.onChange(opt.value);
-                        setLocationId(opt.value);
+                        const newId = opt?.value || "";
+                        field.onChange(newId);
+                        setSelectedBranchId(newId);
+                        setSelectedLocationId("");
+                        setValue("locationId", "");
                       }}
                       isDisabled={fieldsLocked}
                       classNamePrefix="form-control-select"
@@ -423,7 +370,41 @@ function LoggedPage() {
                 />
               </div>
 
-              <div style={{ textAlign: "center" }} className="button-group">
+              <div className="logged-details">
+                <label>Location</label>
+                <Controller
+                  name="locationId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={
+                        locationOptions.find(
+                          (opt) => opt.value === field.value,
+                        ) ||
+                        locationOptions.find(
+                          (opt) => opt.value === selectedLocationId,
+                        ) ||
+                        null
+                      }
+                      options={locationOptions}
+                      onChange={(opt) => {
+                        const newId = opt?.value || "";
+                        field.onChange(newId);
+                        setSelectedLocationId(newId);
+                      }}
+                      isDisabled={fieldsLocked || locationOptions.length === 0}
+                      placeholder={
+                        locationOptions.length === 0
+                          ? "Select..."
+                          : "Select Location"
+                      }
+                      classNamePrefix="form-control-select"
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="button-group" style={{ textAlign: "center" }}>
                 <button
                   className="logged-btn"
                   onClick={handleOk}
@@ -443,7 +424,6 @@ function LoggedPage() {
           </div>
         </div>
       </div>
-      {/* <LoadingPage /> */}
       <Footer />
     </>
   );

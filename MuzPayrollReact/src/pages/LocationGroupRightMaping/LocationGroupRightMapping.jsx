@@ -42,21 +42,21 @@ const GROUPS = [
 ];
 
 const initData = [
-  {
-    id: 1,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
+  // {
+  //   id: 1,
+  //   businessSolution: { id: 1, name: "Employee portal" },
+  //   branch: {
+  //     id: 1,
+  //     name: "Norms Management Pvt Ltd",
+  //   },
+  //   location: {
+  //     id: "1002",
+  //     name: "ALAPPUZHA",
+  //   },
+  //   group: [{ id: 1027, name: "WAYANAD" }],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
   // {
   //   id: 7,
   //   businessSolution: { id: 2, name: "Employee portal" },

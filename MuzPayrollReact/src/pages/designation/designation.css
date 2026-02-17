@@ -189,7 +189,7 @@
 
 /* ================= HEADER ================= */
 
-.header-section {
+.designation-page .header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;

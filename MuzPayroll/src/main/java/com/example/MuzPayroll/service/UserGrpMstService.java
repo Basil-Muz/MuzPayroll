@@ -599,7 +599,7 @@ public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, Use
         dto.setActiveDate(entity.getActiveDate());
         dto.setInactiveDate(entity.getInactiveDate());
         dto.setEntityMst(entity.getEntityMst());
-        dto.setEntityMstID(entity.getEntityMst().getEtmEntityID());
+        // dto.setEntityMstID(entity.getEntityMst().getEtmEntityID());
         dto.setUgmCode(entity.getUgmCode());
         dto.setUgmDesc(entity.getUgmDesc());
         dto.setUgmName(entity.getUgmName());
