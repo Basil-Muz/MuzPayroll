@@ -24,7 +24,7 @@ public class MenuRepository {
             Integer entityid) {
 
         Query query = entityManager.createNativeQuery(
-                "SELECT * FROM menufunction(:transtype,:transsubtype,:userid,:solutionid,:entityid)");
+                "SELECT * FROM menufunction_main_menu(:transtype,:transsubtype,:userid,:solutionid,:entityid)");
 
         query.setParameter("transtype", transtype);
         query.setParameter("transsubtype", transsubtype);

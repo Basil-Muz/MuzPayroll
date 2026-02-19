@@ -737,7 +737,7 @@ public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, Use
     private boolean isEmpty(EntityMst entityMst) {
         if (entityMst == null)
             return true;
-        return entityMst.getEtmEntityID() == null ||
+        return entityMst.getEtmEntityId() == null ||
                 isEmpty(entityMst.getEtmName()) ||
                 isEmpty(entityMst.getEtmCode());
     }

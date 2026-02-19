@@ -1,49 +1,39 @@
 package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Transient;
 
 @Entity
-public class EntityMst {
+public class EntityLog {
 
-    @Transient
-    private List<EntityLog> entityLogs;
 
-    @Transient
+    @EmbeddedId
     private EntityLogPK entityLogPK;
 
-    @Transient
-    @JsonIgnore
-    private Authorization authorization;
+    @ManyToOne
+    @MapsId("addressInfoLogPK")
+    @JoinColumns({
+            @JoinColumn(name = "AddressInfoID", referencedColumnName = "AddressInfoID"),
+            @JoinColumn(name = "row_no", referencedColumnName = "row_no")
+    })
+    private AddressInfoLog addressInfoLog;
 
-    @Transient
-    @JsonIgnore
-    private AddressInfoMst addressInfoMst;
+    @Column(nullable = false)
+    private String EtmCode;
 
-    @Transient
-    private String amendNo;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "EtmEntityID")
-    private Long etmEntityId;
-
-    @Column(name = "EtmCode", nullable = false)
-    private String etmCode;
-
-    @Column(name = "EtmName", nullable = false)
-    private String etmName;
+    @Column(nullable = false)
+    private String EtmName;
 
     @Column(nullable = false)
     private String EtmShortName;
@@ -55,10 +45,6 @@ public class EntityMst {
 
     @Column(nullable = true)
     private String EtmImage;
-
-    @ManyToOne
-    @JoinColumn(name = "AddressInfoID", nullable = true)
-    private AddressInfoMst addressInfoID;
 
     @Column(nullable = true)
     private String EtmDocInfoID;
@@ -81,9 +67,48 @@ public class EntityMst {
     @Column(name = "InActiveDate", nullable = true)
     private LocalDate InactiveDate;
 
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "AuthID", nullable = false)
+    private Authorization authorization;
+
+    @Column(nullable = false, name = "AmendNo")
+    private String amendNo;
+
     // =========================
     // Getters and Setters
     // =========================
+    public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
+
+    public EntityLogPK getEntityLogPK() {
+        return entityLogPK;
+    }
+
+    public void setEntityLogPK(EntityLogPK entityLogPK) {
+        this.entityLogPK = entityLogPK;
+    }
+
+    public String getEtmCode() {
+        return EtmCode;
+    }
+
+    public void setEtmCode(String etmCode) {
+        EtmCode = etmCode;
+    }
+
+    public String getEtmName() {
+        return EtmName;
+    }
+
+    public void setEtmName(String etmName) {
+        EtmName = etmName;
+    }
 
     public String getEtmShortName() {
         return EtmShortName;
@@ -165,60 +190,12 @@ public class EntityMst {
         this.InactiveDate = InactiveDate;
     }
 
-    public AddressInfoMst getAddressInfoID() {
-        return addressInfoID;
+    public AddressInfoLog getAddressInfoLog() {
+        return addressInfoLog;
     }
 
-    public void setAddressInfoID(AddressInfoMst addressInfoID) {
-        this.addressInfoID = addressInfoID;
-    }
-
-    public Long getEtmEntityId() {
-        return etmEntityId;
-    }
-
-    public void setEtmEntityId(Long etmEntityId) {
-        this.etmEntityId = etmEntityId;
-    }
-
-    public String getEtmCode() {
-        return etmCode;
-    }
-
-    public void setEtmCode(String etmCode) {
-        this.etmCode = etmCode;
-    }
-
-    public String getEtmName() {
-        return etmName;
-    }
-
-    public void setEtmName(String etmName) {
-        this.etmName = etmName;
-    }
-
-    public Authorization getAuthorization() {
-        return authorization;
-    }
-
-    public void setAuthorization(Authorization authorization) {
-        this.authorization = authorization;
-    }
-
-    public EntityLogPK getEntityLogPK() {
-        return entityLogPK;
-    }
-
-    public void setEntityLogPK(EntityLogPK entityLogPK) {
-        this.entityLogPK = entityLogPK;
-    }
-
-    public List<EntityLog> getEntityLogs() {
-        return entityLogs;
-    }
-
-    public void setEntityLogs(List<EntityLog> entityLogs) {
-        this.entityLogs = entityLogs;
+    public void setAddressInfoLog(AddressInfoLog addressInfoLog) {
+        this.addressInfoLog = addressInfoLog;
     }
 
     public String getAmendNo() {
@@ -229,11 +206,4 @@ public class EntityMst {
         this.amendNo = amendNo;
     }
 
-    public AddressInfoMst getAddressInfoMst() {
-        return addressInfoMst;
-    }
-
-    public void setAddressInfoMst(AddressInfoMst addressInfoMst) {
-        this.addressInfoMst = addressInfoMst;
-    }
 }

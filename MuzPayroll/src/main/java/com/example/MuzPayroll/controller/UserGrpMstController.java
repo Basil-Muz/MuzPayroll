@@ -60,10 +60,12 @@ public class UserGrpMstController {
     }
 
     // To get the data list from the MST table
-    @GetMapping("/userGrplist/{ugmEntityHierarchyID}")
-    public ResponseEntity<List<FormListDTO>> getUserGrpList(@PathVariable Long ugmEntityHierarchyID) {
+    @GetMapping("/userGrplist")
+    public ResponseEntity<List<FormListDTO>> getUserGrpList(
+            @RequestParam Long companyId,
+            @RequestParam(required = false) Boolean activeStatusYN) {
 
-        List<UserGrpMst> list = userGrpMstRepo.findByEntityHierarchyID(ugmEntityHierarchyID);
+        List<UserGrpMst> list = userGrpMstRepo.findUserGrpByStatus(companyId, activeStatusYN);
 
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
@@ -83,48 +85,4 @@ public class UserGrpMstController {
         return ResponseEntity.ok(response);
     }
 
-    // To get the Company list from the MST table
-    @GetMapping("/activeuserGrplist/{ugmEntityHierarchyID}")
-    public ResponseEntity<List<FormListDTO>> getUserGrpActiveList(@PathVariable Long ugmEntityHierarchyID) {
-
-        List<UserGrpMst> list = userGrpMstRepo.findActiveUserGrpsByEntityHierarchyID(ugmEntityHierarchyID);
-
-        List<FormListDTO> response = list.stream()
-                .map(entity -> {
-                    FormListDTO dto = new FormListDTO();
-                    dto.setMstID(entity.getUgmUserGroupID());
-                    dto.setCode(entity.getUgmCode());
-                    dto.setName(entity.getUgmName());
-                    dto.setShortName(entity.getUgmShortName());
-                    dto.setActiveDate(entity.getActiveDate());
-                    dto.setInactiveDate(entity.getInactiveDate());
-                    dto.setActiveStatusYN(entity.getUgmActiveYN());
-                    return dto;
-                })
-                .toList();
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/inactiveuserGrplist/{ugmEntityHierarchyID}")
-    public ResponseEntity<List<FormListDTO>> getInactiveUserGrpList(@PathVariable Long ugmEntityHierarchyID) {
-
-        List<UserGrpMst> list = userGrpMstRepo.findInactiveUserGrpsByEntityHierarchyID(ugmEntityHierarchyID);
-
-        List<FormListDTO> response = list.stream()
-                .map(entity -> {
-                    FormListDTO dto = new FormListDTO();
-                    dto.setMstID(entity.getUgmUserGroupID());
-                    dto.setCode(entity.getUgmCode());
-                    dto.setName(entity.getUgmName());
-                    dto.setShortName(entity.getUgmShortName());
-                    dto.setActiveDate(entity.getActiveDate());
-                    dto.setInactiveDate(entity.getInactiveDate());
-                    dto.setActiveStatusYN(entity.getUgmActiveYN());
-                    return dto;
-                })
-                .toList();
-
-        return ResponseEntity.ok(response);
-    }
 }

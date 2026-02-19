@@ -3,14 +3,21 @@ package com.example.MuzPayroll.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.DTO.CompanyDTO;
+import com.example.MuzPayroll.entity.DTO.EntityMstDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
+import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.entity.DTO.UserEntityDTO;
 import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.repository.EntityRepository;
@@ -26,6 +33,22 @@ public class EntityController {
 
     @Autowired
     private EntityRepository entityRepository;
+
+    @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response<EntityMstDTO> saveCompany(
+            @ModelAttribute EntityMstDTO dto, // ← This will bind ALL form fields to DTO
+            @RequestParam(value = "companyImage", required = false) MultipartFile entityImage,
+            @RequestParam String mode) {
+
+        try {
+            dto.setEtmImage(entityImage);
+            return entityService.saveWrapper(dto, mode);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.error("Error processing request: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/fetchCompany")
     public List<UserEntityDTO> getUserCompany(
@@ -44,7 +67,7 @@ public class EntityController {
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
                     FormListDTO dto = new FormListDTO();
-                    dto.setMstID(entity.getEtmEntityID());
+                    dto.setMstID(entity.getEtmEntityId());
                     dto.setCode(entity.getEtmCode());
                     dto.setName(entity.getEtmName());
                     dto.setShortName(entity.getEtmShortName());
@@ -77,7 +100,7 @@ public class EntityController {
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
                     FormListDTO dto = new FormListDTO();
-                    dto.setMstID(entity.getEtmEntityID());
+                    dto.setMstID(entity.getEtmEntityId());
                     dto.setCode(entity.getEtmCode());
                     dto.setName(entity.getEtmName());
                     dto.setShortName(entity.getEtmShortName());
@@ -112,7 +135,7 @@ public class EntityController {
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
                     FormListDTO dto = new FormListDTO();
-                    dto.setMstID(entity.getEtmEntityID());
+                    dto.setMstID(entity.getEtmEntityId());
                     dto.setCode(entity.getEtmCode());
                     dto.setName(entity.getEtmName());
                     dto.setShortName(entity.getEtmShortName());
