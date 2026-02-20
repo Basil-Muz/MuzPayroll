@@ -1,44 +1,35 @@
-import React, { useEffect, useState, useRef } from "react";
+// React & Core
 import { useForm, Controller } from "react-hook-form";
+import React, { useEffect, useState, useRef } from "react";
 
-import "./usergroupform.css";
-
+// Third-party Libraries
+import Select from "react-select";
 import { FaSave } from "react-icons/fa";
+import { BsInbox } from "react-icons/bs";
+import { RxCross2 } from "react-icons/rx";
+import DatePicker from "react-datepicker";
 import { MdOutlineCancel } from "react-icons/md";
 import { IoNotificationsSharp } from "react-icons/io5";
-import { RxCross2 } from "react-icons/rx";
-import { BsInbox } from "react-icons/bs";
 
-import Loading from "../../components/Loaders/Loading";
+// Context / Custom Hooks
+import { useAuth } from "../../context/AuthProvider";
+import { useLoader } from "../../context/LoaderContext";
+import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
 
-import {
-  saveUserGroup,
-  getUserGroupById,
-  getUserGroupAmendById,
-} from "../../services/usergroup.service";
-
-// Utils
+// Utils / Helpers
 import { ensureMinDuration } from "../../utils/loaderDelay";
 import { handleApiError } from "../../utils/errorToastResolver";
 import {
-  toDateString,
   toLocalIsoDate,
   formatDate,
 } from "../../utils/dateFormater";
 
-// Context / hooks
-import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
 
-import { useLoader } from "../../context/LoaderContext";
-import { useAuth } from "../../context/AuthProvider";
+// Styles (always last)
+import "./ListItemForm.css";
 
-import Select from "react-select";
-import DatePicker from "react-datepicker";
-import { USER_GROUP_FIELD_MAP } from "../../constants/userGroupMap";
 
-// import axios from "axios";
-
-function UserGroupForm({ toggleForm, data }) {
+function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,ENTITY_FIELD_MAP }) {
   //   const [position, setPosition] = useState({ x: 355, y: 43 });
   //   const dragging = useRef(false);
   //   const offset = useRef({ x: 0, y: 0 });
@@ -67,7 +58,7 @@ function UserGroupForm({ toggleForm, data }) {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      authorizationStatus: "0",
+      authorizationStatus: 0,
       //   mode:"INSERT",
       entityMst: user.userEntityHierarchyId,
       userCode: user.userCode,
@@ -79,7 +70,7 @@ function UserGroupForm({ toggleForm, data }) {
   });
   const { setAmendmentData } = useSetAmendmentData({
     setValue,
-    fieldMap: USER_GROUP_FIELD_MAP,
+    fieldMap: ENTITY_FIELD_MAP,
   });
 
   //   const [errors, setErrors] = useState({});
@@ -88,21 +79,8 @@ function UserGroupForm({ toggleForm, data }) {
   const codeInputRef = useRef(null);
 
   const notifTimer = useRef(null);
-  //   const [form, setForm] = useState({
-  //     GroupCode: "",
-  //     GroupName: "",
-  //     ShortName: "",
-  //     Description: "",
-  //     ActiveDate: new Date().toISOString().split("T")[0], // sets today's date
-  // defaultValues: {
-  //   authorization: "ENTRY",
 
-  // }
-
-  //   });
-  // const [isOpenForm, setIsOpenForm] = useState(true);
   const [isVarified, setIsVarified] = useState(false);
-  //   const [salaryHeads, setSalaryHead] = useState([]);
 
   useEffect(() => {
     if (!flag) {
@@ -118,16 +96,16 @@ function UserGroupForm({ toggleForm, data }) {
   const fetchFormDataById = async (data) => {
     const startTime = Date.now();
     // show loader
-    showRailLoader("Fetching available user group…");
+    showRailLoader("Fetching available "+entity+"..");
     try {
-      const response = await getUserGroupById(data);
+      const response = await fetchEntityById(data);
       console.log("Data by id", response);
       setAmendmentData(response.data);
       if (response.data.authorizationStatus === true) setIsVarified(true);
     } catch (error) {
-      console.error("Error fetching user group:", error);
+      console.error("Error fetching "+entity, error);
       handleApiError(error, {
-        entity: "User group",
+        entity: entity,
       });
     } finally {
       await ensureMinDuration(startTime, 1200);
@@ -137,21 +115,7 @@ function UserGroupForm({ toggleForm, data }) {
 
   useEffect(() => {
     // console.log("Data from parent", data);
-
     if (data) fetchFormDataById(data);
-    // if (data) {
-    //   reset({
-    //     code: data.GroupCode,
-    //     name: data.GroupName,
-    //     shortName: data.ShortName,
-    //     description: data.Description,
-    //     activeDate: data.ActiveDate
-    //       ? new Date(data.ActiveDate + "T00:00:00")
-    //       : null,
-    //     authorization: data.Authorization,
-    //   });
-    //   setIsVarified(data.Authorization === "VERIFIED");
-    // }
   }, [data]);
 
   const handleNotifEnter = () => {
@@ -185,50 +149,6 @@ function UserGroupForm({ toggleForm, data }) {
   //     dragging.current = false;
   //   };
 
-  //   const validateEach = (name, value) => {
-  //     const newErrors = {};
-  //     if (value.trim() === "") {
-  //       newErrors[name] =
-  //         `${name.charAt(0).toUpperCase() + name.slice(1)} is required.`;
-  //     } else {
-  //       if (name === "GroupCode") {
-  //         if (/\s/.test(value)) {
-  //           newErrors.GroupCode = "Group Code must not contain spaces.";
-  //         } else if (/[a-z]/.test(value)) {
-  //           newErrors.GroupCode = "Lowercase letters are not allowed.";
-  //         }
-  //       }
-  //     }
-  //     setError(newErrors);
-  //     return Object.keys(newErrors).length === 0;
-  //   };
-  //   const validate = (form) => {
-  //     const newErrors = {};
-
-  //     if (!form.GroupCode) {
-  //       newErrors.GroupCode = "Group Code is required.";
-  //     } else if (/\s/.test(form.GroupCode)) {
-  //       newErrors.GroupCode = "Group Code must not contain spaces.";
-  //     } else if (/[a-z]/.test(form.GroupCode)) {
-  //       newErrors.GroupCode = "Lowercase letters are not allowed.";
-  //     }
-  //     if (!form.GroupName) newErrors.GroupName = "Group Name is required.";
-  //     if (!form.ShortName) newErrors.ShortName = "Short Name is required.";
-  //     if (!form.Description) newErrors.Description = "Description is required.";
-  //     // alert(JSON.stringify(newErrors));
-  //     setError(newErrors);
-  //     return Object.keys(newErrors).length === 0;
-  //   };
-
-  //   const handleChange = (e) => {
-  //     const { name, value } = e.target;
-  //     const updatedForm = { ...form, [name]: value };
-
-  //     setForm(updatedForm);
-
-  //     validateEach(name, value); // Pass the latest values
-  //   };
-
   //   const handleBlur = (e) => {
   //     const { name } = e.target;
   //     setTouched((prev) => ({ ...prev, [name]: true }));
@@ -236,14 +156,7 @@ function UserGroupForm({ toggleForm, data }) {
   //   };
 
   const onSubmit = async (values) => {
-    // e.preventDefault();
-    // console.log("save ciecked", values.activeDate);
-    // const payload = {
-    //   ...values,
-    //   activeDate: toDateString(values.activeDate),
-    // };
-    // comsole.log("sdfsdfsdf")
-    // console.log("Datas", payload);
+
     const formData = new FormData();
 
     Object.keys(values).forEach((key) => {
@@ -254,36 +167,20 @@ function UserGroupForm({ toggleForm, data }) {
     }
     const startTime = Date.now();
     // show loader
-    showRailLoader("Saving user groups…");
+    showRailLoader("Saving "+entity+"…");
     try {
       if (!data)
         //  For fresh insert
-        await saveUserGroup(formData, "INSERT");
-      else await saveUserGroup(formData, "UPDATE"); //for edit
+        await saveEntity(formData, "INSERT");
+      else await saveEntity(formData, "UPDATE"); //for edit
 
       // console.log("Save response",response);
     } catch (error) {
-      console.error("Error updating advance type:", error);
+      console.error("Error updating "+entity+":", error);
       handleApiError(error, {
-        entity: "User group",
+        entity: entity,
       });
     } finally {
-      //   alert(`Form Updation successfully!`);
-
-      //   } else {
-      //     axios.post("http://localhost:9082/saveAdvanceType", {
-      //       code: form.code,
-      //       name: form.name,
-      //       date: form.date,
-      //       shortName: form.shortName,
-      //       recoveryHead: form.recoveryHead,
-      //       description: form.description,
-      //       activeDate: form.activeDate,
-      //       status: form.status, // Or just boolean true/false
-      //     });
-
-      //     alert("Form insertion successfully!");
-      //   }
       await ensureMinDuration(startTime, 1200);
       hideLoader();
       toggleForm();
@@ -338,7 +235,7 @@ function UserGroupForm({ toggleForm, data }) {
       <Search/>
         
         </div> */}
-          <div className="form-title">User Group</div>
+          <div className="form-title">{entity}</div>
 
           <div className="header-icons">
             <div
@@ -491,13 +388,6 @@ function UserGroupForm({ toggleForm, data }) {
                   control={control}
                   rules={{ required: "Please select a date" }}
                   render={({ field }) => {
-                    // Convert the field value to a Date object for the picker
-                    // const selectedDate = field.value
-                    //   ? formatDate(field.value)
-                    //   : null;
-
-                    // console.log("Field value:", field.value);
-                    // console.log("Selected date for picker:", selectedDate);
                     return (
                       <DatePicker
                         placeholderText="Select date"
@@ -601,10 +491,8 @@ function UserGroupForm({ toggleForm, data }) {
           </div>
         </form>
       </div>
-
-      {flag && <Loading />}
     </div>
   );
 }
 
-export default UserGroupForm;
+export default ListItemForm;

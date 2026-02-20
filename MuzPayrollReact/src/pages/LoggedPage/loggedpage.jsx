@@ -13,18 +13,23 @@ import { useLoader } from "../../context/LoaderContext";
 import { useAuth } from "../../context/AuthProvider";
 import { ensureMinDuration } from "../../utils/loaderDelay";
 import { getCurrentFinYear, getFinYearOptions } from "../../utils/finyearUtils";
-import { fetchCompanies, fetchBranch, fetchLocation, } from "../../services/home.service";
+import {
+  fetchCompanies,
+  fetchBranch,
+  fetchLocation,
+} from "../../services/home.service";
 import { fetchMainMenu } from "../../services/menu.service";
 
 import { useLocation } from "react-router-dom";
 
 import "./loggedpage.css";
 import { handleApiError } from "../../utils/errorToastResolver";
+import { organizeMenuFromBackend } from "../../utils/menuUtils";
 
 function LoggedPage() {
   const navigate = useNavigate();
 
-  const { user, updateUser, updateMenus, menus } = useAuth();
+  const { user, updateUser, updateMenus } = useAuth();
 
   const { showRailLoader, hideLoader } = useLoader();
   const { control, setValue } = useForm();
@@ -78,7 +83,7 @@ function LoggedPage() {
       replace: true,
     });
   }, [user, solutionId, navigate]);
-
+  console.log("Use id", user);
   // ================= Load companies =================
   useEffect(() => {
     if (!user?.userMstId) return;
@@ -87,6 +92,7 @@ function LoggedPage() {
       try {
         const data = await fetchCompanies(user.userMstId);
         const companies = Array.isArray(data) ? data : [];
+        console.log("companies");
         setCompanyList(companies);
 
         if (companies.length > 0) {
@@ -207,7 +213,7 @@ function LoggedPage() {
 
   // ================= Validation =================
   const validateForm = () => {
-    // ✅ ALWAYS validate before saving
+    // ALWAYS validate before saving
     if (!selectedBranchId) {
       toast.error("Please select Branch");
       return false;
@@ -221,7 +227,6 @@ function LoggedPage() {
     return true;
   };
 
-  console.log("Menu", menus);
   // ================= Actions =================
   const handleOk = async () => {
     if (!validateForm()) return;
@@ -230,29 +235,22 @@ function LoggedPage() {
     showRailLoader("Applying branch and location changes…");
 
     try {
-      // console.log("Api menu called");
-      const response = await fetchMainMenu(
-        "MAIN_MENU",
-        "LIST",
-        user.userMstId,
-        user.solutionId,
-        user.userEntityHierarchyId,
+      const selectedCompany = companyList.find(
+        (b) => String(b.entityHierarchyId) === selectedCompanyId,
       );
-      // console.log("response ", response);
-      updateMenus(response.data);
-      // console.log("Menu", menus);
+
       const selectedBranch = branchList.find(
         (b) => String(b.entityHierarchyId) === selectedBranchId,
       );
 
-      //  ADD THIS BACK HERE (correct place)
       const selectedLocation = locationList.find(
         (l) => String(l.entityHierarchyId) === selectedLocationId,
       );
-
+      // console.log("Comapny",selectedCompany);
       updateUser({
         ...user,
         userEntityHierarchyId: selectedCompanyId,
+        companyName: selectedCompany?.entityName || "",
         branchEntityHierarchyId: selectedBranchId,
         branchName: selectedBranch?.entityName || "",
         defaultEntityHierarchyId: selectedLocationId,
@@ -263,8 +261,19 @@ function LoggedPage() {
         okEnabled: false,
         changeEnabled: true,
       });
+      const response = await fetchMainMenu(
+        "MAIN_MENU",
+        "LIST",
+        user.userMstId,
+        user.solutionId,
+        user.defaultEntityHierarchyId,
+      );
+      // console.log("Menu", response);
+      const organizedMenu = organizeMenuFromBackend(response.data);
+      // console.log("Organized menu", organizedMenu);
+      updateMenus(organizedMenu);
     } catch (error) {
-      console.log("Error" + error);
+      // console.log("Error" + error);
       handleApiError(error, {
         entity: "menu",
       });
@@ -282,7 +291,6 @@ function LoggedPage() {
       changeEnabled: false,
     });
   };
-
 
   const loginDate = new Date().toISOString().split("T")[0];
 

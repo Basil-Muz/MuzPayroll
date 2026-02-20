@@ -241,7 +241,7 @@ padding-bottom: 0 !important;
 }
 
 .modal-usergroup-form .save-btn:hover {
-  color: var(--success);
+  color: rgb(178, 20, 184) !important;
   background: rgba(210, 24, 216, 0.16);
 }
 
@@ -267,11 +267,6 @@ padding-bottom: 0 !important;
   font-size: 12.5px;
 }
 
-/* .modal-usergroup-form .save-btn {
-  color: #409e4cff;
-  transition: all 0.2s ease;
-} */
-
 .modal-usergroup-form .cancel-btn {
   color: #d44242ff;
   transition: all 0.2s ease;
@@ -285,7 +280,7 @@ padding-bottom: 0 !important;
   pointer-events: none;
 }
 .modal-usergroup-form .save-btn:not(:disabled):hover {
-  color: #33793aff;
+  /* color: #33793aff; */
   background: rgba(210, 24, 216, 0.16);
 }
 

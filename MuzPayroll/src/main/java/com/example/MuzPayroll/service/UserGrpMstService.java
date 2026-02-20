@@ -129,7 +129,7 @@ public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, Use
 
                     // Collect ALL errors
                     if (dto.getUgmUserGroupID() == null)
-                        rowErrors.add(("User Id is required"));
+                        rowErrors.add(("User user Id is required"));
                     if (isEmpty(dto.getUgmName()))
                         rowErrors.add("Group Name is required");
                     if (isEmpty(dto.getUgmDesc()))
@@ -873,6 +873,83 @@ public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, Use
         // Attach list to MST DTO
         dto.setUserGrpLogDTOs(logDtos);
 
+        return dto;
+    }
+
+    
+       @Transactional(readOnly = true)
+    public UserGrpMstDTO getUserGrpWithAuth(Long ugmUserGroupID) {
+
+        // Fetch MST row
+        UserGrpMst entity = userGrpMstRepo.findById(ugmUserGroupID)
+                .orElseThrow(() -> new RuntimeException("User Grp not found"));
+
+        // Convert MST → DTO
+        UserGrpMstDTO dto = entityToDto(entity);
+
+        // Fetch ALL logs related to this MST
+        // List<UserGrpLog> Logs = userGrpLogRepo
+        //         .findByUserGrpLogPK_UgmUserGroupIDOrderByUserGrpLogPK_RowNoDesc(
+        //                 ugmUserGroupID);
+
+        // Optional<UserGrpLog> selectedLog = Logs.stream()
+        //         .filter(log -> log.getAuthorization() != null)
+        //         .max(Comparator.comparing(UserGrpLog::getAmendNo))
+        //         .flatMap(latestLog -> {
+
+        //             // Case 1: latest is TRUE → return it
+        //             if (Boolean.TRUE.equals(
+        //                     latestLog.getAuthorization().getAuthorizationStatus())) {
+        //                 return Optional.of(latestLog);
+        //             }
+
+        //             // Case 2: latest is FALSE → find latest TRUE
+        //             return Logs.stream()
+        //                     .filter(log -> log.getAuthorization() != null)
+        //                     .filter(log -> Boolean.TRUE.equals(
+        //                             log.getAuthorization().getAuthorizationStatus()))
+        //                     .max(Comparator.comparing(UserGrpLog::getAmendNo));
+        //         });
+
+        // // Case 3: no TRUE exists → fallback to latest FALSE
+        // if (!selectedLog.isPresent()) {
+        //     selectedLog = Logs.stream()
+        //             .filter(log -> log.getAuthorization() != null)
+        //             .filter(log -> Boolean.FALSE.equals(
+        //                     log.getAuthorization().getAuthorizationStatus()))
+        //             .max(Comparator.comparing(UserGrpLog::getAmendNo));
+        // }
+
+        // // Apply mapping
+        // selectedLog.ifPresent(log -> {
+
+        //     dto.setAmendNo(log.getAmendNo());
+        //     dto.setUgmAuthInfoID(log.getAuthorization().getAuthId());
+        //     dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
+        //     dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+
+        //     if (log.getAuthorization().getUserMst() != null) {
+        //         dto.setUserCode(
+        //                 log.getAuthorization().getUserMst().getUserCode());
+        //     }
+        // });
+
+        // // Convert ALL logs → DTO list
+        // List<UserGrpLogDTO> logDtos = Logs.stream()
+        //         .map(userGrpLogService::entityToDto)
+        //         .toList();
+
+        // // Attach list to MST DTO
+        // dto.setUserGrpLogDTOs(logDtos);
+
+        Authorization auth = authorizationRepository
+        .findTopByMstIdOrderByAuthIdDesc(ugmUserGroupID)
+        .orElse(null);
+
+        // entity.setAuthorization(auth);  
+
+        // System.out.println("Authrization "+ entity.getAuthorization());
+          dto.setAuthorizationStatus(auth.getAuthorizationStatus());
         return dto;
     }
 }

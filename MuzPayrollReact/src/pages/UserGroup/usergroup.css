@@ -285,6 +285,7 @@
     border: none;
     outline: none;
     background: transparent;
+    color:var(--text);
     font-size: 13.5px;
     width: 100%;
 }

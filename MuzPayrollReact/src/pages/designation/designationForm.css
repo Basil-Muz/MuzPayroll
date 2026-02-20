@@ -130,7 +130,7 @@
 }
 
 .modal-header 
-.notifications:hover
+.modal-designation-form .notifications:hover
 {
   background-color: var(--primary-hover);
 }
@@ -182,21 +182,21 @@ margin-top: 5px;
     border-radius: 50%;
     border:1px solid rgba(219, 53, 11, 0.93);;
 } */
-.header-icons .notifications {
+.modal-designation-form .header-icons .notifications {
     /* position: relative;
     display: inline-block;
     padding-right: 10px;
     height: 100%; */
     /* padding: 18px; */
     padding: 6px 10px 2px 10px;
-    height: 1.5rem;
+    /* height: 1.5rem; */
     display: inline-block;
     color: var(--primary);
     border-radius: 6px;
     transition: all 0.5s ease-in-out;
      
 }
-.header-icons .notifications:hover {
+.modal-designation-form .header-icons .notifications:hover {
     background-color: rgba(219, 37, 235, 0.06);
     color: var(--primary-hover);
 }

@@ -644,7 +644,7 @@ const Header = ({ backendError = [] }) => {
                     ))
                   ) : (
                     <div className="no-notifications">
-                      <BsInbox size={48} />
+                      <BsBell size={48} />
                       <p>No new notifications</p>
                     </div>
                   )}

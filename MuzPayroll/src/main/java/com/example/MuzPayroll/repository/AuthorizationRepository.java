@@ -32,4 +32,6 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
 
   @Query("SELECT COUNT(a) FROM Authorization a WHERE a.mstId = :mstId")
   long countByMstId(@Param("mstId") Long mstId);
+
+  Optional<Authorization> findTopByMstIdOrderByAuthIdDesc(Long ugmUserGroupID);
 }

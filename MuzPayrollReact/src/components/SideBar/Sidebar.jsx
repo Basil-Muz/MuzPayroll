@@ -12,6 +12,7 @@ import { IoMdArrowDropright } from "react-icons/io";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { FaGears } from "react-icons/fa6";
 
+import { AuthProvider } from "../../context/AuthProvider";
 import "./sidebar.css";
 
 import useIsMobile from "../../hooks/useIsMobile";
@@ -21,166 +22,168 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthProvider";
 
-const menuItems = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: <HiMiniSwatch size={18} />,
-    link: "/dashboard",
-  },
+// const menuItems = [
+//   {
+//     id: "dashboard",
+//     label: "Dashboard",
+//     icon: <HiMiniSwatch size={18} />,
+//     link: "/dashboard",
+//   },
 
-  /*  Employee */
-  {
-    id: "employee",
-    label: "Employee",
-    icon: <FaUserTie size={18} />,
-    children: [
-      { id: "employee.profile", label: "Employee", link: "/employee" },
-      { id: "employee.list", label: "Employee List", link: "/employee-list" },
-      {
-        id: "employee.upload",
-        label: "Employee Upload",
-        link: "/employee-upload",
-      },
-      {
-        id: "employee.attributes",
-        label: "Employee Attributes",
-        link: "/employee-attribute-allocation",
-      },
-      {
-        id: "employee.bulkVerify",
-        label: "Bulk Verification",
-        link: "/employee-bulk-verification",
-      },
-    ],
-  },
+//   /*  Employee */
+//   {
+//     id: "employee",
+//     label: "Employee",
+//     icon: <FaUserTie size={18} />,
+//     children: [
+//       { id: "employee.profile", label: "Employee", link: "/employee" },
+//       { id: "employee.list", label: "Employee List", link: "/employee-list" },
+//       {
+//         id: "employee.upload",
+//         label: "Employee Upload",
+//         link: "/employee-upload",
+//       },
+//       {
+//         id: "employee.attributes",
+//         label: "Employee Attributes",
+//         link: "/employee-attribute-allocation",
+//       },
+//       {
+//         id: "employee.bulkVerify",
+//         label: "Bulk Verification",
+//         link: "/employee-bulk-verification",
+//       },
+//     ],
+//   },
 
-  /* TIME & PAYROLL */
-  {
-    id: "timePayroll",
-    label: "Time & Payroll",
-    icon: <FaRegCalendarAlt size={18} />,
-    children: [
-      {
-        id: "attendance.masterRoll",
-        label: "Master Roll",
-        link: "/master-roll",
-      },
-      {
-        id: "attendance.weekly",
-        label: "Weekly Allocation",
-        link: "/weekly-allocation",
-      },
-      {
-        id: "attendance.shift",
-        label: "Shift Allocation",
-        link: "/shift-allocation",
-      },
-      {
-        id: "attendance.leave",
-        label: "Leave Allocation",
-        link: "/leave-allocation-deallocation",
-      },
-      {
-        id: "attendance.exchange",
-        label: "Leave Exchange",
-        link: "/leave-encashment",
-      },
-      {
-        id: "attendance.yearEnd",
-        label: "Leave Year End",
-        link: "/leave-year-end-process",
-      },
+//   /* TIME & PAYROLL */
+//   {
+//     id: "timePayroll",
+//     label: "Time & Payroll",
+//     icon: <FaRegCalendarAlt size={18} />,
+//     children: [
+//       {
+//         id: "attendance.masterRoll",
+//         label: "Master Roll",
+//         link: "/master-roll",
+//       },
+//       {
+//         id: "attendance.weekly",
+//         label: "Weekly Allocation",
+//         link: "/weekly-allocation",
+//       },
+//       {
+//         id: "attendance.shift",
+//         label: "Shift Allocation",
+//         link: "/shift-allocation",
+//       },
+//       {
+//         id: "attendance.leave",
+//         label: "Leave Allocation",
+//         link: "/leave-allocation-deallocation",
+//       },
+//       {
+//         id: "attendance.exchange",
+//         label: "Leave Exchange",
+//         link: "/leave-encashment",
+//       },
+//       {
+//         id: "attendance.yearEnd",
+//         label: "Leave Year End",
+//         link: "/leave-year-end-process",
+//       },
 
-      {
-        id: "process.payroll",
-        label: "Payroll Process",
-        link: "/payroll-process",
-      },
-      {
-        id: "process.verify",
-        label: "Payroll Verification",
-        link: "/payroll-process-verification",
-      },
-    ],
-  },
+//       {
+//         id: "process.payroll",
+//         label: "Payroll Process",
+//         link: "/payroll-process",
+//       },
+//       {
+//         id: "process.verify",
+//         label: "Payroll Verification",
+//         link: "/payroll-process-verification",
+//       },
+//     ],
+//   },
 
-  /* FINANCE */
-  {
-    id: "finance",
-    label: "Finance",
-    icon: <FaRegMoneyBillAlt size={18} />,
-    children: [
-      { id: "advance.issue", label: "Advance Issue", link: "/advance-issue" },
-      {
-        id: "advance.recovery",
-        label: "Advance Recovery",
-        link: "/advance-recovery-update",
-      },
-      { id: "process.bonus", label: "Bonus Process", link: "/bonus-process" },
-      {
-        id: "process.gratuity",
-        label: "Gratuity Process",
-        link: "/gratiuty-process",
-      },
-      {
-        id: "other.allowance",
-        label: "Allowances & Deductions",
-        link: "/monthly-allowance-deduction",
-      },
-    ],
-  },
+//   /* FINANCE */
+//   {
+//     id: "finance",
+//     label: "Finance",
+//     icon: <FaRegMoneyBillAlt size={18} />,
+//     children: [
+//       { id: "advance.issue", label: "Advance Issue", link: "/advance-issue" },
+//       {
+//         id: "advance.recovery",
+//         label: "Advance Recovery",
+//         link: "/advance-recovery-update",
+//       },
+//       { id: "process.bonus", label: "Bonus Process", link: "/bonus-process" },
+//       {
+//         id: "process.gratuity",
+//         label: "Gratuity Process",
+//         link: "/gratiuty-process",
+//       },
+//       {
+//         id: "other.allowance",
+//         label: "Allowances & Deductions",
+//         link: "/monthly-allowance-deduction",
+//       },
+//     ],
+//   },
 
-  /* Administration */
-  {
-    id: "administration",
-    label: "Administration",
-    icon: <FaGears size={18} />,
-    children: [
-      { id: "admin.masters", label: "Masters", link: "/masters" },
-      { id: "admin.settings", label: "Settings", link: "/settings" },
-      {
-        id: "admin.backup",
-        label: "Database Backup",
-        link: "/database-backup",
-      },
-      {
-        id: "admin.reminders",
-        label: "Employee Reminders",
-        link: "/employee-reminder-register",
-      },
-    ],
-  },
+//   /* Administration */
+//   {
+//     id: "administration",
+//     label: "Administration",
+//     icon: <FaGears size={18} />,
+//     children: [
+//       { id: "admin.masters", label: "Masters", link: "/masters" },
+//       { id: "admin.settings", label: "Settings", link: "/settings" },
+//       {
+//         id: "admin.backup",
+//         label: "Database Backup",
+//         link: "/database-backup",
+//       },
+//       {
+//         id: "admin.reminders",
+//         label: "Employee Reminders",
+//         link: "/employee-reminder-register",
+//       },
+//     ],
+//   },
 
-  /* COMPLIANCE */
-  {
-    id: "compliance",
-    label: "Compliance",
-    icon: <FaScaleBalanced size={18} />,
-    children: [
-      {
-        id: "compliance.letters",
-        label: "Compliance Letters",
-        link: "/complients-letter",
-      },
-      {
-        id: "compliance.reports",
-        label: "Statutory Reports",
-        link: "/report-and-letter",
-      },
-      {
-        id: "compliance.final",
-        label: "Final Settlement",
-        link: "/employee-final-settlement",
-      },
-    ],
-  },
-];
+//   /* COMPLIANCE */
+//   {
+//     id: "compliance",
+//     label: "Compliance",
+//     icon: <FaScaleBalanced size={18} />,
+//     children: [
+//       {
+//         id: "compliance.letters",
+//         label: "Compliance Letters",
+//         link: "/complients-letter",
+//       },
+//       {
+//         id: "compliance.reports",
+//         label: "Statutory Reports",
+//         link: "/report-and-letter",
+//       },
+//       {
+//         id: "compliance.final",
+//         label: "Final Settlement",
+//         link: "/employee-final-settlement",
+//       },
+//     ],
+//   },
+// ];
 
 export default function Sidebar({ forceOpen }) {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
+  const { user, menus } = useAuth();
+
+  console.log("user sidebar", menus);
   const sidebarRef = useRef(null);
   const closeTimer = useRef(null);
   // const submenuRef = useRef(null);
@@ -195,6 +198,7 @@ export default function Sidebar({ forceOpen }) {
     left: 0,
     position: "absolute",
   });
+  const menuItems = Array.isArray(menus) ? menus : [];
 
   // console.log("console in sdebar", stored);
 
@@ -271,7 +275,7 @@ export default function Sidebar({ forceOpen }) {
   const handleNav = (item) => {
     setActive(item.id);
     localStorage.setItem("activeMenu", item.id);
-    if (item.link) navigate(item.link);
+    if (item.url) navigate(item.url);
 
     if (isMobile) {
       setSidebarOpen(false);
@@ -281,7 +285,7 @@ export default function Sidebar({ forceOpen }) {
   const handleSubNav = (child) => {
     setActive(child.id);
     localStorage.setItem("activeMenu", child.id);
-    navigate(child.link);
+    navigate(child.url);
     setOpenSubmenu(null);
 
     if (isMobile) {
@@ -489,7 +493,7 @@ export default function Sidebar({ forceOpen }) {
         </div>
 
         {/* Navigation */}
-        {sidebarEnabled && (
+        {sidebarEnabled && menuItems && (
           <nav
             className="sidebar-nav"
             aria-label="Main navigation"
@@ -498,7 +502,8 @@ export default function Sidebar({ forceOpen }) {
             }}
           >
             {menuItems.map((item) => {
-              const hasChildren = !!item.children && item.children.length > 0;
+              if (!item) return null;
+              const hasChildren = item.children?.length > 0;
               return (
                 <div
                   key={item.id}
@@ -518,7 +523,7 @@ export default function Sidebar({ forceOpen }) {
                   <button
                     className={`nav-item ${active === item.id ? "active" : ""}`}
                     onClick={(e) => {
-                      if (item.link) {
+                      if (item.url) {
                         handleNav(item);
                         return;
                       }
@@ -541,7 +546,9 @@ export default function Sidebar({ forceOpen }) {
                     aria-current={active === item.id ? "page" : undefined}
                     aria-expanded={openSubmenu === item.id}
                   >
-                    <div className="nav-icon">{item.icon}</div>
+                    <div className="nav-icon">
+                      {item.icon && <item.icon size={18} />}
+                    </div>
 
                     {(isMobile || sidebarOpen) && (
                       <div className="nav-label">
@@ -646,7 +653,11 @@ export default function Sidebar({ forceOpen }) {
                             </span>
                             <span
                               className="submenu-arrow"
-                              style={{ color: "#9ca3af", fontSize: 12 ,  transition: "transform 0.2s ease",   }}
+                              style={{
+                                color: "#9ca3af",
+                                fontSize: 12,
+                                transition: "transform 0.2s ease",
+                              }}
                             >
                               <IoIosArrowForward size={14} />
                             </span>
