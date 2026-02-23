@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../LoginPage/loginpage.css";
 import { RiAdminFill } from "react-icons/ri";
+import { sendOtp, verifyOtp } from "../../services/forgotpassword.service";
+import { useAuth } from "../../context/AuthProvider";
+
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -12,6 +15,7 @@ function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [otp, setOtp] = useState("");
+  const { solutionId } = useAuth();
 
 
   // Normalize user code (append @muziris if missing)
@@ -40,55 +44,30 @@ function ForgotPassword() {
     return finalUserCode; //  THIS IS THE KEY
   };
 
-  // STEP 1️⃣ : SEND OTP
-  const sendOtp = async () => {
+  const handleSendOtp = async () => {
     setMessage("");
     setError("");
 
-    const finalUserCode = normalizeUserCode(); // ✅ STORE IT
+    const finalUserCode = normalizeUserCode();
     if (!finalUserCode) return;
-
-    console.log("Sending userCode:", finalUserCode);
 
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8087/forgot-password/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userCode: finalUserCode,
-        }),
-      });
-
-      // const data = await response.json();
-      console.log("Sending userCode:", finalUserCode);
-      //  error case
-      if (!response.ok) {
-        const text = await response.text(); // 👈 VERY IMPORTANT
-        console.error("Backend error raw:", text);
-
-        try {
-          const json = JSON.parse(text);
-          setError(json.errors?.[0] || "Request failed");
-        } catch {
-          setError(text || "Request failed");
-        }
-        return;
-      }
-
-      // ✅ SUCCESS
-      const data = await response.json();
+      await sendOtp(finalUserCode);
       setMessage("OTP sent to registered email");
-      setStep(2)
-    } catch (e) {
-      setError("Server error. Try again later.");
+      setStep(2);
+    } catch (err) {
+      setError(
+        err?.response?.data?.errors?.[0] ||
+        err.message ||
+        "Request failed"
+      );
     } finally {
       setLoading(false);
     }
   };
-
-  const verifyOtp = async () => {
+  const handleVerifyOtp = async () => {
     if (!otp) {
       setError("OTP is required");
       return;
@@ -99,39 +78,27 @@ function ForgotPassword() {
     setMessage("");
 
     try {
-      const res = await fetch(
-        "http://localhost:8087/forgot-password/verify-otp",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userCode: userCode.trim(),
-            otp: otp.trim(),
-          }),
-        }
-      );
+      const data = await verifyOtp(userCode.trim(), otp.trim());
 
-      const data = await res.json();
-      console.log("Sending userCode:", userCode.trim());
-
-      // ✅ HANDLE INVALID OTP HERE
-      if (!res.ok || data.success === false) {
+      if (data.success === false) {
         setError(data.errors?.[0] || "Invalid OTP");
         return;
       }
 
-      // ✅ SUCCESS → GO NEXT
       navigate("/changepassword", {
         state: { userCode: userCode.trim(), forgotFlow: true },
       });
 
-    } catch (e) {
-      setError("Server error. Try again later.");
+    } catch (err) {
+      setError(
+        err?.response?.data?.errors?.[0] ||
+        err.message ||
+        "Server error"
+      );
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="login-container">
       <div className="login-box">
@@ -141,12 +108,8 @@ function ForgotPassword() {
 
         <form
           onSubmit={(e) => {
-            e.preventDefault(); // 
-            if (step === 1) {
-              sendOtp();
-            } else if (step === 2) {
-              verifyOtp();
-            }
+            e.preventDefault();
+            step === 1 ? handleSendOtp() : handleVerifyOtp();
           }}
         >
 

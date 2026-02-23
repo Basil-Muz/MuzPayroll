@@ -1,3 +1,4 @@
+// import { useEffect } from "react";
 import React, { createContext, useContext, useState} from "react";
 import { getLoginData, setLoginData } from "../utils/loginstorageUtils";
 
@@ -7,6 +8,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => getLoginData());
   const [menus, setMenus] = useState(null);
   const [isMenuLoaded, setIsMenuLoaded] = useState(false);
+
+//   useEffect(() => {
+//   console.log("AUTH CONTEXT UPDATED ", user);
+// }, [user]);
+
   //   useEffect(() => {
   //     if (user) {
   //       localStorage.setItem("loginData", JSON.stringify(user));
