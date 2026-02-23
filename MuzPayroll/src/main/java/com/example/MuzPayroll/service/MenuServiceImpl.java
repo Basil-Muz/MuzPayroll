@@ -18,8 +18,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuDTO> getMenu(String transtype, String transsubtype, Integer userId, Integer solutionId,
-            Integer entityHierarchyId) {
+            Integer entityHierarchyId, Integer productid, Integer menu_row_no) {
         return menuRepository.getMenu(transtype, transsubtype, userId, solutionId,
-                entityHierarchyId);
+                entityHierarchyId, productid, menu_row_no);
     }
 }

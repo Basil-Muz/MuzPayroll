@@ -21,16 +21,20 @@ public class MenuRepository {
             String transsubtype,
             Integer userid,
             Integer solutionid,
-            Integer entityid) {
+            Integer entityid,
+            Integer productid,
+            Integer menu_row_no) {
 
         Query query = entityManager.createNativeQuery(
-                "SELECT * FROM menufunction_main_menu(:transtype,:transsubtype,:userid,:solutionid,:entityid)");
+                "SELECT * FROM menufunction(:transtype,:transsubtype,:userid,:solutionid,:entityid,:productid,:menu_row_no)");
 
         query.setParameter("transtype", transtype);
         query.setParameter("transsubtype", transsubtype);
         query.setParameter("userid", userid);
         query.setParameter("solutionid", solutionid);
         query.setParameter("entityid", entityid);
+        query.setParameter("productid", productid);
+        query.setParameter("menu_row_no", menu_row_no);
 
         List<Object[]> rows = query.getResultList();
 
