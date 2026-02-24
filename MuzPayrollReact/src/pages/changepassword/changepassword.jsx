@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
 import "../LoginPage/loginpage.css";
 import { TbPasswordUser } from "react-icons/tb";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import { useAuth } from "../../context/AuthProvider";
+import { changePassword, changePasswordForgot } from "../../services/changepassword.service";
 
 function ChangePassword() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { solutionId } = useAuth();
 
-  // 🔁 Detect forgot-password flow
+  //Detect forgot-password flow
   const isForgotFlow = location.state?.forgotFlow === true;
   const userCodeFromForgot = location.state?.userCode;
 
@@ -21,7 +23,7 @@ function ChangePassword() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔐 Password rules
+  // Password rules
   const validatePasswordRules = (password) => {
     if (password.length < 2)
       return "Password must be at least 2 characters long";
@@ -36,26 +38,26 @@ function ChangePassword() {
     setError("");
     setSuccess("");
 
-    // 1️⃣ Required validation
+    // Required validation
     if (!newPassword || !confirmPassword) {
       setError("All fields are required");
       return;
     }
 
-    // 2️⃣ Password rules
+    // Password rules
     const ruleError = validatePasswordRules(newPassword);
     if (ruleError) {
       setError(ruleError);
       return;
     }
 
-    // 3️⃣ Match check
+    // Match check
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    // 4️⃣ Normal flow needs current password
+    // Normal flow needs current password
     if (!isForgotFlow && !currentPassword) {
       setError("Current password is required");
       return;
@@ -63,23 +65,29 @@ function ChangePassword() {
 
     setLoading(true);
 
+    if (isForgotFlow && !userCodeFromForgot) {
+      setError("Session expired. Please retry forgot password.");
+      setLoading(false);
+      return;
+    }
+
     try {
       let payload = {};
-      let url = "";
+      let response;
 
       if (isForgotFlow) {
-        // 🔁 FORGOT PASSWORD FLOW
         payload = {
           userCode: userCodeFromForgot,
           newPassword,
           confirmPassword,
         };
-        url = "http://localhost:8087/forgot-password/change-password";
+
+        response = await changePasswordForgot(payload);
       } else {
-        // 🔐 NORMAL CHANGE PASSWORD
         const loginData = JSON.parse(localStorage.getItem("loginData"));
         if (!loginData?.userCode) {
           setError("User not logged in");
+          setLoading(false);
           return;
         }
 
@@ -89,18 +97,13 @@ function ChangePassword() {
           newPassword,
           confirmPassword,
         };
-        url = "http://localhost:8087/change-password";
+
+        response = await changePassword(payload);
       }
 
-      const response = await axios.post(url, payload);
+      setSuccess(response.data?.message || "Password changed successfully");
 
-      setSuccess(
-        response.data?.message || "Password changed successfully"
-      );
-
-      //  Logout after success
-      const solutionId = user?.solutionId;  // read first
-
+      // const solutionId = user?.solutionId;
       localStorage.clear();
 
       setTimeout(() => {
@@ -109,10 +112,10 @@ function ChangePassword() {
         } else if (solutionId === 2) {
           navigate("/payrollemp", { replace: true });
         } else {
-          navigate("/payroll", { replace: true }); // default fallback
+          navigate("/payroll", { replace: true });
         }
       }, 2000);
-      
+
     } catch (err) {
       setError(
         err.response?.data?.errors?.[0] ||

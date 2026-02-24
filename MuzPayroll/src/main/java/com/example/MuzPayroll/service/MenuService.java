@@ -11,5 +11,7 @@ public interface MenuService {
             String transsubtype,
             Integer userId,
             Integer solutionId,
-            Integer entityHierarchyId);
+            Integer entityHierarchyId,
+            Integer menu_row_no,
+            Integer productid);
 }

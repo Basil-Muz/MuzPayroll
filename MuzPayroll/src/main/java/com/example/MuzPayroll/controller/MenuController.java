@@ -28,8 +28,11 @@ public class MenuController {
             @RequestParam String transsubtype,
             @RequestParam Integer userId,
             @RequestParam Integer solutionId,
-            @RequestParam Integer entityHierarchyId) {
+            @RequestParam Integer entityHierarchyId,
+            @RequestParam Integer productid,
+            @RequestParam(required = false) Integer menu_row_no) {
 
-         return menuService.getMenu(transtype, transsubtype, userId, solutionId, entityHierarchyId);
+        return menuService.getMenu(transtype, transsubtype, userId, solutionId, entityHierarchyId, productid,
+                menu_row_no);
     }
 }
