@@ -149,43 +149,73 @@ export const buildSitemapFromSubMenuResponse = (
 };
 
 
-export const buildSitemapUIData = (tree = []) => {
-  const sections = [];
+export const organizeSiteMapMenu = (rawMenu) => {
+  if (!Array.isArray(rawMenu)) return [];
 
-  const collectPages = (node, bucket) => {
-    if (node.optionYn && node.url) {
-      bucket.push({
-        title: node.displayName,
-        subtitle: node.displayName,
-        link: node.url
-      });
-    }
+  const map = new Map();
 
-    node.children?.forEach(child => collectPages(child, bucket));
-  };
-
-  tree.forEach(root => {
-    if (!root.isFolder) return;
-
-    root.children.forEach(sectionNode => {
-      if (!sectionNode.isFolder) return;
-
-      const pages = [];
-      collectPages(sectionNode, pages);
-
-      // Split into rows of 3 (same UI behavior as before)
-      const rows = [];
-      for (let i = 0; i < pages.length; i += 3) {
-        rows.push(pages.slice(i, i + 3));
-      }
-
-      sections.push({
-        title: sectionNode.fullPath.replace(" / ", "/"),
-        subtitle: sectionNode.displayName,
-        rows
-      });
+  // 1. Normalize & index
+  rawMenu.forEach(item => {
+    map.set(item.menuRowNo, {
+      ...item,
+      children: [],
+      fullPath: "",
+      isFolder: item.optionYn === false
     });
   });
 
-  return sections;
+  const roots = [];
+
+  // 2. Build hierarchy
+  map.forEach(node => {
+    if (node.parentMenuRowNo && map.has(node.parentMenuRowNo)) {
+      map.get(node.parentMenuRowNo).children.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+
+  // 3. Cleanup duplicates:
+  //    If a folder has a child with SAME displayName → keep only folder
+  const removeDuplicateTitles = node => {
+    const seen = new Set();
+
+    node.children = node.children.filter(child => {
+      const key = child.displayName?.toLowerCase();
+
+      if (seen.has(key) && !child.isFolder) {
+        return false; // drop duplicate page
+      }
+
+      seen.add(key);
+      return true;
+    });
+
+    node.children.forEach(removeDuplicateTitles);
+  };
+
+  roots.forEach(removeDuplicateTitles);
+
+  // 4. Build sitemap path
+  const buildPath = (node, parentPath = "") => {
+    node.fullPath = parentPath
+      ? `${parentPath} / ${node.displayName}`
+      : node.displayName;
+
+    node.children.forEach(child => buildPath(child, node.fullPath));
+  };
+
+  roots.forEach(root => buildPath(root));
+
+  // 5. Sort by menuRowNo (stable UI)
+  const sortTree = node => {
+    node.children.sort(
+      (a, b) => (a.menuRowNo ?? 0) - (b.menuRowNo ?? 0)
+    );
+    node.children.forEach(sortTree);
+  };
+
+  roots.forEach(sortTree);
+
+  return roots;
 };

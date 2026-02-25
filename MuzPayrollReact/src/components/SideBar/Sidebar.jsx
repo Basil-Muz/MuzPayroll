@@ -10,8 +10,9 @@ import { FaUserTie } from "react-icons/fa";
 import { IoMdArrowDropleft } from "react-icons/io";
 import { IoMdArrowDropright } from "react-icons/io";
 import { FaRegCalendarAlt } from "react-icons/fa";
+import { MdOutlineDashboard } from "react-icons/md";
 import { FaGears } from "react-icons/fa6";
-
+import { MAIN_MENU_ICON_MAP } from "../../utils/menuIcons";
 import { AuthProvider } from "../../context/AuthProvider";
 import "./sidebar.css";
 
@@ -44,7 +45,7 @@ export default function Sidebar({ forceOpen }) {
   });
   const menuItems = Array.isArray(menus) ? menus : [];
 
-  // console.log("console in sdebar", stored);
+  console.log("console in sdebar", menuItems);
 
   const sidebarEnabled = user.sidebarOpen || forceOpen; //opens navigation
 
@@ -347,6 +348,7 @@ export default function Sidebar({ forceOpen }) {
           >
             {menuItems.map((item) => {
               if (!item) return null;
+              const IconComponent = MAIN_MENU_ICON_MAP[item.label]|| MdOutlineDashboard;
               const hasChildren = item.children?.length > 0;
               return (
                 <div
@@ -391,7 +393,7 @@ export default function Sidebar({ forceOpen }) {
                     aria-expanded={openSubmenu === item.id}
                   >
                     <div className="nav-icon">
-                      {item.icon && <item.icon size={18} />}
+                      {item.label && <IconComponent size={18} />}
                     </div>
 
                     {(isMobile || sidebarOpen) && (

@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => getLoginData());
-  const [menus, setMenus] = useState(null);
+  const [menus, setMenus] = useState(() => getMenuData());
   const [isMenuLoaded, setIsMenuLoaded] = useState(false);
 
 //   useEffect(() => {
@@ -36,14 +36,14 @@ export const AuthProvider = ({ children }) => {
   //         console.log("Data from Auth Provider After update",user)
   //   };
 
- // RESTORE MENUS FROM LOCALSTORAGE
-  useEffect(() => {
-    const storedMenus = getMenuData();
-    if (storedMenus.length) {
-      setMenus(storedMenus);
-      setIsMenuLoaded(true);
-    }
-  }, []);
+//  // RESTORE MENUS FROM LOCALSTORAGE
+//   useEffect(() => {
+//     const storedMenus = getMenuData();
+//     if (storedMenus.length) {
+//       setMenus(storedMenus);
+//       setIsMenuLoaded(true);
+//     }
+//   }, []);
 
   const updateUser = (updates) => {
     setUser((prev) => {

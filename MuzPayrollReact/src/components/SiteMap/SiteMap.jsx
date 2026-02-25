@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import {
@@ -47,19 +46,19 @@ const PAGE_SECTION_ICON_MAP = {
     esi: MdAccountBalance,
     wf: MdAccountBalance,
   },
-  sitemap:{
-        reports: MdAssessment,
+  sitemap: {
+    reports: MdAssessment,
     pf: MdAccountBalance,
     esi: MdAccountBalance,
     wf: MdAccountBalance,
-        masters: MdStorage,
+    masters: MdStorage,
     organisation: MdBusiness,
     organization: MdBusiness,
     payroll: MdSettings,
     "user rights": FaUserCog,
-    "employee management":MdPeople,
-    "attendance and leave management":MdEventAvailable,
-  }
+    "employee management": MdPeople,
+    "attendance and leave management": MdEventAvailable,
+  },
 };
 
 /* ======================================================
@@ -74,74 +73,104 @@ const getSectionIcon = (pageType = "masters", sectionTitle = "") => {
 
   return matchedKey ? pageMap[matchedKey] : MdSettings;
 };
-const collectLeafPages = (node, result = []) => {
-  if (node.optionYn && node.url) {
-    result.push(node);
-  }
+// const collectLeafPages = (node, result = []) => {
+//   if (node.optionYn && node.url) {
+//     result.push(node);
+//   }
 
-  node.children?.forEach((child) =>
-    collectLeafPages(child, result)
-  );
+//   node.children?.forEach((child) =>
+//     collectLeafPages(child, result)
+//   );
 
-  return result;
-};
+//   return result;
+// };
+
 export default function GenericSitemap({ data, pageType = "masters" }) {
-  if (!data || data.length === 0) return null;
+  if (!data?.length) return null;
 
-  return (
-    <>
-      {data.flatMap((root) =>
-        root.children
-          ?.filter((section) => section.isFolder) // LEVEL 2 ONLY
-          .map((section) => {
-            const SectionIcon = getSectionIcon(
-              pageType,
-              section.displayName
-            );
+  const renderSections = (nodes) => {
+    return nodes.flatMap((node) => {
+      const SectionIcon = getSectionIcon(
+        pageType,
+        node.displayName
+      );
 
-            return (
-              <section
-                key={section.menuRowNo}
-                className="sitemap-section"
+      const directPages = node.children?.filter(
+        (child) => child.optionYn && child.url
+      );
+
+      const childFolders = node.children?.filter(
+        (child) => child.isFolder
+      );
+
+      // 🔹 CASE 1: ROOT PAGE (Dashboard type)
+      if (node.optionYn && node.url && !node.isFolder) {
+        return (
+          <section
+            key={node.menuRowNo}
+            className="sitemap-section"
+          >
+            <div className="section-header">
+              <SectionIcon size={20} />
+             <div className="section-title">
+              {node.fullPath.replace(/\s\/\s/g, "/")}
+            </div>
+            <div className="section-subtitle">{node.displayName}</div>
+            </div>
+
+            <div className="tile-row">
+              <Link
+                to={node.url}
+                className="tile-card"
               >
-                {/* ================= HEADER ================= */}
-                <div className="section-header">
-                  <div className="first">
-                    <SectionIcon size={20} />
-                    <div className="section-title">
-                      {section.fullPath.replace(" / ", "/")}
-                    </div>
-                  </div>
-
-                  <div className="section-subtitle">
-                    {section.displayName}
-                  </div>
+                <SectionIcon size={18} />
+                <div className="tile-title">
+                  {node.displayName}
                 </div>
+              </Link>
+            </div>
+          </section>
+        );
+      }
 
-                {/* ================= CHILD TILES ================= */}
-                <div className="tile-row">
-                  {collectLeafPages(section).map((tile) => (
-                    <Link
-                      key={tile.menuRowNo}
-                      to={tile.url}
-                      className="tile-card"
-                    >
-                      <SectionIcon size={18} />
-                      <div className="tile-text">
-                        <div className="tile-title">
-                          {tile.displayName}
-                        </div>
-                        <div className="tile-subtitle">
-                          {tile.fullPath}
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+      // 🔹 CASE 2: Folder
+      if (node.isFolder) {
+        return [
+          <section
+            key={node.menuRowNo}
+            className="sitemap-section"
+          >
+            <div className="section-header">
+              <SectionIcon size={20} />
+              <div className="section-title">
+                {node.fullPath.replace(/\s\/\s/g, "/")}
+              </div>
+            </div>
+
+            <div className="tile-row">
+              {directPages?.map((page) => (
+                <Link
+                  key={page.menuRowNo}
+                  to={page.url}
+                  className="tile-card"
+                >
+                  <SectionIcon size={18} />
+                 <div className="tile-text">
+                  <div className="tile-title">{page.displayName}</div>
+                  <div className="tile-subtitle">{page.description}</div>{" "}
                 </div>
-              </section>
-            );
-          })
-      )}
-    </>
-  );
+                </Link>
+              ))}
+            </div>
+          </section>,
+
+          ...renderSections(childFolders || [])
+        ];
+      }
+
+      return [];
+    });
+  };
+
+  return <>{renderSections(data)}</>;
 }
