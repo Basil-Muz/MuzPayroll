@@ -11,7 +11,7 @@ import Sidebar from "../../components/SideBar/Sidebar";
 import { fetchMainMenu } from "../../services/menu.service";
 import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { buildSitemapUIData } from "../../utils/menuUtils.js";
+import { organizeSiteMapMenu } from "../../utils/menuUtils.js";
 import { handleApiError } from "../../utils/errorToastResolver";
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
@@ -43,7 +43,7 @@ export default function Letters() {
         null,
       );
       console.log("Sub menus", response);
-      const sitemapData = buildSitemapUIData(
+      const sitemapData = organizeSiteMapMenu(
         response.data,
         // "System Management",
       );

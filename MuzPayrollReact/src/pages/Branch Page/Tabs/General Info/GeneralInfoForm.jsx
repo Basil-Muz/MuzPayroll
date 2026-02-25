@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ImageCropModal from "./ImageCropModal";
 const VITE_API_BASE_URL = "http://localhost:8087";
-
+import { formatLocalDate } from "../../../../utils/dateFormater";
 const GeneralInfoForm = function GeneralInfoForm({
   register,
   errors,
@@ -51,7 +51,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
     if (branchList?.length > 0) {
       // The branchId is string but in branchList it is integer
-      setValue("branchEntity", parseInt(branchId), {
+      setValue("branchEntity", branchList[0].value, {
         shouldDirty: false,
         shouldTouch: false,
         shouldValidate: false,
@@ -66,8 +66,9 @@ const GeneralInfoForm = function GeneralInfoForm({
         nameInputRef.current?.focus();
         // setIsCompanyMenuOpen(true);
       }, 120);
-      // console.log("Field Name :",EtmName);
-      setFocus("name");
+      // console.log("Field Name :");
+    } else {
+      setFocus("EtmName");
     }
   }, [isUnlocked, isLocked, setFocus]);
 

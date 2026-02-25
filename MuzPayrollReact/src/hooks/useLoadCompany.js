@@ -10,15 +10,23 @@ export const useLoadCompany = () => {
       if (!userId) return;
 
       const companyResponse = await fetchCompany(userId);
+      const companies = companyResponse.data;
 
-      const company = companyResponse.data;
-      // console.log("Company Listdasfgwsdrg:", company.companyMstID);
-      const companyobj = {
-        value: company.companyMstID,
-        label: company.company,
-      };
-      setCompanyList([companyobj]);
+      const companyList = Array.isArray(companies)
+        ? companies.map((c) => ({
+            value: c.entityHierarchyId,
+            label: c.entityName,
+          }))
+        : [
+            {
+              value: companies.entityHierarchyId,
+              label: companies.entityName,
+            },
+          ];
 
+      setCompanyList(companyList);
+
+      console.log("Company List:", companyList);
       // setCompanyList([company]);
       // setInitialCompanyId(company.companyMstID); // store it
     } catch (error) {

@@ -25,9 +25,12 @@ import { useGenerateAmend } from "../../../hooks/useGenerateAmend";
 import { useFormStepper } from "../../../hooks/useFormStepper";
 import { useSaveForm } from "../../../hooks/useSaveForm";
 
+import { useAuth } from "../../../context/AuthProvider"
+
 //service
 import { getBranchAmendList } from "../../../services/branch.service";
 import { saveBranch } from "../../../services/branch.service";
+
 //  constants
 import { steps } from "../../../constants/FormSteps";
 import { COMMON_BRANCH_FIELD_MAP } from "../../../constants/branchFieldMap";
@@ -40,14 +43,18 @@ export default function GenaralBranchForm() {
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
   const generalInfoRef = useRef(null);
-  const UserData = localStorage.getItem("loginData");
-  const userObj = JSON.parse(UserData);
+  // const UserData = localStorage.getItem("loginData");
+  // const userObj = JSON.parse(UserData);
 
   //Convert the JSON string to objects
-  const userCode = userObj.userCode.split("@", 1)[0];
-  const companyId = userObj.companyId;
-  const userId = userObj.userId;
+  const { user } = useAuth()
 
+   const userId = user.userMstId;
+ const userCode = user.userCode.split("@", 1)[0];
+  // const companyId = userObj.companyId;
+
+
+  console.log("Userid",user)
   //Fetch company amendmends data
   const {
     amendments,
@@ -97,7 +104,7 @@ export default function GenaralBranchForm() {
       authorizationStatus: 0, // ENTRY
       mode: inputMode,
       EtmActiveYN: 1,
-      muzControllCodes: 14,
+      EtmEntityTypeMccID: 14,
     },
   });
 
@@ -257,7 +264,7 @@ export default function GenaralBranchForm() {
 
   useEffect(() => {
     loadCompany(userId);
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;

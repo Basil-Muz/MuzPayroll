@@ -40,6 +40,7 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
 // Styles
 import "react-datepicker/dist/react-datepicker.css";
+import { useAuth } from "../../context/AuthProvider";
 
 export default function GenaralLocationForm() {
   /* ------------------------------------------------------------------
@@ -54,10 +55,12 @@ export default function GenaralLocationForm() {
   /* ------------------------------------------------------------------
    * 2. USER / SESSION DATA
    * ------------------------------------------------------------------ */
-  const userObj = JSON.parse(localStorage.getItem("loginData"));
-  const userCode = userObj.userCode.split("@", 1)[0];
-  const companyId = userObj.companyId;
-
+  // const userObj = JSON.parse(localStorage.getItem("loginData"));
+  const { user } = useAuth();
+  const userCode = user.userCode.split("@", 1)[0];
+  const userId = user.userMstId;
+  const companyId = user.userEntityHierarchyId;
+console.log("Userfgfdg",user)
   /* ------------------------------------------------------------------
    * 3. ROUTE PARAMS
    * ------------------------------------------------------------------ */
@@ -104,7 +107,7 @@ export default function GenaralLocationForm() {
       authorizationDate: new Date().toISOString().split("T")[0],
       authorizationStatus: 0,
       EtmActiveYN: 1,
-      muzControllCodes: 15,
+      EtmEntityTypeMccID: 15,
     },
   });
 
@@ -240,12 +243,12 @@ export default function GenaralLocationForm() {
    * ------------------------------------------------------------------ */
   const load = useCallback(async () => {
     try {
-      loadBranches(companyId);
-      loadCompany(companyId);
+      loadBranches(userId, companyId);
+      loadCompany(userId);
     } catch (err) {
       if (!cancelledRef.current) handleApiError(err);
     }
-  }, [companyId, loadBranches, loadCompany]);
+  }, [userId, loadBranches, ,companyId]);
 
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });

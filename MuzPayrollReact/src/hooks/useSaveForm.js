@@ -37,8 +37,8 @@ export const useSaveForm = ({
     const isFirstAmend = amendments.length === 0;
 
     // show loader
-    if (isFirstAmend) showRailLoader("Saving"+ entity +"information…");
-    else showRailLoader("Updating" + entity +" details…");
+    if (isFirstAmend) showRailLoader("Saving" + entity + "information…");
+    else showRailLoader("Updating" + entity + " details…");
 
     try {
       const payload = {
@@ -76,10 +76,19 @@ export const useSaveForm = ({
       //   }
       // }
 
-      await saveEntity(formData); // to call the API
+      const res = await saveEntity(formData); // to call the API
+
+      if (res?.success === false) {
+        throw {
+          response: {
+            status: res.statusCode,
+            data: res,
+          },
+        };
+      }
       //   await refreshAmendments(companyId);   //  refresh Amendments data
       //setCanSave(false);     // disable save button
-      toast.success(entity +" saved successfully!");
+      toast.success(entity + " saved successfully!");
       setStep(0); //Goes to step 1
       console.log("Has Amend", isFirstAmend);
       // reset only on success

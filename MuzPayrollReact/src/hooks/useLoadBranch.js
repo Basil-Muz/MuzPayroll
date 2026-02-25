@@ -5,15 +5,15 @@ import { handleApiError } from "../utils/errorToastResolver";
 export const useLoadBranch = () => {
   const [branchList, setBranchList] = useState([]);
 
-  const loadBranches = useCallback(async (companyId) => {
+  const loadBranches = useCallback(async (userId, companyId) => {
     if (!companyId) return;
 
     try {
-      const res = await fetchBranchesByCompany(companyId);
+      const res = await fetchBranchesByCompany(userId,companyId);
 
       const branches = res.data.map((branch) => ({
-        value: branch.branchMstID,
-        label: branch.branch,
+        value: branch.entityHierarchyId,
+        label: branch.entityName,
       }));
 
       setBranchList(branches);

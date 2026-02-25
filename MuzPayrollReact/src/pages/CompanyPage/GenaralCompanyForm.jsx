@@ -25,6 +25,8 @@ import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
 import { saveCompany } from "../../services/company.service";
 import { getCompanyAmendList } from "../../services/company.service";
 
+import { useAuth } from "../../context/AuthProvider";
+
 //Utils (Helpers)
 import { formatDate } from "../../utils/dateFormater";
 
@@ -44,11 +46,17 @@ export default function GenaralCompanyForm() {
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
   // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
-  const UserData = localStorage.getItem("loginData");
-  const userObj = JSON.parse(UserData);
+  // const UserData = localStorage.getItem("loginData");
+  // const userObj = JSON.parse(UserData);
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
   //Convert the JSON string to objects
-  const userCode = userObj.userCode.split("@", 1)[0];
+  // const userCode = userObj.userCode.split("@", 1)[0];
+
+  const { user } = useAuth();
+
+  //  const userId = user.userMstId;
+
+  const userCode = user.userCode.split("@", 1)[0];
 
   const { companyId } = useParams();
 
