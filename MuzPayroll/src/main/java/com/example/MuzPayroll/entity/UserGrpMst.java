@@ -19,7 +19,7 @@ public class UserGrpMst {
     private List<UserGrpLog> userGrpLogs;
 
     @Transient
-    @JsonIgnore
+    // @JsonIgnore
     private Authorization authorization;
 
     @Id

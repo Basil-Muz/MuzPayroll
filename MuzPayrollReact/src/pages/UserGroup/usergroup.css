@@ -1,11 +1,11 @@
 /* ================= PAGE ================= */
 
 .usergroup-page {
-    padding: var(--header-padding) 13px 21px 12px;
+    padding: var(--header-padding) 13px 21px 18px;
     /* padding-top: 72px; */
     font-family: sans-serif;
     background-color: #f9f3f9;
-    padding-left: 18px;
+    /* padding-left: 18px; */
 }
 
 .usergroup-page h2 {
@@ -285,6 +285,7 @@
     border: none;
     outline: none;
     background: transparent;
+    color:var(--text);
     font-size: 13.5px;
     width: 100%;
 }

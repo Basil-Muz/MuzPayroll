@@ -2,12 +2,15 @@ package com.example.MuzPayroll.repository;
 
 import java.util.List;
 
+// import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import com.example.MuzPayroll.entity.UserGrpMst;
+import com.example.MuzPayroll.entity.DTO.UserGrpMstDTO;
 
 @Repository
 public interface UserGrpMstRepo extends JpaRepository<UserGrpMst, Long> {
@@ -33,6 +36,21 @@ public interface UserGrpMstRepo extends JpaRepository<UserGrpMst, Long> {
         List<UserGrpMst> findUserGrpByStatus(
                         @Param("companyId") Long companyId,
                         @Param("activeStatusYN") Boolean activeStatusYN);
+
+@Query("""
+    SELECT ug FROM UserGrpMst ug
+    WHERE (:search IS NULL OR :search = '' OR
+        LOWER(ug.UgmCode) LIKE LOWER(CONCAT('%', :search, '%')) OR
+        LOWER(ug.UgmName) LIKE LOWER(CONCAT('%', :search, '%')) OR
+        LOWER(ug.UgmShortName) LIKE LOWER(CONCAT('%', :search, '%')) OR
+        LOWER(ug.UgmDesc) LIKE LOWER(CONCAT('%', :search, '%'))
+    )
+""")
+Page<UserGrpMst> searchUserGroup(
+    @Param("search") String search,
+    Pageable pageable
+);
+
 
         /**
          * Get the LATEST Location with LO prefix using Pageable

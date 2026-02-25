@@ -1,6 +1,6 @@
 // import { useEffect } from "react";
-import React, { createContext, useContext, useState} from "react";
-import { getLoginData, setLoginData } from "../utils/loginstorageUtils";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { getLoginData, setLoginData, setMenuData, getMenuData } from "../utils/loginstorageUtils";
 
 const AuthContext = createContext(null);
 
@@ -36,6 +36,15 @@ export const AuthProvider = ({ children }) => {
   //         console.log("Data from Auth Provider After update",user)
   //   };
 
+ // RESTORE MENUS FROM LOCALSTORAGE
+  useEffect(() => {
+    const storedMenus = getMenuData();
+    if (storedMenus.length) {
+      setMenus(storedMenus);
+      setIsMenuLoaded(true);
+    }
+  }, []);
+
   const updateUser = (updates) => {
     setUser((prev) => {
       const next = { ...prev, ...updates };
@@ -43,6 +52,15 @@ export const AuthProvider = ({ children }) => {
       return next;
     });
   };
+
+const updateMenus = (updates) => {
+  setMenus((prev) => {
+    const next = [...updates]; // or merge logic if needed
+    setMenuData(next);
+    setIsMenuLoaded(true);
+    return next;
+  });
+};
 
   const login = (loginData) => {
     setUser(loginData);
@@ -59,10 +77,11 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.clear();
   };
 
-  const updateMenus = (menuData) => {
-    setMenus(menuData);
-    setIsMenuLoaded(true);
-  };
+  // const updateMenus = (menuData) => {
+  //   setMenus(menuData);
+  //   setIsMenuLoaded(true);
+  //    setMenuData(menuData); 
+  // };
 
   return (
     <>

@@ -42,7 +42,6 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function GenaralLocationForm() {
-
   /* ------------------------------------------------------------------
    * 1. LOCAL STATE & REFS
    * ------------------------------------------------------------------ */
@@ -52,7 +51,6 @@ export default function GenaralLocationForm() {
   const dateWrapperRef = useRef(null);
   const cancelledRef = useRef(false);
 
-
   /* ------------------------------------------------------------------
    * 2. USER / SESSION DATA
    * ------------------------------------------------------------------ */
@@ -60,12 +58,10 @@ export default function GenaralLocationForm() {
   const userCode = userObj.userCode.split("@", 1)[0];
   const companyId = userObj.companyId;
 
-
   /* ------------------------------------------------------------------
    * 3. ROUTE PARAMS
    * ------------------------------------------------------------------ */
   const { locationId } = useParams();
-
 
   /* ------------------------------------------------------------------
    * 4. DOMAIN / BUSINESS HOOKS
@@ -84,7 +80,6 @@ export default function GenaralLocationForm() {
 
   const { loadCompany, companyList } = useLoadCompany();
   const { loadBranches, branchList } = useLoadBranch();
-
 
   /* ------------------------------------------------------------------
    * 5. FORM INITIALIZATION (React Hook Form)
@@ -109,6 +104,7 @@ export default function GenaralLocationForm() {
       authorizationDate: new Date().toISOString().split("T")[0],
       authorizationStatus: 0,
       activeStatusYN: 1,
+      muzControllCodes: 15,
     },
   });
 
@@ -127,7 +123,6 @@ export default function GenaralLocationForm() {
   const isAmendMode = amendments.length > 0;
   const isVerifiedAmendment =
     selectedAmendment?.authorizationStatus === true && !addingNewAmend;
-
 
   /* ------------------------------------------------------------------
    * 7. UI / FLOW CONTROL HOOKS
@@ -161,7 +156,6 @@ export default function GenaralLocationForm() {
 
   const { nextStep, prevStep } = useFormStepper({ trigger, setStep });
 
-
   /* ------------------------------------------------------------------
    * 8. FIELD ARRAYS & WATCHERS
    * ------------------------------------------------------------------ */
@@ -175,7 +169,6 @@ export default function GenaralLocationForm() {
     name: "documents",
   });
 
-
   /* ------------------------------------------------------------------
    * 9. DERIVED OPTIONS & COMPUTED VALUES
    * ------------------------------------------------------------------ */
@@ -186,8 +179,11 @@ export default function GenaralLocationForm() {
 
   const latestAmendmentId = amendments.length
     ? amendments
-        .filter(a => a.authorizationStatus === false)
-        .reduce((max, cur) => (cur.amendNo > max.amendNo ? cur : max), amendments[0])
+        .filter((a) => a.authorizationStatus === false)
+        .reduce(
+          (max, cur) => (cur.amendNo > max.amendNo ? cur : max),
+          amendments[0],
+        )
     : null;
 
   const amendmentAuthorizationOptions = [];
@@ -195,7 +191,7 @@ export default function GenaralLocationForm() {
   if (selectedAmendment?.authorizationStatus === false) {
     amendmentAuthorizationOptions.push(
       { label: `ENTRY : ${selectedAmendment.authorizationDate}`, value: 0 },
-      { label: "VERIFIED :", value: 1 }
+      { label: "VERIFIED :", value: 1 },
     );
   }
 
@@ -212,7 +208,6 @@ export default function GenaralLocationForm() {
     !isVerifiedAmendment &&
     ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
 
-
   /* ------------------------------------------------------------------
    * 10. DATA MAPPING HELPERS
    * ------------------------------------------------------------------ */
@@ -223,7 +218,6 @@ export default function GenaralLocationForm() {
     setValue,
     fieldMap: COMMON_LOCATION_FIELD_MAP,
   });
-
 
   /* ------------------------------------------------------------------
    * 11. EVENT HANDLERS
@@ -277,10 +271,15 @@ export default function GenaralLocationForm() {
     if (isVerifiedAmendment) return;
 
     const timer = setTimeout(() => {
-      dateWrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      dateWrapperRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
 
       setTimeout(() => {
-        document.querySelector(".withaffectdate")?.focus({ preventScroll: true });
+        document
+          .querySelector(".withaffectdate")
+          ?.focus({ preventScroll: true });
         datePickerRef.current?.setOpen(true);
       }, 500);
     }, 300);
@@ -646,30 +645,28 @@ export default function GenaralLocationForm() {
                 </div>
 
                 <div>
-                  {
-                    step < steps.length - 1 && (
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={nextStep}
+                  {step < steps.length - 1 && (
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={nextStep}
+                    >
+                      Next
+                      <svg
+                        className="btn-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        Next
-                        <svg
-                          className="btn-icon"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </button>
-                    )
-                  }
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
             </form>

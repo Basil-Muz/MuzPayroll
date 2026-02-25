@@ -3,6 +3,9 @@ package com.example.MuzPayroll.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -43,12 +46,14 @@ public class UserGrpMstController {
 
     // TO get the location from UserGrpMst by giving MstID
     @GetMapping("/{UgmUserGroupID}")
-    public ResponseEntity<UserGrpMst> getUserGrpById(
+    public ResponseEntity<UserGrpMstDTO> getUserGrpById(
             @PathVariable @NonNull Long UgmUserGroupID) {
 
-        return userGrpMstRepo.findById(UgmUserGroupID)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                UserGrpMstDTO dto = userGrpMstService.getUserGrpWithAuth(UgmUserGroupID);
+                return ResponseEntity.ok(dto);
+        // return userGrpMstRepo.findById(UgmUserGroupID)
+        //         .map(ResponseEntity::ok)
+        //         .orElse(ResponseEntity.notFound().build());
     }
 
     // TO get the Mst and the List of Logs y using MstID
@@ -84,5 +89,26 @@ public class UserGrpMstController {
 
         return ResponseEntity.ok(response);
     }
+
+@GetMapping("/user-groups")
+public Page<FormListDTO> searchUserGroups(
+        @RequestParam(required = false) String search,
+        @PageableDefault(size = 10) Pageable pageable) {
+
+    Page<UserGrpMst> page = userGrpMstRepo.searchUserGroup(search, pageable);
+
+    return page.map(entity -> {
+        FormListDTO dto = new FormListDTO();
+        dto.setMstID(entity.getUgmUserGroupID());
+        dto.setCode(entity.getUgmCode());
+        dto.setName(entity.getUgmName());
+        dto.setShortName(entity.getUgmShortName());
+        dto.setDescription(entity.getUgmDesc());
+        dto.setActiveDate(entity.getActiveDate());
+        dto.setInactiveDate(entity.getInactiveDate());
+        dto.setActiveStatusYN(entity.getUgmActiveYN());
+        return dto;
+    });
+}
 
 }

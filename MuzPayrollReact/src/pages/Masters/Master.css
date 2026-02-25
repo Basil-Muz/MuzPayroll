@@ -7,7 +7,13 @@
   background-color:   var(--bg);
   font-family: "Roboto", Arial, sans-serif;
 }
-
+.master-app-shell {
+  display: flex;
+  /* min-height: 100vh; */
+  background: var(--bg);
+    font-family: "Roboto", Arial, sans-serif;
+  padding-top: var(--header-padding);
+}
 
 /* sidebar */
 .side-nav {
@@ -143,27 +149,34 @@
     margin-bottom: 14px;
 } */
 
+
 .sitemap-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+ background: var(--bg-primary);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-light);
+  backdrop-filter: blur(10px);
 }
 
 
 /* sections */
-.sitemap-section + .sitemap-section {
+/* .sitemap-section + .sitemap-section {
     margin-top: 22px;
+} */
+
+.sitemap-section {
+  margin-bottom: 32px;
+}
+
+.sitemap-section:last-child {
+  margin-bottom: 0;
 }
 
 .section-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #eee;
-  background: transparent;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border);
 }
 
 
@@ -175,42 +188,66 @@
 }
 
 .section-title {
-    font-size: 16px;
-    padding-left:6px;
-    font-weight: 500;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+
 }
 
 .section-subtitle {
-    font-size: 11px;
-    display: flex;
-    color: #777;
+  margin-left: 30px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
 }
 
 /* tiles */
 .tile-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
   margin-bottom: 18px;
 }
 
 
 .tile-card {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 16px;
-  border-radius: 12px;
-  background: #ffffff;
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  border: 1px solid var(--border-light);
   text-decoration: none;
-  color: inherit;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+
+/* Left navigation indicator */
+.tile-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--brand);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.tile-card:hover::before {
+  opacity: 1;
 }
 
 .tile-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  border-color: var(--brand-border);
+  box-shadow: var(--shadow-sm);
 }
 
 /* .title-card:hover {
@@ -219,39 +256,78 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 } */
-.tile-icon {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #1daa4a;
-    color: #ffffff;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
+/* ===================== ICON ===================== */
+
+.tile-card svg {
+  width: 22px;
+  height: 22px;
+  color: var(--brand);
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.tile-card:hover svg {
+  transform: scale(1.1);
 }
 
 .first {
       display: flex;
 }
 
+/* ===================== TEXT ===================== */
+
 .tile-text {
-    display: flex;
-    padding-left:6px;
-    flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
 .tile-title {
-  font-size: 14px;
+  font-size: var(--text-md);
   font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tile-subtitle {
-  font-size: 12px;
-  color: #777;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+/* ===================== ANIMATION ===================== */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+.tile-card {
+  animation: fadeUp 0.35s ease both;
+}
+
+
+/* ===================== ACCESSIBILITY ===================== */
+
+.tile-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* ===================== LOADING STATE ===================== */
+
+.tile-card.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ===================== RESPONSIVE ===================== */
 
 /* small tweak for single-card rows so it doesn’t stretch too wide
 .tile-row:has(.tile-card:nth-child(1):nth-last-child(1)) {
@@ -270,18 +346,282 @@
 }
 
 .main-cancel {
-  width: 46px;
-  height: 36px;
-  border-radius: 10px;
-  background-color: var(--danger);
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: var(--danger-light);
+  color: var(--danger);
   display: flex;
-  color: white;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.55s ease;
+  border:1px solid var(--danger)
 }
 
 .main-cancel:hover {
-  background-color: #9e3030ff;
+  background: var(--danger);
+  color: #fff;
+  /* transform: rotate(90deg); */
+}
+
+.main-cancel:hover svg{
+    /* color: #fff; */
+  transform: rotate(90deg);
+}
+
+.main-cancel:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* ===================== OVERALL LAYOUT ===================== */
+
+.master-app-shell {
+  display: flex;
+  background: var(--bg);
+  font-family: "Roboto", Arial, sans-serif;
+  padding-top: var(--header-padding);
+  /* min-height: 100vh; */
+}
+
+/* ===================== SIDEBAR ===================== */
+
+.side-nav {
+  width: 88px;
+  min-width: 88px;
+  background-color: #fafafa;
+  border-right: 1px solid #e3e3e3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .side-nav {
+    width: 64px;
+    min-width: 64px;
+  }
+}
+
+/* ===================== MAIN AREA ===================== */
+
+.master-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  color: #201f1f;
+  /* overflow-x: hidden; */
+}
+
+/* ===================== CONTENT ===================== */
+
+.content {
+  padding: 28px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 20px 16px;
+  }
+}
+
+/* ===================== HEADER ===================== */
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 22px;
+  }
+}
+
+/* ===================== CANCEL BUTTON ===================== */
+
+.main-cancel {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: var(--danger-light);
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--danger);
+  flex-shrink: 0;
+}
+
+.main-cancel:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+.main-cancel:hover svg {
+  transform: rotate(90deg);
+}
+
+@media (max-width: 480px) {
+  .main-cancel {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ===================== SITEMAP CARD ===================== */
+
+.sitemap-card {
+  background: var(--background);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-light);
+}
+
+@media (max-width: 768px) {
+  .sitemap-card {
+    padding: 20px;
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .sitemap-card {
+    padding: 16px;
+  }
+}
+
+/* ===================== SECTIONS ===================== */
+
+.sitemap-section {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.section-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.section-subtitle {
+  margin-left: 30px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .section-subtitle {
+    margin-left: 0;
+  }
+}
+
+/* ===================== TILE GRID ===================== */
+
+.tile-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 1024px) {
+  .tile-row {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .tile-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+/* ===================== TILE CARD ===================== */
+
+.tile-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  border: 1px solid var(--border-light);
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .tile-card {
+    padding: 14px;
+  }
+}
+
+/* ===================== ICON ===================== */
+
+.tile-card svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .tile-card svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ===================== TEXT ===================== */
+
+.tile-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+@media (max-width: 480px) {
+  .tile-title {
+    font-size: 14px;
+  }
+
+  .tile-subtitle {
+    font-size: 12px;
+  }
 }

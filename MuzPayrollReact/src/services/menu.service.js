@@ -5,7 +5,9 @@ export const fetchMainMenu = (
   transsubtype,
   userId,
   solutionId,
-  entityHierarchyId
+  entityHierarchyId,
+  productid,
+  menu_row_no,
 ) => {
   return api.get(`/menu/mainmenu`, {
     params: {
@@ -13,7 +15,9 @@ export const fetchMainMenu = (
       transsubtype,
       userId,
       solutionId,
-      entityHierarchyId
+      entityHierarchyId,
+      productid,
+      menu_row_no,
     }
   });
 };

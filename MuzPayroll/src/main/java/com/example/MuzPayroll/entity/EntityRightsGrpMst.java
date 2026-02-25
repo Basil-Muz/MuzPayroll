@@ -1,15 +1,25 @@
 package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class EntityRightsGrpMst {
+    @Transient
+    private List<EntityRightsGrpLog> entityRightsGrpLogs;
+
+    @Transient
+    // @JsonIgnore
+    private Authorization authorization;
 
     @Id
     @Column(name = "ErmEntityGroupID", unique = true, nullable = false)
@@ -30,10 +40,6 @@ public class EntityRightsGrpMst {
     @Column(nullable = false)
     private Boolean ErmActiveYN;
 
-    @ManyToOne
-    @JoinColumn(name = "ErmEntityHierarchyID", nullable = true)
-    private EntityHierarchyInfo entityHierarchyInfo;
-
     @Column(name = "ErmActiveDate", nullable = false)
     private LocalDate activeDate;
 
@@ -43,6 +49,25 @@ public class EntityRightsGrpMst {
     public Long getErmEntityGroupID() {
         return ErmEntityGroupID;
     }
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "ErmEntityHierarchyID", nullable = true)
+    private EntityMst entityMst;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "ErmEntityHierarchyInfoID", nullable = true)
+    private EntityHierarchyInfo entityHierarchyInfoID;
+
+    public EntityHierarchyInfo getEntityHierarchyInfoID() {
+        return entityHierarchyInfoID;
+    }
+
+    public void setEntityHierarchyInfoID(EntityHierarchyInfo entityHierarchyInfoID) {
+        this.entityHierarchyInfoID = entityHierarchyInfoID;
+    }
+    @Column(nullable = true)
+    private LocalDate withaffectdate;
 
     public void setErmEntityGroupID(Long ErmEntityGroupID) {
         this.ErmEntityGroupID = ErmEntityGroupID;
@@ -88,14 +113,6 @@ public class EntityRightsGrpMst {
         this.ErmActiveYN = ErmActiveYN;
     }
 
-    public EntityHierarchyInfo getEntityHierarchyInfo() {
-        return entityHierarchyInfo;
-    }
-
-    public void setEntityHierarchyInfo(EntityHierarchyInfo entityHierarchyInfo) {
-        this.entityHierarchyInfo = entityHierarchyInfo;
-    }
-
     public LocalDate getActiveDate() {
         return activeDate;
     }
@@ -111,4 +128,27 @@ public class EntityRightsGrpMst {
     public void setInactiveDate(LocalDate InactiveDate) {
         this.InactiveDate = InactiveDate;
     }
+    public LocalDate getWithaffectdate() {
+        return withaffectdate;
+    }
+
+    public void setWithaffectdate(LocalDate withaffectdate) {
+        this.withaffectdate = withaffectdate;
+    }
+
+    public EntityMst getEntityMst() {
+        return entityMst;
+    }
+
+    public void setEntityMst(EntityMst entityMst) {
+        this.entityMst = entityMst;
+    }
+        public Authorization getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(Authorization authorization) {
+        this.authorization = authorization;
+    }
+    
 }

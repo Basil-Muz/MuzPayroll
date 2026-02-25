@@ -1,11 +1,14 @@
 package com.example.MuzPayroll.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.MuzPayroll.entity.EntityHierarchyInfo;
+import com.example.MuzPayroll.entity.DTO.EntityRightsGrpMstDTO;
 
 @Repository
 public interface EntityHierarchyInfoRepository extends JpaRepository<EntityHierarchyInfo, Long> {
@@ -25,5 +28,15 @@ public interface EntityHierarchyInfoRepository extends JpaRepository<EntityHiera
                 WHERE eh.ehi_entity_hierarchyid = :entityId
                 """, nativeQuery = true)
     String findEntityNameByEntityId(@Param("entityId") Long entityId);
+    
+@Query(value = """
+    SELECT eh.ehi_business_groupid
+    FROM entity_hierarchy_info eh
+    WHERE eh.ehi_entity_hierarchyid = :entityHierarchyInfoID
+    """, nativeQuery = true)
+Optional<Long> findBusinessGroupIdByEntityHierarchyInfoId(
+        @Param("entityHierarchyInfoID") EntityHierarchyInfo entityHierarchyInfoID
+);
+
     
 }

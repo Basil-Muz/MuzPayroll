@@ -292,8 +292,8 @@
 .custom-datepicker .react-datepicker__day:hover {
   background: rgba(199, 30, 190, 0.12);
 }
-.custom-datepicker .react-datepicker__day--selected,
-.custom-datepicker .react-datepicker__day--keyboard-selected {
+.statusupdate-page .custom-datepicker .react-datepicker__day--selected,
+.statusupdate-page .custom-datepicker .react-datepicker__day--keyboard-selected {
   background: #c71ebeff;
   color: #fff;
   font-weight: 600;

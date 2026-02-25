@@ -96,6 +96,7 @@ export default function GenaralBranchForm() {
       authorizationStatus: 0, // ENTRY
       mode: inputMode,
       activeStatusYN: 1,
+      muzControllCodes:14,
     },
   });
 

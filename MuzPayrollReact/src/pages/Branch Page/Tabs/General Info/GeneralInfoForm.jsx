@@ -42,7 +42,7 @@ const GeneralInfoForm = function GeneralInfoForm({
   // console.log("Branches:", branchId);
   // console.log("Branch sgsg", UserData);
 
-  const formatLocalDate = (date) => date.toLocaleDateString("en-CA"); // yyyy-MM-dd
+  // yyyy-MM-dd
 
   useEffect(() => {
     if (companys?.length > 0) {

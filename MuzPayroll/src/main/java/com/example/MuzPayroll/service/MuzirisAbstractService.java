@@ -2,6 +2,7 @@ package com.example.MuzPayroll.service;
 
 import java.util.List;
 
+import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.DTO.Response;
 
 public abstract class MuzirisAbstractService<D, E> {
