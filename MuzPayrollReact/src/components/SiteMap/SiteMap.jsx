@@ -13,10 +13,19 @@ import { FaBuildingUser } from "react-icons/fa6";
 import { FaUserCog } from "react-icons/fa";
 import { MdStorage } from "react-icons/md";
 import { MdAssessment } from "react-icons/md";
+import { MdGavel } from "react-icons/md";
 import { MdAccountBalance } from "react-icons/md";
 // import { MdDescription } from "react-icons/md";
 import { MdPeople } from "react-icons/md";
 import { MdEventAvailable } from "react-icons/md";
+import { MdDashboard } from "react-icons/md";
+import { FaMoneyBillTransfer } from "react-icons/fa6";
+import { MdLogout } from "react-icons/md";
+import { MdAutorenew } from "react-icons/md";
+import { FaUserTie, FaRegCalendarAlt, FaBalanceScale } from "react-icons/fa";
+import { MdSyncAlt } from "react-icons/md";
+import { MdOutlineAssessment } from "react-icons/md";
+import { MdBackup } from "react-icons/md";
 /* ======================================================
    SECTION ICON MAP (DOMAIN-LEVEL)
 ====================================================== */
@@ -54,10 +63,20 @@ const PAGE_SECTION_ICON_MAP = {
     masters: MdStorage,
     organisation: MdBusiness,
     organization: MdBusiness,
-    payroll: MdSettings,
+    // payroll: MdSettings,
     "user rights": FaUserCog,
     "employee management": MdPeople,
     "attendance and leave management": MdEventAvailable,
+    dashboard: MdDashboard,
+    "advance management": FaMoneyBillTransfer,
+    "other transaction": MdSyncAlt,
+    "employee relieving": MdLogout,
+    "appraisal process management": MdOutlineAssessment,
+    process: MdAutorenew,
+    "statutory compliance": FaBalanceScale,
+    letters: MdDescription,
+    "system management":MdBackup,
+        payroll: FaBuildingUser,
   },
 };
 
@@ -90,42 +109,32 @@ export default function GenericSitemap({ data, pageType = "masters" }) {
 
   const renderSections = (nodes) => {
     return nodes.flatMap((node) => {
-      const SectionIcon = getSectionIcon(
-        pageType,
-        node.displayName
-      );
+      const SectionIcon = getSectionIcon(pageType, node.displayName);
 
       const directPages = node.children?.filter(
-        (child) => child.optionYn && child.url
+        (child) => child.optionYn && child.url,
       );
 
-      const childFolders = node.children?.filter(
-        (child) => child.isFolder
-      );
+      const childFolders = node.children?.filter((child) => child.isFolder);
 
       // 🔹 CASE 1: ROOT PAGE (Dashboard type)
       if (node.optionYn && node.url && !node.isFolder) {
         return (
-          <section
-            key={node.menuRowNo}
-            className="sitemap-section"
-          >
-            <div className="section-header">
+          <section key={node.menuRowNo} className="sitemap-section">
+            {/* <div className="section-header">
               <SectionIcon size={20} />
-             <div className="section-title">
-              {node.fullPath.replace(/\s\/\s/g, "/")}
-            </div>
-            <div className="section-subtitle">{node.displayName}</div>
-            </div>
+              <div className="section-title">
+                {node.fullPath.replace(/\s\/\s/g, "/")}
+              </div>
+              <div className="section-subtitle">{node.displayName}</div>
+            </div> */}
 
             <div className="tile-row">
-              <Link
-                to={node.url}
-                className="tile-card"
-              >
+              <Link to={node.url} className="tile-card">
                 <SectionIcon size={18} />
-                <div className="tile-title">
-                  {node.displayName}
+                <div className="tile-text">
+                  <div className="tile-title">{node.displayName}</div>
+                  <div className="tile-subtitle">{node.displayName}</div>{" "}
                 </div>
               </Link>
             </div>
@@ -136,35 +145,30 @@ export default function GenericSitemap({ data, pageType = "masters" }) {
       // 🔹 CASE 2: Folder
       if (node.isFolder) {
         return [
-          <section
-            key={node.menuRowNo}
-            className="sitemap-section"
-          >
+          <section key={node.menuRowNo} className="sitemap-section">
             <div className="section-header">
               <SectionIcon size={20} />
+
               <div className="section-title">
                 {node.fullPath.replace(/\s\/\s/g, "/")}
               </div>
+              <div className="section-subtitle">{node.description}</div>
             </div>
 
             <div className="tile-row">
               {directPages?.map((page) => (
-                <Link
-                  key={page.menuRowNo}
-                  to={page.url}
-                  className="tile-card"
-                >
+                <Link key={page.menuRowNo} to={page.url} className="tile-card">
                   <SectionIcon size={18} />
-                 <div className="tile-text">
-                  <div className="tile-title">{page.displayName}</div>
-                  <div className="tile-subtitle">{page.description}</div>{" "}
-                </div>
+                  <div className="tile-text">
+                    <div className="tile-title">{page.displayName}</div>
+                    <div className="tile-subtitle">{page.description}</div>{" "}
+                  </div>
                 </Link>
               ))}
             </div>
           </section>,
 
-          ...renderSections(childFolders || [])
+          ...renderSections(childFolders || []),
         ];
       }
 

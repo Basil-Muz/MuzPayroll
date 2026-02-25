@@ -248,7 +248,7 @@ console.log("Userfgfdg",user)
     } catch (err) {
       if (!cancelledRef.current) handleApiError(err);
     }
-  }, [userId, loadBranches, ,companyId]);
+  }, [userId, loadBranches,loadCompany ,companyId]);
 
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });

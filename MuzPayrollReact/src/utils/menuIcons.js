@@ -7,7 +7,7 @@ import {
   FaBalanceScale,
 } from "react-icons/fa";
 import { FaHandHoldingDollar } from "react-icons/fa6";
-
+import { MdAccountTree } from "react-icons/md";
 import {
   MdOutlineAssessment,
   MdOutlineSettings,
@@ -15,7 +15,7 @@ import {
   MdSwapHoriz,
   MdLogout,
 } from "react-icons/md";
-
+import { MdAutorenew } from "react-icons/md"
 export const MAIN_MENU_ICON_MAP = {
   // Core
   Dashboard: HiMiniSwatch,
@@ -33,10 +33,10 @@ export const MAIN_MENU_ICON_MAP = {
   "Appraisal Process Management": MdOutlineAssessment,
 
   // System / Process
-  Process: MdOutlineSettings,
+  Process: MdAutorenew,
   "System Management": MdSettings,
 
   // Compliance
   "Statutory Compliance": FaBalanceScale,
-  // "Sitemap":MdAccountTree,
+  "Sitemap":MdAccountTree,
 };

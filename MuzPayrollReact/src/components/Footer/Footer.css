@@ -1,38 +1,342 @@
+/* Footer.css */
+/*@import url('./variables.css');  If you have a separate variables file */
+
 .app-footer {
-  /* height: 40px; */
-  background-color: #f3f3f3;        /* light grey like screenshot */
-  border-top: 1px solid #e0e0e0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 10px var(--brand-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 40px;
-  font-size: 12px;
-  color: #777777;
+  padding: 12px 32px;
+  font-size: var(--text-sm);
+  color: var(--text);
   z-index: 1000;
+  backdrop-filter: blur(4px);
+  flex-wrap: wrap;
+  gap: 16px;
+  transition: all 0.3s ease;
 }
 
-/* left text */
+/* Left section */
 .footer-left {
-  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-/* right red “alert” icon */
+.copyright-symbol {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.copyright-text {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--text-dark);
+}
+
+.version-badge {
+  background: var(--success-light);
+  color: var(--brand);
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--brand-border);
+  transition: all 0.2s ease;
+}
+
+.version-badge:hover {
+  background: var(--brand-light);
+  color: var(--background);
+  transform: translateY(-1px);
+  border-color: var(--brand);
+}
+
+/* Center section */
+.footer-center {
+  display: flex;
+  align-items: center;
+}
+
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--success-light);
+  padding: 4px 12px;
+  border-radius: 30px;
+  border: 1px solid var(--brand-border);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.status-online {
+  background-color: var(--brand);
+  box-shadow: 0 0 0 var(--brand-border);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--brand-border);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(210, 24, 216, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(210, 24, 216, 0);
+  }
+}
+
+.status-text {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--brand);
+}
+
+/* Right section */
 .footer-right {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 20px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.footer-link:hover {
+  color: var(--brand);
+}
+
+.footer-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--brand);
+  transition: width 0.2s ease;
+}
+
+.footer-link:hover::after {
+  width: 100%;
+}
+
+.link-separator {
+  color: var(--border);
+  font-size: var(--text-sm);
+}
+
+/* Alert icon */
+.footer-alert-wrapper {
+  position: relative;
 }
 
 .footer-alert-icon {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background-color: #e53935;        /* red */
+  background: linear-gradient(135deg, var(--danger), var(--danger-dark));
   color: #ffffff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 5px var(--danger-light);
+  transition: all 0.2s ease;
+  animation: subtle-ring 3s infinite;
+}
+
+@keyframes subtle-ring {
+  0%, 100% {
+    transform: rotate(0);
+  }
+  2% {
+    transform: rotate(5deg);
+  }
+  4% {
+    transform: rotate(-5deg);
+  }
+  6% {
+    transform: rotate(3deg);
+  }
+  8% {
+    transform: rotate(-3deg);
+  }
+  10% {
+    transform: rotate(0);
+  }
+}
+
+.footer-alert-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px var(--danger-light);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .app-footer {
+    padding: 12px 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-left {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .footer-center {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .footer-right {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .system-status {
+    margin: 4px 0;
+  }
+
+  .footer-links {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .app-footer {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .footer-left {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .version-badge {
+    align-self: center;
+  }
+
+  .footer-right {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+  }
+}
+
+/* Dark mode is handled by [data-theme="dark"] in variables */
+
+/* Print styles */
+@media print {
+  .app-footer {
+    background: var(--background);
+    border-top: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .footer-alert-wrapper,
+  .footer-links {
+    display: none;
+  }
+}
+
+/* Additional payroll-specific enhancements */
+.app-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--brand) 20%, 
+    var(--brand-light) 50%, 
+    var(--brand) 80%, 
+    transparent 100%
+  );
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.app-footer {
+  position: relative;
+}
+
+/* Active payroll period indicator (optional) */
+.payroll-period {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid var(--border);
+}
+
+.period-label {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.period-value {
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 12px;
+  background: var(--success-light);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+/* Optional: Add company logo or brand element */
+.brand-mark {
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.brand-mark::before {
+  content: '●';
+  color: var(--brand);
+  font-size: 8px;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }

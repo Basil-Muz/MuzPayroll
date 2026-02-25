@@ -1,7 +1,7 @@
 .to-top-btn {
   /* Positioning */
   position: fixed;
-  bottom: calc(24px + env(safe-area-inset-bottom));
+  bottom: calc(63px + env(safe-area-inset-bottom));
   right: calc(24px + env(safe-area-inset-right));
 
   /* Size – responsive */
