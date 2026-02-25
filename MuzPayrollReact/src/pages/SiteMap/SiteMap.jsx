@@ -15,7 +15,7 @@ import { organizeSiteMapMenu } from "../../utils/menuUtils";
 import { handleApiError } from "../../utils/errorToastResolver";
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
-import LettersSitemap from "../../components/SiteMapSection/GenericSitemap";
+import Sitemap from "../../components/SiteMap/SiteMap";
 export default function Letters() {
   // const [open, setOpen] = useState(false);    //sidebar state
   // const [backendError, setBackendError] = useState([]);
@@ -227,7 +227,7 @@ export default function Letters() {
             </div>
 
             <div className="sitemap-card">
-              <LettersSitemap data={siteMapData} pageType="sitemap"/>
+              <Sitemap data={siteMapData} pageType="sitemap"/>
             </div>
           </main>
         </div>
