@@ -103,7 +103,7 @@ export default function GenaralLocationForm() {
       userCode,
       authorizationDate: new Date().toISOString().split("T")[0],
       authorizationStatus: 0,
-      activeStatusYN: 1,
+      EtmActiveYN: 1,
       muzControllCodes: 15,
     },
   });

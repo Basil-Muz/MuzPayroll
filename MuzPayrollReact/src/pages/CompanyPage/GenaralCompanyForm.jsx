@@ -100,8 +100,8 @@ export default function GenaralCompanyForm() {
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
       authorizationStatus: 0, // ENTRY
       // mode: inputMode,once assign the value not changes
-      activeStatusYN: 1,
-      muzControllCodes: 13,
+      EtmActiveYN: 1,
+      EtmEntityTypeMccID: 13,
     },
   });
 

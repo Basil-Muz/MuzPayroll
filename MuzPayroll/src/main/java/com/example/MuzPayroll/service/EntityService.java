@@ -140,6 +140,9 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                 rowErrors.add("User code is required");
                                         if (dto.getEtmActiveYN() == null)
                                                 rowErrors.add("Active StatusYN is required");
+                                        if (dto.getEtmEntityTypeMccID() == null)
+                                                rowErrors.add("MccId is required");
+
                                         MuzControlCodes controlCodes = muzControlCodesRepository
                                                         .findById(dto.getEtmEntityTypeMccID())
                                                         .orElseThrow(() -> new RuntimeException("Invalid ID"));
@@ -780,7 +783,6 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         dto.setEmployerName(entity.getAddressInfoMst().getEmployerName());
                         dto.setEmployerNumber(entity.getAddressInfoMst().getEmployerNumber());
                         dto.setEmployerEmail(entity.getAddressInfoMst().getEmployerEmail());
-                        dto.setImagePath(entity.getAddressInfoMst().getImage());
                         // dto.setWithaffectdate(entity.getWithaffectdate().getW);
                         dto.setAmendNo(entity.getAddressInfoMst().getAmendNo());
 
@@ -811,8 +813,6 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         }
 
                         savedEntity = entityRepository.save(entity);
-
-                        System.out.println("AddressInfoID" + entity.getAddressInfoMst().getAddressInfoID());
 
                         // ===== SAVE AUTHORIZATION =====
                         Authorization auth = entity.getAuthorization();
@@ -1135,7 +1135,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                 // Fetch MST row
                 EntityMst entity = entityRepository.findById(MstID)
-                                .orElseThrow(() -> new RuntimeException("Company not found"));
+                                .orElseThrow(() -> new RuntimeException("Entity not found"));
 
                 // Convert MST → DTO
                 EntityMstDTO dto = entityToDto(entity);

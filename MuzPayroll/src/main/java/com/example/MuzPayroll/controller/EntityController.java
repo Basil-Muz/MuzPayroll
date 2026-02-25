@@ -8,12 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.EntityMstDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
@@ -47,6 +49,14 @@ public class EntityController {
             e.printStackTrace();
             return Response.error("Error processing request: " + e.getMessage());
         }
+    }
+
+    // TO get the companyMst and the List of Logs y using MstID
+    @GetMapping("/getamendlist/{ID}")
+    public ResponseEntity<EntityMstDTO> getEntityById(@PathVariable Long ID) {
+
+        EntityMstDTO dto = entityService.getEntityWithLogs(ID);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/fetchCompany")

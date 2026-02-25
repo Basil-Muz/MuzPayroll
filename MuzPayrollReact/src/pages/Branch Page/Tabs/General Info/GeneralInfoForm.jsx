@@ -69,7 +69,7 @@ const GeneralInfoForm = function GeneralInfoForm({
       // console.log("Field Name :",EtmName);
       setFocus("name");
     }
-  }, [isUnlocked, isLocked, setFocus, EtmName]);
+  }, [isUnlocked, isLocked, setFocus]);
 
   // useImperativeHandle(ref, () => ({
   //   focusName() {
@@ -263,8 +263,8 @@ const GeneralInfoForm = function GeneralInfoForm({
               className={`form-control ${errors.EtmName ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
               placeholder="Enter name"
               disabled={isReadOnly}
-              {...register(EtmName, {
-                required: `Name is required ${EtmName}`,
+              {...register("EtmName", {
+                required: `Name is required Name`,
                 pattern: {
                   value: /^[a-zA-Z0-9\s.-]+$/,
                   message:
@@ -315,7 +315,9 @@ const GeneralInfoForm = function GeneralInfoForm({
               })}
             />
             {errors.EtmShortName && (
-              <span className="error-message">{errors.EtmShortName.message}</span>
+              <span className="error-message">
+                {errors.EtmShortName.message}
+              </span>
             )}
           </div>
 
@@ -394,7 +396,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
               <div className="image-upload-container">
                 <Controller
-                  name="companyImage"
+                  name="entityImage"
                   control={control}
                   rules={{ required: "Company image is required" }}
                   render={({ field }) => (
@@ -412,7 +414,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
                             // Validate file type
                             if (!file.type.match("image/(png|jpeg|jpg)")) {
-                              setError("companyImage", {
+                              setError("entityImage", {
                                 type: "manual",
                                 message:
                                   "Only PNG, JPG and JPEG files are allowed",
@@ -422,7 +424,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
                             // Validate file size (5MB max)
                             if (file.size > 5 * 1024 * 1024) {
-                              setError("companyImage", {
+                              setError("entityImage", {
                                 type: "manual",
                                 message: "File size must be less than 5MB",
                               });
@@ -565,12 +567,12 @@ const GeneralInfoForm = function GeneralInfoForm({
                       </div>
 
                       {/* Error Message */}
-                      {errors.companyImage && (
+                      {errors.entityImage && (
                         <div className="error-message">
                           {/* <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg> */}
-                          {errors.companyImage.message}
+                          {errors.entityImage.message}
                         </div>
                       )}
 

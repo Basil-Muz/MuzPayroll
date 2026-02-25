@@ -49,17 +49,6 @@ public class AddressInfoMst {
         this.addressInfoID = addressInfoID;
     }
 
-    @Column(nullable = true)
-    private String image;
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     @Column(nullable = false)
     private String address;
 
