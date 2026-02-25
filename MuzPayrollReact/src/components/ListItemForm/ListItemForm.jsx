@@ -19,17 +19,19 @@ import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
 // Utils / Helpers
 import { ensureMinDuration } from "../../utils/loaderDelay";
 import { handleApiError } from "../../utils/errorToastResolver";
-import {
-  toLocalIsoDate,
-  formatDate,
-} from "../../utils/dateFormater";
-
+import { toLocalIsoDate, formatDate } from "../../utils/dateFormater";
 
 // Styles (always last)
 import "./ListItemForm.css";
 
-
-function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,ENTITY_FIELD_MAP }) {
+function ListItemForm({
+  entity,
+  toggleForm,
+  data,
+  saveEntity,
+  fetchEntityById,
+  ENTITY_FIELD_MAP,
+}) {
   //   const [position, setPosition] = useState({ x: 355, y: 43 });
   //   const dragging = useRef(false);
   //   const offset = useRef({ x: 0, y: 0 });
@@ -46,8 +48,8 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
     register,
     handleSubmit,
     // trigger,
-    setError,
-    // clearErrors,
+    // setError,
+    clearErrors,
     setValue,
     reset,
     setFocus,
@@ -64,7 +66,7 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
       userCode: user.userCode,
       authorizationDate: toLocalIsoDate(),
       activeDate: toLocalIsoDate(),
-      UgmActiveYN: true,
+      [ENTITY_FIELD_MAP.activeYN]: true,
       withaffectdate: toLocalIsoDate(),
     },
   });
@@ -90,20 +92,20 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
   }, [flag]);
 
   useEffect(() => {
-    setFocus("UgmCode");
+    setFocus("Code");
   }, []);
 
   const fetchFormDataById = async (data) => {
     const startTime = Date.now();
     // show loader
-    showRailLoader("Fetching available "+entity+"..");
+    showRailLoader("Fetching available " + entity + "..");
     try {
       const response = await fetchEntityById(data);
       console.log("Data by id", response);
       setAmendmentData(response.data);
       if (response.data.authorizationStatus === true) setIsVarified(true);
     } catch (error) {
-      console.error("Error fetching "+entity, error);
+      console.error("Error fetching " + entity, error);
       handleApiError(error, {
         entity: entity,
       });
@@ -156,7 +158,6 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
   //   };
 
   const onSubmit = async (values) => {
-
     const formData = new FormData();
 
     Object.keys(values).forEach((key) => {
@@ -167,7 +168,7 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
     }
     const startTime = Date.now();
     // show loader
-    showRailLoader("Saving "+entity+"…");
+    showRailLoader("Saving " + entity + "…");
     try {
       if (!data)
         //  For fresh insert
@@ -176,7 +177,7 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
 
       // console.log("Save response",response);
     } catch (error) {
-      console.error("Error updating "+entity+":", error);
+      console.error("Error updating " + entity + ":", error);
       handleApiError(error, {
         entity: entity,
       });
@@ -191,7 +192,7 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
     if (!data) {
       reset();
 
-      setError();
+      clearErrors();
     } else {
       setFlag(true);
       const timer = setTimeout(() => {
@@ -287,18 +288,18 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
                 <div>
                   <input
                     type="text"
-                    className={`form-control ${errors.UgmCode ? "error" : ""} ${
+                    className={`form-control ${errors[ENTITY_FIELD_MAP.code] ? "error" : ""} ${
                       isVarified ? "read-only" : ""
                     }`}
                     placeholder="Enter Group Code"
                     disabled={isVarified}
-                    {...register("UgmCode", {
+                    {...register(ENTITY_FIELD_MAP.code, {
                       required: "Group Code is required",
                     })}
                   />
-                  {errors.UgmCode && (
+                  {errors[ENTITY_FIELD_MAP.code] && (
                     <span className="error-message">
-                      {errors.UgmCode.message}
+                      {errors[ENTITY_FIELD_MAP.code].message}
                     </span>
                   )}
                 </div>
@@ -312,18 +313,18 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
                 <div>
                   <input
                     type="text"
-                    className={`form-control ${errors.UgmName ? "error" : ""} ${
+                    className={`form-control ${errors[ENTITY_FIELD_MAP.name] ? "error" : ""} ${
                       isVarified ? "read-only" : ""
                     }`}
                     placeholder="Enter Group Name"
                     disabled={isVarified}
-                    {...register("UgmName", {
+                    {...register(ENTITY_FIELD_MAP.name, {
                       required: "Group Name is required",
                     })}
                   />
-                  {errors.UgmName && (
+                  {errors[ENTITY_FIELD_MAP.name] && (
                     <span className="error-message">
-                      {errors.UgmName.message}
+                      {errors[ENTITY_FIELD_MAP.name].message}
                     </span>
                   )}
                 </div>
@@ -337,18 +338,18 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
                 <div>
                   <input
                     type="text"
-                    className={`form-control ${errors.UgmShortName ? "error" : ""} ${
+                    className={`form-control ${errors[ENTITY_FIELD_MAP.shortName] ? "error" : ""} ${
                       isVarified ? "read-only" : ""
                     }`}
                     placeholder="Enter Short Name"
                     disabled={isVarified}
-                    {...register("UgmShortName", {
+                    {...register(ENTITY_FIELD_MAP.shortName, {
                       required: "Short Name is required",
                     })}
                   />
-                  {errors.UgmShortName && (
+                  {errors[ENTITY_FIELD_MAP.shortName] && (
                     <span className="error-message">
-                      {errors.UgmShortName.message}
+                      {errors[ENTITY_FIELD_MAP.shortName].message}
                     </span>
                   )}
                 </div>
@@ -360,19 +361,19 @@ function ListItemForm({ entity, toggleForm, data, saveEntity, fetchEntityById,EN
                 <label className="group-form-label required">Description</label>
                 <div>
                   <textarea
-                    className={`form-control ${errors.UgmDesc ? "error" : ""} ${
+                    className={`form-control ${errors[ENTITY_FIELD_MAP.desc] ? "error" : ""} ${
                       isVarified ? "read-only" : ""
                     }`}
                     placeholder="Enter Description"
                     rows={3}
                     disabled={isVarified}
-                    {...register("UgmDesc", {
+                    {...register(ENTITY_FIELD_MAP.desc, {
                       required: "Description is required",
                     })}
                   />
-                  {errors.UgmDesc && (
+                  {errors[ENTITY_FIELD_MAP.desc] && (
                     <span className="error-message">
-                      {errors.UgmDesc.message}
+                      {errors[ENTITY_FIELD_MAP.desc].message}
                     </span>
                   )}
                 </div>

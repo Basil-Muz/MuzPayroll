@@ -4,7 +4,7 @@ import Header from "../../components/Header/Header";
 import { MdOutlineCancel } from "react-icons/md";
 import React, { useEffect, useState } from "react";
 // import { useState } from "react";
-import "./Master.css";
+// import "./Master.css";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 import Sidebar from "../../components/SideBar/Sidebar";
 import { useParams } from "react-router-dom";
@@ -15,8 +15,8 @@ import { buildSitemapFromSubMenuResponse } from "../../utils/menuUtils";
 import { handleApiError } from "../../utils/errorToastResolver";
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
-import MasterSitemap from "../../components/SiteMapSection/GenericSitemap";
-export default function HomePage() {
+import LettersSitemap from "../../components/SiteMapSection/GenericSitemap";
+export default function Letters() {
   // const [open, setOpen] = useState(false);    //sidebar state
   // const [backendError, setBackendError] = useState([]);
   // console.log("Menu")
@@ -24,7 +24,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { showRailLoader, hideLoader } = useLoader();
   // console.log("Row Number",rowNumber);
-  const [masterData, setMasterData] = useState([]);
+  const [lettersData, setLettersData] = useState([]);
   // const sitemapData = [
   //   {
   //     title: "System Management/Masters",
@@ -172,7 +172,7 @@ export default function HomePage() {
         response.data,
         "System Management",
       );
-      setMasterData(sitemapData);
+      setLettersData(sitemapData);
       console.log("Generated sitemap", sitemapData);
     } catch (error) {
       handleApiError(error);
@@ -219,7 +219,7 @@ export default function HomePage() {
           <main className="content">
             <div className="main-header">
               <h1 className="page-title" style={{ fontWeight: 500 }}>
-                Masters
+                Reports
               </h1>
               <div className="main-cancel">
                 <MdOutlineCancel size={20} onClick={handleCancel} />
@@ -227,7 +227,7 @@ export default function HomePage() {
             </div>
 
             <div className="sitemap-card">
-              <MasterSitemap data={masterData} pageType="masters"/>
+              <LettersSitemap data={lettersData} pageType="reports"/>
             </div>
           </main>
         </div>

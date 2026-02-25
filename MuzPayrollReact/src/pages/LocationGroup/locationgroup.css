@@ -1,11 +1,11 @@
 /* ================= PAGE ================= */
 
 .locationgroup-page {
-    padding: var(--header-padding) 13px 21px 12px;
-    padding-top: 72px;
+    padding: var(--header-padding) 18px 21px 18px;
+    /* padding-top: 72px; */
     font-family: sans-serif;
     background-color: #f9f3f9;
-    padding-left: 10px;
+    /* padding-left: 18px; */
 }
 
 .locationgroup-page h2 {
@@ -171,7 +171,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 7px;
 }
 
 .header-actions {

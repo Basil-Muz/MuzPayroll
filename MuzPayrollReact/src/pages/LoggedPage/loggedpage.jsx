@@ -83,7 +83,7 @@ function LoggedPage() {
       replace: true,
     });
   }, [user, solutionId, navigate]);
-  console.log("Use id", user);
+  // console.log("Use id", user);
   // ================= Load companies =================
   useEffect(() => {
     if (!user?.userMstId) return;
@@ -267,8 +267,10 @@ function LoggedPage() {
         user.userMstId,
         user.solutionId,
         user.defaultEntityHierarchyId,
+        1,
+        null,
       );
-      // console.log("Menu", response);
+      console.log("Main Menu", response);
       const organizedMenu = organizeMenuFromBackend(response.data);
       // console.log("Organized menu", organizedMenu);
       updateMenus(organizedMenu);

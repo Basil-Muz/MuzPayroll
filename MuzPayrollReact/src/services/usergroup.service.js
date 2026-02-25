@@ -1,7 +1,7 @@
 // services/user.service.js
 import api from "../api/axiosInstance";
 
-// Fetch company amendment list
+// Fetch user Group amendment list
 export const getUserGroupsList = (companyId, activeStatusYN) => {
   return api.get("/userGrp/userGrplist", {
     params: {
@@ -22,6 +22,7 @@ export const getUserGroupAmendById = (userGroupId) => {
 export const saveUserGroup = (formData, mode) => {
   return api.post("/userGrp/save", formData, { params: { mode: mode } });
 };
+
 export const searchUserGroup = (search) => {
   return api.get("/userGrp/user-groups", {
     params: {

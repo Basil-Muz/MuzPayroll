@@ -51,7 +51,10 @@ import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 import LoaderRenderer from "./components/Loaders/LoaderRenderer.jsx";
 import LocationGroupRightsMapping from "./pages/LocationGroupRightMaping/LocationGroupRightMapping.jsx";
 
+import Letters from "./pages/Letters/Letters.jsx"
+import Reports from "./pages/Reports/Reports.jsx"
 
+import SiteMap from "./pages/SiteMap/SiteMap.jsx"
 function App() {
  
   return (
@@ -64,22 +67,22 @@ function App() {
           <Route path="/payroll" element={<LoginPage />} />
           <Route path="/payrollemp" element={<LoginPage />} />
           <Route path="/home" element={<LoggedPage />} />
-          <Route path="/company" element={<Companyform />} />
-          <Route path="/generalform" element={<GeneralForm />} />
+          {/* <Route path="/company" element={<Companyform />} />
+          <Route path="/generalform" element={<GeneralForm />} /> */}
           <Route path="/documentsinfo" element={<DocumentsInfo />} />
-          <Route path="/masters" element={<MasterPage />} />
+          <Route path="/masters/:rowNumber" element={<MasterPage />} />
           <Route path="/changepassword" element={<ChangePassword />} />
 
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/:rowNumber" element={<Settings />} />
 
-          <Route path="/branch" element={<BranchForm />} />
-          <Route path="/generalform" element={<BranchGeneralForm />} />
-          <Route path="/documentsinfo" element={<BranchDocumentsInfo />} />
+          {/* <Route path="/branch" element={<BranchForm />} /> */}
+          {/* <Route path="/generalform" element={<BranchGeneralForm />} />
+          <Route path="/documentsinfo" element={<BranchDocumentsInfo />} /> */}
 
-          <Route path="/location" element={<LocationForm />} />
-          <Route path="/generalform" element={<LocationGeneralForm />} />
-          <Route path="/documentsinfo" element={<LocationDocumentsInfo />} />
+          {/* <Route path="/location" element={<LocationForm />} /> */}
+          {/* <Route path="/generalform" element={<LocationGeneralForm />} />
+          <Route path="/documentsinfo" element={<LocationDocumentsInfo />} /> */}
           <Route path="/designation" element={<Designation />} />
           <Route path="/branchform" element={<BranchPageForm />} />
           <Route path="/companyform" element={
@@ -145,7 +148,30 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+            <Route
+            path="/letters/:rowNumber"
+            element={
+              <ProtectedRoute>
+                <Letters />
+              </ProtectedRoute>
+            }
+          />
+            <Route
+            path="/reports/:rowNumber"
+            element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            }
+          />
+                      <Route
+            path="/sitemap"
+            element={
+              <ProtectedRoute>
+                <SiteMap />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/payrollgroup" element={<PayrollGroup />} />
           <Route path="/payrollgroupsearch" element={<PayrollGroupSearch />} />
           <Route path="/payrollgrouplist" element={<PayrollGroupList />} />
@@ -158,6 +184,7 @@ function App() {
             element={<LocationGroupRightsMapping />}
           />
         </Routes>
+
       </AuthProvider>
       <Toaster
         position="top-right"

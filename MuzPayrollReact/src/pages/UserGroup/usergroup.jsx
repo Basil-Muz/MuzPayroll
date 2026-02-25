@@ -48,27 +48,32 @@ function UserGroup() {
   const [showForm, setShowForm] = useState(false);
   const [searchData, setSearchdata] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [flag, setFlag] = useState(false); // new state for flag from child
+  // const [loading, setLoading] = useState(true);
+  // const [flag, setFlag] = useState(false); // new state for flag from child
 
   const { user } = useAuth();
   // console.log("Entutirjgfdg", user);
 
   const entityId = user.userEntityHierarchyId;
 
-  const getAllUserGroups = async () => {
-    const startTime = Date.now();
+  const getAllUserGroups = async (loadFirst) => {
+     const startTime = Date.now();
+    if(loadFirst === true){
+         
     // show loader
     showRailLoader("Retrieving available user groups…");
+    }
     try {
       const response = await getUserGroupsList(entityId, true);
       setUserGroupList(response.data);
-      // console.log("user Group", response);
+      console.log("user Group", response);
     } catch (error) {
       handleApiError(error);
     } finally {
-      await ensureMinDuration(startTime, 1200);
+      if(loadFirst){
+        await ensureMinDuration(startTime, 700);
       hideLoader();
+      }
     }
   };
 
@@ -77,7 +82,7 @@ function UserGroup() {
   //   };
 
   const handleClear = async () => {
-    await getAllUserGroups();
+    await getAllUserGroups(true);
     toast.success("User groups have been updated.");
   };
 
@@ -111,12 +116,13 @@ const searchdata = useCallback(async () => {
     setUserGroupList(response.data);
   }
 }, [searchData, entityId]);
+
 useEffect(() => {
   const handler = setTimeout(() => {
     if (searchData.trim() !== "") {
       searchdata();
     } else {
-      getAllUserGroups();
+      getAllUserGroups(false);
     }
   }, 400);
 
@@ -205,7 +211,7 @@ useEffect(() => {
               <IoIosSearch size={18} />
               <input
                 type="text"
-                placeholder="Search …"
+                placeholder="Search groups…"
                 value={searchData}
                 onChange={handleSearchChange}
               />

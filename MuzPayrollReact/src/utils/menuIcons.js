@@ -38,4 +38,5 @@ export const MAIN_MENU_ICON_MAP = {
 
   // Compliance
   "Statutory Compliance": FaBalanceScale,
+  // "Sitemap":MdAccountTree,
 };

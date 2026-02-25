@@ -67,7 +67,7 @@ function UserGroupForm({ toggleForm, data }) {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      authorizationStatus: "0",
+      authorizationStatus: 0,
       //   mode:"INSERT",
       entityMst: user.userEntityHierarchyId,
       userCode: user.userCode,

@@ -101,6 +101,7 @@ export default function GenaralCompanyForm() {
       authorizationStatus: 0, // ENTRY
       // mode: inputMode,once assign the value not changes
       activeStatusYN: 1,
+      muzControllCodes: 13,
     },
   });
 

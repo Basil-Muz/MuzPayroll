@@ -4,27 +4,27 @@ import Header from "../../components/Header/Header";
 import { MdOutlineCancel } from "react-icons/md";
 import React, { useEffect, useState } from "react";
 // import { useState } from "react";
-import "./Master.css";
+// import "./Master.css";
 import ScrollToTopButton from "../../components/ScrollToTop/ScrollToTopButton";
 import Sidebar from "../../components/SideBar/Sidebar";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import { fetchMainMenu } from "../../services/menu.service";
 import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { buildSitemapFromSubMenuResponse } from "../../utils/menuUtils";
+import { organizeSiteMapMenu } from "../../utils/menuUtils";
 import { handleApiError } from "../../utils/errorToastResolver";
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
-import MasterSitemap from "../../components/SiteMapSection/GenericSitemap";
-export default function HomePage() {
+import LettersSitemap from "../../components/SiteMapSection/GenericSitemap";
+export default function Letters() {
   // const [open, setOpen] = useState(false);    //sidebar state
   // const [backendError, setBackendError] = useState([]);
   // console.log("Menu")
-  const { rowNumber } = useParams();
+  // const { rowNumber } = useParams();
   const navigate = useNavigate();
   const { showRailLoader, hideLoader } = useLoader();
   // console.log("Row Number",rowNumber);
-  const [masterData, setMasterData] = useState([]);
+  const [siteMapData, setSiteMapData] = useState([]);
   // const sitemapData = [
   //   {
   //     title: "System Management/Masters",
@@ -159,20 +159,20 @@ export default function HomePage() {
 
     try {
       const response = await fetchMainMenu(
-        "SUB_MENU",
+        "SITEMAP",
         "LIST",
         user.userMstId,
         user.solutionId,
         user.defaultEntityHierarchyId,
         1,
-        rowNumber,
+        null,
       );
       console.log("Sub menus", response);
-      const sitemapData = buildSitemapFromSubMenuResponse(
-        response.data,
-        "System Management",
+      const sitemapData = organizeSiteMapMenu(
+        response.data,  
+        // "System Management",
       );
-      setMasterData(sitemapData);
+      setSiteMapData(sitemapData);
       console.log("Generated sitemap", sitemapData);
     } catch (error) {
       handleApiError(error);
@@ -183,9 +183,9 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    if (!user || !rowNumber) return;
+    if (!user) return;
     FetchSubmenus();
-  }, [user, rowNumber]);
+  }, [user]);
 
   // cancle operation and return to home
   const handleCancel = () => {
@@ -219,7 +219,7 @@ export default function HomePage() {
           <main className="content">
             <div className="main-header">
               <h1 className="page-title" style={{ fontWeight: 500 }}>
-                Masters
+                Sitemap
               </h1>
               <div className="main-cancel">
                 <MdOutlineCancel size={20} onClick={handleCancel} />
@@ -227,7 +227,7 @@ export default function HomePage() {
             </div>
 
             <div className="sitemap-card">
-              <MasterSitemap data={masterData} pageType="masters"/>
+              <LettersSitemap data={siteMapData} pageType="sitemap"/>
             </div>
           </main>
         </div>
