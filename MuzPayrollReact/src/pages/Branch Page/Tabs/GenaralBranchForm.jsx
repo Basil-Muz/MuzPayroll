@@ -46,6 +46,7 @@ export default function GenaralBranchForm() {
   //Convert the JSON string to objects
   const userCode = userObj.userCode.split("@", 1)[0];
   const companyId = userObj.companyId;
+  const userId = userObj.userId;
 
   //Fetch company amendmends data
   const {
@@ -95,8 +96,8 @@ export default function GenaralBranchForm() {
       authorizationDate: new Date().toISOString().split("T")[0], //  Date of save
       authorizationStatus: 0, // ENTRY
       mode: inputMode,
-      activeStatusYN: 1,
-      muzControllCodes:14,
+      EtmActiveYN: 1,
+      muzControllCodes: 14,
     },
   });
 
@@ -255,8 +256,8 @@ export default function GenaralBranchForm() {
   // }, [watchedDocuments]);
 
   useEffect(() => {
-    loadCompany(companyId);
-  }, [loadCompany, companyId]);
+    loadCompany(userId);
+  }, []);
 
   useEffect(() => {
     if (isVerifiedAmendment) return;
@@ -309,7 +310,7 @@ export default function GenaralBranchForm() {
     trigger,
     setStep,
   });
-  
+
   const { handleClear } = useFormClear({
     setAmendmentData,
     selectedAmendment,

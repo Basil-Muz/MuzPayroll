@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,7 +38,7 @@ public class EntityController {
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<EntityMstDTO> saveCompany(
             @ModelAttribute EntityMstDTO dto, // ← This will bind ALL form fields to DTO
-            @RequestParam(value = "companyImage", required = false) MultipartFile entityImage,
+            @RequestParam(value = "entityImage", required = false) MultipartFile entityImage,
             @RequestParam String mode) {
 
         try {
@@ -48,6 +49,14 @@ public class EntityController {
             e.printStackTrace();
             return Response.error("Error processing request: " + e.getMessage());
         }
+    }
+
+    // TO get the companyMst and the List of Logs y using MstID
+    @GetMapping("/getamendlist/{ID}")
+    public ResponseEntity<EntityMstDTO> getEntityById(@PathVariable Long ID) {
+
+        EntityMstDTO dto = entityService.getEntityWithLogs(ID);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/fetchCompany")

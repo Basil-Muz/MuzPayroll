@@ -1,6 +1,7 @@
 import { MAIN_MENU_ICON_MAP } from "./menuIcons";
 import { MdOutlineDashboard } from "react-icons/md";
 import { MdAccountTree } from "react-icons/md";
+
 export const organizeMenuFromBackend = (rawMenu) => {
   if (!Array.isArray(rawMenu)) return [];
 

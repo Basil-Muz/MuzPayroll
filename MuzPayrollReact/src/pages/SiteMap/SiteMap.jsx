@@ -11,11 +11,12 @@ import Sidebar from "../../components/SideBar/Sidebar";
 import { fetchMainMenu } from "../../services/menu.service";
 import { useAuth } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { organizeSiteMapMenu } from "../../utils/menuUtils";
+import { buildSitemapUIData } from "../../utils/menuUtils.js";
 import { handleApiError } from "../../utils/errorToastResolver";
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
 import Sitemap from "../../components/SiteMap/SiteMap";
+import { js } from "@eslint/js";
 export default function Letters() {
   // const [open, setOpen] = useState(false);    //sidebar state
   // const [backendError, setBackendError] = useState([]);
@@ -42,8 +43,8 @@ export default function Letters() {
         null,
       );
       console.log("Sub menus", response);
-      const sitemapData = organizeSiteMapMenu(
-        response.data,  
+      const sitemapData = buildSitemapUIData(
+        response.data,
         // "System Management",
       );
       setSiteMapData(sitemapData);
@@ -101,7 +102,7 @@ export default function Letters() {
             </div>
 
             <div className="sitemap-card">
-              <Sitemap data={siteMapData} pageType="sitemap"/>
+              <Sitemap data={siteMapData} pageType="sitemap" />
             </div>
           </main>
         </div>

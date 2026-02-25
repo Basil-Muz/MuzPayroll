@@ -72,9 +72,6 @@ public class EntityMst {
     @Column(nullable = false)
     private Boolean EtmActiveYN;
 
-    @Column(nullable = true)
-    private Long EtmAuthInfoID;
-
     @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
 
@@ -139,14 +136,6 @@ public class EntityMst {
 
     public void setEtmActiveYN(Boolean etmActiveYN) {
         EtmActiveYN = etmActiveYN;
-    }
-
-    public Long getEtmAuthInfoID() {
-        return EtmAuthInfoID;
-    }
-
-    public void setEtmAuthInfoID(Long etmAuthInfoID) {
-        EtmAuthInfoID = etmAuthInfoID;
     }
 
     public LocalDate getActiveDate() {

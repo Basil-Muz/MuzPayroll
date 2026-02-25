@@ -7,7 +7,7 @@ export const getLocationAmendList = (locationId) => {
 
 //  Save location
 export const saveLocation = (data) => {
-  return api.post("/location/save", data);
+  return api.post("/entity/save", data);
 };
 
 export const fetchLocaion = (userId, companyId, branchId) => {

@@ -33,13 +33,7 @@ const GeneralInfoForm = function GeneralInfoForm({
   const isLocked = !isUnlocked;
   // const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
 
-  const fieldName = flags.locationForm
-    ? "location"
-    : flags.companyForm
-      ? "company"
-      : flags.branchForm
-        ? "branch"
-        : "name";
+  // const fieldName = "EtmName";
 
   const UserData = localStorage.getItem("loginData");
   const userObj = JSON.parse(UserData);
@@ -72,10 +66,10 @@ const GeneralInfoForm = function GeneralInfoForm({
         nameInputRef.current?.focus();
         // setIsCompanyMenuOpen(true);
       }, 120);
-      // console.log("Field Name :",fieldName);
+      // console.log("Field Name :",EtmName);
       setFocus("name");
     }
-  }, [isUnlocked, isLocked, setFocus, fieldName]);
+  }, [isUnlocked, isLocked, setFocus]);
 
   // useImperativeHandle(ref, () => ({
   //   focusName() {
@@ -266,11 +260,11 @@ const GeneralInfoForm = function GeneralInfoForm({
             <input
               type="text"
               // ref={nameInputRef}
-              className={`form-control ${errors[fieldName] ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+              className={`form-control ${errors.EtmName ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
               placeholder="Enter name"
               disabled={isReadOnly}
-              {...register(fieldName, {
-                required: `Name is required ${fieldName}`,
+              {...register("EtmName", {
+                required: `Name is required Name`,
                 pattern: {
                   value: /^[a-zA-Z0-9\s.-]+$/,
                   message:
@@ -287,16 +281,16 @@ const GeneralInfoForm = function GeneralInfoForm({
                     .map((w) => w[0])
                     .join("")
                     .toUpperCase();
-                  setValue("shortName", short, {
+                  setValue("EtmShortName", short, {
                     shouldDirty: true,
                     shouldValidate: false,
                   });
-                  clearErrors("shortName");
+                  clearErrors("EtmShortName");
                 },
               })}
             />
-            {errors[fieldName] && (
-              <span className="error-message">{errors[fieldName].message}</span>
+            {errors.EtmName && (
+              <span className="error-message">{errors.EtmName.message}</span>
             )}
           </div>
 
@@ -310,9 +304,9 @@ const GeneralInfoForm = function GeneralInfoForm({
             <input
               type="text"
               disabled={isReadOnly}
-              className={`form-control ${errors.shortName ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+              className={`form-control ${errors.EtmShortName ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
               placeholder="eg: TCS, IBM , SAP.."
-              {...register("shortName", {
+              {...register("EtmShortName", {
                 required: "short name is required",
                 pattern: {
                   value: /^[a-zA-Z0-9\s-]+$/,
@@ -320,8 +314,10 @@ const GeneralInfoForm = function GeneralInfoForm({
                 },
               })}
             />
-            {errors.shortName && (
-              <span className="error-message">{errors.shortName.message}</span>
+            {errors.EtmShortName && (
+              <span className="error-message">
+                {errors.EtmShortName.message}
+              </span>
             )}
           </div>
 
@@ -400,7 +396,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
               <div className="image-upload-container">
                 <Controller
-                  name="companyImage"
+                  name="entityImage"
                   control={control}
                   rules={{ required: "Company image is required" }}
                   render={({ field }) => (
@@ -418,7 +414,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
                             // Validate file type
                             if (!file.type.match("image/(png|jpeg|jpg)")) {
-                              setError("companyImage", {
+                              setError("entityImage", {
                                 type: "manual",
                                 message:
                                   "Only PNG, JPG and JPEG files are allowed",
@@ -428,7 +424,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
                             // Validate file size (5MB max)
                             if (file.size > 5 * 1024 * 1024) {
-                              setError("companyImage", {
+                              setError("entityImage", {
                                 type: "manual",
                                 message: "File size must be less than 5MB",
                               });
@@ -571,12 +567,12 @@ const GeneralInfoForm = function GeneralInfoForm({
                       </div>
 
                       {/* Error Message */}
-                      {errors.companyImage && (
+                      {errors.entityImage && (
                         <div className="error-message">
                           {/* <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg> */}
-                          {errors.companyImage.message}
+                          {errors.entityImage.message}
                         </div>
                       )}
 

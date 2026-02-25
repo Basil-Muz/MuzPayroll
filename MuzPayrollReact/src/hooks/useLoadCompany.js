@@ -3,14 +3,13 @@ import { fetchCompany } from "../services/company.service";
 import { handleApiError } from "../utils/errorToastResolver";
 
 export const useLoadCompany = () => {
-
   const [companyList, setCompanyList] = useState([]); //fetch companys
-  
-  const loadCompany = useCallback(async (companyId) => {
-    try {
-      if (!companyId) return;
 
-      const companyResponse = await fetchCompany(companyId);
+  const loadCompany = useCallback(async (userId) => {
+    try {
+      if (!userId) return;
+
+      const companyResponse = await fetchCompany(userId);
 
       const company = companyResponse.data;
       // console.log("Company Listdasfgwsdrg:", company.companyMstID);
