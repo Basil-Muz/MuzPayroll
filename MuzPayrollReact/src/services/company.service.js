@@ -7,7 +7,7 @@ export const getCompanyAmendList = (companyId) => {
 };
 
 export const saveCompany = (data) => {
-  return api.post("/company/save", data);
+  return api.post("/entity/save", data);
 };
 
 export const fetchCompany = (companyId) => {

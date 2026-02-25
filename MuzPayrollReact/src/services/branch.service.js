@@ -7,7 +7,7 @@ export const getBranchAmendList = (branchId) => {
 };
 //  Save branches
 export const saveBranch = (data) => {
-  return api.post("/branch/save", data);
+  return api.post("/entity/save", data);
 };
 
 // Fetch branches by company
@@ -15,8 +15,7 @@ export const fetchBranchesByCompany = (userId, companyId) => {
   return api.get(`/entity/fetchBranch`, {
     params: {
       userId,
-      companyId
-    }
+      companyId,
+    },
   });
 };
-;

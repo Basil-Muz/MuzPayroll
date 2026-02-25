@@ -7,15 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.MuzPayroll.entity.AddressInfoMst;
 import com.example.MuzPayroll.entity.Authorization;
-import com.example.MuzPayroll.entity.BranchMst;
 import com.example.MuzPayroll.entity.EntityLogPK;
-import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.MuzControlCodes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
 public class EntityMstDTO {
@@ -390,7 +386,7 @@ public class EntityMstDTO {
     @JsonIgnore
     private AddressInfoMst addressInfoMst;
 
-    private Long addressInfoID;
+    private AddressInfoMst addressInfoID;
 
     // Authorization
 
@@ -451,11 +447,11 @@ public class EntityMstDTO {
         this.addressInfoMst = addressInfoMst;
     }
 
-    public Long getAddressInfoID() {
+    public AddressInfoMst getAddressInfoID() {
         return addressInfoID;
     }
 
-    public void setAddressInfoID(Long addressInfoID) {
+    public void setAddressInfoID(AddressInfoMst addressInfoID) {
         this.addressInfoID = addressInfoID;
     }
 

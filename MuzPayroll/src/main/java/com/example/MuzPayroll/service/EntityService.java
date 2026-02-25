@@ -712,24 +712,6 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 entity.setEtmImage(dto.getImagePath());
                 entity.setEtmPrefix(dto.getEtmPrefix());
 
-                // addressInfo.setAddress(dto.getAddress());
-                // addressInfo.setAddress1(dto.getAddress1());
-                // addressInfo.setAddress2(dto.getAddress2());
-                // addressInfo.setCountry(dto.getCountry());
-                // addressInfo.setState(dto.getState());
-                // addressInfo.setDistrict(dto.getDistrict());
-                // addressInfo.setPlace(dto.getPlace());
-                // addressInfo.setPincode(dto.getPincode());
-                // addressInfo.setLandlineNumber(dto.getLandlineNumber());
-                // addressInfo.setMobileNumber(dto.getMobileNumber());
-                // addressInfo.setEmail(dto.getEmail());
-                // addressInfo.setDesignation(dto.getDesignation());
-                // addressInfo.setEmployerName(dto.getEmployerName());
-                // addressInfo.setEmployerNumber(dto.getEmployerNumber());
-                // addressInfo.setEmployerEmail(dto.getEmployerEmail());
-                // addressInfo.setWithaffectdate(dto.getWithaffectdate());
-                // addressInfo.setAmendNo(dto.getAmendNo());
-
                 // Set image path if already available in DTO
                 if (dto.getImagePath() != null) {
                         entity.setEtmImage(dto.getImagePath());
@@ -753,9 +735,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
         public EntityMstDTO entityToDto(EntityMst entity) {
 
                 EntityMstDTO dto = new EntityMstDTO();
-                AddressInfoMst addressInfo = new AddressInfoMst();
 
-                // dto.setMstID(entity.getAddressInfoID());
                 dto.setEtmEntityId(entity.getEtmEntityId());
                 dto.setEtmCode(entity.getEtmCode());
                 dto.setEtmName(entity.getEtmName());
@@ -784,7 +764,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 }
 
                 if (entity.getAddressInfoMst() != null) {
-                        dto.setAddressInfoID(entity.getAddressInfoMst().getAddressInfoID());
+                        dto.setAddressInfoID(entity.getAddressInfoID());
                         dto.setAddress(entity.getAddressInfoMst().getAddress());
                         dto.setAddress1(entity.getAddressInfoMst().getAddress1());
                         dto.setAddress2(entity.getAddressInfoMst().getAddress2());
@@ -818,15 +798,21 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                 if ("INSERT".equalsIgnoreCase(mode)) {
 
-                        // ===== SAVE ENTITY =====
-                        savedEntity = entityRepository.save(entity);
-
                         // ===== SAVE Address info =====
                         AddressInfoMst addressInfoMst = entity.getAddressInfoMst();
-                        // addressInfoMst.getAddressInfoID(dto.getMstID());
-
                         AddressInfoMst saveAddress = addressInfoMstRepository.save(addressInfoMst);
-                        dto.setAddressInfoID(saveAddress.getAddressInfoID());
+
+                        // Set the entire object (NOT the ID)
+                        entity.setAddressInfoID(saveAddress);
+
+                        // ===== VALIDATION =====
+                        if (entity.getAddressInfoID() == null) {
+                                throw new RuntimeException("Address Info ID is required");
+                        }
+
+                        savedEntity = entityRepository.save(entity);
+
+                        System.out.println("AddressInfoID" + entity.getAddressInfoMst().getAddressInfoID());
 
                         // ===== SAVE AUTHORIZATION =====
                         Authorization auth = entity.getAuthorization();
@@ -971,7 +957,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                         logDto.setMstID(dto.getMstID());
                         logDto.setAuthId(dto.getAuthId());
-                        logDto.setAddressInfoID(dto.getAddressInfoID());
+                        // logDto.setAddressInfoID(dto.getAddressInfoID());
                         logDto.setEtmCode(dto.getEtmCode());
                         logDto.setEtmName(dto.getEtmName());
                         logDto.setEtmShortName(dto.getEtmShortName());
@@ -1008,9 +994,9 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
         private Response<String> validateAndProcessImage(EntityMstDTO dto) {
                 MultipartFile file = dto.getEtmImage();
 
-                // If no new image uploaded and no existing image path, image is required
+                // // If no new image uploaded and no existing image path, image is required
                 // if ((file == null || file.isEmpty()) && isEmpty(dto.getImagePath())) {
-                // return Response.error("Company image is required");
+                // return Response.error("Entity image is required");
                 // }
 
                 // If new image is uploaded, validate and process it

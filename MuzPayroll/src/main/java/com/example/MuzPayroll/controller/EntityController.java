@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.MuzPayroll.entity.DTO.CompanyDTO;
 import com.example.MuzPayroll.entity.DTO.EntityMstDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
@@ -37,7 +36,7 @@ public class EntityController {
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<EntityMstDTO> saveCompany(
             @ModelAttribute EntityMstDTO dto, // ← This will bind ALL form fields to DTO
-            @RequestParam(value = "companyImage", required = false) MultipartFile entityImage,
+            @RequestParam(value = "entityImage", required = false) MultipartFile entityImage,
             @RequestParam String mode) {
 
         try {
