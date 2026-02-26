@@ -23,7 +23,8 @@
   transition:
     width 250ms ease,
     transform 300ms ease;
-  z-index: 10 ;
+  z-index: 10;
+  overflow: visible;
 }
 
 .sidebar-backdrop {
@@ -34,16 +35,17 @@
 }
 
 .submenu.floating {
-  background: #ffffff;
+  /* background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
-  overflow: hidden;
+  overflow: hidden; */
 
   /* animation */
-  opacity: 0;
+  /* opacity: 0;
   transform: translateX(-6px) scale(0.96);
   animation: submenuEnter 280ms ease-out forwards;
   transform-origin: left center;
+  z-index: 2000; */
 }
 
 @keyframes submenuEnter {
@@ -85,7 +87,7 @@
 .sidebar-top {
   display: flex;
   align-items: center;
-  background-color: var(--background-alt); 
+  background-color: var(--background-alt);
   /* background: linear-gradient(90deg, rgba(240, 43, 230, 0.247), rgba(208, 89, 224, 0.192));  */
   /* gap: 12px; */
   padding: 12px;
@@ -203,15 +205,19 @@
   padding: 12px 8px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
 }
-.sidebar.collapsed .sidebar-nav{
-  padding-top: 7px;
+.sidebar.collapsed .sidebar-nav {
+  padding-top: 6px;
 }
 /* single nav row */
+
+.sidebar-nav > div:last-child {
+  padding-bottom: 1.5rem;
+}
 
 .nav-item {
   display: flex;
@@ -224,6 +230,7 @@
   border: none;
   cursor: pointer;
   position: relative;
+  overflow: visible;
   color: var(--muted);
   text-align: left;
   transition:
@@ -269,7 +276,7 @@
   flex: 1;
   min-width: 0;
   white-space: nowrap;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 .label-text {
   /* font-weight: 600; */
@@ -281,7 +288,6 @@
   transform: translateX(4px);
   color: #c71ebeff;
 }
-
 
 /* badge */
 .nav-badge {
@@ -303,11 +309,11 @@
 /* Tooltip (for collapsed mode) */
 .sidebar .tooltip {
   position: absolute;
-  left: 76px;
-  top: 50%;
+  left: 76px !important;
+  top: 50% !important;
   transform: translateY(-50%);
-  background: #111827;
-  color: #fff;
+  /* background: #111827;
+  color: #fff; */
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 13px;
@@ -317,8 +323,9 @@
   transition:
     opacity 150ms ease,
     transform 150ms ease;
+  width: fit-content;
   transform-origin: left center;
-  z-index: 40;
+  /* z-index: 1400 !important; */
 }
 
 /* show tooltip when collapsed & hovering item */
@@ -345,7 +352,7 @@
   align-items: center;
   gap: 13px;
 }
- .user-avatar {
+.user-avatar {
   width: 36px;
   height: 36px;
   border-radius: 8px;
@@ -526,7 +533,6 @@
 @media (max-width: 900px) {
   .sidebar {
     width: 72px;
-
   }
   .sidebar.expanded {
     width: 126px;
@@ -594,8 +600,8 @@
   .submenu.floating {
     animation: submenuEnterMobile 180ms ease-out forwards;
     left: 5.2rem !important;
-    top:96px !important;
-    width: max-content; 
+    top: 96px !important;
+    width: max-content;
   }
 
   @keyframes submenuEnterMobile {

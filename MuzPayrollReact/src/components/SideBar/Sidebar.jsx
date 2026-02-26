@@ -165,7 +165,7 @@ export default function Sidebar({ forceOpen }) {
         minWidth: "280px",
         maxHeight: "70vh",
         overflowY: "auto",
-        zIndex: 1000,
+        zIndex: 2000,
       };
     },
     [isMobile, sidebarOpen],
@@ -417,7 +417,7 @@ export default function Sidebar({ forceOpen }) {
                       </div>
                     )}
 
-                    {!sidebarOpen && !isMobile && (
+                    {!sidebarOpen && !isMobile && (item.label == "Dashboard"  || item.label === "Sitemap") && (
                       <span className="tooltip">{item.label}</span>
                     )}
                   </button>

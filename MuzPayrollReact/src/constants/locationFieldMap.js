@@ -1,7 +1,7 @@
 export const COMMON_LOCATION_FIELD_MAP = {
-  locationMstID: "locationMstID",
-  location: "location",
-  shortName: "shortName",
+  etmEntityId: "etmEntityId",
+  EtmName: "etmName",
+  EtmShortName: "etmShortName",
   authorizationStatus: "authorizationStatus",
   withaffectdate: "withaffectdate",
   esiRegion: "esiRegion",

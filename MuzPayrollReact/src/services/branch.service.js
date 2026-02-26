@@ -3,7 +3,7 @@ import api from "../api/axiosInstance";
 
 // Fetch Branch amendment list
 export const getBranchAmendList = (branchId) => {
-  return api.get(`/branch/getamendlist/${branchId}`);
+  return api.get(`/entity/getamendlist/${branchId}`);
 };
 //  Save branches
 export const saveBranch = (data) => {

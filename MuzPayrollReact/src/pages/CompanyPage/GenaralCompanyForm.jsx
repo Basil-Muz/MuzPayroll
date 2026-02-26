@@ -10,7 +10,7 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
 //Constants
 import { steps } from "../../constants/FormSteps";
-import { COMMON_COMPANY_FIELD_MAP } from "../../constants/companyFieldMap";
+import { COMMON_ENTITY_FIELD_MAP } from "../../constants/companyFieldMap";
 
 //Hook (flow control)
 import { useSaveForm } from "../../hooks/useSaveForm";
@@ -119,7 +119,7 @@ export default function GenaralCompanyForm() {
   const { setAmendmentData } = useSetAmendmentData({
     amendLenght,
     setValue,
-    fieldMap: COMMON_COMPANY_FIELD_MAP,
+    fieldMap: COMMON_ENTITY_FIELD_MAP,
   });
 
   // From content changes

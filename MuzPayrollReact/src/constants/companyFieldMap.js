@@ -1,10 +1,10 @@
-export const COMMON_COMPANY_FIELD_MAP = {
-  companyMstID: "companyMstID",
-  shortName: "shortName",
+export const COMMON_ENTITY_FIELD_MAP = {
+  etmEntityId: "etmEntityId",
+  EtmShortName: "etmShortName",
   authorizationStatus: "authorizationStatus",
   withaffectdate: "withaffectdate",
-  company: "company",
-  companyImage: "companyImagePath",
+  EtmName: "etmName",
+  EtmImage: "companyImagePath",
   activeDate: "activeDate",
   pincode: "pincode",
   address: "address",

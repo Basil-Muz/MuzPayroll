@@ -2,7 +2,7 @@ import api from "../api/axiosInstance";
 
 //  Fetch location amendment list by locationId
 export const getLocationAmendList = (locationId) => {
-  return api.get(`/location/getamendlist/${locationId}`);
+  return api.get(`/entity/getamendlist/${locationId}`);
 };
 
 //  Save location
