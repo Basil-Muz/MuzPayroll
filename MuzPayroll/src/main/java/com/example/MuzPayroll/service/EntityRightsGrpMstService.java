@@ -244,16 +244,18 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         if (!errors.isEmpty()) {
             return Response.error(errors);
         }
+        // System.out.println("Entityfgvgdfgv"+dto.getEntityMst());
         //Fetching business groupid with entity hierarchy id
-    Long businessGroupId = entityHierarchyInfoRepository
+Long businessGroupId = entityHierarchyInfoRepository
         .findBusinessGroupIdByEntityHierarchyInfoId(
-                dto.getEntityHierarchyInfoID()
+                dto.getEntityMst().getEtmEntityId()
         )
         .orElseThrow(() -> new RuntimeException("Business Group not found"));
 
     // Convert ID → Entity
     EntityHierarchyInfo bgRef =
         entityManager.getReference(EntityHierarchyInfo.class, businessGroupId);
+        // System.out.println("Entityfgvgdfgv"+bgRef);
 
     dto.setEntityHierarchyInfoID(bgRef);
         

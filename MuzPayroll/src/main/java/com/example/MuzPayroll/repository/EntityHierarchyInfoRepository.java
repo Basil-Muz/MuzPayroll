@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.MuzPayroll.entity.EntityHierarchyInfo;
+import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.DTO.EntityRightsGrpMstDTO;
 
 @Repository
@@ -35,7 +36,7 @@ public interface EntityHierarchyInfoRepository extends JpaRepository<EntityHiera
     WHERE eh.ehi_entity_hierarchyid = :entityHierarchyInfoID
     """, nativeQuery = true)
 Optional<Long> findBusinessGroupIdByEntityHierarchyInfoId(
-        @Param("entityHierarchyInfoID") EntityHierarchyInfo entityHierarchyInfoID
+        @Param("entityHierarchyInfoID") Long entityHierarchyInfoID
 );
 
     

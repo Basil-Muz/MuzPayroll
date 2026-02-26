@@ -6,4 +6,5 @@ export const USER_GROUP_FIELD_MAP = {
   activeDate: "activeDate",
   authorizationStatus: "authorizationStatus",
   ugmUserGroupID:"ugmUserGroupID",
+  activeYN: "ugmActiveYN"
 };

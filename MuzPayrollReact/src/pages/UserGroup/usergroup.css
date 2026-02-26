@@ -4,13 +4,13 @@
     padding: var(--header-padding) 13px 21px 18px;
     /* padding-top: 72px; */
     font-family: sans-serif;
-    background-color: #f9f3f9;
+    background-color: var(--bg)
     /* padding-left: 18px; */
 }
 
 .usergroup-page h2 {
     margin-bottom: 20px;
-    color: #333;
+    color: var(--text);
     font-family: "Roboto", sans-serif;
     font-weight: 400;
 }

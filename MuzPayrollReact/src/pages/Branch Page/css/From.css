@@ -182,6 +182,7 @@ body {
 #root {
   min-height: 100vh;
   overflow-x: visible; /* when it hidden scrolling top is blocked*/
+  background-color:var(--bg);
 }
 
 .branch-container-tab {

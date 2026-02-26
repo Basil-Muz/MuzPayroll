@@ -70,7 +70,7 @@ function ListItemForm({
       withaffectdate: toLocalIsoDate(),
     },
   });
-  const { setAmendmentData } = useSetAmendmentData({
+  const { setSeconderyFormData } = useSetAmendmentData({
     setValue,
     fieldMap: ENTITY_FIELD_MAP,
   });
@@ -100,9 +100,10 @@ function ListItemForm({
     // show loader
     showRailLoader("Fetching available " + entity + "..");
     try {
+      console.log("Selected data",data)
       const response = await fetchEntityById(data);
       console.log("Data by id", response);
-      setAmendmentData(response.data);
+      setSeconderyFormData(response.data);
       if (response.data.authorizationStatus === true) setIsVarified(true);
     } catch (error) {
       console.error("Error fetching " + entity, error);
@@ -291,7 +292,7 @@ function ListItemForm({
                     className={`form-control ${errors[ENTITY_FIELD_MAP.code] ? "error" : ""} ${
                       isVarified ? "read-only" : ""
                     }`}
-                    placeholder="Enter Group Code"
+                    placeholder={`Enter Group Code ${ENTITY_FIELD_MAP.code}`}
                     disabled={isVarified}
                     {...register(ENTITY_FIELD_MAP.code, {
                       required: "Group Code is required",
