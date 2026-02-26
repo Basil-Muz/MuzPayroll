@@ -126,13 +126,13 @@
     margin-bottom: 6px;
 }
 
-.usergroup-page .code {
+.advance-card .code {
     font-size: 12.5px;
     font-weight: 600;
     color: var(--brand);
 }
 
-.usergroup-page .status {
+.advance-card .status {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -140,24 +140,24 @@
     color: var(--text-muted);
 }
 
-.usergroup-page .check-icon {
+.advance-card .check-icon {
     color: var(--brand);
     font-size: 14px;
 }
 
-.usergroup-page .card-title {
+.advance-card .card-title {
     font-size: 14.5px;
     font-weight: 600;
     color: var(--text-dark);
 }
 
-.usergroup-page .card-shortname,
-.usergroup-page .card-description {
+.advance-card .card-shortname,
+.advance-card .card-description {
     font-size: 13px;
     color: var(--text-muted);
 }
 
-.usergroup-page .card-description {
+.advance-card .card-description {
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -167,20 +167,20 @@
 
 /* ================= STATUS ================= */
 
-.usergroup-page .status {
+.advance-card .status {
   display: flex;
   align-items: flex-end;
 }
 
 /* Inactive: stacked dates */
-.usergroup-page .status-stack {
+.advance-card .status-stack {
   display: flex;
   flex-direction: column;
   gap: 4px;
   align-items: flex-end;
 }
 
-.usergroup-page .status-item {
+.advance-card .status-item {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -188,7 +188,7 @@
   font-weight: 500;
 }
 
-.usergroup-page .status-item.active {
+.advance-card .status-item.active {
   color: var(--brand);
 }
 

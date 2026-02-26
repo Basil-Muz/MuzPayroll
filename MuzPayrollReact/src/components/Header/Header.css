@@ -11,7 +11,7 @@
   min-height: 66px;
   padding: 0 24px;
   background: var(--background);
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -27,14 +27,16 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 2px;
   background: linear-gradient(
     90deg,
-    var(--brand) 0%,
-    rgba(210, 24, 216, 0.8) 50%,
-    var(--brand) 100%
+    transparent 0%,
+    var(--brand) 20%,
+    var(--brand-light) 50%,
+    var(--brand) 80%,
+    transparent 100%
   );
-  opacity: 0.9;
+  opacity: 0.5;
 }
 
 /* =========================================================
@@ -59,8 +61,8 @@
   height: 42px;
   flex-shrink: 0;
 }
-.logo.logo-border{
-    border-right: 1px solid var(--border-light);
+.logo.logo-border {
+  border-right: 1px solid var(--border-light);
 }
 .logo img {
   height: 38px;
@@ -1375,9 +1377,9 @@
     height: 28px;
     font-size: 12px;
   }
-  .header-icons{
-    width:16px;
-    height:16px;
+  .header-icons {
+    width: 16px;
+    height: 16px;
   }
 }
 

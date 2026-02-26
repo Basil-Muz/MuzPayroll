@@ -1,6 +1,6 @@
 .payroll-group-page {
   min-height: calc(100vh - 60px);
-  background: var(--background);
+  /* background: var(--background); */
   padding-top: 65px;
   overflow: hidden;
 }
