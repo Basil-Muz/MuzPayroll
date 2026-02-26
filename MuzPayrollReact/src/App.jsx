@@ -55,6 +55,8 @@ import Letters from "./pages/Letters/Letters.jsx"
 import Reports from "./pages/Reports/Reports.jsx"
 
 import SiteMap from "./pages/SiteMap/SiteMap.jsx"
+import Department from "./pages/Department/department.jsx";
+
 function App() {
  
   return (
@@ -84,6 +86,7 @@ function App() {
           {/* <Route path="/generalform" element={<LocationGeneralForm />} />
           <Route path="/documentsinfo" element={<LocationDocumentsInfo />} /> */}
           <Route path="/designation" element={<Designation />} />
+          <Route path="/department" element={<Department/>}  />
           <Route path="/branchform" element={<BranchPageForm />} />
           <Route path="/companyform" element={
             <ProtectedRoute>

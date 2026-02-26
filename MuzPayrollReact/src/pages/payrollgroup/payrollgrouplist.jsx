@@ -1,4 +1,4 @@
-import "./payrollgrouplist.css";
+// import "./payrollgrouplist.css";
 
 const PayrollGroupList = ({ data, view, searchText, onSelect }) => {
 
@@ -7,11 +7,11 @@ const PayrollGroupList = ({ data, view, searchText, onSelect }) => {
   );
 
   return (
-    <div className={`payroll-group-container ${view}`}>
+    <div className={`card-grid  ${view}`}>
       {filteredData.map(item => (
         <div
           key={item.code}
-          className="payroll-group-card"
+          className="advance-card"
           onClick={() => onSelect(item)}
         >
           <div className="code">{item.code}</div>
