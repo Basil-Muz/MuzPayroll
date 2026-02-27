@@ -48,13 +48,7 @@ export const useSetAmendmentData = ({ amendLength, setValue, fieldMap }) => {
         if (formField === "authorizationStatus") {
           value = selectedItem.authorizationStatus ? 1 : 0;
         }
-        if (formField === "companyImag") {
-          console.log("Conpamy image path", selectedItem.companyImagePath);
-        }
-        if (formField === "country") {
-          value = selectedItem.country ?? "IN";
-        }
-
+        if(formField !== "entityMst")
         setValue(dataKey, value ?? "", {
           shouldDirty: false,
           shouldValidate: true,

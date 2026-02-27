@@ -35,17 +35,17 @@
 }
 
 .submenu.floating {
-  /* background: #ffffff;
+  background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
-  overflow: hidden; */
+  overflow: hidden;
 
   /* animation */
-  /* opacity: 0;
+  opacity: 0;
   transform: translateX(-6px) scale(0.96);
-  animation: submenuEnter 280ms ease-out forwards;
+  animation: submenuEnter 340ms ease-out forwards;
   transform-origin: left center;
-  z-index: 2000; */
+  z-index: 2000;
 }
 
 @keyframes submenuEnter {

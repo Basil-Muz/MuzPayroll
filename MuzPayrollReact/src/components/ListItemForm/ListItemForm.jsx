@@ -1,8 +1,9 @@
 // React & Core
 import { useForm, Controller } from "react-hook-form";
 import React, { useEffect, useState, useRef } from "react";
-
+  
 // Third-party Libraries
+import { toast } from "react-hot-toast";
 import Select from "react-select";
 import { FaSave } from "react-icons/fa";
 import { BsInbox } from "react-icons/bs";
@@ -62,7 +63,7 @@ function ListItemForm({
     defaultValues: {
       authorizationStatus: 0,
       //   mode:"INSERT",
-      entityMst: user.userEntityHierarchyId,
+      [ENTITY_FIELD_MAP.entityMst]: user.userEntityHierarchyId,
       userCode: user.userCode,
       authorizationDate: toLocalIsoDate(),
       activeDate: toLocalIsoDate(),
@@ -132,32 +133,6 @@ function ListItemForm({
     }, 300); // delay before hiding
   };
 
-  //   const handleMouseDown = (e) => {
-  //     dragging.current = true;
-  //     offset.current = {
-  //       x: e.clientX - position.x,
-  //       y: e.clientY - position.y,
-  //     };
-  //   };
-
-  //   const handleMouseMove = (e) => {
-  //     if (dragging.current) {
-  //       setPosition({
-  //         x: e.clientX - offset.current.x,
-  //         y: e.clientY - offset.current.y,
-  //       });
-  //     }
-  //   };
-  //   const handleMouseUp = () => {
-  //     dragging.current = false;
-  //   };
-
-  //   const handleBlur = (e) => {
-  //     const { name } = e.target;
-  //     setTouched((prev) => ({ ...prev, [name]: true }));
-  //     validate();
-  //   };
-
   const onSubmit = async (values) => {
     const formData = new FormData();
 
@@ -175,7 +150,7 @@ function ListItemForm({
         //  For fresh insert
         await saveEntity(formData, "INSERT");
       else await saveEntity(formData, "UPDATE"); //for edit
-
+      toast.success(entity+" saved successfully")
       // console.log("Save response",response);
     } catch (error) {
       console.error("Error updating " + entity + ":", error);
@@ -292,7 +267,7 @@ function ListItemForm({
                     className={`form-control ${errors[ENTITY_FIELD_MAP.code] ? "error" : ""} ${
                       isVarified ? "read-only" : ""
                     }`}
-                    placeholder={`Enter Group Code ${ENTITY_FIELD_MAP.code}`}
+                    placeholder="Enter Group Code"
                     disabled={isVarified}
                     {...register(ENTITY_FIELD_MAP.code, {
                       required: "Group Code is required",

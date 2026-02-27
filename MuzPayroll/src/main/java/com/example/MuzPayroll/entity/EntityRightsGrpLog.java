@@ -56,6 +56,18 @@ public class EntityRightsGrpLog {
         return ErmCode;
     }
 
+    @ManyToOne
+    @JoinColumn(name = "ehi_entity_hierarchyid")
+    private EntityHierarchyInfo entityHierarchyInfoID; 
+
+    public EntityHierarchyInfo getEntityHierarchyInfoID() {
+        return entityHierarchyInfoID;
+    }
+
+    public void setEntityHierarchyInfoID(EntityHierarchyInfo entityHierarchyInfoID) {
+        this.entityHierarchyInfoID = entityHierarchyInfoID;
+    }
+
     public void setErmCode(String ErmCode) {
         this.ErmCode = ErmCode;
     }

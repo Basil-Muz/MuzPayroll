@@ -3,6 +3,7 @@ package com.example.MuzPayroll.entity.DTO;
 import java.time.LocalDate;
 
 import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.EntityHierarchyInfo;
 import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.EntityRightsGrpLogPK;
 
@@ -21,7 +22,7 @@ public class EntityRightsGrpLogDTO {
 
     private String ErmDesc;
 
-    private EntityMst entityMst;
+    // private EntityMst entityMst;
 
     private Long ErmAuthInfoID;
 
@@ -34,6 +35,19 @@ public class EntityRightsGrpLogDTO {
     private LocalDate authorizationDate;
 
     private Boolean authorizationStatus;
+
+    private Long entityHierarchyInfoID; 
+
+    private EntityHierarchyInfo HierarchyInfoID; 
+
+    public EntityHierarchyInfo getHierarchyInfoID() {
+        return HierarchyInfoID;
+    }
+
+    public void setHierarchyInfoID(EntityHierarchyInfo hierarchyInfoID) {
+        HierarchyInfoID = hierarchyInfoID;
+    }
+
 
     @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
@@ -152,11 +166,20 @@ public class EntityRightsGrpLogDTO {
         this.ErmEntityRightsGroupID = ErmEntityRightsGroupID;
     }
 
-    public EntityMst getEntityMst() {
-        return entityMst;
+    // public EntityMst getEntityMst() {
+    //     return entityMst;
+    // }
+
+    // public void setEntityMst(EntityMst entityMst) {
+    //     this.entityMst = entityMst;
+    // }
+
+      public Long getEntityHierarchyInfoID() {
+        return entityHierarchyInfoID;
     }
 
-    public void setEntityMst(EntityMst entityMst) {
-        this.entityMst = entityMst;
+
+    public void setEntityHierarchyInfoID(Long entityHierarchyInfoID) {
+        this.entityHierarchyInfoID = entityHierarchyInfoID;
     }
 }

@@ -146,7 +146,7 @@ useEffect(() => {
   // }, [searchData]);
 
   useEffect(() => {
-    getAllUserGroups();
+    getAllUserGroups(true);
   }, [showForm]);
 
   const toggleForm = () => {

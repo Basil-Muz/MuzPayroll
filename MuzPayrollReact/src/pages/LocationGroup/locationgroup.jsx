@@ -42,12 +42,9 @@ function LocationGroup() {
   const [showForm, setShowForm] = useState(false);
   const [searchData, setSearchdata] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [flag, setFlag] = useState(false);
   const [headerError, setHeaderError] = useState([]);
   const { showRailLoader, hideLoader } = useLoader();
   const { user } = useAuth();
-  console.log("Entutirjgfdg", user);
 
   const entityId = user.userEntityHierarchyId;
 
@@ -71,7 +68,7 @@ function LocationGroup() {
   };
 
   useEffect(() => {
-    getAllLocationGroups();
+    getAllLocationGroups(true);
   }, [showForm]);
 
   const handleNew = () => {
@@ -102,20 +99,6 @@ function LocationGroup() {
     console.log("Delete clicked");
   };
 
-  // const handlePrint = () => {
-  //     console.log("Print clicked");
-  // };
-
-  // const handleNewPage = () => {
-  //     console.log("New page clicked");
-  // };
-
-  // const handleFlagChange = (newFlag) => {
-  //     setFlag(newFlag);  // update parent state
-  //     setTimeout(() => {
-  //         setFlag(false); // reset flag after 2 seconds
-  //     }, 1000);
-  // };
   const handleSearchChange = (e) => {
     setSearchdata(e.target.value);
   };
@@ -148,11 +131,6 @@ function LocationGroup() {
     }
   };
   const containerStyle = { display: "flex" };
-
-  //   const hanbleSearchChange = (item) => {
-  //     setSelectedItem(item);
-  //     toggleForm();
-  //   };
 
   return (
     <>
@@ -210,45 +188,49 @@ function LocationGroup() {
         </div>
 
         <div className={`card-grid ${listView ? "list" : "tile"}`}>
-          {locationGroupList.map((item) => (
-            <div className="advance-card" key={item.code}>
-              <div className="card-header">
-                <span
-                  className="code"
+          {locationGroupList && locationGroupList.length > 0 ? (
+            locationGroupList.map((item) => (
+              <div className="advance-card" key={item.code}>
+                <div className="card-header">
+                  <span
+                    className="code"
+                    onClick={() => handleDataToForm(item.mstID)}
+                  >
+                    {item.code}
+                  </span>
+
+                  <div className="status">
+                    <TiTick className="check-icon" />
+                    <span className="date">{item.activeDate}</span>
+                  </div>
+                </div>
+
+                <div
+                  className="card-title"
+                  style={listView ? containerStyle : null}
                   onClick={() => handleDataToForm(item.mstID)}
                 >
-                  {item.code}
-                </span>
+                  {item.name}
+                </div>
 
-                <div className="status">
-                  <TiTick className="check-icon" />
-                  <span className="date">{item.activeDate}</span>
+                <div
+                  className="card-shortname"
+                  style={listView ? containerStyle : null}
+                >
+                  {item.shortName}
+                </div>
+
+                <div
+                  className="card-description"
+                  style={listView ? containerStyle : null}
+                >
+                  {item.description}
                 </div>
               </div>
-
-              <div
-                className="card-title"
-                style={listView ? containerStyle : null}
-                onClick={() => handleDataToForm(item.mstID)}
-              >
-                {item.name}
-              </div>
-
-              <div
-                className="card-shortname"
-                style={listView ? containerStyle : null}
-              >
-                {item.shortName}
-              </div>
-
-              <div
-                className="card-description"
-                style={listView ? containerStyle : null}
-              >
-                {item.description}
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="no-data-found">No locations available yet</div>
+          )}
         </div>
 
         {/* <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/> */}
@@ -285,14 +267,6 @@ function LocationGroup() {
             // },
           }}
         />
-
-        {/* {showForm && selectedItem && loading && <Loading />}
-        {showForm && !loading && selectedItem && (
-          <LocationGroupForm data={selectedItem} toggleForm={toggleForm} />
-        )}
-        {showForm && !selectedItem && (
-          <LocationGroupForm data={selectedItem} toggleForm={toggleForm} />
-        )} */}
 
         {showForm && (
           <ListItemForm

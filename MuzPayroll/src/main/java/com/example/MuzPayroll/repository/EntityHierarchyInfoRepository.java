@@ -38,6 +38,6 @@ public interface EntityHierarchyInfoRepository extends JpaRepository<EntityHiera
 Optional<Long> findBusinessGroupIdByEntityHierarchyInfoId(
         @Param("entityHierarchyInfoID") Long entityHierarchyInfoID
 );
-
+Optional<EntityHierarchyInfo> findById(Long id);
     
 }
