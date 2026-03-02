@@ -1,23 +1,34 @@
+/* ================= REACT ================= */
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
+/* ================= THIRD PARTY ================= */
+import { useNavigate } from "react-router-dom";
 import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
-import { TiTick } from "react-icons/ti";
-import { RxCross2 } from "react-icons/rx";
 
+/* ================= CONTEXT / HOOKS ================= */
+import { useAuth } from "../../context/AuthProvider";
+import { useLoader } from "../../context/LoaderContext";
+
+/* ================= SERVICES ================= */
+import {
+  fetchAllLocation,
+  fetchActiveLocation,
+  fetchInactiveLocation,
+} from "../../services/locationlist.service";
+
+/* ================= UTILS ================= */
+import { ensureMinDuration } from "../../utils/loaderDelay";
+import { handleApiError } from "../../utils/errorToastResolver";
+
+/* ================= COMPONENTS ================= */
 import Header from "../../components/Header/Header";
 import Search from "../../components/search/Search";
+import { ListCard } from "../../components/List Card/ListCard";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import Loading from "../../components/Loaders/Loading";
-
-import { useLoader } from "../../context/LoaderContext";
-import { ensureMinDuration } from "../../utils/loaderDelay";
-
-import { useAuth } from "../../context/AuthProvider";
-import { fetchAllLocation, fetchActiveLocation, fetchInactiveLocation } from "../../services/locationlist.service";
 
 const LocationList = () => {
   /* ================= STATE ================= */
@@ -30,17 +41,14 @@ const LocationList = () => {
   const [activeLocation, setActiveLocation] = useState([]);
   const [inactiveLocation, setInactiveLocation] = useState([]);
 
-  const [loading, setLoading] = useState(false);
   const { showRailLoader, hideLoader } = useLoader();
-
-  const [headerError] = useState([]);
 
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const token = user.token;
+  // const token = user.token;
 
-   /* ================= NAVIGATION ================= */
+  /* ================= NAVIGATION ================= */
   const handleCardClick = (mstID) => {
     navigate(`/location/${mstID}`);
   };
@@ -64,7 +72,7 @@ const LocationList = () => {
     try {
       const res = await fetchAllLocation(
         user.userEntityHierarchyId,
-        user.branchEntityHierarchyId
+        user.branchEntityHierarchyId,
       );
       setTimeout(() => {
         setAllLocation(res);
@@ -72,6 +80,7 @@ const LocationList = () => {
         setInactiveLocation([]);
       }, 800);
     } catch (err) {
+      handleApiError(err);
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
@@ -94,18 +103,17 @@ const LocationList = () => {
       const [activeRes, inactiveRes] = await Promise.all([
         fetchActiveLocation(
           user.userEntityHierarchyId,
-          user.branchEntityHierarchyId
+          user.branchEntityHierarchyId,
         ),
         fetchInactiveLocation(
           user.userEntityHierarchyId,
-          user.branchEntityHierarchyId
+          user.branchEntityHierarchyId,
         ),
       ]);
 
       setTimeout(() => {
         setActiveLocation(activeRes);
         setInactiveLocation(inactiveRes);
-        setLoading(false);
       }, 800);
     } catch (err) {
       console.error(err);
@@ -118,41 +126,6 @@ const LocationList = () => {
   const handleClear = () => {
     loadAllLocation();
   };
-  /* ================= CARD ================= */
-  const renderCard = (item, status) => (
-    <div
-      key={item.code}
-      className={`advance-card ${status}`}
-      onClick={() => handleCardClick(item.mstID)}
-    >
-      {/* HEADER */}
-      <div className="card-header">
-        <span className="code">{item.code}</span>
-
-        {status === "inactive" ? (
-          <div className="status-stack">
-            <div className="status-item active">
-              <TiTick />
-              <span>{item.activeDate}</span>
-            </div>
-            <div className="status-item inactive">
-              <RxCross2 />
-              <span>{item.inactiveDate}</span>
-            </div>
-          </div>
-        ) : (
-          <div className="status-item active">
-            <TiTick />
-            <span>{item.activeDate}</span>
-          </div>
-        )}
-      </div>
-
-      {/* BODY */}
-      <div className="card-title">{item.name}</div>
-      <div className="card-shortname">{item.shortName}</div>
-    </div>
-  );
   /* ================= UI ================= */
   return (
     <>
@@ -203,34 +176,44 @@ const LocationList = () => {
           <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
         </div>
 
-        {/* CONTENT */}
-        {loading && <Loading />}
 
-        {!loading && (
-          <>
             {!groupByStatus && (
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                {allLocation.map((item) =>
-                  renderCard(item, item.inactiveDate ? "inactive" : "active"),
-                )}
+                {allLocation.map((item) => (
+                  <ListCard
+                    item={item}
+                    status={item.inactiveDate ? "inactive" : "active"}
+                    handleDataToForm={handleCardClick}
+                  />
+                ))}
               </div>
             )}
 
             {groupByStatus && (
               <>
-                <h3 className="group-title">Active</h3>
+                <h3 className="group-title active">Active</h3>
                 <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {activeLocation.map((item) => renderCard(item, "active"))}
+                  {activeLocation.map((item) => (
+                    <ListCard
+                      item={item}
+                      status="active"
+                      handleDataToForm={handleCardClick}
+                    />
+                  ))}
                 </div>
 
                 <h3 className="group-title inactive">Inactive</h3>
                 <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {inactiveLocation.map((item) => renderCard(item, "inactive"))}
+                  {inactiveLocation.map((item) => (
+                    <ListCard
+                      item={item}
+                      status="inactive"
+                      handleDataToForm={handleCardClick}
+                    />
+                  ))}
                 </div>
               </>
             )}
-          </>
-        )}
 
         <FloatingActionBar
           actions={{

@@ -134,7 +134,7 @@
 
 .context-branch,
 .context-location {
-  color: var(--text-primary, #111827);
+  /* color: var(--text-primary, #111827); */
   font-weight: 500;
   padding: 2px 8px;
   background: transparent; /* No background */

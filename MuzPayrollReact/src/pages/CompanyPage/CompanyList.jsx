@@ -1,23 +1,32 @@
+/* ================= REACT ================= */
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
+/* ================= THIRD PARTY ================= */
+import { useNavigate } from "react-router-dom";
 import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
-import { TiTick } from "react-icons/ti";
-import { RxCross2 } from "react-icons/rx";
 
+/* ================= CONTEXT / HOOKS ================= */
+import { useAuth } from "../../context/AuthProvider";
+import { useLoader } from "../../context/LoaderContext";
+
+/* ================= SERVICES ================= */
+import {
+  fetchAllCompanies,
+  fetchActiveCompanies,
+  fetchInactiveCompanies,
+} from "../../services/companylist.service";
+
+/* ================= UTILS ================= */
+import { ensureMinDuration } from "../../utils/loaderDelay";
+
+/* ================= COMPONENTS ================= */
 import Header from "../../components/Header/Header";
+import { ListCard } from "../../components/List Card/ListCard";
 import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import Loading from "../../components/Loaders/Loading";
-import { useLoader } from "../../context/LoaderContext";
-import { ensureMinDuration } from "../../utils/loaderDelay";
-import { useAuth } from "../../context/AuthProvider";
-import {fetchAllCompanies,fetchActiveCompanies,fetchInactiveCompanies,} from "../../services/companylist.service";
-
-
 
 const CompanyList = () => {
   const [listView, setListView] = useState(false);
@@ -29,14 +38,13 @@ const CompanyList = () => {
   const [activeCompanies, setActiveCompanies] = useState([]);
   const [inactiveCompanies, setInactiveCompanies] = useState([]);
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
-  const token = user.token;
+  // const token = user.token;
   const navigate = useNavigate();
   const { showRailLoader, hideLoader } = useLoader(); //Import functions from context
 
- 
   /* ================= NAVIGATION ================= */
   const handleCardClick = (mstID) => {
     navigate(`/company/${mstID}`);
@@ -111,42 +119,6 @@ const CompanyList = () => {
     loadAllCompanies();
   };
 
-  /* ================= CARD ================= */
-  const renderCard = (item, status) => (
-    <div
-      key={item.code}
-      className={`advance-card ${status}`}
-      onClick={() => handleCardClick(item.mstID)}
-    >
-      {/* HEADER */}
-      <div className="card-header">
-        <span className="code">{item.code}</span>
-
-        {status === "inactive" ? (
-          <div className="status-stack">
-            <div className="status-item active">
-              <TiTick />
-              <span>{item.activeDate}</span>
-            </div>
-            <div className="status-item inactive">
-              <RxCross2 />
-              <span>{item.inactiveDate}</span>
-            </div>
-          </div>
-        ) : (
-          <div className="status-item active">
-            <TiTick />
-            <span>{item.activeDate}</span>
-          </div>
-        )}
-      </div>
-
-      {/* BODY */}
-      <div className="card-title">{item.name}</div>
-      <div className="card-shortname">{item.shortName}</div>
-    </div>
-  );
-
   /* ================= UI ================= */
   return (
     <>
@@ -198,35 +170,47 @@ const CompanyList = () => {
         </div>
 
         {/* CONTENT */}
-        {loading && <Loading />}
+        {/* {loading && <Loading />} */}
 
-        {!loading && (
-          <>
+       
             {!groupByStatus && (
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                {allCompanies.map((item) =>
-                  renderCard(item, item.inactiveDate ? "inactive" : "active"),
-                )}
+                {allCompanies.map((item) => (
+                  // renderCard(item, item.inactiveDate ? "inactive" : "active"),
+                  <ListCard
+                    item={item}
+                    status={item.inactiveDate ? "inactive" : "active"}
+                    handleDataToForm={handleCardClick}
+                  />
+                ))}
               </div>
             )}
 
             {groupByStatus && (
               <>
-                <h3 className="group-title">Active</h3>
+                <h3 className="group-title active">Active</h3>
                 <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {activeCompanies.map((item) => renderCard(item, "active"))}
+                  {activeCompanies.map((item) => (
+                    <ListCard
+                      item={item}
+                      status="active"
+                      handleDataToForm={handleCardClick}
+                    />
+                  ))}
                 </div>
 
                 <h3 className="group-title inactive">Inactive</h3>
                 <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {inactiveCompanies.map((item) =>
-                    renderCard(item, "inactive"),
-                  )}
+                  {inactiveCompanies.map((item) => (
+                    <ListCard
+                      item={item}
+                      status="inactive"
+                      handleDataToForm={handleCardClick}
+                    />
+                  ))}
                 </div>
               </>
             )}
-          </>
-        )}
 
         <FloatingActionBar
           actions={{

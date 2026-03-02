@@ -411,7 +411,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                             // Data exists - get latest data and increment
                             generatedId = maxId + 1;
 
-                            if (generatedId > 3999999L) {
+                            if (generatedId > 39999999L) {
                                 errors.add("Cannot generate ID. Maximum limit (399999) reached for Location: " +
                                         (dto.getErmName() != null ? dto.getErmName() : "Unknown"));
                                 continue;
