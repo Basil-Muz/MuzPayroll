@@ -26,6 +26,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 }) {
   // const watchName = watch("name");
   // const [imageSrc,setImageSrc]=useState(null);
+  // const [generatedCode, setGeneratedCode] = useState("");
   const [rawImage, setRawImage] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
   const fileInputRef = useRef(null);
@@ -39,10 +40,6 @@ const GeneralInfoForm = function GeneralInfoForm({
   const userObj = JSON.parse(UserData);
 
   const branchId = userObj.branchId;
-  // console.log("Branches:", branchId);
-  // console.log("Branch sgsg", UserData);
-
-  // yyyy-MM-dd
 
   useEffect(() => {
     if (companys?.length > 0) {
@@ -61,14 +58,28 @@ const GeneralInfoForm = function GeneralInfoForm({
   }, [companys, setValue, branchList, branchId]);
 
   useEffect(() => {
+    const scrollAndFocus = (element) => {
+      if (!element) return;
+
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center", // centers vertically
+      });
+
+      setTimeout(() => {
+        element.focus();
+      }, 300); // wait for scroll animation
+    };
+
     if (isLocked) {
       setTimeout(() => {
-        nameInputRef.current?.focus();
-        // setIsCompanyMenuOpen(true);
-      }, 120);
-      // console.log("Field Name :");
+        scrollAndFocus(nameInputRef.current);
+      }, 1200);
     } else {
-      setFocus("EtmName");
+      setTimeout(() => {
+        const codeInput = document.querySelector('input[name="EtmCode"]');
+        scrollAndFocus(codeInput);
+      }, 120);
     }
   }, [isUnlocked, isLocked, setFocus]);
 
@@ -125,6 +136,39 @@ const GeneralInfoForm = function GeneralInfoForm({
   //   });
   // };
 
+  // const handleGenerateCode = () => {
+  //   const prefix = flags.companyForm
+  //     ? "CMP"
+  //     : flags.branchForm
+  //       ? "BR"
+  //       : flags.locationForm
+  //         ? "LOC"
+  //         : "ENT";
+
+  //   // Extract existing numbers
+  //   const existingCodes = locationGroupList
+  //     ?.map((item) => item.code)
+  //     .filter((code) => code?.startsWith(prefix))
+  //     .map((code) => parseInt(code.replace(prefix, ""), 10))
+  //     .filter((num) => !isNaN(num));
+
+  //   const nextNumber =
+  //     existingCodes.length > 0 ? Math.max(...existingCodes) + 1 : 1;
+
+  //   const formattedNumber = String(nextNumber).padStart(3, "0");
+
+  //   const newCode = `${prefix}${formattedNumber}`;
+
+  //   setValue("EtmCode", newCode, {
+  //     shouldDirty: true,
+  //     shouldValidate: false,
+  //   });
+  // };
+
+  // useEffect(()=>{
+  //   handleGenerateCode();//code generate only onece
+  // },[])
+
   return (
     <>
       <div className={`gen-form ${isLocked ? "locked" : ""}`}>
@@ -143,17 +187,6 @@ const GeneralInfoForm = function GeneralInfoForm({
           {!flags.companyForm && (
             <div className="branch-form-group">
               <label className="form-label required">Company</label>
-              {/* <input 
-                    type="text" 
-                    className={`form-control ${errors.company ? "error" : ""}`}
-                    placeholder="Select Company"
-                    {...register('company', { required: "Company is required",
-                      pattern:{
-                        value:/^[a-zA-Z0-9\s-]*$/,
-                        message:"Please enter valide company",
-                      }
-                      })}
-                  /> */}
               <Controller
                 name="companyEntity"
                 // ref={(!flags.companyForm)  ? firstFieldRef : null}
@@ -228,28 +261,49 @@ const GeneralInfoForm = function GeneralInfoForm({
             </div>
           )}
 
-          {/* {(!flags.companyForm && !flags.branchForm) && <div className="branch-form-group">
-                  <label className="form-label required">Location</label>
-                  <Controller
-                    name="location"
-                    control={control}
-                    rules={{ required: "Please select a location" }}
-                    render={({ field }) => (
-                      <Select
-                        options={locations}
-                        placeholder="Select location"
-                        isSearchable
-                        classNamePrefix="form-control-select"
-                        className={errors.location ? "error" : ""}
-                        value={field.value}                //  important
-                        onChange={(option) => field.onChange(option)} //  store full object
-                      />
-                    )}
-                  />
-                  {errors.location && (
-                    <span className="error-message">{errors.location.message}</span>
-                  )}
-                </div>} */}
+          <div className="branch-form-group">
+            <label className="form-label required">
+              {flags.locationForm && "Location "}
+              {flags.companyForm && "Company "}
+              {flags.branchForm && "Branch "}
+              Code
+            </label>
+            <input
+              type="text"
+              // ref={nameInputRef}
+              className={`form-control ${errors.EtmCode ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+              placeholder="Enter code"
+              disabled={isReadOnly}
+              {...register("EtmCode", {
+                required: "Code is required",
+                pattern: {
+                  value: /^[A-Z]{2,5}\d{3}$/,
+                  message:
+                    "Code must be uppercase letters followed by 3 digits (e.g., CMP001)",
+                },
+                onChange: (e) => {
+                  const value = e.target.value;
+
+                  if (value.length < 3) return;
+
+                  const short = value
+                    .trim()
+                    .split(/\s+/)
+                    .map((w) => w[0])
+                    .join("")
+                    .toUpperCase();
+                  setValue("EtmShortName", short, {
+                    shouldDirty: true,
+                    shouldValidate: false,
+                  });
+                  clearErrors("EtmShortName");
+                },
+              })}
+            />
+            {errors.EtmCode && (
+              <span className="error-message">{errors.EtmCode.message}</span>
+            )}
+          </div>
 
           <div className="branch-form-group">
             <label className="form-label required">

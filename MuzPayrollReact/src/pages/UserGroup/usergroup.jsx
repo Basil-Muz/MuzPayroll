@@ -130,13 +130,11 @@ function UserGroup() {
 
   const toggleForm = () => {
     setShowForm((prev) => !prev);
-
   };
-  // const handleNew = () => {
-  //   setSelectedItem(null);
-  //   setShowForm(true);
-  // };
-
+  const handleNew = () => {
+    setSelectedItem(null);
+    setShowForm(true);
+  };
 
   const handleDataToForm = (item) => {
     setSelectedItem(item);
@@ -237,6 +235,7 @@ function UserGroup() {
             <div className={`card-grid ${listView ? "list" : "tile"}`}>
               {userGroupList.map((item) => (
                 <ListCard
+                  key={item.mstID}
                   item={item}
                   status="active"
                   handleDataToForm={handleDataToForm}
@@ -244,34 +243,40 @@ function UserGroup() {
               ))}
             </div>
           ) : (
-            <div className="no-data-found">No user groups available yet</div>
+            <div className="no-data-found">No usergroups available yet</div>
           ))}
         {groupByStatus && (
           <>
             <h3 className="group-title active">Active</h3>
-            {activeUserGroups && (
+            {activeUserGroups.length > 0 ? (
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
                 {activeUserGroups.map((item) => (
                   <ListCard
+                    key={item.mstID}
                     item={item}
                     status="active"
                     handleDataToForm={handleDataToForm}
                   />
                 ))}
               </div>
+            ) : (
+              <div className="no-data-found">No usergroups available</div>
             )}
 
             <h3 className="group-title inactive">Inactive</h3>
-            {inactiveUserGroups && (
+            {inactiveUserGroups.length > 0 ? (
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
                 {inactiveUserGroups.map((item) => (
                   <ListCard
+                    key={item.mstID}
                     item={item}
                     status="inactive"
                     handleDataToForm={handleDataToForm}
                   />
                 ))}
               </div>
+            ) : (
+              <div className="no-data-found">No usergroups available</div>
             )}
           </>
         )}
@@ -302,7 +307,7 @@ function UserGroup() {
               disabled: true,
             },
             new: {
-              // onClick: handleNew, //to toggle the usergroup form
+               onClick: handleNew, //to toggle the usergroup form
             },
             // refresh: {
             //   onClick: () => window.location.reload(),  // Refresh the page

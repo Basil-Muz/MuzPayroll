@@ -55,9 +55,6 @@ const CompanyList = () => {
     if (!user?.token) {
       navigate("/");
     }
-  }, []);
-
-  useEffect(() => {
     loadAllCompanies();
   }, []);
 
@@ -114,7 +111,6 @@ const CompanyList = () => {
       hideLoader();
     }
   };
-
   const handleClear = () => {
     loadAllCompanies();
   };
@@ -169,48 +165,54 @@ const CompanyList = () => {
           <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
         </div>
 
-        {/* CONTENT */}
-        {/* {loading && <Loading />} */}
+        {!groupByStatus &&
+          (allCompanies ? (
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {allCompanies.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status={item.inactiveDate ? "inactive" : "active"}
+                  handleDataToForm={handleCardClick}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="no-data-found">No company available yet</div>
+          ))}
 
-       
-            {!groupByStatus && (
+        {groupByStatus && (
+          <>
+            <h3 className="group-title active">Active</h3>
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {activeCompanies.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status="active"
+                  handleDataToForm={handleCardClick}
+                />
+              ))}
+            </div>
+
+            <h3 className="group-title inactive">Inactive</h3>
+
+            {inactiveCompanies.length !== 0 ? (
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                {allCompanies.map((item) => (
-                  // renderCard(item, item.inactiveDate ? "inactive" : "active"),
+                {inactiveCompanies.map((item) => (
                   <ListCard
+                    key={item.mstID}
                     item={item}
-                    status={item.inactiveDate ? "inactive" : "active"}
+                    status="inactive"
                     handleDataToForm={handleCardClick}
                   />
                 ))}
               </div>
+            ) : (
+              <div className="no-data-found">No company available yet</div>
             )}
-
-            {groupByStatus && (
-              <>
-                <h3 className="group-title active">Active</h3>
-                <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {activeCompanies.map((item) => (
-                    <ListCard
-                      item={item}
-                      status="active"
-                      handleDataToForm={handleCardClick}
-                    />
-                  ))}
-                </div>
-
-                <h3 className="group-title inactive">Inactive</h3>
-                <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {inactiveCompanies.map((item) => (
-                    <ListCard
-                      item={item}
-                      status="inactive"
-                      handleDataToForm={handleCardClick}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
+          </>
+        )}
 
         <FloatingActionBar
           actions={{

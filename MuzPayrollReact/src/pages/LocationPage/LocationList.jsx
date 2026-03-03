@@ -176,44 +176,53 @@ const LocationList = () => {
           <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
         </div>
 
+        {!groupByStatus &&
+          (allLocation.length > 0 ? (
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {allLocation.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status={item.inactiveDate ? "inactive" : "active"}
+                  handleDataToForm={handleCardClick}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="no-data-found">No locations available yet</div>
+          ))}
 
-            {!groupByStatus && (
+        {groupByStatus && (
+          <>
+            <h3 className="group-title active">Active</h3>
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {activeLocation.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status="active"
+                  handleDataToForm={handleCardClick}
+                />
+              ))}
+            </div>
+
+            <h3 className="group-title inactive">Inactive</h3>
+            {inactiveLocation.length > 0 ? (
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                {allLocation.map((item) => (
+                {inactiveLocation.map((item) => (
                   <ListCard
+                    key={item.mstID}
                     item={item}
-                    status={item.inactiveDate ? "inactive" : "active"}
+                    status="inactive"
                     handleDataToForm={handleCardClick}
                   />
                 ))}
               </div>
+            ) : (
+              <div className="no-data-found">No locations available yet</div>
             )}
-
-            {groupByStatus && (
-              <>
-                <h3 className="group-title active">Active</h3>
-                <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {activeLocation.map((item) => (
-                    <ListCard
-                      item={item}
-                      status="active"
-                      handleDataToForm={handleCardClick}
-                    />
-                  ))}
-                </div>
-
-                <h3 className="group-title inactive">Inactive</h3>
-                <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {inactiveLocation.map((item) => (
-                    <ListCard
-                      item={item}
-                      status="inactive"
-                      handleDataToForm={handleCardClick}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
+          </>
+        )}
 
         <FloatingActionBar
           actions={{

@@ -29,6 +29,7 @@ import { LOCATION_GROUP_FIELD_MAP } from "../../constants/locationGroupMap";
 /* ================= COMPONENTS ================= */
 import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
+import { ListCard } from "../../components/List Card/ListCard";
 import Header from "../../components/Header/Header";
 import ListItemForm from "../../components/ListItemForm/ListItemForm";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
@@ -234,6 +235,7 @@ function LocationGroup() {
             <div className={`card-grid ${listView ? "list" : "tile"}`}>
               {locationGroupList.map((item) => (
                 <ListCard
+                  key={item.mstID}
                   item={item}
                   status={item.inactiveDate ? "inactive" : "active"}
                   handleDataToForm={handleDataToForm}
@@ -252,6 +254,7 @@ function LocationGroup() {
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
                 {activeLocations.map((item) => (
                   <ListCard
+                    key={item.mstID}
                     item={item}
                     status="active"
                     handleDataToForm={handleDataToForm}
@@ -261,15 +264,20 @@ function LocationGroup() {
             )}
 
             <h3 className="group-title inactive">Inactive</h3>
-            {inactiveLocations && (
+            {inactiveLocations.length > 0 ? (
               <div className={`card-grid ${listView ? "list" : "tile"}`}>
                 {inactiveLocations.map((item) => (
                   <ListCard
+                    key={item.mstID}
                     item={item}
                     status="inactive"
                     handleDataToForm={handleDataToForm}
                   />
                 ))}
+              </div>
+            ) : (
+              <div className="no-data-found">
+                No location groups available yet
               </div>
             )}
           </>

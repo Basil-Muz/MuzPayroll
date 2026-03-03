@@ -173,51 +173,54 @@ const BranchList = () => {
           <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
         </div>
 
-        {/* CONTENT */}
-
         {
           <>
-            {!groupByStatus && (
-              <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                {allBranch.map((item) => (
-                  <ListCard
-                    item={item}
-                    status={item.inactiveDate ? "inactive" : "active"}
-                    handleDataToForm={handleCardClick}
-                  />
-                ))}
-              </div>
-            )}
+            {!groupByStatus &&
+              (allBranch.length > 0 ? (
+                <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                  {allBranch.map((item) => (
+                    <ListCard
+                      key={item.mstID}
+                      item={item}
+                      status={item.inactiveDate ? "inactive" : "active"}
+                      handleDataToForm={handleCardClick}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="no-data-found">No branches available yet</div>
+              ))}
 
             {groupByStatus && (
               <>
                 <h3 className="group-title active">Active</h3>
                 <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {activeBranch.map(
-                    (item) => (
-                      <ListCard
-                        item={item}
-                        status="active"
-                        handleDataToForm={handleCardClick}
-                      />
-                    ),
-                    // renderCard(item, "active")
-                  )}
+                  {activeBranch.map((item) => (
+                    <ListCard
+                      key={item.mstID}
+                      item={item}
+                      status="active"
+                      handleDataToForm={handleCardClick}
+                    />
+                  ))}
                 </div>
 
                 <h3 className="group-title inactive">Inactive</h3>
-                <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {inactiveBranch.map(
-                    (item) => (
+
+                {inactiveBranch.length > 0 ? (
+                  <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                    {inactiveBranch.map((item) => (
                       <ListCard
+                        key={item.mstID}
                         item={item}
                         status="inactive"
                         handleDataToForm={handleCardClick}
                       />
-                    ),
-                    // renderCard(item, "inactive")
-                  )}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-data-found">No branches available yet</div>
+                )}
               </>
             )}
           </>
