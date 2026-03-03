@@ -113,7 +113,7 @@ const Header = ({ backendError = [] }) => {
     }
   };
 
-  const {  setValue } = useForm({
+  const { setValue } = useForm({
     defaultValues: {
       company: null,
       branch: null,
@@ -293,7 +293,9 @@ const Header = ({ backendError = [] }) => {
   }, []);
 
   useEffect(() => {
-    if (companyList.length === 0) return;
+    if (!user || companyList.length === 0) return;
+
+    // if (companyList.length === 0) return;
 
     const companyOption = companyList.find(
       (c) => c.value === Number(user.userEntityHierarchyId),
@@ -305,28 +307,28 @@ const Header = ({ backendError = [] }) => {
         shouldTouch: false,
       });
     }
-  }, [companyList, user.userEntityHierarchyId, setValue]);
+  }, [companyList, user, setValue]);
 
   const contextInitialData = {
-    company: user.userEntityHierarchyId
+    company: user?.userEntityHierarchyId
       ? {
-          value: user.userEntityHierarchyId,
-          label: user.companyName,
-        }
+        value: user.userEntityHierarchyId,
+        label: user?.companyName,
+      }
       : null,
 
-    branch: user.branchId
+    branch: user?.branchId
       ? {
-          value: user.branchId,
-          label: user.branchName,
-        }
+        value: user.branchId,
+        label: user?.branchName,
+      }
       : null,
 
-    location: user.locationId
+    location: user?.locationId
       ? {
-          value: user.locationId,
-          label: user.locationName,
-        }
+        value: user.locationId,
+        label: user?.locationName,
+      }
       : null,
   };
   // console.log("sdfsdfgs", user);
@@ -513,7 +515,7 @@ const Header = ({ backendError = [] }) => {
     <>
       <header className="header" role="banner">
         <div className="header-left">
-          <div className={`logo ${shouldRenderHome? "logo-border" : "" }`}>
+          <div className={`logo ${shouldRenderHome ? "logo-border" : ""}`}>
             <img
               src="/muziris-png.ico"
               alt="Muziris Logo"
@@ -536,15 +538,15 @@ const Header = ({ backendError = [] }) => {
               >
                 <div className="context-summary-content">
                   <span className="context-company">
-                    {user.companyName || "Company"}
+                    {user?.companyName || "Company"}
                   </span>
                   <span className="context-separator">|</span>
                   <span className="context-branch">
-                    {user.branchName || "Branch"}
+                    {user?.branchName || "Branch"}
                   </span>
                   <span className="context-separator">|</span>
                   <span className="context-location">
-                    {user.locationName || "Location"}
+                    {user?.locationName || "Location"}
                   </span>
                 </div>
                 <div className="context-edit-icon">
@@ -765,7 +767,7 @@ const Header = ({ backendError = [] }) => {
               aria-expanded={profileOpen}
             >
               <div className="user-avatar">
-                {user.userName?.charAt(0) || "U"}
+                {user?.userName?.charAt(0) || "U"}
                 {/* <FaUser /> */}
               </div>
             </button>
@@ -779,12 +781,12 @@ const Header = ({ backendError = [] }) => {
               >
                 <div className="profile-header">
                   <div className="profile-avatar">
-                    {user.userName?.charAt(0) || "U"}
+                    {user?.userName?.charAt(0) || "U"}
                     {/* <FaUser /> */}
                   </div>
                   <div className="profile-info">
-                    <h4>{user.userName || "User"}</h4>
-                    <p>{user.role || "Admin"}</p>
+                    <h4>{user?.userName || "User"}</h4>
+                    <p>{user?.role || "Admin"}</p>
                   </div>
                 </div>
 

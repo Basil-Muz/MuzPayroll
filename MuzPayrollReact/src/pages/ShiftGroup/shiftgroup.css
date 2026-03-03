@@ -1,7 +1,7 @@
 .shift-group-page {
   min-height: calc(100vh - 60px);
-  background: var(--background);
   padding-top: 65px;
+  margin-left: 23px;
  }
 
 .shift-group-page .page-title {
@@ -9,6 +9,7 @@
     font-size: 24px;
     font-weight: 500;
     margin-bottom: 14px;
+    
 }
 
 /* ================= SEARCH SIDEBAR ================= */
@@ -34,7 +35,7 @@
 .search-section {
   padding-bottom: 15px;
   margin-bottom: 15px;
-  border-bottom: 1px dotted #999; /* ✅ SEPARATOR */
+  border-bottom: 1px dotted #999; 
 }
 
 .search-sidebar h3 {
@@ -53,7 +54,7 @@
   padding: 8px;
 }
 input[type="radio"] {
-  accent-color:var(--brand); /* Changes the checked color to red */
+  accent-color:var(--brand); 
 }
 
 
@@ -76,10 +77,14 @@ input[type="radio"] {
 .shift-group-page .floating-action-bar {
   position: fixed;
   right: 18px;
-  top: 290px;                 /*  BELOW HEADER + SEARCH */
+  top: 290px;                 
   display: flex;
   flex-direction: column;
   gap: 10px;
   z-index: 1000;
+}
+.shift-group-page .modal-content{
+  top:4%;
+  min-width: 38rem;
 }
 

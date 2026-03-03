@@ -36,7 +36,7 @@ public class CompanyController {
 
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<CompanyDTO> saveCompany(
-            @ModelAttribute CompanyDTO dto, // ← This will bind ALL form fields to DTO
+            @ModelAttribute CompanyDTO dto, // This will bind ALL form fields to DTO
             @RequestParam(value = "companyImage", required = false) MultipartFile companyImage,
             @RequestParam String mode) {
 

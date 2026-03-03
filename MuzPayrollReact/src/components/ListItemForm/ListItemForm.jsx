@@ -1,7 +1,7 @@
 // React & Core
 import { useForm, Controller } from "react-hook-form";
 import React, { useEffect, useState, useRef } from "react";
-  
+
 // Third-party Libraries
 import { toast } from "react-hot-toast";
 import Select from "react-select";
@@ -11,6 +11,9 @@ import { RxCross2 } from "react-icons/rx";
 import DatePicker from "react-datepicker";
 import { MdOutlineCancel } from "react-icons/md";
 import { IoNotificationsSharp } from "react-icons/io5";
+import TimePicker from "react-time-picker";
+import "react-time-picker/dist/TimePicker.css";
+import "react-clock/dist/Clock.css";
 
 // Context / Custom Hooks
 import { useAuth } from "../../context/AuthProvider";
@@ -21,6 +24,8 @@ import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
 import { ensureMinDuration } from "../../utils/loaderDelay";
 import { handleApiError } from "../../utils/errorToastResolver";
 import { toLocalIsoDate, formatDate } from "../../utils/dateFormater";
+import { GrSun, GrMoon } from "react-icons/gr";
+import { LiaAdjustSolid } from "react-icons/lia";
 
 // Styles (always last)
 import "./ListItemForm.css";
@@ -33,6 +38,7 @@ function ListItemForm({
   fetchEntityById,
   ENTITY_FIELD_MAP,
 }) {
+
   //   const [position, setPosition] = useState({ x: 355, y: 43 });
   //   const dragging = useRef(false);
   //   const offset = useRef({ x: 0, y: 0 });
@@ -45,6 +51,7 @@ function ListItemForm({
   const { showRailLoader, hideLoader } = useLoader();
   const { user } = useAuth();
 
+
   const {
     register,
     handleSubmit,
@@ -54,7 +61,7 @@ function ListItemForm({
     setValue,
     reset,
     setFocus,
-    // watch,
+    watch,
     // getValues,
     control,
     formState: { errors },
@@ -101,7 +108,7 @@ function ListItemForm({
     // show loader
     showRailLoader("Fetching available " + entity + "..");
     try {
-      console.log("Selected data",data)
+      console.log("Selected data", data)
       const response = await fetchEntityById(data);
       console.log("Data by id", response);
       setSeconderyFormData(response.data);
@@ -150,7 +157,7 @@ function ListItemForm({
         //  For fresh insert
         await saveEntity(formData, "INSERT");
       else await saveEntity(formData, "UPDATE"); //for edit
-      toast.success(entity+" saved successfully")
+      toast.success(entity + " saved successfully")
       // console.log("Save response",response);
     } catch (error) {
       console.error("Error updating " + entity + ":", error);
@@ -201,11 +208,11 @@ function ListItemForm({
       >
         <div
           className="modal-header"
-          //  onMouseDown={handleMouseDown}
-          //   onMouseMove={handleMouseMove}
-          //   onMouseUp={handleMouseUp}
-          //   onMouseLeave={handleMouseUp}
-          //   style={ {cursor: dragging.current ? 'grabbing' : 'grab'}}
+        //  onMouseDown={handleMouseDown}
+        //   onMouseMove={handleMouseMove}
+        //   onMouseUp={handleMouseUp}
+        //   onMouseLeave={handleMouseUp}
+        //   style={ {cursor: dragging.current ? 'grabbing' : 'grab'}}
         >
           {/* <div className={`slide-container ${showSearch ? 'show' : 'hide'}`}>
         
@@ -264,9 +271,8 @@ function ListItemForm({
                 <div>
                   <input
                     type="text"
-                    className={`form-control ${errors[ENTITY_FIELD_MAP.code] ? "error" : ""} ${
-                      isVarified ? "read-only" : ""
-                    }`}
+                    className={`form-control ${errors[ENTITY_FIELD_MAP.code] ? "error" : ""} ${isVarified ? "read-only" : ""
+                      }`}
                     placeholder="Enter Group Code"
                     disabled={isVarified}
                     {...register(ENTITY_FIELD_MAP.code, {
@@ -289,9 +295,8 @@ function ListItemForm({
                 <div>
                   <input
                     type="text"
-                    className={`form-control ${errors[ENTITY_FIELD_MAP.name] ? "error" : ""} ${
-                      isVarified ? "read-only" : ""
-                    }`}
+                    className={`form-control ${errors[ENTITY_FIELD_MAP.name] ? "error" : ""} ${isVarified ? "read-only" : ""
+                      }`}
                     placeholder="Enter Group Name"
                     disabled={isVarified}
                     {...register(ENTITY_FIELD_MAP.name, {
@@ -314,9 +319,8 @@ function ListItemForm({
                 <div>
                   <input
                     type="text"
-                    className={`form-control ${errors[ENTITY_FIELD_MAP.shortName] ? "error" : ""} ${
-                      isVarified ? "read-only" : ""
-                    }`}
+                    className={`form-control ${errors[ENTITY_FIELD_MAP.shortName] ? "error" : ""} ${isVarified ? "read-only" : ""
+                      }`}
                     placeholder="Enter Short Name"
                     disabled={isVarified}
                     {...register(ENTITY_FIELD_MAP.shortName, {
@@ -331,30 +335,153 @@ function ListItemForm({
                 </div>
               </div>
             </div>
-            {/* Description */}
-            <div className="full-content description">
-              <div className="form-row group-form-textarea">
-                <label className="group-form-label required">Description</label>
-                <div>
-                  <textarea
-                    className={`form-control ${errors[ENTITY_FIELD_MAP.desc] ? "error" : ""} ${
-                      isVarified ? "read-only" : ""
-                    }`}
-                    placeholder="Enter Description"
-                    rows={3}
-                    disabled={isVarified}
-                    {...register(ENTITY_FIELD_MAP.desc, {
-                      required: "Description is required",
-                    })}
+            {/* ================= CONDITIONAL SECTION ================= */}
+
+            {entity === "Shift Group" ? (
+              <>
+                {/* Time From */}
+                <div className="form-row">
+                  <label className="group-form-label required">Time From</label>
+
+                  <Controller
+                    name={ENTITY_FIELD_MAP.timeFrom}
+                    control={control}
+                    rules={{ required: "Time From is required" }}
+                    render={({ field }) => (
+                      <TimePicker
+                        {...field}
+                        format="HH:mm"
+                        disableClock={true}
+                        clearIcon={null}
+                        clockIcon={null}
+                        className={`custom-time-picker ${errors[ENTITY_FIELD_MAP.timeFrom] ? "error" : ""
+                          }`}
+                      />
+                    )}
                   />
-                  {errors[ENTITY_FIELD_MAP.desc] && (
+
+                  {errors[ENTITY_FIELD_MAP.timeFrom] && (
                     <span className="error-message">
-                      {errors[ENTITY_FIELD_MAP.desc].message}
+                      {errors[ENTITY_FIELD_MAP.timeFrom].message}
                     </span>
                   )}
                 </div>
+
+                {/* Time To */}
+                <div className="form-row">
+                  <label className="group-form-label required">Time To</label>
+                  <Controller
+                    name={ENTITY_FIELD_MAP.timeTo}
+                    control={control}
+                    rules={{ required: "Time To is required" }}
+                    render={({ field }) => (
+                      <TimePicker
+                        {...field}
+                        format="HH:mm"
+                        disableClock={true}
+                        clearIcon={null}
+                        clockIcon={null}
+                        className={`custom-time-picker ${errors[ENTITY_FIELD_MAP.timeTo] ? "error" : ""
+                          }`}
+                      />
+                    )}
+                  />
+
+                  {errors[ENTITY_FIELD_MAP.timeTo] && (
+                    <span className="error-message">
+                      {errors[ENTITY_FIELD_MAP.timeTo].message}
+                    </span>
+                  )}
+                </div>
+
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label required">Shift Type</label>
+
+                    <div className="shift-type-container">
+                      <div
+                        className={`shift-type ${watch(ENTITY_FIELD_MAP.shiftType) === "DAY" ? "active" : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(ENTITY_FIELD_MAP.shiftType, "DAY", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <GrSun />
+                      </div>
+
+                      <div
+                        className={`shift-type ${watch(ENTITY_FIELD_MAP.shiftType) === "NIGHT" ? "active" : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(ENTITY_FIELD_MAP.shiftType, "NIGHT", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <GrMoon />
+                      </div>
+
+                      <div
+                        className={`shift-type ${watch(ENTITY_FIELD_MAP.shiftType) === "GENERAL"
+                          ? "active"
+                          : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(ENTITY_FIELD_MAP.shiftType, "GENERAL", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <LiaAdjustSolid />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hidden input for RHF */}
+                  <input
+                    type="hidden"
+                    {...register(ENTITY_FIELD_MAP.shiftType, {
+                      required: "Shift Type is required",
+                    })}
+                  />
+
+                  {errors[ENTITY_FIELD_MAP.shiftType] && (
+                    <span className="error-message">
+                      {errors[ENTITY_FIELD_MAP.shiftType].message}
+                    </span>
+                  )}
+                </div>
+              </>
+            ) : (
+              /* ================= DESCRIPTION ================= */
+              <div className="full-content description">
+                <div className="form-row group-form-textarea">
+                  <label className="group-form-label required">Description</label>
+                  <div>
+                    <textarea
+                      className={`form-control ${errors[ENTITY_FIELD_MAP.desc] ? "error" : ""} ${isVarified ? "read-only" : ""
+                        }`}
+                      placeholder="Enter Description"
+                      rows={3}
+                      disabled={isVarified}
+                      {...register(ENTITY_FIELD_MAP.desc, {
+                        required: "Description is required",
+                      })}
+                    />
+                    {errors[ENTITY_FIELD_MAP.desc] && (
+                      <span className="error-message">
+                        {errors[ENTITY_FIELD_MAP.desc].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Active Date */}
             <div className="full-content">
@@ -369,9 +496,8 @@ function ListItemForm({
                       <DatePicker
                         placeholderText="Select date"
                         disabled={isVarified}
-                        className={`form-control datepicker-input ${
-                          errors.activeDate ? "error" : ""
-                        }`}
+                        className={`form-control datepicker-input ${errors.activeDate ? "error" : ""
+                          }`}
                         popperPlacement="bottom-start"
                         popperContainer={({ children }) => (
                           <div style={{ zIndex: 3000 }}>{children}</div>
@@ -408,21 +534,21 @@ function ListItemForm({
                     // Build options dynamically
                     const options = isVarified
                       ? [
-                          {
-                            value: 1,
-                            label: `VERIFIED : ${data?.date || ""}`,
-                          },
-                        ]
+                        {
+                          value: 1,
+                          label: `VERIFIED : ${data?.date || ""}`,
+                        },
+                      ]
                       : [
-                          {
-                            value: 0,
-                            label: `ENTRY : ${data?.date || ""}`,
-                          },
-                          {
-                            value: 1,
-                            label: "VERIFIED",
-                          },
-                        ];
+                        {
+                          value: 0,
+                          label: `ENTRY : ${data?.date || ""}`,
+                        },
+                        {
+                          value: 1,
+                          label: "VERIFIED",
+                        },
+                      ];
 
                     return (
                       <Select
@@ -452,7 +578,7 @@ function ListItemForm({
               className="save-btn"
               disabled={isVarified}
               style={{ outline: "none" }}
-              // onClick={handleSubmit}
+            // onClick={handleSubmit}
             >
               <FaSave size={20} />
             </button>

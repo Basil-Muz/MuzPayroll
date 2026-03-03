@@ -6,107 +6,114 @@ import ShiftGroupList from "./shiftgrouplist";
 import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
-import ShiftGroupForm from "./shiftgroupform";
 import Loading from "../../components/Loaders/Loading";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import "./shiftgroup.css";
+import ListItemForm from "../../components/ListItemForm/ListItemForm";
+
+import {
+  saveShiftGroup,
+  getShiftGroupById,
+} from "../../services/shiftgroup.service";
+
+import { SHIFT_GROUP_FIELD_MAP } from "../../constants/shiftGroupMap";
 
 function ShiftGroup() {
-
   const [listView, setListView] = useState(false);
   const [showSearch, setShowSearch] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [filters, setFilters] = useState(null);
-  const [headerError] = useState([]);
 
-const [showForm, setShowForm] = useState(false);
-const [selectedItem, setSelectedItem] = useState(null);
-const [loading, setLoading] = useState(false);
-const [flag, setFlag] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-const toggleForm = () => {
-  setShowForm(prev => !prev);
-};
+  const toggleForm = () => setShowForm((prev) => !prev);
 
-
-  // Dummy data
+  /* ================= DUMMY DATA ================= */
   const ShiftGroups = [
-    { code: "SG001", name: "Morning Shift" },
-    { code: "SG002", name: "Evening Shift" },
-    { code: "SG003", name: "Night Shift" } ,
-    { code: "SG001", name: "Morning Shift" },
-    { code: "SG002", name: "Evening Shift" },
-    { code: "SG003", name: "Night Shift" },
-     { code: "SG001", name: "Morning Shift" },
-    { code: "SG002", name: "Evening Shift" },
-    { code: "SG003", name: "Night Shift" },
-     { code: "SG001", name: "Morning Shift" },
-    { code: "SG002", name: "Evening Shift" },
-    { code: "SG003", name: "Night Shift" }
-   
+    {
+      mstID: 1,
+      code: "SG001",
+      name: "Morning Shift",
+      shortName: "MORN",
+      timeFrom: "09:00",
+      timeTo: "17:00",
+      activeDate: "10-01-2024",
+    },
+     {
+      mstID: 2,
+      code: "SG002",
+      name: "Night Shift",
+      shortName: "NIGHT",
+      timeFrom: "21:00",
+      timeTo: "05:00",
+      activeDate: "10-02-2024",
+    },
   ];
 
   /* ================= HANDLERS ================= */
 
+  const handleDataToForm = (mstID) => {
+    setSelectedItem(mstID);
+    setShowForm(true);
+  };
+
+  const handleNew = () => {
+    setSelectedItem(null);
+    setShowForm(true);
+  };
+
   const handleSearchApply = (searchFilters) => {
     setFilters(searchFilters);
-    setShowSearch(false); // close slide search
+    setShowSearch(false);
   };
 
   const handleClear = () => {
     setFilters(null);
     setSearchText("");
-    setShowSearch(true); // go back to search-only screen
+    setShowSearch(true);
   };
 
-  const handleSearchInput = (e) => {
-    setSearchText(e.target.value);
-  };
+  const handleSearchInput = (e) => setSearchText(e.target.value);
 
-const handleSelect = (item) => {
-  setSelectedItem(item);   // pass data to form
-  setShowForm(true);       // open modal
-};
-
-
-  const hasDataView = !showSearch; 
+  const hasDataView = !showSearch;
 
   return (
     <>
-    
-      <Header backendError={headerError} />
+      <Header />
 
       <div className="shift-group-page">
-            
-              {/* ================= HEADER (ONLY WHEN DATA SHOWN) ================= */}
-             
+
+        {/* HEADER */}
         {hasDataView && (
           <div className="header-section">
-           <h2 className="page-title">Shift Group</h2>
+            <h2 className="page-title">Shift Group</h2>
 
             <div className="header-actions">
-              {/* View Toggle */}
               <div className="view-toggle">
-              <button className={`icon-btn ${!listView ? "active" : ""}`} 
-              title="Tile View" onClick={() => setListView(false)}>
-                <BsGrid3X3GapFill size={18} />
+                <button
+                  className={`icon-btn ${!listView ? "active" : ""}`}
+                  onClick={() => setListView(false)}
+                >
+                  <BsGrid3X3GapFill size={18} />
                 </button>
-                <button className={`icon-btn ${listView ? "active" : ""}`}
-                title="List View" onClick={() => setListView(true)}>
-                  <FaListUl size={18} />
-                  </button>
 
-                {/*  SEARCH ICON (NO GROUP ICON) */}
+                <button
+                  className={`icon-btn ${listView ? "active" : ""}`}
+                  onClick={() => setListView(true)}
+                >
+                  <FaListUl size={18} />
+                </button>
+
                 <button
                   className={`icon-btn ${showSearch ? "active" : ""}`}
-                  title="Search"
                   onClick={() => setShowSearch(!showSearch)}
                 >
                   <IoIosSearch size={18} />
                 </button>
               </div>
 
-              {/* Inline Search */}
               <div className="search-box">
                 <IoIosSearch size={18} />
                 <input
@@ -120,71 +127,45 @@ const handleSelect = (item) => {
           </div>
         )}
 
-        {/* ================= SLIDE SEARCH ================= */}
-        {showSearch && (
-          <ShiftGroupSearch onApply={handleSearchApply} />
-        )}
+        {/* SEARCH PANEL */}
+        {showSearch && <ShiftGroupSearch onApply={handleSearchApply} />}
 
-        {/* ================= LIST / TILE VIEW ================= */}
+        {/* LIST */}
         {!showSearch && (
           <ShiftGroupList
             data={ShiftGroups}
             view={listView ? "list" : "tile"}
             searchText={searchText}
-            filters={filters}
-            onSelect={handleSelect}
+            handleDataToForm={handleDataToForm}
           />
         )}
 
-        {/* ================= FLOATING ACTION BAR (DATA ONLY) ================= */}
+   
+
+        {/* FLOATING BAR */}
         {!showSearch && (
           <FloatingActionBar
             actions={{
-              save: {
-                onClick: () => console.log("Save Shift Group"),
-                disabled: true,
-              },
-              // search: {
-              //   onClick: () => setShowSearch(true),
-              // },
-              clear: {
-                onClick: handleClear,
-              },
-              delete: {
-                onClick: () => console.log("Delete Shift Group"),
-                disabled: true,
-              },
-              // print: {
-              //   onClick: () => console.log("Print Shift Group"),
-              //   disabled: true,
-              // },
-              new: {
-                onClick: () => {
-                    setSelectedItem(null);
-                    setShowForm(true);
-                },
-              },
-              refresh: {
-                onClick: () => window.location.reload(),
-              },
+              clear: { onClick: handleClear },
+              new: { onClick: handleNew },
+              refresh: { onClick: () => window.location.reload() },
             }}
           />
-          
         )}
-{/* ================= SHIFT GROUP FORM ================= */}
-{showForm && loading && <Loading />}
 
-{showForm && !loading && (
-  <ShiftGroupForm
-    data={selectedItem}
-    toggleForm={toggleForm}
-  />
-)}
-
-{flag && <Loading />}
-
-<BackToTop />
-
+        {loading && <Loading />}
+             {/* FORM */}
+        {showForm && (
+          <ListItemForm
+            entity="Shift Group"
+            data={selectedItem}
+            toggleForm={toggleForm}
+            saveEntity={saveShiftGroup}
+            fetchEntityById={getShiftGroupById}
+            ENTITY_FIELD_MAP={SHIFT_GROUP_FIELD_MAP}
+          />
+        )}
+        <BackToTop />
       </div>
     </>
   );

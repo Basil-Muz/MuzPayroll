@@ -58,7 +58,7 @@ import SiteMap from "./pages/SiteMap/SiteMap.jsx"
 import Department from "./pages/Department/department.jsx";
 
 function App() {
- 
+
   return (
     <>
       <AuthProvider>
@@ -68,12 +68,15 @@ function App() {
           <Route path="/" element={<Navigate to="/payroll" replace />} />
           <Route path="/payroll" element={<LoginPage />} />
           <Route path="/payrollemp" element={<LoginPage />} />
-          <Route path="/home" element={<LoggedPage />} />
+          <Route path="/home" element={<ProtectedRoute><LoggedPage /></ProtectedRoute>} />
           {/* <Route path="/company" element={<Companyform />} />
           <Route path="/generalform" element={<GeneralForm />} /> */}
           <Route path="/documentsinfo" element={<DocumentsInfo />} />
           <Route path="/masters/:rowNumber" element={<MasterPage />} />
-          <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/changepassword" element={
+            <ProtectedRoute>
+              <ChangePassword />
+            </ProtectedRoute>} />
 
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/settings/:rowNumber" element={<Settings />} />
@@ -86,7 +89,7 @@ function App() {
           {/* <Route path="/generalform" element={<LocationGeneralForm />} />
           <Route path="/documentsinfo" element={<LocationDocumentsInfo />} /> */}
           <Route path="/designation" element={<Designation />} />
-          <Route path="/department" element={<Department/>}  />
+          <Route path="/department" element={<Department />} />
           <Route path="/branchform" element={<BranchPageForm />} />
           <Route path="/companyform" element={
             <ProtectedRoute>
@@ -151,7 +154,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-            <Route
+          <Route
             path="/letters/:rowNumber"
             element={
               <ProtectedRoute>
@@ -159,7 +162,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-            <Route
+          <Route
             path="/reports/:rowNumber"
             element={
               <ProtectedRoute>
@@ -167,7 +170,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-                      <Route
+          <Route
             path="/sitemap"
             element={
               <ProtectedRoute>

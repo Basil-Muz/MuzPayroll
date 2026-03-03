@@ -1,7 +1,7 @@
 /* ================= CONTAINER ================= */
 
 .shift-group-container {
-  padding-left: 15px;      /* ✅ LEFT spacing (THIS was missing) */
+  padding-left: 15px;      /*  LEFT spacing (THIS was missing) */
   padding-right: 100px;    /* space for floating bar */
   max-width: calc(100% - 90px);
   will-change: opacity, transform;

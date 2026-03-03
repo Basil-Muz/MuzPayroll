@@ -6,7 +6,9 @@ import PayrollGroupList from "./payrollgrouplist";
 import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
-
+import ListItemForm from "../../components/ListItemForm/ListItemForm";
+import { savePayrollGroup, getPayrollGroupById } from "../../services/payrollgroup.service";
+import { PAYROLL_GROUP_FIELD_MAP } from "../../constants/payrollGroupMap";
 import "./payrollgroup.css";
 
 function PayrollGroup() {
@@ -17,56 +19,73 @@ function PayrollGroup() {
   const [filters, setFilters] = useState(null);
   const [headerError] = useState([]);
 
+  const [showForm, setShowForm] = useState(false);
+
+
   // Dummy data
-const payrollGroups = [
-  {
-    mstID: 1,
-    code: "PG001",
-    name: "Monthly Payroll",
-    shortName: "MONTHLY",
-    description: "Processes salary on a monthly basis.",
-    activeDate: "01-01-2024",
-    inactiveDate: null,
-  },
-  {
-    mstID: 2,
-    code: "PG002",
-    name: "Weekly Payroll",
-    shortName: "WEEKLY",
-    description: "Processes salary every week.",
-    activeDate: "01-03-2024",
-    inactiveDate: null,
-  },
-  {
-    mstID: 3,
-    code: "PG003",
-    name: "Minimum Wages",
-    shortName: "MINWAGE",
-    description: "Payroll group for minimum wage employees.",
-    activeDate: "15-02-2024",
-    inactiveDate: "31-12-2024",
-  },
-  {
-    mstID: 4,
-    code: "PG004",
-    name: "Contract Payroll",
-    shortName: "CONTRACT",
-    description: "Payroll for contract-based employees.",
-    activeDate: "01-04-2024",
-    inactiveDate: null,
-  },
-  {
-    mstID: 5,
-    code: "PG005",
-    name: "Executive Payroll",
-    shortName: "EXEC",
-    description: "Payroll group for executive employees.",
-    activeDate: "10-01-2024",
-    inactiveDate: "30-09-2024",
-  },
-];
+  const payrollGroups = [
+    {
+      mstID: 1,
+      code: "PG001",
+      name: "Monthly Payroll",
+      shortName: "MONTHLY",
+      description: "Processes salary on a monthly basis.",
+      activeDate: "01-01-2024",
+      inactiveDate: null,
+    },
+    {
+      mstID: 2,
+      code: "PG002",
+      name: "Weekly Payroll",
+      shortName: "WEEKLY",
+      description: "Processes salary every week.",
+      activeDate: "01-03-2024",
+      inactiveDate: null,
+    },
+    {
+      mstID: 3,
+      code: "PG003",
+      name: "Minimum Wages",
+      shortName: "MINWAGE",
+      description: "Payroll group for minimum wage employees.",
+      activeDate: "15-02-2024",
+      inactiveDate: "31-12-2024",
+    },
+    {
+      mstID: 4,
+      code: "PG004",
+      name: "Contract Payroll",
+      shortName: "CONTRACT",
+      description: "Payroll for contract-based employees.",
+      activeDate: "01-04-2024",
+      inactiveDate: null,
+    },
+    {
+      mstID: 5,
+      code: "PG005",
+      name: "Executive Payroll",
+      shortName: "EXEC",
+      description: "Payroll group for executive employees.",
+      activeDate: "10-01-2024",
+      inactiveDate: "30-09-2024",
+    },
+  ];
 
   /* ================= HANDLERS ================= */
+
+  const toggleForm = () => {
+    setShowForm((prev) => !prev);
+  };
+
+  const handleDataToForm = (item) => {
+    setSelectedItem(item.mstID); // edit mode
+    setShowForm(true);
+  };
+
+  const handleNew = () => {
+    setSelectedItem(null); // new record
+    setShowForm(true);
+  };
 
   const handleSearchApply = (searchFilters) => {
     setFilters(searchFilters);
@@ -89,16 +108,17 @@ const payrollGroups = [
 
   const hasDataView = !showSearch;
 
-  const handleDataToForm = (item) => {
-    setSelectedItem(item);
-    toggleForm();
-  };
+  // const handleDataToForm = (item) => {
+  //   setSelectedItem(item);
+  //   toggleForm();
+  // };
 
   return (
     <>
       <Header backendError={headerError} />
 
       <div className="payroll-group-page">
+
         {/* ================= HEADER (ONLY WHEN DATA SHOWN) ================= */}
 
         {hasDataView && (
@@ -161,16 +181,7 @@ const payrollGroups = [
             handleDataToForm={handleDataToForm}
           />
         )}
-        {/* {showForm && (
-          <ListItemForm
-            entity="User Group"
-            data={selectedItem}
-            toggleForm={toggleForm}
-            saveEntity={saveUserGroup}
-            fetchEntityById={getUserGroupById}
-            ENTITY_FIELD_MAP={USER_GROUP_FIELD_MAP}
-          />
-        )} */}
+
 
         {/* ================= FLOATING ACTION BAR (DATA ONLY) ================= */}
         {!showSearch && (
@@ -195,7 +206,7 @@ const payrollGroups = [
               //   disabled: true,
               // },
               new: {
-                onClick: () => console.log("New Payroll Group"),
+                onClick: () => handleNew(),
               },
               refresh: {
                 onClick: () => window.location.reload(),
@@ -203,6 +214,17 @@ const payrollGroups = [
             }}
           />
         )}
+        {showForm && (
+          <ListItemForm
+            entity="Payroll Group"
+            data={selectedItem}
+            toggleForm={toggleForm}
+            saveEntity={savePayrollGroup}
+            fetchEntityById={getPayrollGroupById}
+            ENTITY_FIELD_MAP={PAYROLL_GROUP_FIELD_MAP}
+          />
+        )}
+
       </div>
     </>
   );
