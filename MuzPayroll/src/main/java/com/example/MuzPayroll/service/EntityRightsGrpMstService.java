@@ -101,7 +101,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                         rowErrors.add("Short name is required");
                     if (dto.getActiveDate() == null)
                         rowErrors.add("Active date is required");
-                    if (isEmpty(dto.getEntityMst()))
+                    if (dto.getEntityHierarchyInfoID()== null)
                         rowErrors.add("Enity ID is required");
 
                     // Add row errors to main error list with row number
@@ -151,8 +151,6 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                         rowErrors.add("Short name is required");
                     if (dto.getActiveDate() == null)
                         rowErrors.add("Active date is required");
-                    if (isEmpty(dto.getEntityMst()))
-                        rowErrors.add("Enity ID is required");
                     if (dto.getWithaffectdate() == null)
                         rowErrors.add("With affect date is required");
                     if (dto.getAuthorizationDate() == null)
@@ -225,7 +223,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
             logDto.setUserCode(dto.getUserCode());
             logDto.setAmendNo(dto.getAmendNo());
             logDto.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
-            logDto.setEntityMst(dto.getEntityMst());
+            logDto.setEntityHierarchyInfoID(dto.getEntityHierarchyInfoID());
 
             logDtos.add(logDto);
         }
@@ -244,18 +242,22 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         if (!errors.isEmpty()) {
             return Response.error(errors);
         }
+        // System.out.println("Entityfgvgdfgv"+dto.getEntityHierarchyInfoID());
+        //   System.out.println("Entity  "+dto.getEntityHierarchyInfoID().getInfoID());
         //Fetching business groupid with entity hierarchy id
-    Long businessGroupId = entityHierarchyInfoRepository
-        .findBusinessGroupIdByEntityHierarchyInfoId(
+        Long businessGroupId =
+        entityHierarchyInfoRepository.findBusinessGroupIdByEntityHierarchyInfoId(
                 dto.getEntityHierarchyInfoID()
         )
-        .orElseThrow(() -> new RuntimeException("Business Group not found"));
+        .orElseThrow(() -> new RuntimeException("Hierarchy not found"));
 
-    // Convert ID → Entity
-    EntityHierarchyInfo bgRef =
-        entityManager.getReference(EntityHierarchyInfo.class, businessGroupId);
+        // Long businessGroupId = hierarchyInfo.getEhiBusinessGroupID();
+// System.out.println("Entity  "+businessGroupId);
+        // EntityHierarchyInfo businessGroupRef =
+        // entityManager.getReference(EntityHierarchyInfo.class, businessGroupId);
+        // System.out.println("Entityfgvgdfgv"+businessGroupRef);
 
-    dto.setEntityHierarchyInfoID(bgRef);
+    dto.setEntityHierarchyInfoID(businessGroupId);
         
 
         if ("INSERT".equals(mode)) {
@@ -330,7 +332,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         DtoLog.setAuthorizationDate(dto.getAuthorizationDate());
         DtoLog.setAuthorizationStatus(dto.getAuthorizationStatus());
         DtoLog.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
-        DtoLog.setEntityMst(dto.getEntityMst());
+        DtoLog.setErmEntityRightsGroupID(dto.getErmEntityRightsGroupID());
         DtoLogs.add(DtoLog);
         return DtoLogs;
 
@@ -404,12 +406,12 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
 
                         if (maxId == null) {
                             // No data in DB - start from 100000
-                            generatedId = 1100011L;
+                            generatedId = 10100011L;
                         } else {
                             // Data exists - get latest data and increment
                             generatedId = maxId + 1;
 
-                            if (generatedId > 399999L) {
+                            if (generatedId > 39999999L) {
                                 errors.add("Cannot generate ID. Maximum limit (399999) reached for Location: " +
                                         (dto.getErmName() != null ? dto.getErmName() : "Unknown"));
                                 continue;
@@ -475,7 +477,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                         Response<Long> responseLogMaxRowNo = entityRightsGrpLogService.getMaxRowNo(transID);
 
                         Long mstId = dto.getErmEntityRightsGroupID();
-                        System.out.println("Mstid " + mstId);
+                        // System.out.println("Mstid " + mstId);
 
                         Long authId = authorizationRepository
                                 .findLatestAuthIdByMstId(mstId)
@@ -648,7 +650,15 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
 
         // Set ALL fields from the first DTO
         entity.setErmEntityGroupID(dto.getErmEntityRightsGroupID());
-        entity.setEntityMst(dto.getEntityMst());
+         if (dto.getEntityHierarchyInfoID() != null) {
+            EntityHierarchyInfo hierarchy =
+                entityHierarchyInfoRepository.findById(
+                        dto.getEntityHierarchyInfoID()
+                ).orElseThrow(() ->
+                        new RuntimeException("Hierarchy not found"));
+
+            entity.setEntityHierarchyInfoID(hierarchy);
+        }
         entity.setErmCode(dto.getErmCode());
         entity.setErmDesc(dto.getErmDesc());
         entity.setErmName(dto.getErmName());
@@ -676,7 +686,11 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         dto.setAuthorization(entity.getAuthorization());
         dto.setActiveDate(entity.getActiveDate());
         dto.setInactiveDate(entity.getInactiveDate());
-        dto.setEntityMst(entity.getEntityMst());
+           if (entity.getEntityHierarchyInfoID() != null) {
+            dto.setEntityHierarchyInfoID(
+                entity.getEntityHierarchyInfoID().getInfoID()
+            );
+        }
         // dto.setEntityMstID(entity.getEntityMst().getEtmEntityID());
         dto.setErmCode(entity.getErmCode());
         dto.setErmDesc(entity.getErmDesc());

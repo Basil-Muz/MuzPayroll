@@ -7,6 +7,7 @@ export const getLocationGroupsList = (companyId, activeStatusYN) => {
     params: {
       bussinessGroupId:companyId,
       ErmActiveYN:activeStatusYN,
+      activeStatusYN:activeStatusYN,
     },
   });
 };

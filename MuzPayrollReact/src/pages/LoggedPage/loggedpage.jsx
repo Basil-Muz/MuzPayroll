@@ -266,11 +266,11 @@ function LoggedPage() {
         "LIST",
         user.userMstId,
         user.solutionId,
-        user.defaultEntityHierarchyId,
+        selectedLocationId,
         1,
         null,
       );
-      console.log("Main Menu", response);
+      // console.log("Main Menu", response);
       const organizedMenu = organizeMenuFromBackend(response.data);
       // console.log("Organized menu", organizedMenu);
       updateMenus(organizedMenu);

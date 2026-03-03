@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import React, { useEffect, useState, useRef } from "react";
 
 // Third-party Libraries
+import { toast } from "react-hot-toast";
 import Select from "react-select";
 import { FaSave } from "react-icons/fa";
 import { BsInbox } from "react-icons/bs";
@@ -62,7 +63,7 @@ function ListItemForm({
     defaultValues: {
       authorizationStatus: 0,
       //   mode:"INSERT",
-      entityMst: user.userEntityHierarchyId,
+      [ENTITY_FIELD_MAP.entityMst]: user.userEntityHierarchyId,
       userCode: user.userCode,
       authorizationDate: toLocalIsoDate(),
       activeDate: toLocalIsoDate(),
@@ -70,7 +71,7 @@ function ListItemForm({
       withaffectdate: toLocalIsoDate(),
     },
   });
-  const { setAmendmentData } = useSetAmendmentData({
+  const { setSeconderyFormData } = useSetAmendmentData({
     setValue,
     fieldMap: ENTITY_FIELD_MAP,
   });
@@ -100,9 +101,10 @@ function ListItemForm({
     // show loader
     showRailLoader("Fetching available " + entity + "..");
     try {
+      // console.log("Selected data",data)
       const response = await fetchEntityById(data);
-      console.log("Data by id", response);
-      setAmendmentData(response.data);
+      // console.log("Data by id", response);
+      setSeconderyFormData(response.data);
       if (response.data.authorizationStatus === true) setIsVarified(true);
     } catch (error) {
       console.error("Error fetching " + entity, error);
@@ -131,32 +133,6 @@ function ListItemForm({
     }, 300); // delay before hiding
   };
 
-  //   const handleMouseDown = (e) => {
-  //     dragging.current = true;
-  //     offset.current = {
-  //       x: e.clientX - position.x,
-  //       y: e.clientY - position.y,
-  //     };
-  //   };
-
-  //   const handleMouseMove = (e) => {
-  //     if (dragging.current) {
-  //       setPosition({
-  //         x: e.clientX - offset.current.x,
-  //         y: e.clientY - offset.current.y,
-  //       });
-  //     }
-  //   };
-  //   const handleMouseUp = () => {
-  //     dragging.current = false;
-  //   };
-
-  //   const handleBlur = (e) => {
-  //     const { name } = e.target;
-  //     setTouched((prev) => ({ ...prev, [name]: true }));
-  //     validate();
-  //   };
-
   const onSubmit = async (values) => {
     const formData = new FormData();
 
@@ -174,7 +150,7 @@ function ListItemForm({
         //  For fresh insert
         await saveEntity(formData, "INSERT");
       else await saveEntity(formData, "UPDATE"); //for edit
-
+      toast.success(entity + " saved successfully");
       // console.log("Save response",response);
     } catch (error) {
       console.error("Error updating " + entity + ":", error);
@@ -472,22 +448,18 @@ function ListItemForm({
 
           <div className="form-buttons">
             <button
-              type="submit"
-              className="save-btn"
-              disabled={isVarified}
-              style={{ outline: "none" }}
-              // onClick={handleSubmit}
-            >
-              <FaSave size={20} />
-            </button>
-            <button
               type="button"
               className="cancel-btn"
-              disabled={isVarified}
-              style={{ outline: "none" }}
               onClick={handleClear}
+              disabled={isVarified}
             >
-              <MdOutlineCancel size={20} />
+              <MdOutlineCancel size={18} />
+              <span>Cancel</span>
+            </button>
+
+            <button type="submit" className="save-btn" disabled={isVarified}>
+              <FaSave size={18} />
+              <span>Save</span>
             </button>
           </div>
         </form>

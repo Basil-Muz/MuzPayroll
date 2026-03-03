@@ -31,7 +31,7 @@ public class EntityRightsGrpMstDTO {
 
     private Boolean ErmActiveYN;
 
-    private EntityMst entityMst;
+    // private EntityMst entityMst;
 
     // private Long entityMstID;
 
@@ -51,13 +51,23 @@ public class EntityRightsGrpMstDTO {
 
     private LocalDate withaffectdate;
 
-    private EntityHierarchyInfo entityHierarchyInfoID;
+    private Long entityHierarchyInfoID;
 
-    public EntityHierarchyInfo getEntityHierarchyInfoID() {
+    private EntityHierarchyInfo HierarchyInfoID;
+
+    public EntityHierarchyInfo getHierarchyInfoID() {
+        return HierarchyInfoID;
+    }
+
+    public void setHierarchyInfoID(EntityHierarchyInfo hierarchyInfoID) {
+        HierarchyInfoID = hierarchyInfoID;
+    }
+
+    public Long getEntityHierarchyInfoID() {
         return entityHierarchyInfoID;
     }
 
-    public void setEntityHierarchyInfoID(EntityHierarchyInfo entityHierarchyInfoID) {
+    public void setEntityHierarchyInfoID(Long entityHierarchyInfoID) {
         this.entityHierarchyInfoID = entityHierarchyInfoID;
     }
 
@@ -181,13 +191,13 @@ public class EntityRightsGrpMstDTO {
         this.withaffectdate = withaffectdate;
     }
 
-    public EntityMst getEntityMst() {
-        return entityMst;
-    }
+    // public EntityMst getEntityMst() {
+    //     return entityMst;
+    // }
 
-    public void setEntityMst(EntityMst entityMst) {
-        this.entityMst = entityMst;
-    }
+    // public void setEntityMst(EntityMst entityMst) {
+    //     this.entityMst = entityMst;
+    // }
 
     public List<EntityRightsGrpLogDTO> getEntityRightsGrpLogDTOs() {
         return entityRightsGrpLogDTOs;

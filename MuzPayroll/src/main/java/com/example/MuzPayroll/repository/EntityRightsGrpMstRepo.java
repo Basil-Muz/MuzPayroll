@@ -19,15 +19,19 @@ public interface EntityRightsGrpMstRepo extends JpaRepository<EntityRightsGrpMst
 
     EntityRightsGrpMst save(EntityRightsGrpMst entity);
 
-@Query("SELECT MAX(e.ErmEntityGroupID) FROM EntityRightsGrpMst e")
-Long findMaxErmEntityRightsGroupID();
+// @Query("SELECT MAX(e.ErmEntityGroupID) FROM EntityRightsGrpMst e")
+// Long findMaxErmEntityRightsGroupID();
 
+
+    // Find maximum ID
+    @Query("SELECT MAX(e.ErmEntityGroupID) FROM EntityRightsGrpMst e WHERE e.ErmEntityGroupID >= 10100010")
+    Long findMaxErmEntityRightsGroupID();
 
 @Query(value = """
     SELECT e.*
     FROM entity_rights_grp_mst e
     JOIN entity_hierarchy_info eh
-      ON e.erm_entity_hierarchyid = eh.ehi_business_groupid
+      ON e.erm_entity_hierarchy_infoid = eh.ehi_business_groupid
     WHERE eh.ehi_entity_hierarchyid = :companyId
     AND (:activeStatusYN IS NULL OR e.erm_activeyn = :activeStatusYN)
     """, nativeQuery = true)

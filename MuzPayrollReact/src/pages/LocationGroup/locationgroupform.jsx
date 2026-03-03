@@ -136,7 +136,7 @@ function LocationGroupForm({ toggleForm, data }) {
 
     setForm(updatedForm);
 
-    validateEach(name, value); // ✅ Pass the latest values
+    validateEach(name, value); // Pass the latest values
   };
 
   //   const handleBlur = (e) => {

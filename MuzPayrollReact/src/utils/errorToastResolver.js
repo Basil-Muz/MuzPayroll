@@ -26,6 +26,7 @@ export const handleApiError = (
      2️⃣ Backend response extraction
   ---------------------------------- */
   const responseData = error.response.data || {};
+  console.log("Error in toast",error)
   const status =
     error.response.status ||
     responseData.statusCode ||
@@ -39,7 +40,7 @@ export const handleApiError = (
     defaultMessage;
 
   /* ----------------------------------
-     3️⃣ Status-based handling
+     Status-based handling
   ---------------------------------- */
   switch (status) {
     case 400:

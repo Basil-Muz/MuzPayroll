@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.EntityHierarchyInfo;
 import com.example.MuzPayroll.entity.EntityRightsGrpLog;
 import com.example.MuzPayroll.entity.UserGrpLog;
 import com.example.MuzPayroll.entity.UserMst;
@@ -16,6 +17,7 @@ import com.example.MuzPayroll.entity.DTO.EntityRightsGrpLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.entity.DTO.UserGrpLogDTO;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
+import com.example.MuzPayroll.repository.EntityHierarchyInfoRepository;
 import com.example.MuzPayroll.repository.EntityRightsGrpLogRepo;
 import com.example.MuzPayroll.repository.UserRepository;
 
@@ -31,6 +33,9 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
     @Autowired
     private AuthorizationRepository authorizationRepository;
    
+    @Autowired
+    private EntityHierarchyInfoRepository entityHierarchyInfoRepository;
+
     @Override
     public Response<Boolean> entityValidate(List<EntityRightsGrpLogDTO> dtos, String mode) {
            // =================== 1️⃣ ENTITY VALIDATION ===================
@@ -161,7 +166,16 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         // Set ALL fields
 
         log.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
-        log.setEntityMst(dto.getEntityMst());
+       
+        if (dto.getEntityHierarchyInfoID() != null) {
+            EntityHierarchyInfo hierarchy =
+                entityHierarchyInfoRepository.findById(
+                        dto.getEntityHierarchyInfoID()
+                ).orElseThrow(() ->
+                        new RuntimeException("Hierarchy not found"));
+
+            log.setEntityHierarchyInfoID(hierarchy);
+        }
         log.setErmCode(dto.getErmCode());
         log.setErmDesc(dto.getErmDesc());
         log.setErmName(dto.getErmName());
@@ -181,7 +195,12 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         EntityRightsGrpLogDTO dto = new EntityRightsGrpLogDTO();
 
         dto.setEntityRightsGrpLogPK(entity.getEntityRightsGrpLogPK());
-        dto.setEntityMst(entity.getEntityMst());
+       
+        if (entity.getEntityHierarchyInfoID() != null) {
+            dto.setEntityHierarchyInfoID(
+                entity.getEntityHierarchyInfoID().getInfoID()
+            );
+        }
         dto.setErmCode(entity.getErmCode());
         dto.setErmDesc(entity.getErmDesc());
         dto.setErmName(entity.getErmName());
@@ -214,7 +233,15 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         if ("INSERT".equalsIgnoreCase(mode) || "UPDATE".equalsIgnoreCase(mode)) {
 
             log.setErmName(dto.getErmName());
-            log.setEntityMst(dto.getEntityMst());
+            if (dto.getEntityHierarchyInfoID() != null) {
+            EntityHierarchyInfo hierarchy =
+                entityHierarchyInfoRepository.findById(
+                        dto.getEntityHierarchyInfoID()
+                ).orElseThrow(() ->
+                        new RuntimeException("Hierarchy not found"));
+
+            log.setEntityHierarchyInfoID(hierarchy);
+        }
             log.setActiveDate(dto.getActiveDate());
             log.setWithaffectdate(dto.getWithaffectdate());
             log.setAmendNo(dto.getAmendNo());

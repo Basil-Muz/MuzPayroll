@@ -1,12 +1,11 @@
 // React & hooks
-import React, { useEffect, useState, useCallback} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 // Third-party libraries
 import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
-import { RxCross2 } from "react-icons/rx";
-import { TiTick } from "react-icons/ti";
+
 import { toast } from "react-hot-toast";
 // Styles
 import "./usergroup.css";
@@ -19,6 +18,7 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 
 // Local components
 import ListItemForm from "../../components/ListItemForm/ListItemForm";
+import { ListCard } from "../../components/List Card/ListCard";
 
 // Context / hooks
 import { useAuth } from "../../context/AuthProvider";
@@ -46,22 +46,23 @@ function UserGroup() {
   const [listView, setListView] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [groupByStatus, setGroupByStatus] = useState(false);
+  const [activeUserGroups, setActiveUserGroups] = useState([]);
+  const [inactiveUserGroups, setInactiveUserGroups] = useState([]);
   const [searchData, setSearchdata] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   // const [loading, setLoading] = useState(true);
   // const [flag, setFlag] = useState(false); // new state for flag from child
 
   const { user } = useAuth();
-  // console.log("Entutirjgfdg", user);
 
   const entityId = user.userEntityHierarchyId;
 
   const getAllUserGroups = async (loadFirst) => {
-     const startTime = Date.now();
-    if(loadFirst === true){
-         
-    // show loader
-    showRailLoader("Retrieving available user groups…");
+    const startTime = Date.now();
+    if (loadFirst === true) {
+      // show loader
+      showRailLoader("Retrieving available user groups…");
     }
     try {
       const response = await getUserGroupsList(entityId, true);
@@ -70,33 +71,26 @@ function UserGroup() {
     } catch (error) {
       handleApiError(error);
     } finally {
-      if(loadFirst){
+      if (loadFirst) {
         await ensureMinDuration(startTime, 700);
-      hideLoader();
+        hideLoader();
       }
     }
   };
 
-  //   const handleSearch = () => {
-  //     console.log("Search clicked");
-  //   };
-
   const handleClear = async () => {
     await getAllUserGroups(true);
+    setGroupByStatus(false);
     toast.success("User groups have been updated.");
   };
 
-  const handleDelete = () => {
-    console.log("Delete clicked");
-  };
+  // const handleDelete = () => {
+  //   console.log("Delete clicked");
+  // };
 
-  const handlePrint = () => {
-    console.log("Print clicked");
-  };
-
-  //   const handleNewPage = () => {
-  //     console.log("New page clicked");
-  //   };
+  // const handlePrint = () => {
+  //   console.log("Print clicked");
+  // };
 
   //   const handleFlagChange = (newFlag) => {
   //     setFlag(newFlag); // update parent state
@@ -107,64 +101,78 @@ function UserGroup() {
   const handleSearchChange = (e) => {
     setSearchdata(e.target.value);
   };
-const searchdata = useCallback(async () => {
-  if (searchData.trim()) {
-    const response = await searchUserGroup(searchData);
-    setUserGroupList(response.data.content);
-  } else {
-    const response = await getUserGroupsList(entityId, true);
-    setUserGroupList(response.data);
-  }
-}, [searchData, entityId]);
 
-useEffect(() => {
-  const handler = setTimeout(() => {
-    if (searchData.trim() !== "") {
-      searchdata();
+  const searchdata = useCallback(async () => {
+    if (searchData.trim()) {
+      const response = await searchUserGroup(searchData);
+      setUserGroupList(response.data.content);
     } else {
-      getAllUserGroups(false);
+      const response = await getUserGroupsList(entityId, true);
+      setUserGroupList(response.data);
     }
-  }, 400);
-
-  return () => clearTimeout(handler);
-}, [searchData]);
-
-  // useEffect(() => {
-  //   const delayDebounceFn = setTimeout(() => {
-  //     if (searchData.trim()) {
-  //       // axios.get(`http://localhost:9082/searchAdvanceType?data=${searchData}`)
-  //       // .then((res) => setUserGroupList(res.data))
-  //       // .catch(console.error);
-  //     } else {
-  //       // If searchData is empty, get all advance types
-  //       // axios.get("http://localhost:9082/viewAdvanceType")
-  //       // .then((res) => setUserGroupList(res.data))
-  //       // .catch(console.error);
-  //     }
-  //   }, 200); // debounce delay
-  //   return () => clearTimeout(delayDebounceFn);
-  // }, [searchData]);
+  }, [searchData, entityId]);
 
   useEffect(() => {
-    getAllUserGroups();
+    const handler = setTimeout(() => {
+      if (searchData.trim() !== "") {
+        searchdata();
+      } else {
+        getAllUserGroups(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchData]);
+
+  useEffect(() => {
+    getAllUserGroups(true);
   }, [showForm]);
 
   const toggleForm = () => {
     setShowForm((prev) => !prev);
-
-    //Api call for fetching the usergroup with mstId
-
-    //  console.log("slecteditem",selectedItem)
   };
   const handleNew = () => {
     setSelectedItem(null);
     setShowForm(true);
   };
-  const containerStyle = { display: "flex" };
 
   const handleDataToForm = (item) => {
     setSelectedItem(item);
     toggleForm();
+  };
+
+  /* ================= GROUPING ================= */
+  const handleGroupSubmit = async (checked) => {
+    setGroupByStatus(checked);
+    setShowSearch(false);
+
+    if (!checked) {
+      const res = await getUserGroupsList(entityId, null);
+      setUserGroupList(res.data);
+      return;
+    }
+
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Retrieving available locations…");
+    try {
+      const [activeRes, inactiveRes] = await Promise.all([
+        getUserGroupsList(entityId, 1),
+        getUserGroupsList(entityId, 0),
+      ]);
+      // console.log("inActive Locations", inactiveRes);
+      setTimeout(() => {
+        setActiveUserGroups(activeRes.data);
+        setInactiveUserGroups(inactiveRes.data);
+        // console.log("Active locations", activeUserGroups);
+      }, 800);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      await ensureMinDuration(startTime, 800);
+      // hide loader ONLY at the end
+      hideLoader();
+    }
   };
 
   return (
@@ -219,74 +227,60 @@ useEffect(() => {
           </div>
         </div>
         <div className={`slide-container ${showSearch ? "show" : "hide"}`}>
-          <Search />
+          <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
         </div>
 
-        <div className={`card-grid ${listView ? "list" : "tile"}`}>
-          {userGroupList.map((item) => (
-            <div
-              className={`advance-card ${item.inactiveDate ? "inactive" : "active"}`}
-              key={item.mstID}
-            >
-              <div className="card-header">
-                <span
-                  className="code"
-                  onClick={() => handleDataToForm(item.mstID)}
-                >
-                  {item.code}
-                </span>
-                {/* {console.log("Data in list",item)} */}
-                <div className="status">
-                  {item.inactiveDate ? (
-                    <div className="status-stack inactive">
-                      <div className="status-item inactive">
-                        <RxCross2 className="check-icon" />
-                        <span className="status-text">Inactive</span>
-                        <span className="date">{item.inactiveDate}</span>
-                      </div>
-
-                      <div className="status-sub">
-                        <TiTick className="check-icon muted" />
-                        <span className="status-text muted">Active from</span>
-                        <span className="date muted">{item.activeDate}</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="status-item active">
-                      <TiTick className="check-icon" />
-                      <span className="status-text">Active</span>
-                      <span className="date">{item.activeDate}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div
-                className="card-title"
-                style={listView ? containerStyle : null}
-                onClick={() => handleDataToForm(item.mstID)}
-              >
-                {item.name}
-              </div>
-
-              <div
-                className="card-shortname"
-                style={listView ? containerStyle : null}
-              >
-                {item.shortName}
-              </div>
-
-              <div
-                className="card-description"
-                style={listView ? containerStyle : null}
-              >
-                {item.description}
-              </div>
+        {!groupByStatus &&
+          (userGroupList.length > 0 ? (
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {userGroupList.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status="active"
+                  handleDataToForm={handleDataToForm}
+                />
+              ))}
             </div>
+          ) : (
+            <div className="no-data-found">No usergroups available yet</div>
           ))}
-        </div>
+        {groupByStatus && (
+          <>
+            <h3 className="group-title active">Active</h3>
+            {activeUserGroups.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {activeUserGroups.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="active"
+                    handleDataToForm={handleDataToForm}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">No usergroups available</div>
+            )}
 
-        {/* <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/> */}
+            <h3 className="group-title inactive">Inactive</h3>
+            {inactiveUserGroups.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {inactiveUserGroups.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="inactive"
+                    handleDataToForm={handleDataToForm}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">No usergroups available</div>
+            )}
+          </>
+        )}
+
         <FloatingActionBar
           actions={{
             save: {
@@ -303,31 +297,23 @@ useEffect(() => {
               // disabled:true,
             },
             delete: {
-              onClick: handleDelete,
+              // onClick: handleDelete,
               // disabled: !hasDeletePermission
               disabled: true,
             },
             print: {
-              onClick: handlePrint,
+              // onClick: handlePrint,
               // disabled: isNewRecord
               disabled: true,
             },
             new: {
-              onClick: handleNew, //to toggle the usergroup form
+               onClick: handleNew, //to toggle the usergroup form
             },
             // refresh: {
             //   onClick: () => window.location.reload(),  // Refresh the page
             // },
           }}
         />
-
-        {/* {showForm && selectedItem && loading && <Loading />} */}
-        {/* {showForm && !loading && selectedItem && (
-          <UserGroupForm data={selectedItem} toggleForm={toggleForm} />
-        )} */}
-        {/* {showForm && (
-          <UserGroupForm data={selectedItem} toggleForm={toggleForm} />
-        )} */}
 
         {showForm && (
           <ListItemForm

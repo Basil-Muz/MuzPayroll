@@ -34,5 +34,29 @@ export const useSetAmendmentData = ({ amendLength, setValue, fieldMap }) => {
     [setValue, amendLength, fieldMap],
   );
 
-  return { setAmendmentData };
+  const setSeconderyFormData = useCallback(
+    (selectedItem) => {
+      //has no data passed the compilation stoped
+      if (!selectedItem) return;
+
+      //loop with respect to the form feilds
+      Object.entries(fieldMap).forEach(([formField, dataKey]) => {
+        //set the data with respect to form feilds
+        let value = selectedItem[dataKey];
+
+        // defaults & transforms
+        if (formField === "authorizationStatus") {
+          value = selectedItem.authorizationStatus ? 1 : 0;
+        }
+        if(formField !== "entityMst")
+        setValue(dataKey, value ?? "", {
+          shouldDirty: false,
+          shouldValidate: true,
+        });
+      });
+    },
+    [setValue, amendLength, fieldMap],
+  );
+
+  return { setAmendmentData, setSeconderyFormData};
 };

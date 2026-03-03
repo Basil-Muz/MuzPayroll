@@ -6,5 +6,6 @@ export const LOCATION_GROUP_FIELD_MAP = {
   activeDate: "activeDate",
   authorizationStatus: "authorizationStatus",
   ermEntityRightsGroupID:"ermEntityRightsGroupID",
-  activeYN:"ErmActiveYN",
+  activeYN:"ermActiveYN",
+  entityMst:"entityHierarchyInfoID"
 };

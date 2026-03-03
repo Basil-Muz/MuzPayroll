@@ -68,7 +68,7 @@ public class EntityRightsGrpMstController {
             @RequestParam Long bussinessGroupId,
             @RequestParam(required = false) Boolean activeStatusYN) {
 
-        List<EntityRightsGrpMst> list = entityRightsGrpMstRepo.findEntityRightsGrpByStatus(bussinessGroupId, activeStatusYN);
+      List<EntityRightsGrpMst> list = entityRightsGrpMstRepo.findEntityRightsGrpByStatus(bussinessGroupId, activeStatusYN);
 
         List<FormListDTO> response = list.stream()
                 .map(entity -> {

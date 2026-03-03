@@ -69,7 +69,7 @@
   --text-lg: 19px;
   --text-xl: 24px;
 
-  --header-padding: 86px; /* Header width 66px */
+  --header-padding: 80px; /* Header width 66px */
 }
 
 [data-theme="dark"] {
@@ -133,7 +133,7 @@
   --text-md: 16px;
   --text-lg: 19px;
   --text-xl: 24px;
-  --header-padding: 94px; /* Header width 66px */
+  /* --header-padding: 94px; Header width 66px */
 }
 
 /* ===== LAYOUT RESET ===== */
@@ -182,6 +182,7 @@ body {
 #root {
   min-height: 100vh;
   overflow-x: visible; /* when it hidden scrolling top is blocked*/
+  background-color:var(--bg);
 }
 
 .branch-container-tab {
@@ -718,6 +719,22 @@ body {
   color: var(--text);
   border: 1px solid var(--border);
 }
+[data-theme="dark"] .custom-datepicker select:hover {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--brand-light); 
+}
+
+[data-theme="dark"] .custom-datepicker option {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+[data-theme="dark"] .custom-datepicker option:hover {
+  background: var(--brand-light) !important;
+  color: var(--text);
+}
+
 /* ---------- DatePicker Disabled Days (Dark Mode) ---------- */
 [data-theme="dark"] .custom-datepicker .react-datepicker__day--disabled {
   color: rgba(255, 255, 255, 0.25) !important;
