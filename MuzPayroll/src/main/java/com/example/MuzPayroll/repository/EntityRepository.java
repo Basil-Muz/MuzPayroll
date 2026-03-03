@@ -302,7 +302,6 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
             ) a ON a.mst_id = em.etm_entityid
 
             WHERE mcc.mccid = 13
-            AND a.authorization_status = TRUE
             AND (:activeStatusYN IS NULL OR em.etm_activeyn = :activeStatusYN);
                          """, nativeQuery = true)
     List<EntityMst> findCompanyByStatus(
@@ -320,7 +319,6 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
             JOIN authorization_tbl a
                 ON a.mst_id = l.etm_entityid
             WHERE mcc.mccid = 14
-            AND a.authorization_status = TRUE
             AND uel.ehi_companyid = :companyId
             AND (:activeStatusYN IS NULL OR em.etm_activeyn = :activeStatusYN)
             """, nativeQuery = true)
@@ -340,7 +338,6 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
                     JOIN authorization_tbl a
                         ON a.mst_id = l.etm_entityid
                     WHERE mcc.mccid = 15
-                    AND a.authorization_status = TRUE
                     AND (:activeStatusYN IS NULL OR em.etm_activeyn = :activeStatusYN)
                     AND uel.ehi_companyid = :companyId
                     AND (:branchId IS NULL OR uel.ehi_branchid = :branchId)
