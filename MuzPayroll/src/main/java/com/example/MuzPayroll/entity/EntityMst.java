@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -32,10 +30,13 @@ public class EntityMst {
     private AddressInfoMst addressInfoMst;
 
     @Transient
+    @JsonIgnore
+    private EntityHierarchyInfo entityHierarchyInfo;
+
+    @Transient
     private String amendNo;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EtmEntityID")
     private Long etmEntityId;
 
@@ -224,5 +225,13 @@ public class EntityMst {
 
     public void setAddressInfoMst(AddressInfoMst addressInfoMst) {
         this.addressInfoMst = addressInfoMst;
+    }
+
+    public EntityHierarchyInfo getEntityHierarchyInfo() {
+        return entityHierarchyInfo;
+    }
+
+    public void setEntityHierarchyInfo(EntityHierarchyInfo entityHierarchyInfo) {
+        this.entityHierarchyInfo = entityHierarchyInfo;
     }
 }

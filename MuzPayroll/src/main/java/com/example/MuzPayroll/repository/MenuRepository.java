@@ -12,7 +12,6 @@ import jakarta.persistence.Query;
 
 @Repository
 public class MenuRepository {
-
     @PersistenceContext
     private EntityManager entityManager;
 

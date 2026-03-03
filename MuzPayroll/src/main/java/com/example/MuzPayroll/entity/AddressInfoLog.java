@@ -15,9 +15,6 @@ public class AddressInfoLog {
     @EmbeddedId
     private AddressInfoLogPK addressInfoLogPK;
 
-    @Column(nullable = true)
-    private String Image;
-
     @Column(nullable = false)
     private String address;
 
@@ -211,11 +208,4 @@ public class AddressInfoLog {
         this.addressInfoLogPK = addressInfoLogPK;
     }
 
-    public String getImage() {
-        return Image;
-    }
-
-    public void setImage(String image) {
-        Image = image;
-    }
 }

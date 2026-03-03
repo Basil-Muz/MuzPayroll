@@ -1,17 +1,11 @@
 package com.example.MuzPayroll.entity.DTO;
 
 import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.MuzPayroll.entity.AddressInfoLog;
-import com.example.MuzPayroll.entity.AddressInfoMst;
+import com.example.MuzPayroll.entity.AddressInfoLogPK;
 import com.example.MuzPayroll.entity.Authorization;
-import com.example.MuzPayroll.entity.BranchMst;
-import com.example.MuzPayroll.entity.CompanyMst;
 import com.example.MuzPayroll.entity.EntityLogPK;
-import com.example.MuzPayroll.entity.LocationMst;
 import com.example.MuzPayroll.entity.MuzControlCodes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -37,38 +31,9 @@ public class EntityLogDTO {
 
     private Long addressInfoID;
 
-    @Transient
-    private List<CompanyLogDTO> companyDtoLogs;
+    private AddressInfoLog addressInfoLogID;
 
-    public List<CompanyLogDTO> getCompanyDtoLogs() {
-        return companyDtoLogs;
-    }
-
-    public void setCompanyDtoLogs(List<CompanyLogDTO> companyDtoLogs) {
-        this.companyDtoLogs = companyDtoLogs;
-    }
-
-    @Transient
-    private List<BranchLogDTO> branchLogDTOs;
-
-    public List<BranchLogDTO> getBranchLogDTOs() {
-        return branchLogDTOs;
-    }
-
-    public void setBranchLogDTOs(List<BranchLogDTO> branchLogDTOs) {
-        this.branchLogDTOs = branchLogDTOs;
-    }
-
-    @Transient
-    private List<LocationLogDTO> locationLogDTOs;
-
-    public List<LocationLogDTO> getLocationLogDTOs() {
-        return locationLogDTOs;
-    }
-
-    public void setLocationLogDTOs(List<LocationLogDTO> locationLogDTOs) {
-        this.locationLogDTOs = locationLogDTOs;
-    }
+    private AddressInfoLogPK addressInfoLogPK;
 
     private EntityLogPK entityLogPK;
 
@@ -122,46 +87,6 @@ public class EntityLogDTO {
         this.muzControlCodes = muzControlCodes;
     }
 
-    private MultipartFile EtmImage;
-
-    public MultipartFile getEtmImage() {
-        return EtmImage;
-    }
-
-    public void setEtmImage(MultipartFile etmImage) {
-        EtmImage = etmImage;
-    }
-
-    private CompanyMst companyMst;
-
-    public CompanyMst getCompanyMst() {
-        return companyMst;
-    }
-
-    public void setCompanyMst(CompanyMst companyMst) {
-        this.companyMst = companyMst;
-    }
-
-    private BranchMst branchMst;
-
-    public BranchMst getBranchMst() {
-        return branchMst;
-    }
-
-    public void setBranchMst(BranchMst branchMst) {
-        this.branchMst = branchMst;
-    }
-
-    private LocationMst locationMst;
-
-    public LocationMst getLocationMst() {
-        return locationMst;
-    }
-
-    public void setLocationMst(LocationMst locationMst) {
-        this.locationMst = locationMst;
-    }
-
     private String EtmDocInfoID;
 
     public String getEtmDocInfoID() {
@@ -202,16 +127,6 @@ public class EntityLogDTO {
         EtmActiveYN = etmActiveYN;
     }
 
-    private Long EtmAuthInfoID;
-
-    public Long getEtmAuthInfoID() {
-        return EtmAuthInfoID;
-    }
-
-    public void setEtmAuthInfoID(Long etmAuthInfoID) {
-        EtmAuthInfoID = etmAuthInfoID;
-    }
-
     private LocalDate activeDate;
 
     public LocalDate getActiveDate() {
@@ -230,26 +145,6 @@ public class EntityLogDTO {
 
     public void setInactiveDate(LocalDate inactiveDate) {
         InactiveDate = inactiveDate;
-    }
-
-    private Long LogPK;
-
-    public Long getLogPK() {
-        return LogPK;
-    }
-
-    public void setLogPK(Long logPK) {
-        LogPK = logPK;
-    }
-
-    private Long MstID;
-
-    public Long getMstID() {
-        return MstID;
-    }
-
-    public void setMstID(Long mstID) {
-        MstID = mstID;
     }
 
     private String ImagePath;
@@ -491,11 +386,47 @@ public class EntityLogDTO {
         this.addressInfoLog = addressInfoLog;
     }
 
+    public AddressInfoLog getAddressInfoLogID() {
+        return addressInfoLogID;
+    }
+
+    public void setAddressInfoLogID(AddressInfoLog addressInfoLogID) {
+        this.addressInfoLogID = addressInfoLogID;
+    }
+
+    public AddressInfoLogPK getAddressInfoLogPK() {
+        return addressInfoLogPK;
+    }
+
+    public void setAddressInfoLogPK(AddressInfoLogPK addressInfoLogPK) {
+        this.addressInfoLogPK = addressInfoLogPK;
+    }
+
     public Long getAddressInfoID() {
         return addressInfoID;
     }
 
     public void setAddressInfoID(Long addressInfoID) {
         this.addressInfoID = addressInfoID;
+    }
+
+    private Long transID;
+
+    private Long logRowNo;
+
+    public Long getLogRowNo() {
+        return logRowNo;
+    }
+
+    public void setLogRowNo(Long logRowNo) {
+        this.logRowNo = logRowNo;
+    }
+
+    public Long getTransID() {
+        return transID;
+    }
+
+    public void setTransID(Long transID) {
+        this.transID = transID;
     }
 }

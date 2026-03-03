@@ -17,15 +17,7 @@ public class EntityHierarchyInfo {
 
     @ManyToOne
     @JoinColumn(name = "EhiEntityHierarchyID", nullable = true)
-    private EntityMst entityMst;
-
-    public EntityMst getEntityMst() {
-        return entityMst;
-    }
-
-    public void setEntityMst(EntityMst entityMst) {
-        this.entityMst = entityMst;
-    }
+    private EntityMst EhiEntityHierarchyID;
 
     @Column(nullable = false)
     private Long EhiBusinessGroupID;
@@ -99,19 +91,12 @@ public class EntityHierarchyInfo {
         EhiLevelNo = ehiLevelNo;
     }
 
-    @Column(nullable = true)
-    private Long EhiParentEntityHierarchyID;
-
-    public Long getEhiParentEntityHierarchyID() {
-        return EhiParentEntityHierarchyID;
-    }
-
-    public void setEhiParentEntityHierarchyID(Long ehiParentEntityHierarchyID) {
-        EhiParentEntityHierarchyID = ehiParentEntityHierarchyID;
-    }
+    @ManyToOne
+    @JoinColumn(name = "EhiParentEntityHierarchyID", nullable = true)
+    private EntityMst EhiParentEntityHierarchyID;
 
     @ManyToOne
-    @JoinColumn(name = "EhiLeafEntityTypeMccID", nullable = true)
+    @JoinColumn(name = "EhiLeafEntityTypeMccID", nullable = false)
     private MuzControlCodes muzControlCodes;
 
     public MuzControlCodes getMuzControlCodes() {
@@ -136,6 +121,22 @@ public class EntityHierarchyInfo {
 
     public void setInfoID(Long InfoID) {
         this.InfoID = InfoID;
+    }
+
+    public EntityMst getEhiParentEntityHierarchyID() {
+        return EhiParentEntityHierarchyID;
+    }
+
+    public void setEhiParentEntityHierarchyID(EntityMst EhiParentEntityHierarchyID) {
+        this.EhiParentEntityHierarchyID = EhiParentEntityHierarchyID;
+    }
+
+    public EntityMst getEhiEntityHierarchyID() {
+        return EhiEntityHierarchyID;
+    }
+
+    public void setEhiEntityHierarchyID(EntityMst EhiEntityHierarchyID) {
+        this.EhiEntityHierarchyID = EhiEntityHierarchyID;
     }
 
 }

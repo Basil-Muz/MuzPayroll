@@ -9,25 +9,13 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.Transient;
 
 @Entity
 public class EntityLog {
 
-
     @EmbeddedId
     private EntityLogPK entityLogPK;
-
-    @ManyToOne
-    @MapsId("addressInfoLogPK")
-    @JoinColumns({
-            @JoinColumn(name = "AddressInfoID", referencedColumnName = "AddressInfoID"),
-            @JoinColumn(name = "row_no", referencedColumnName = "row_no")
-    })
-    private AddressInfoLog addressInfoLog;
 
     @Column(nullable = false)
     private String EtmCode;
@@ -58,9 +46,6 @@ public class EntityLog {
     @Column(nullable = false)
     private Boolean EtmActiveYN;
 
-    @Column(nullable = true)
-    private Long EtmAuthInfoID;
-
     @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
 
@@ -69,7 +54,7 @@ public class EntityLog {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "AuthID", nullable = false)
+    @JoinColumn(name = "EtmAuthInfoID", nullable = false)
     private Authorization authorization;
 
     @Column(nullable = false, name = "AmendNo")
@@ -166,14 +151,6 @@ public class EntityLog {
         EtmActiveYN = etmActiveYN;
     }
 
-    public Long getEtmAuthInfoID() {
-        return EtmAuthInfoID;
-    }
-
-    public void setEtmAuthInfoID(Long etmAuthInfoID) {
-        EtmAuthInfoID = etmAuthInfoID;
-    }
-
     public LocalDate getActiveDate() {
         return activeDate;
     }
@@ -190,13 +167,13 @@ public class EntityLog {
         this.InactiveDate = InactiveDate;
     }
 
-    public AddressInfoLog getAddressInfoLog() {
-        return addressInfoLog;
-    }
+    // public AddressInfoLog getAddressInfoLog() {
+    // return addressInfoLog;
+    // }
 
-    public void setAddressInfoLog(AddressInfoLog addressInfoLog) {
-        this.addressInfoLog = addressInfoLog;
-    }
+    // public void setAddressInfoLog(AddressInfoLog addressInfoLog) {
+    // this.addressInfoLog = addressInfoLog;
+    // }
 
     public String getAmendNo() {
         return amendNo;
