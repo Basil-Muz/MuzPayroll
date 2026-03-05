@@ -20,7 +20,7 @@ public class AddressInfoLogPK implements Serializable {
         this.addressInfoID = addressInfoID;
     }
 
-    @Column(name = "row_no")
+    @Column(name = "AddRow_no")
     private Long rowNo;
 
     public Long getRowNo() {

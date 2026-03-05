@@ -43,7 +43,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
   useEffect(() => {
     if (companys?.length > 0) {
-      setValue("companyEntity", companys[0].value);
+      setValue("companyMst", companys[0].value);
     }
 
     if (branchList?.length > 0) {
@@ -188,7 +188,7 @@ const GeneralInfoForm = function GeneralInfoForm({
             <div className="branch-form-group">
               <label className="form-label required">Company</label>
               <Controller
-                name="companyEntity"
+                name="companyMst"
                 // ref={(!flags.companyForm)  ? firstFieldRef : null}
                 control={control}
                 disabled={isReadOnly}
@@ -208,7 +208,7 @@ const GeneralInfoForm = function GeneralInfoForm({
                       // menuIsOpen={isCompanyMenuOpen? true : null}
                       // onMenuClose={() => setIsCompanyMenuOpen(false)}
                       classNamePrefix="form-control-select"
-                      className={`${errors.companyEntity ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                      className={`${errors.companyMst ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                       value={selectedOption || null} //                   label comes from options
                       onChange={(option) => {
                         field.onChange(option.value);
@@ -220,9 +220,9 @@ const GeneralInfoForm = function GeneralInfoForm({
                 }}
               />
 
-              {errors.companyEntity && (
+              {errors.companyMst && (
                 <span className="error-message">
-                  {errors.companyEntity.message}
+                  {errors.companyMst.message}
                 </span>
               )}
             </div>
@@ -451,7 +451,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
               <div className="image-upload-container">
                 <Controller
-                  name="entityImage"
+                  name="EtmImage"
                   control={control}
                   rules={{ required: "Company image is required" }}
                   render={({ field }) => (
@@ -469,7 +469,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
                             // Validate file type
                             if (!file.type.match("image/(png|jpeg|jpg)")) {
-                              setError("entityImage", {
+                              setError("EtmImage", {
                                 type: "manual",
                                 message:
                                   "Only PNG, JPG and JPEG files are allowed",
@@ -479,7 +479,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
                             // Validate file size (5MB max)
                             if (file.size > 5 * 1024 * 1024) {
-                              setError("entityImage", {
+                              setError("EtmImage", {
                                 type: "manual",
                                 message: "File size must be less than 5MB",
                               });
@@ -622,12 +622,12 @@ const GeneralInfoForm = function GeneralInfoForm({
                       </div>
 
                       {/* Error Message */}
-                      {errors.entityImage && (
+                      {errors.EtmImage && (
                         <div className="error-message">
                           {/* <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg> */}
-                          {errors.entityImage.message}
+                          {errors.EtmImage.message}
                         </div>
                       )}
 

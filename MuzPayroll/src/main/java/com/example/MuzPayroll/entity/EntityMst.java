@@ -22,15 +22,15 @@ public class EntityMst {
     private EntityLogPK entityLogPK;
 
     @Transient
-    @JsonIgnore
+    // @JsonIgnore
     private Authorization authorization;
 
     @Transient
-    @JsonIgnore
+    // @JsonIgnore
     private AddressInfoMst addressInfoMst;
 
-    @Transient
-    @JsonIgnore
+    @Transient  
+    // @JsonIgnore
     private EntityHierarchyInfo entityHierarchyInfo;
 
     @Transient

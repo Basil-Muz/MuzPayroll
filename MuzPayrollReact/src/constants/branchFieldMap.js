@@ -1,10 +1,12 @@
 export const COMMON_BRANCH_FIELD_MAP = {
   etmEntityId: "etmEntityId",
   EtmName: "etmName",
+  EtmCode: "etmCode",
+  // EtmImage: "imagePath",
   EtmShortName: "etmShortName",
   authorizationStatus: "authorizationStatus",
   withaffectdate: "withaffectdate",
-//   companyEntity: "company",
+  //   companyEntity: "company",
   // branch: "branch",
   activeDate: "activeDate",
   pincode: "pincode",

@@ -15,6 +15,7 @@ import jakarta.persistence.Transient;
 public class EntityLogDTO {
 
     @Transient
+    @JsonIgnore
     private Authorization authorization;
 
     public Authorization getAuthorization() {
@@ -31,6 +32,7 @@ public class EntityLogDTO {
 
     private Long addressInfoID;
 
+    @JsonIgnore
     private AddressInfoLog addressInfoLogID;
 
     private AddressInfoLogPK addressInfoLogPK;
@@ -77,6 +79,7 @@ public class EntityLogDTO {
         EtmShortName = etmShortName;
     }
 
+    @JsonIgnore
     private MuzControlCodes muzControlCodes;
 
     public MuzControlCodes getMuzControlCodes() {
@@ -410,23 +413,4 @@ public class EntityLogDTO {
         this.addressInfoID = addressInfoID;
     }
 
-    private Long transID;
-
-    private Long logRowNo;
-
-    public Long getLogRowNo() {
-        return logRowNo;
-    }
-
-    public void setLogRowNo(Long logRowNo) {
-        this.logRowNo = logRowNo;
-    }
-
-    public Long getTransID() {
-        return transID;
-    }
-
-    public void setTransID(Long transID) {
-        this.transID = transID;
-    }
 }

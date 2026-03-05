@@ -22,7 +22,7 @@ public class CompanyMst {
     private CompanyLogPK companyLogPK;
 
     @Transient
-    @JsonIgnore
+    // @JsonIgnore
     private Authorization authorization;
 
     @Id

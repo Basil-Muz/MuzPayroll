@@ -21,6 +21,7 @@ import jakarta.persistence.Transient;
 public class EntityMstDTO {
 
     @Transient
+    @JsonIgnore
     private Authorization authorization;
 
     public Authorization getAuthorization() {
@@ -46,6 +47,7 @@ public class EntityMstDTO {
 
     private Long etmEntityId;
 
+    @JsonIgnore
     private EntityLogPK entityLogPK;
 
     public EntityLogPK getEntityLogPK() {
@@ -86,6 +88,7 @@ public class EntityMstDTO {
         EtmEntityTypeMccID = etmEntityTypeMccID;
     }
 
+    @JsonIgnore
     private MuzControlCodes muzControlCodes;
 
     public MuzControlCodes getMuzControlCodes() {
@@ -364,8 +367,10 @@ public class EntityMstDTO {
 
     private AddressInfoLogPK addressInfoLogPK;
 
+    @JsonIgnore
     private Long logRowNo;
 
+    @JsonIgnore
     private EntityHierarchyInfo entityHierarchyInfo;
 
     // Authorization
@@ -451,10 +456,13 @@ public class EntityMstDTO {
         this.addressInfoID = addressInfoID;
     }
 
+    @JsonIgnore
     private EntityMst companyMst;
 
+    @JsonIgnore
     private EntityMst branchMst;
 
+    @JsonIgnore
     private EntityMst locationMst;
 
     public EntityMst getCompanyMst() {
@@ -489,6 +497,7 @@ public class EntityMstDTO {
         this.entityHierarchyInfo = entityHierarchyInfo;
     }
 
+    @JsonIgnore
     private Long EhiBusinessGroupID;
 
     public Long getEhiBusinessGroupID() {
@@ -499,6 +508,7 @@ public class EntityMstDTO {
         EhiBusinessGroupID = ehiBusinessGroupID;
     }
 
+    @JsonIgnore
     private Long EhiParentLedgerID;
 
     public Long getEhiParentLedgerID() {
@@ -509,6 +519,7 @@ public class EntityMstDTO {
         EhiParentLedgerID = ehiParentLedgerID;
     }
 
+    @JsonIgnore
     private Long EhiSubLedgerID;
 
     public Long getEhiSubLedgerID() {
