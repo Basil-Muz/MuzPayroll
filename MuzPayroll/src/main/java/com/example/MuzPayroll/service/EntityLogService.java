@@ -15,6 +15,7 @@ import com.example.MuzPayroll.entity.EntityLog;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.EntityLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
+import com.example.MuzPayroll.repository.AddressInfoLogRepository;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
@@ -29,6 +30,9 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
 
     @Autowired
     private AuthorizationRepository authorizationRepository;
+
+    @Autowired
+    private AddressInfoLogRepository addressInfoLogRepository;
 
     // =================== 1️⃣ ENTITY VALIDATION ===================
     @Override
@@ -59,6 +63,29 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
             UserMst user = userRepository.findByUserCode(dto.getUserCode());
             if (user == null)
                 errors.add("Invalid user code");
+
+            // ===== CREATE AUTHORIZATION =====
+            AddressInfoLog infoLog = new AddressInfoLog();
+            infoLog.setAddress(dto.getAddress());
+            infoLog.setAddress(dto.getAddress());
+            infoLog.setAddress1(dto.getAddress1());
+            infoLog.setAddress2(dto.getAddress2());
+            infoLog.setCountry(dto.getCountry());
+            infoLog.setState(dto.getState());
+            infoLog.setDistrict(dto.getDistrict());
+            infoLog.setPlace(dto.getPlace());
+            infoLog.setPincode(dto.getPincode());
+            infoLog.setLandlineNumber(dto.getLandlineNumber());
+            infoLog.setMobileNumber(dto.getMobileNumber());
+            infoLog.setEmail(dto.getEmail());
+            infoLog.setDesignation(dto.getDesignation());
+            infoLog.setEmployerName(dto.getEmployerName());
+            infoLog.setEmployerNumber(dto.getEmployerNumber());
+            infoLog.setEmployerEmail(dto.getEmployerEmail());
+            infoLog.setWithaffectdate(dto.getWithaffectdate());
+            infoLog.setAmendNo(dto.getAmendNo());
+
+            dto.setAddressInfoLog(infoLog);
 
             if (!errors.isEmpty()) {
                 return Response.error(errors);
@@ -103,6 +130,9 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
     public Response<Object> generatePK(List<EntityLogDTO> dtos, String mode) {
 
         if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {
+
+            // populateAddressPKfromEntity(transID, logRowNo, dto);/
+
         }
         return Response.success(true);
     }
@@ -135,7 +165,7 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
             generatedAmendNo = 1L;
         } else {
 
-            Long MstID = dto.getMstID();
+            Long MstID = dto.getEtmEntityId();
 
             Long latestAmendNo = entityLogRepository
                     .findLatestAmendNoByMstId(MstID)
@@ -143,7 +173,7 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
 
             Long authId = authorizationRepository
                     .findLatestAuthIdByMstId(MstID)
-                    .orElseThrow(() -> new IllegalStateException("AuthId not found for mstId " + MstID));
+                    .orElseThrow(() -> new IllegalStateException("AuthId not found for Entity ID " + MstID));
 
             Optional<Boolean> status = authorizationRepository.findStatusByAuthId(authId);
 
@@ -177,8 +207,6 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
 
         EntityLog Log = new EntityLog();
 
-        AddressInfoLog addressinfoLog = new AddressInfoLog();
-
         // Set ALL fields
         Log.setEntityLogPK(dto.getEntityLogPK());
         Log.setEtmCode(dto.getEtmCode());
@@ -187,6 +215,10 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
         Log.setActiveDate(dto.getActiveDate());
         Log.setEtmActiveYN(dto.getEtmActiveYN());
         Log.setAmendNo(dto.getAmendNo());
+        Log.setAuthorization(dto.getAuthorization());
+
+        AddressInfoLog addressinfoLog = new AddressInfoLog();
+
         addressinfoLog.setAddress(dto.getAddress());
         addressinfoLog.setAddress1(dto.getAddress1());
         addressinfoLog.setAddress2(dto.getAddress2());
@@ -203,11 +235,11 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
         addressinfoLog.setEmployerNumber(dto.getEmployerNumber());
         addressinfoLog.setEmployerEmail(dto.getEmployerEmail());
         addressinfoLog.setWithaffectdate(dto.getWithaffectdate());
-        addressinfoLog.setImage(dto.getImagePath());
         addressinfoLog.setAmendNo(dto.getAmendNo());
+        addressinfoLog.setAddressInfoLogPK(dto.getAddressInfoLogPK());
 
         // if (dto.getAddressInfoLog() != null) {
-        // entity.setAddressInfoLog(dto.getAddressInfoLog());
+        // Log.setAddressInfoLog(dto.getAddressInfoLog());
         // }
 
         return Log;
@@ -227,25 +259,8 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
         dto.setEtmShortName(entity.getEtmShortName());
         dto.setEtmActiveYN(entity.getEtmActiveYN());
         dto.setActiveDate(entity.getActiveDate());
-        // dto.setAddress(addressinfoLog.getAddress());
-        // dto.setAddress1(addressinfoLog.getAddress1());
-        // dto.setAddress2(addressinfoLog.getAddress2());
-        // dto.setCountry(addressinfoLog.getCountry());
-        // dto.setState(addressinfoLog.getState());
-        // dto.setDistrict(addressinfoLog.getDistrict());
-        // dto.setPlace(addressinfoLog.getPlace());
-        // dto.setPincode(addressinfoLog.getPincode());
-        // dto.setLandlineNumber(addressinfoLog.getLandlineNumber());
-        // dto.setMobileNumber(addressinfoLog.getMobileNumber());
-        // dto.setEmail(addressinfoLog.getEmail());
-        // dto.setImagePath(addressinfoLog.getImage());
-        // dto.setWithaffectdate(addressinfoLog.getWithaffectdate());
-        // dto.setDesignation(addressinfoLog.getDesignation());
-        // dto.setEmployerName(addressinfoLog.getEmployerName());
-        // dto.setEmployerNumber(addressinfoLog.getEmployerNumber());
-        // dto.setEmployerEmail(addressinfoLog.getEmployerEmail());
-        // dto.setAmendNo(addressinfoLog.getAmendNo());
-        dto.setMstID(entity.getEntityLogPK().getEtmEntityID());
+        dto.setImagePath(entity.getEtmImage());
+        dto.setInactiveDate(entity.getInactiveDate());
 
         if (entity.getAuthorization() != null) {
             dto.setAuthId(entity.getAuthorization().getAuthId());
@@ -255,28 +270,6 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
             if (entity.getAuthorization().getUserMst() != null) {
                 dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
             }
-        }
-
-        if (entity.getAddressInfoLog() != null) {
-            dto.setAddress(entity.getAddressInfoLog().getAddress());
-            dto.setAddress1(entity.getAddressInfoLog().getAddress1());
-            dto.setAddress2(entity.getAddressInfoLog().getAddress2());
-            dto.setCountry(entity.getAddressInfoLog().getCountry());
-            dto.setState(entity.getAddressInfoLog().getState());
-            dto.setDistrict(entity.getAddressInfoLog().getDistrict());
-            dto.setPlace(entity.getAddressInfoLog().getPlace());
-            dto.setPincode(entity.getAddressInfoLog().getPincode());
-            dto.setLandlineNumber(entity.getAddressInfoLog().getLandlineNumber());
-            dto.setMobileNumber(entity.getAddressInfoLog().getMobileNumber());
-            dto.setEmail(entity.getAddressInfoLog().getEmail());
-            dto.setDesignation(entity.getAddressInfoLog().getDesignation());
-            dto.setEmployerName(entity.getAddressInfoLog().getEmployerName());
-            dto.setEmployerNumber(entity.getAddressInfoLog().getEmployerNumber());
-            dto.setEmployerEmail(entity.getAddressInfoLog().getEmployerEmail());
-            dto.setImagePath(entity.getAddressInfoLog().getImage());
-            // dto.setWithaffectdate(entity.getWithaffectdate().getW);
-            dto.setAmendNo(entity.getAddressInfoLog().getAmendNo());
-
         }
 
         return dto;
@@ -289,11 +282,36 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
 
         EntityLogDTO dto = dtos.get(0);
 
-        AddressInfoLog addressinfoLog = new AddressInfoLog();
-
         EntityLog savedLog = null;
 
         if ("INSERT".equalsIgnoreCase(mode) || "UPDATE".equalsIgnoreCase(mode)) {
+
+            // ===== SAVE Address info =====
+            AddressInfoLog addressinfoLog = new AddressInfoLog();
+
+            // SET THE PK ON THE ADDRESSINFOLOG
+            addressinfoLog.setAddressInfoLogPK(dto.getAddressInfoLogPK());
+            addressinfoLog.setWithaffectdate(dto.getWithaffectdate());
+            addressinfoLog.setAddress(dto.getAddress());
+            addressinfoLog.setAddress1(dto.getAddress1());
+            addressinfoLog.setAddress2(dto.getAddress2());
+            addressinfoLog.setCountry(dto.getCountry());
+            addressinfoLog.setState(dto.getState());
+            addressinfoLog.setDistrict(dto.getDistrict());
+            addressinfoLog.setPlace(dto.getPlace());
+            addressinfoLog.setPincode(dto.getPincode());
+            addressinfoLog.setLandlineNumber(dto.getLandlineNumber());
+            addressinfoLog.setMobileNumber(dto.getMobileNumber());
+            addressinfoLog.setEmail(dto.getEmail());
+            addressinfoLog.setEmployerName(dto.getEmployerName());
+            addressinfoLog.setDesignation(dto.getDesignation());
+            addressinfoLog.setEmployerNumber(dto.getEmployerNumber());
+            addressinfoLog.setEmployerEmail(dto.getEmployerEmail());
+            addressinfoLog.setAmendNo(dto.getAmendNo());
+
+            AddressInfoLog savedAddress = addressInfoLogRepository.save(addressinfoLog);
+
+            // log.setAddressInfoLog(savedAddress);
 
             log.setEntityLogPK(dto.getEntityLogPK());
             log.setEtmName(dto.getEtmName());
@@ -302,25 +320,12 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
             log.setActiveDate(dto.getActiveDate());
             log.setEtmActiveYN(dto.getEtmActiveYN());
             log.setAmendNo(dto.getAmendNo());
-            // addressinfoLog.setWithaffectdate(dto.getWithaffectdate());
-            // addressinfoLog.setAddress(dto.getAddress());
-            // addressinfoLog.setAddress1(dto.getAddress1());
-            // addressinfoLog.setAddress2(dto.getAddress2());
-            // addressinfoLog.setCountry(dto.getCountry());
-            // addressinfoLog.setState(dto.getState());
-            // addressinfoLog.setDistrict(dto.getDistrict());
-            // addressinfoLog.setPlace(dto.getPlace());
-            // addressinfoLog.setPincode(dto.getPincode());
-            // addressinfoLog.setLandlineNumber(dto.getLandlineNumber());
-            // addressinfoLog.setMobileNumber(dto.getMobileNumber());
-            // addressinfoLog.setEmail(dto.getEmail());
-            // addressinfoLog.setEmployerName(dto.getEmployerName());
-            // addressinfoLog.setDesignation(dto.getDesignation());
-            // addressinfoLog.setEmployerNumber(dto.getEmployerNumber());
-            // addressinfoLog.setEmployerEmail(dto.getEmployerEmail());
-            // addressinfoLog.setImage(dto.getImagePath());
-            // // addressinfoLog.setEntityLogPK(dto.getEntityLogPK());
-            // addressinfoLog.setAmendNo(dto.getAmendNo());
+            log.setEtmDocInfoID(dto.getEtmDocInfoID());
+            log.setEtmImage(dto.getImagePath());
+            log.setEtmIntPrefix(dto.getEtmIntPrefix());
+            log.setEtmPrefix(dto.getEtmPrefix());
+            log.setInactiveDate(dto.getInactiveDate());
+            log.setMuzControlCodes(dto.getMuzControlCodes());
 
             // SET AUTHORIZATION
             if (dto.getAuthId() != null) {
@@ -329,12 +334,6 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
                 log.setAuthorization(auth);
             } else {
                 throw new RuntimeException("Authorization ID is required for EntityLog");
-            }
-            if (dto.getAddressInfoID() != null) {
-                AddressInfoLog infoLog = new AddressInfoLog();
-                log.setAddressInfoLog(infoLog);
-            } else {
-                throw new RuntimeException("AddressInfoID ID is required for EntityLog");
             }
 
             // SAVE TO DATABASE

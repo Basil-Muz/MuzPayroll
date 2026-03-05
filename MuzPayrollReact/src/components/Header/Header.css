@@ -65,7 +65,7 @@
   border-right: 1px solid var(--border-light);
 }
 .logo img {
-  height: 38px;
+  height: 46px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
@@ -134,7 +134,7 @@
 
 .context-branch,
 .context-location {
-  color: var(--text-primary, #111827);
+  /* color: var(--text-primary, #111827); */
   font-weight: 500;
   padding: 2px 8px;
   background: transparent; /* No background */

@@ -1,6 +1,6 @@
 /* usergroupForm.css */
 .modal-usergroup-form {
-   position: fixed;
+  position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
@@ -31,9 +31,8 @@
   height: 100%;
 }
 
-
 .modal-content {
-  background-color: white;
+  background-color: var(--bg);
   padding: 10px 15px;
   position: relative;
   margin: auto;
@@ -61,9 +60,9 @@
   }
 }
 
-.form-row{
-    display: grid;
-    grid-template-columns: 140px 1fr;
+.form-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
 }
 
 .modal-header {
@@ -74,7 +73,7 @@
   font: 400 15px sans-serif;
   padding-left: 26.2px;
   padding-right: 26.2px;
-  background: linear-gradient(90deg, #eadcf3, #f4ecfa);
+  background: var(--background-alt);
   border-bottom: 1px solid var(--border-light);
   margin: -10px -15px 0 -15px;
   display: flex;
@@ -188,7 +187,6 @@
   align-self: center;
 }
 
-
 .modal-usergroup-form .full-content {
   padding-bottom: 6px;
 }
@@ -199,7 +197,7 @@
 }
 
 .modal-usergroup-form .custom-datepicker .react-datepicker__current-month {
-padding-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .modal-usergroup-form input,
@@ -209,7 +207,7 @@ padding-bottom: 0 !important;
   /* padding: 8px 10px; */
   box-sizing: border-box;
   background: none;
-  color: black;
+  /* color: black; */
   /* border-radius: var(--radius-sm); */
   /* margin-top: 4px; */
   /* border: 1px solid #d0c4dc; */
@@ -217,47 +215,49 @@ padding-bottom: 0 !important;
   /* border-radius: 4px;*/
   outline: none;
 }
-
+.modal-usergroup-form .form-control-select__control{
+background: var(--bg) !important
+}
 .modal-usergroup-form .form-buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-.modal-usergroup-form .save-btn,
+/* .modal-usergroup-form .save-btn,
 .modal-usergroup-form .cancel-btn {
   padding: 9px 31px;
   border-radius: 999px;
   background: rgba(210, 24, 216, 0.08);
   border: 1px solid var(--brand-border);
-  /* color: var(--primary); */
+  color: var(--primary);
   backdrop-filter: blur(6px);
   transition: all 0.25s ease;
-}
+} */
 
-.modal-usergroup-form .save-btn {
+
+/* .modal-usergroup-form .save-btn {
   color: var(--success);
 }
 
 .modal-usergroup-form .save-btn:hover {
   color: rgb(178, 20, 184) !important;
   background: rgba(210, 24, 216, 0.16);
-}
+} */
 
 /* .modal-usergroup-form .cancel-btn {
   color: #d44242ff;
 } */
 
-.modelal-usergroup-form .cancel-btn:hover {
+/* .modelal-usergroup-form .cancel-btn:hover {
   color: #833c3cff;
 }
 
 .modal-usergroup-form .save-btn:hover,
 .modal-usergroup-form .cancel-btn:hover {
-  /* color:var(--primary-hover); */
   background: rgba(210, 24, 216, 0.16);
-}
+} */
 
 .main-error .error {
   color: var(--danger);
@@ -267,7 +267,7 @@ padding-bottom: 0 !important;
   font-size: 12.5px;
 }
 
-.modal-usergroup-form .cancel-btn {
+/* .modal-usergroup-form .cancel-btn {
   color: #d44242ff;
   transition: all 0.2s ease;
 }
@@ -278,15 +278,89 @@ padding-bottom: 0 !important;
   cursor: not-allowed;
   opacity: 0.6;
   pointer-events: none;
-}
-.modal-usergroup-form .save-btn:not(:disabled):hover {
-  /* color: #33793aff; */
+} */
+/* .modal-usergroup-form .save-btn:not(:disabled):hover {
   background: rgba(210, 24, 216, 0.16);
-}
+} */
 
-.modal-usergroup-form .cancel-btn:not(:disabled):hover {
+/* .modal-usergroup-form .cancel-btn:not(:disabled):hover {
   color: #833c3cff;
   background: rgba(210, 24, 216, 0.16);
+} */
+/* ================================
+   FORM ACTION BUTTONS
+================================ */
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* Base Button Style */
+.form-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+  min-width: 110px;
+  justify-content: center;
+}
+
+/* ================================
+   PRIMARY (Save)
+================================ */
+.save-btn {
+  background: var(--button-primary);
+  color: #fff;
+  border: 1px solid var(--button-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.save-btn:hover:not(:disabled) {
+  background: var(--button-primary-hover);
+  border-color: var(--button-primary-hover);
+  transform: translateY(-1px);
+}
+
+.save-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* ================================
+   SECONDARY (Cancel)
+================================ */
+.cancel-btn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(212, 37, 235, 0.24);
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: var(--option-light);
+  border-color: var(--brand-border);
+}
+
+/* ================================
+   DISABLED STATE
+================================ */
+.form-buttons button:disabled {
+  background: var(--disabled-bg);
+  color: var(--text-muted);
+  border-color: var(--border-light);
+  cursor: not-allowed;
+  opacity: var(--disabled-opacity);
+  box-shadow: none;
 }
 .shift-type-container {
   display: flex;
@@ -358,7 +432,6 @@ padding-bottom: 0 !important;
 }
 
 @media (max-width: 1024px) {
-
   .modal-content {
     left: 50% !important;
     top: 50% !important;

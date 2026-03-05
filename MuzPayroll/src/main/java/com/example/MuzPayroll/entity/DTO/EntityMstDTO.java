@@ -5,13 +5,17 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.AddressInfoLogPK;
 import com.example.MuzPayroll.entity.AddressInfoMst;
 import com.example.MuzPayroll.entity.Authorization;
+import com.example.MuzPayroll.entity.EntityHierarchyInfo;
 import com.example.MuzPayroll.entity.EntityLogPK;
+import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.MuzControlCodes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+
 import jakarta.persistence.Transient;
 
 public class EntityMstDTO {
@@ -142,16 +146,6 @@ public class EntityMstDTO {
         EtmActiveYN = etmActiveYN;
     }
 
-    private Long EtmAuthInfoID;
-
-    public Long getEtmAuthInfoID() {
-        return EtmAuthInfoID;
-    }
-
-    public void setEtmAuthInfoID(Long etmAuthInfoID) {
-        EtmAuthInfoID = etmAuthInfoID;
-    }
-
     private LocalDate activeDate;
 
     public LocalDate getActiveDate() {
@@ -170,26 +164,6 @@ public class EntityMstDTO {
 
     public void setInactiveDate(LocalDate inactiveDate) {
         InactiveDate = inactiveDate;
-    }
-
-    private Long LogPK;
-
-    public Long getLogPK() {
-        return LogPK;
-    }
-
-    public void setLogPK(Long logPK) {
-        LogPK = logPK;
-    }
-
-    private Long MstID;
-
-    public Long getMstID() {
-        return MstID;
-    }
-
-    public void setMstID(Long mstID) {
-        MstID = mstID;
     }
 
     private String ImagePath;
@@ -386,7 +360,13 @@ public class EntityMstDTO {
     @JsonIgnore
     private AddressInfoMst addressInfoMst;
 
-    private AddressInfoMst addressInfoID;
+    private Long addressInfoID;
+
+    private AddressInfoLogPK addressInfoLogPK;
+
+    private Long logRowNo;
+
+    private EntityHierarchyInfo entityHierarchyInfo;
 
     // Authorization
 
@@ -447,12 +427,96 @@ public class EntityMstDTO {
         this.addressInfoMst = addressInfoMst;
     }
 
-    public AddressInfoMst getAddressInfoID() {
+    public AddressInfoLogPK getAddressInfoLogPK() {
+        return addressInfoLogPK;
+    }
+
+    public void setAddressInfoLogPK(AddressInfoLogPK addressInfoLogPK) {
+        this.addressInfoLogPK = addressInfoLogPK;
+    }
+
+    public Long getLogRowNo() {
+        return logRowNo;
+    }
+
+    public void setLogRowNo(Long logRowNo) {
+        this.logRowNo = logRowNo;
+    }
+
+    public Long getAddressInfoID() {
         return addressInfoID;
     }
 
-    public void setAddressInfoID(AddressInfoMst addressInfoID) {
+    public void setAddressInfoID(Long addressInfoID) {
         this.addressInfoID = addressInfoID;
+    }
+
+    private EntityMst companyMst;
+
+    private EntityMst branchMst;
+
+    private EntityMst locationMst;
+
+    public EntityMst getCompanyMst() {
+        return companyMst;
+    }
+
+    public void setCompanyMst(EntityMst companyMst) {
+        this.companyMst = companyMst;
+    }
+
+    public EntityMst getBranchMst() {
+        return branchMst;
+    }
+
+    public void setBranchMst(EntityMst branchMst) {
+        this.branchMst = branchMst;
+    }
+
+    public EntityMst getLocationMst() {
+        return locationMst;
+    }
+
+    public void setLocationMst(EntityMst locationMst) {
+        this.locationMst = locationMst;
+    }
+
+    public EntityHierarchyInfo getEntityHierarchyInfo() {
+        return entityHierarchyInfo;
+    }
+
+    public void setEntityHierarchyInfo(EntityHierarchyInfo entityHierarchyInfo) {
+        this.entityHierarchyInfo = entityHierarchyInfo;
+    }
+
+    private Long EhiBusinessGroupID;
+
+    public Long getEhiBusinessGroupID() {
+        return EhiBusinessGroupID;
+    }
+
+    public void setEhiBusinessGroupID(Long ehiBusinessGroupID) {
+        EhiBusinessGroupID = ehiBusinessGroupID;
+    }
+
+    private Long EhiParentLedgerID;
+
+    public Long getEhiParentLedgerID() {
+        return EhiParentLedgerID;
+    }
+
+    public void setEhiParentLedgerID(Long ehiParentLedgerID) {
+        EhiParentLedgerID = ehiParentLedgerID;
+    }
+
+    private Long EhiSubLedgerID;
+
+    public Long getEhiSubLedgerID() {
+        return EhiSubLedgerID;
+    }
+
+    public void setEhiSubLedgerID(Long ehiSubLedgerID) {
+        EhiSubLedgerID = ehiSubLedgerID;
     }
 
 }

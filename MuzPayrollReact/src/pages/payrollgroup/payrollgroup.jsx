@@ -1,219 +1,253 @@
-import { useState } from "react";
+// React & hooks
+import React, { useEffect, useState, useCallback } from "react";
+
+// Icons
+import { BsGrid3X3GapFill } from "react-icons/bs";
+import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
+import { IoIosSearch } from "react-icons/io";
+
+// Shared components
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import PayrollGroupSearch from "./payrollgroupsearch";
-import PayrollGroupList from "./payrollgrouplist";
-import { BsGrid3X3GapFill } from "react-icons/bs";
-import { FaListUl } from "react-icons/fa";
-import { IoIosSearch } from "react-icons/io";
+import Search from "../../components/search/Search";
 import ListItemForm from "../../components/ListItemForm/ListItemForm";
-import { savePayrollGroup, getPayrollGroupById } from "../../services/payrollgroup.service";
+import { ListCard } from "../../components/List Card/ListCard";
+
+// Services
+import {getPayrollGroupsList,getPayrollGroupById,savePayrollGroup,searchPayrollGroup,} from "../../services/payrollgroup.service";
 import { PAYROLL_GROUP_FIELD_MAP } from "../../constants/payrollGroupMap";
+import { useAuth } from "../../context/AuthProvider";
+
 import "./payrollgroup.css";
 
 function PayrollGroup() {
-  const [listView, setListView] = useState(false);
-  const [showSearch, setShowSearch] = useState(true);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [searchText, setSearchText] = useState("");
-  const [filters, setFilters] = useState(null);
-  const [headerError] = useState([]);
+  const { user } = useAuth();
+  const companyId = user?.companyId;
 
+  const [payrollGroupList, setPayrollGroupList] = useState([]);
+
+  const [boxView, setBoxView] = useState(true);
+  const [listView, setListView] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [groupByStatus, setGroupByStatus] = useState(false);
+
+  const [activePayrollGroups, setActivePayrollGroups] = useState([]);
+  const [inactivePayrollGroups, setInactivePayrollGroups] = useState([]);
+
+  const [searchText, setSearchText] = useState("");
+  const [selectedItem, setSelectedItem] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
+  /* ================= FETCH ALL ================= */
 
-  // Dummy data
-  const payrollGroups = [
-    {
-      mstID: 1,
-      code: "PG001",
-      name: "Monthly Payroll",
-      shortName: "MONTHLY",
-      description: "Processes salary on a monthly basis.",
-      activeDate: "01-01-2024",
-      inactiveDate: null,
-    },
-    {
-      mstID: 2,
-      code: "PG002",
-      name: "Weekly Payroll",
-      shortName: "WEEKLY",
-      description: "Processes salary every week.",
-      activeDate: "01-03-2024",
-      inactiveDate: null,
-    },
-    {
-      mstID: 3,
-      code: "PG003",
-      name: "Minimum Wages",
-      shortName: "MINWAGE",
-      description: "Payroll group for minimum wage employees.",
-      activeDate: "15-02-2024",
-      inactiveDate: "31-12-2024",
-    },
-    {
-      mstID: 4,
-      code: "PG004",
-      name: "Contract Payroll",
-      shortName: "CONTRACT",
-      description: "Payroll for contract-based employees.",
-      activeDate: "01-04-2024",
-      inactiveDate: null,
-    },
-    {
-      mstID: 5,
-      code: "PG005",
-      name: "Executive Payroll",
-      shortName: "EXEC",
-      description: "Payroll group for executive employees.",
-      activeDate: "10-01-2024",
-      inactiveDate: "30-09-2024",
-    },
-  ];
+  const getAllPayrollGroups = async (activeStatusYN = null) => {
+    try {
+      const response = await getPayrollGroupsList(companyId, activeStatusYN);
+      setPayrollGroupList(response.data);
+    } catch (error) {
+      console.error("Error fetching payroll groups", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllPayrollGroups(null);
+  }, [showForm]);
+
+  /* ================= SEARCH ================= */
+
+  const searchData = useCallback(async () => {
+    if (searchText.trim()) {
+      const response = await searchPayrollGroup(searchText);
+      setPayrollGroupList(response.data.content);
+    } else {
+      getAllPayrollGroups(null);
+    }
+  }, [searchText, companyId]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      searchData();
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchText]);
+
+  /* ================= GROUPING ================= */
+
+  const handleGroupSubmit = async (checked) => {
+    setGroupByStatus(checked);
+    setShowSearch(false);
+
+    if (!checked) {
+      getAllPayrollGroups(null);
+      return;
+    }
+
+    try {
+      const [activeRes, inactiveRes] = await Promise.all([
+        getPayrollGroupsList(companyId, 1),
+        getPayrollGroupsList(companyId, 0),
+      ]);
+
+      setActivePayrollGroups(activeRes.data);
+      setInactivePayrollGroups(inactiveRes.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   /* ================= HANDLERS ================= */
+
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
+  const handleNew = () => {
+    setSelectedItem(null);
+    setShowForm(true);
+  };
 
   const toggleForm = () => {
     setShowForm((prev) => !prev);
   };
 
-  const handleDataToForm = (item) => {
-    setSelectedItem(item.mstID); // edit mode
+  const handleDataToForm = (mstID) => {
+    setSelectedItem(mstID);
     setShowForm(true);
   };
-
-  const handleNew = () => {
-    setSelectedItem(null); // new record
-    setShowForm(true);
-  };
-
-  const handleSearchApply = (searchFilters) => {
-    setFilters(searchFilters);
-    setShowSearch(false); // close slide search
-  };
-
-  const handleClear = () => {
-    setFilters(null);
-    setSearchText("");
-    setShowSearch(true); // go back to search-only screen
-  };
-
-  const handleSearchInput = (e) => {
-    setSearchText(e.target.value);
-  };
-
-  const handleSelect = (item) => {
-    console.log("Selected Payroll Group:", item);
-  };
-
-  const hasDataView = !showSearch;
-
-  // const handleDataToForm = (item) => {
-  //   setSelectedItem(item);
-  //   toggleForm();
-  // };
 
   return (
     <>
-      <Header backendError={headerError} />
+      <Header backendError={[]} />
 
       <div className="payroll-group-page">
+        {/* ================= HEADER ================= */}
+        <div className="header-section">
+          <h2 className="page-title">Payroll Group</h2>
 
-        {/* ================= HEADER (ONLY WHEN DATA SHOWN) ================= */}
+          <div className="header-actions">
+            <div className="view-toggle">
+              <button
+                className={`icon-btn ${boxView ? "active" : ""}`}
+                onClick={() => {
+                  setBoxView(true);
+                  setListView(false);
+                }}
+              >
+                <BsGrid3X3GapFill size={18} />
+              </button>
 
-        {hasDataView && (
-          <div className="header-section">
-            <h2 className="page-title">Payroll Group</h2>
+              <button
+                className={`icon-btn ${listView ? "active" : ""}`}
+                onClick={() => {
+                  setListView(true);
+                  setBoxView(false);
+                }}
+              >
+                <FaListUl size={18} />
+              </button>
 
-            <div className="header-actions">
-              {/* View Toggle */}
-              <div className="view-toggle">
-                <button
-                  className={`icon-btn ${!listView ? "active" : ""}`}
-                  title="Tile View"
-                  onClick={() => setListView(false)}
-                >
-                  <BsGrid3X3GapFill size={18} />
-                </button>
-                <button
-                  className={`icon-btn ${listView ? "active" : ""}`}
-                  title="List View"
-                  onClick={() => setListView(true)}
-                >
-                  <FaListUl size={18} />
-                </button>
+              <button
+                className={`icon-btn ${showSearch ? "active" : ""}`}
+                onClick={() => setShowSearch(!showSearch)}
+              >
+                <FaRegObjectGroup size={18} />
+              </button>
+            </div>
 
-                {/*  SEARCH ICON (NO GROUP ICON) */}
-                <button
-                  className={`icon-btn ${showSearch ? "active" : ""}`}
-                  title="Search"
-                  onClick={() => setShowSearch(!showSearch)}
-                >
-                  <IoIosSearch size={18} />
-                </button>
-              </div>
-
-              {/* Inline Search */}
-              <div className="search-box">
-                <IoIosSearch size={18} />
-                <input
-                  type="text"
-                  placeholder="Search payroll group…"
-                  value={searchText}
-                  onChange={handleSearchInput}
-                />
-              </div>
+            <div className="search-box">
+              <IoIosSearch size={18} />
+              <input
+                type="text"
+                placeholder="Search payroll group…"
+                value={searchText}
+                onChange={handleSearchChange}
+              />
             </div>
           </div>
+        </div>
+
+        {/* ================= GROUP SLIDE ================= */}
+        <div className={`slide-container ${showSearch ? "show" : "hide"}`}>
+          <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
+        </div>
+
+        {/* ================= NORMAL VIEW ================= */}
+        {!groupByStatus &&
+          (payrollGroupList.length > 0 ? (
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {payrollGroupList.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status="active"
+                  handleDataToForm={handleDataToForm}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="no-data-found">
+              No payroll groups available
+            </div>
+          ))}
+
+        {/* ================= GROUPED VIEW ================= */}
+        {groupByStatus && (
+          <>
+            <h3 className="group-title active">Active</h3>
+            {activePayrollGroups.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {activePayrollGroups.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="active"
+                    handleDataToForm={handleDataToForm}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">
+                No active payroll groups
+              </div>
+            )}
+
+            <h3 className="group-title inactive">Inactive</h3>
+            {inactivePayrollGroups.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {inactivePayrollGroups.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="inactive"
+                    handleDataToForm={handleDataToForm}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">
+                No inactive payroll groups
+              </div>
+            )}
+          </>
         )}
 
-        {/* ================= SLIDE SEARCH ================= */}
-        {showSearch && <PayrollGroupSearch onApply={handleSearchApply} />}
+        {/* ================= FLOATING ACTION BAR ================= */}
+        <FloatingActionBar
+          actions={{
+            save: { disabled: true },
+            clear: {
+              onClick: () => getAllPayrollGroups(null),
+            },
+            delete: { disabled: true },
+            print: { disabled: true },
+            new: {
+              onClick: handleNew,
+            },
+          }}
+        />
 
-        {/* ================= LIST / TILE VIEW ================= */}
-        {!showSearch && (
-          <PayrollGroupList
-            data={payrollGroups}
-            view={listView ? "list" : "tile"}
-            searchText={searchText}
-            filters={filters}
-            onSelect={handleSelect}
-            handleDataToForm={handleDataToForm}
-          />
-        )}
-
-
-        {/* ================= FLOATING ACTION BAR (DATA ONLY) ================= */}
-        {!showSearch && (
-          <FloatingActionBar
-            actions={{
-              save: {
-                onClick: () => console.log("Save Payroll Group"),
-                disabled: true,
-              },
-              // search: {
-              //   onClick: () => setShowSearch(true),
-              // },
-              clear: {
-                onClick: handleClear,
-              },
-              delete: {
-                onClick: () => console.log("Delete Payroll Group"),
-                disabled: true,
-              },
-              // print: {
-              //   onClick: () => console.log("Print Payroll Group"),
-              //   disabled: true,
-              // },
-              new: {
-                onClick: () => handleNew(),
-              },
-              refresh: {
-                onClick: () => window.location.reload(),
-              },
-            }}
-          />
-        )}
+        {/* ================= FORM ================= */}
         {showForm && (
           <ListItemForm
             entity="Payroll Group"
@@ -224,7 +258,6 @@ function PayrollGroup() {
             ENTITY_FIELD_MAP={PAYROLL_GROUP_FIELD_MAP}
           />
         )}
-
       </div>
     </>
   );

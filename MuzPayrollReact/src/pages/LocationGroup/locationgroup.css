@@ -15,6 +15,39 @@
     font-weight: 400;
 }
 
+.group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+}
+
+/* Active Style */
+.group-title.active {
+  background: rgba(141, 15, 157, 0.08);
+  color: var(--brand);
+  border-left: 4px solid var(--brand);
+}
+
+/* Inactive Style */
+.group-title.inactive {
+  background: rgba(217, 48, 37, 0.08);
+  color: var(--danger);
+  border-left: 4px solid var(--danger);
+}
+
+.group-title .count {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+}
 /* ================= GRID BASE ================= */
 
 .card-grid {
@@ -28,6 +61,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
     gap: 15px;
+    margin-bottom: 1.2rem;
 }
 
 /* ================= LIST VIEW ================= */
@@ -148,7 +182,7 @@
 .locationgroup-page .card-title {
     font-size: 14.5px;
     font-weight: 600;
-    color: var(--primary);
+    /* color: var(--primary); */
 }
 
 .locationgroup-page .card-shortname,

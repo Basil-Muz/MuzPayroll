@@ -40,6 +40,8 @@ function LoggedPage() {
   const [companyList, setCompanyList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
+  const [userChangedCompany, setUserChangedCompany] = useState(false);
+  const [userChangedBranch, setUserChangedBranch] = useState(false);
   const [selectedLocationId, setSelectedLocationId] = useState(
     user?.defaultEntityHierarchyId || "",
   );
@@ -47,6 +49,7 @@ function LoggedPage() {
   const currentFinYear = getCurrentFinYear();
   const [finYear, setFinYear] = useState(currentFinYear);
   const finYearOptions = getFinYearOptions(currentFinYear);
+
 
   const [selectedCompanyId, setSelectedCompanyId] = useState(
     user?.userEntityHierarchyId || "",
@@ -97,21 +100,25 @@ function LoggedPage() {
         if (companies.length === 0) {
           toast.error("No companies available");
           setCompanyList([]);
-          setSelectedCompanyId("");
           return;
         }
 
         setCompanyList(companies);
 
-        const firstCompany =
+        const defaultCompany =
           companies.find(
-            (c) => String(c.entityHierarchyId) === String(selectedCompanyId),
+            (c) =>
+              String(c.entityHierarchyId) ===
+              String(user?.userEntityHierarchyId)
           ) || companies[0];
 
-        setSelectedCompanyId(String(firstCompany.entityHierarchyId));
-        setValue("companyId", String(firstCompany.entityHierarchyId));
+        const companyId = String(defaultCompany.entityHierarchyId);
 
-      } catch {
+        setSelectedCompanyId(companyId);
+        setValue("companyId", companyId);
+
+       
+      } catch (error) {
         toast.error("Failed to load companies");
         setCompanyList([]);
       }
@@ -129,9 +136,13 @@ function LoggedPage() {
         const data = await fetchBranch(user.userMstId, selectedCompanyId);
         const branches = Array.isArray(data) ? data : [];
 
+        setBranchList(branches);
+
         if (branches.length === 0) {
-          toast.error("No branches available for selected company");
-          setBranchList([]);
+          if (userChangedCompany) {
+            toast.error("No branches available for selected company");
+          }
+
           setSelectedBranchId("");
           setLocationList([]);
           setSelectedLocationId("");
@@ -140,17 +151,19 @@ function LoggedPage() {
           return;
         }
 
-        setBranchList(branches);
-
-        const firstBranch =
+        const defaultBranch =
           branches.find(
-            (b) => String(b.entityHierarchyId) === String(selectedBranchId)
+            (b) =>
+              String(b.entityHierarchyId) ===
+              String(user?.branchEntityHierarchyId)
           ) || branches[0];
 
-        setSelectedBranchId(String(firstBranch.entityHierarchyId));
-        setValue("branchId", String(firstBranch.entityHierarchyId));
+        const branchId = String(defaultBranch.entityHierarchyId);
 
-      } catch {
+        setSelectedBranchId(branchId);
+        setValue("branchId", branchId);
+
+      } catch (error) {
         toast.error("Failed to load branches");
         setBranchList([]);
         setSelectedBranchId("");
@@ -182,27 +195,31 @@ function LoggedPage() {
 
         const locations = Array.isArray(data) ? data : [];
 
+        setLocationList(locations);
+
         if (locations.length === 0) {
-          toast.error("No locations available for selected branch");
-          setLocationList([]);
+          if (userChangedBranch) {
+            toast.error("No locations available for selected branch");
+          }
+
           setSelectedLocationId("");
           setValue("locationId", "");
           return;
         }
 
-        setLocationList(locations);
-
-        const firstLocation =
+        const defaultLocation =
           locations.find(
             (l) =>
               String(l.entityHierarchyId) ===
               String(user?.defaultEntityHierarchyId)
           ) || locations[0];
 
-        setSelectedLocationId(String(firstLocation.entityHierarchyId));
-        setValue("locationId", String(firstLocation.entityHierarchyId));
+        const locationId = String(defaultLocation.entityHierarchyId);
 
-      } catch {
+        setSelectedLocationId(locationId);
+        setValue("locationId", locationId);
+
+      } catch (error) {
         toast.error("Failed to load locations");
         setLocationList([]);
         setSelectedLocationId("");
@@ -213,7 +230,12 @@ function LoggedPage() {
     };
 
     loadLocations();
-  }, [user?.userMstId, selectedCompanyId, selectedBranchId]);
+  }, [
+    user?.userMstId,
+    selectedCompanyId,
+    selectedBranchId,
+
+  ]);
 
   // ================= Select options =================
   const companyOptions = companyList.map((c) => ({
@@ -290,7 +312,7 @@ function LoggedPage() {
         1,
         null,
       );
-      console.log("Main Menu", response);
+      // console.log("Main Menu", response);
       const organizedMenu = organizeMenuFromBackend(response.data);
       // console.log("Organized menu", organizedMenu);
       updateMenus(organizedMenu);
@@ -342,10 +364,14 @@ function LoggedPage() {
                   options={companyOptions}
                   onChange={(opt) => {
                     const newId = opt?.value || "";
+                    setUserChangedCompany(true);   //  mark manual change
                     setSelectedCompanyId(newId);
                     setSelectedBranchId("");
+                    setSelectedLocationId("");
                     setBranchList([]);
+                    setLocationList([]);
                     setValue("branchId", "");
+                    setValue("locationId", "");
                   }}
                   isDisabled={fieldsLocked}
                   classNamePrefix="form-control-select"
@@ -388,9 +414,11 @@ function LoggedPage() {
                       options={branchOptions}
                       onChange={(opt) => {
                         const newId = opt?.value || "";
+                        setUserChangedBranch(true);   // mark manual change
                         field.onChange(newId);
                         setSelectedBranchId(newId);
                         setSelectedLocationId("");
+                        setLocationList([]);
                         setValue("locationId", "");
                       }}
                       isDisabled={fieldsLocked}

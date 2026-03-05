@@ -13,28 +13,34 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.AddressInfoLogPK;
 import com.example.MuzPayroll.entity.AddressInfoMst;
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.DTO.EntityLogDTO;
 import com.example.MuzPayroll.entity.DTO.EntityMstDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.entity.DTO.UserEntityDTO;
+import com.example.MuzPayroll.entity.EntityHierarchyInfo;
 import com.example.MuzPayroll.entity.EntityLog;
 import com.example.MuzPayroll.entity.EntityLogPK;
 import com.example.MuzPayroll.entity.EntityMst;
+import com.example.MuzPayroll.entity.MenuThemeHdr;
 import com.example.MuzPayroll.entity.MuzControlCodes;
+import com.example.MuzPayroll.entity.SolutionMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.repository.AddressInfoMstRepository;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
+import com.example.MuzPayroll.repository.EntityHierarchyInfoRepository;
 import com.example.MuzPayroll.repository.EntityLogRepository;
 import com.example.MuzPayroll.repository.EntityRepository;
+import com.example.MuzPayroll.repository.MenuThemeDtlRepository;
+import com.example.MuzPayroll.repository.MenuThemeHdrRepository;
 import com.example.MuzPayroll.repository.MuzControlCodesRepository;
+import com.example.MuzPayroll.repository.SolutionRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
 @Service
@@ -59,7 +65,19 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
         private AddressInfoMstRepository addressInfoMstRepository;
 
         @Autowired
+        private EntityHierarchyInfoRepository entityHierarchyInfoRepository;
+
+        @Autowired
         private MuzControlCodesRepository muzControlCodesRepository;
+
+        @Autowired
+        private SolutionRepository solutionRepository;
+
+        @Autowired
+        private MenuThemeHdrRepository menuThemeHdrRepository;
+
+        @Autowired
+        private MenuThemeDtlRepository menuThemeDtlRepository;
 
         // private static final String UPLOAD_DIR =
         // "/src/main/java/com/example/MuzPayroll/Uploads/Company/";
@@ -142,6 +160,8 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                 rowErrors.add("Active StatusYN is required");
                                         if (dto.getEtmEntityTypeMccID() == null)
                                                 rowErrors.add("MccId is required");
+                                        if (dto.getEtmCode() == null)
+                                                rowErrors.add("Code is required");
 
                                         MuzControlCodes controlCodes = muzControlCodesRepository
                                                         .findById(dto.getEtmEntityTypeMccID())
@@ -187,7 +207,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                         }
 
                                         // Collect ALL errors
-                                        if (dto.getMstID() == null)
+                                        if (dto.getEtmEntityId() == null)
                                                 rowErrors.add("Entity ID is required");
                                         if (isEmpty(dto.getEtmName()))
                                                 rowErrors.add("Entity name is required");
@@ -221,6 +241,8 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                 rowErrors.add("User code is required");
                                         if (dto.getEtmActiveYN() == null)
                                                 rowErrors.add("Active StatusYN is required");
+                                        if (dto.getEtmCode() == null)
+                                                rowErrors.add("Code is required");
 
                                         // Add row errors to main error list with row number
                                         if (!rowErrors.isEmpty()) {
@@ -306,18 +328,42 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         infoMst.setAmendNo(dto.getAmendNo());
 
                         dto.setAddressInfoMst(infoMst);
+
+                        // ===== CREATE EntityHierarchyInfo =====
+
+                        EntityHierarchyInfo entityInfo = new EntityHierarchyInfo();
+
+                        entityInfo.setEhiBusinessGroupID(1L);
+                        entityInfo.setEhiParentLedgerID(2L);
+                        entityInfo.setEhiSubLedgerID(3L);
+                        entityInfo.setCompanyMst(dto.getCompanyMst());
+                        entityInfo.setBranchMst(dto.getBranchMst());
+                        entityInfo.setMuzControlCodes(dto.getMuzControlCodes());
+
+                        entityInfo.setEhiLevelNo(10L);
+
+                        if (entityInfo.getMuzControlCodes().equals(14L)) {
+
+                                entityInfo.setEhiParentEntityHierarchyID(dto.getCompanyMst());
+                        } else if (entityInfo.getMuzControlCodes().equals(15L)) {
+
+                                entityInfo.setEhiParentEntityHierarchyID(dto.getBranchMst());
+                        }
+
+                        dto.setEntityHierarchyInfo(entityInfo);
+
                 }
 
                 if ("UPDATE".equals(mode)) {
 
-                        Long mstId = dto.getMstID();
+                        Long mstId = dto.getEtmEntityId();
 
                         // Get the latest authId for the mstId
 
                         Long authId = authorizationRepository
                                         .findLatestAuthIdByMstId(mstId)
                                         .orElseThrow(() -> new IllegalStateException(
-                                                        "AuthId not found for mstId " + mstId));
+                                                        "AuthId not found for entity ID " + mstId));
 
                         Optional<Boolean> status = authorizationRepository.findStatusByAuthId(authId);
 
@@ -336,6 +382,35 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                         // Store authorization temporarily
                         dto.setAuthorization(auth);
+
+                        Long addressId = entityRepository
+                                        .findAddressInfoIdByMstId(mstId)
+                                        .orElseThrow(() -> new IllegalStateException(
+                                                        "AddressInfo not found for entity ID " + mstId));
+                        // ===== CREATE AUTHORIZATION =====
+                        AddressInfoMst infoMst = new AddressInfoMst();
+
+                        infoMst.setAddressInfoID(addressId);
+                        infoMst.setAddress(dto.getAddress());
+                        infoMst.setAddress(dto.getAddress());
+                        infoMst.setAddress1(dto.getAddress1());
+                        infoMst.setAddress2(dto.getAddress2());
+                        infoMst.setCountry(dto.getCountry());
+                        infoMst.setState(dto.getState());
+                        infoMst.setDistrict(dto.getDistrict());
+                        infoMst.setPlace(dto.getPlace());
+                        infoMst.setPincode(dto.getPincode());
+                        infoMst.setLandlineNumber(dto.getLandlineNumber());
+                        infoMst.setMobileNumber(dto.getMobileNumber());
+                        infoMst.setEmail(dto.getEmail());
+                        infoMst.setDesignation(dto.getDesignation());
+                        infoMst.setEmployerName(dto.getEmployerName());
+                        infoMst.setEmployerNumber(dto.getEmployerNumber());
+                        infoMst.setEmployerEmail(dto.getEmployerEmail());
+                        infoMst.setWithaffectdate(dto.getWithaffectdate());
+                        infoMst.setAmendNo(dto.getAmendNo());
+
+                        dto.setAddressInfoMst(infoMst);
 
                 }
 
@@ -461,12 +536,20 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                         }
                                                 }
 
-                                                dto.setEtmEntityId(generatedId);
+                                                if (dto.getEtmEntityTypeMccID().equals(13L)) {
+                                                        dto.setEhiBusinessGroupID(generatedId);
+                                                        dto.setEhiParentLedgerID(dto.getEhiBusinessGroupID() + 1);
+                                                        dto.setEhiSubLedgerID(dto.getEhiParentLedgerID() + 1);
+                                                        dto.setEtmEntityId(dto.getEhiSubLedgerID() + 1);
+                                                } else {
+                                                        dto.setEtmEntityId(generatedId);
+                                                }
+
                                         }
 
                                         // Process log rows for this DTO
                                         if (generatedId != null) {
-                                                Long transID = generatedId;
+                                                Long transID = dto.getEtmEntityId();
                                                 Long logRowNo = 1L; // Default to 1
 
                                                 // Get max row number for this transaction
@@ -477,9 +560,11 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                                 && responseLogMaxRowNo.getData() != null) {
                                                         logRowNo = responseLogMaxRowNo.getData() + 1;
                                                 }
+
+                                                dto.setLogRowNo(logRowNo);
                                                 // Populate log entity PK
                                                 populateLogEntityPKfromEntity(transID, logRowNo, dto);
-                                                System.out.println("Entity pk" + dto.getEntityLogPK());
+
                                         }
                                 }
                         }
@@ -522,12 +607,13 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                 Response<Long> responseLogMaxRowNo = entityLogService
                                                                 .getMaxRowNo(transID);
 
-                                                Long mstId = dto.getMstID();
+                                                Long mstId = dto.getEtmEntityId();
 
                                                 Long authId = authorizationRepository
                                                                 .findLatestAuthIdByMstId(mstId)
                                                                 .orElseThrow(() -> new IllegalStateException(
-                                                                                "AuthId not found for mstId " + mstId));
+                                                                                "AuthId not found for Entity ID "
+                                                                                                + mstId));
 
                                                 Optional<Boolean> status = authorizationRepository
                                                                 .findStatusByAuthId(authId);
@@ -544,8 +630,10 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                         }
                                                 }
 
+                                                dto.setLogRowNo(logRowNo);
                                                 // Populate log entity PK
                                                 populateLogEntityPKfromEntity(transID, logRowNo, dto);
+
                                         }
                                 }
 
@@ -579,92 +667,93 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 List<String> errors = new ArrayList<>();
                 EntityMstDTO dto = dtos.get(0);
 
-                try {
-                        if ("INSERT".equals(mode)) {
+                // try {
+                // if ("INSERT".equals(mode)) {
 
-                                String prefix = "CM";
+                // String prefix = "CM";
 
-                                // Generate new code
-                                Pageable pageable = PageRequest.of(0, 1);
-                                List<EntityMst> result = entityRepository.findLatestEntityWithEMPrefix(pageable);
+                // // Generate new code
+                // Pageable pageable = PageRequest.of(0, 1);
+                // List<EntityMst> result =
+                // entityRepository.findLatestEntityWithEMPrefix(pageable);
 
-                                String generatedCode;
+                // String generatedCode;
 
-                                if (result == null || result.isEmpty()) {
-                                        generatedCode = prefix + "01";
-                                } else {
-                                        EntityMst latestEntity = result.get(0);
-                                        String latestCode = latestEntity.getEtmCode();
+                // if (result == null || result.isEmpty()) {
+                // generatedCode = prefix + "01";
+                // } else {
+                // EntityMst latestEntity = result.get(0);
+                // String latestCode = latestEntity.getEtmCode();
 
-                                        // Extract and increment
-                                        String numberPart = latestCode.substring(prefix.length());
-                                        String digits = numberPart.replaceAll("[^0-9]", "");
-                                        int latestNumber = Integer.parseInt(digits);
-                                        int nextNumber = latestNumber + 1;
+                // // Extract and increment
+                // String numberPart = latestCode.substring(prefix.length());
+                // String digits = numberPart.replaceAll("[^0-9]", "");
+                // int latestNumber = Integer.parseInt(digits);
+                // int nextNumber = latestNumber + 1;
 
-                                        // Check limit
-                                        if (nextNumber > 99) {
-                                                errors.add("Entity code limit reached (max: CM99)");
-                                        }
+                // // Check limit
+                // if (nextNumber > 99) {
+                // errors.add("Entity code limit reached (max: CM99)");
+                // }
 
-                                        generatedCode = prefix + String.format("%02d", nextNumber);
-                                }
+                // generatedCode = prefix + String.format("%02d", nextNumber);
+                // }
 
-                                // SET CODE IN BOTH DTO AND ENTITY
-                                dto.setEtmCode(generatedCode);
-                        }
+                // // SET CODE IN BOTH DTO AND ENTITY
+                // dto.setEtmCode(generatedCode);
+                // }
 
-                        // For UPDATE mode
-                        else if ("UPDATE".equals(mode)) {
+                // // For UPDATE mode
+                // else if ("UPDATE".equals(mode)) {
 
-                                Long MstID = dto.getMstID();
+                // Long MstID = dto.getMstID();
 
-                                String code = entityRepository
-                                                .findCodeByEtmEntityID(MstID)
-                                                .orElseThrow(
-                                                                () -> new IllegalStateException(
-                                                                                "code not found for MstID "
-                                                                                                + MstID));
+                // String code = entityRepository
+                // .findCodeByEtmEntityID(MstID)
+                // .orElseThrow(
+                // () -> new IllegalStateException(
+                // "code not found for MstID "
+                // + MstID));
 
-                                // Check format
-                                if (!code.startsWith("CM")) {
-                                        errors.add("Invalid company code format. Must start with 'CM'");
-                                }
+                // // Check format
+                // if (!code.startsWith("CM")) {
+                // errors.add("Invalid company code format. Must start with 'CM'");
+                // }
 
-                                // Check if code already exists
-                                Optional<EntityMst> exists = entityRepository.findByEtmCode(code);
-                                if (exists.isEmpty() || exists == null) {
-                                        errors.add("Company code '" + code + "' not exists");
-                                }
+                // // Check if code already exists
+                // Optional<EntityMst> exists = entityRepository.findByEtmCode(code);
+                // if (exists.isEmpty() || exists == null) {
+                // errors.add("Company code '" + code + "' not exists");
+                // }
 
-                                // SET CODE IN DTO
-                                dto.setEtmCode(code);
-                        }
-                        // if log table present ---->
+                // // SET CODE IN DTO
+                // dto.setEtmCode(code);
+                // }
+                // // if log table present ---->
 
-                        List<EntityLogDTO> logDtos = convertToLogDTO(dtos);
-                        Response<String> loggenerateSerialNo = entityLogService.generateSerialNo(logDtos, mode);
-                        dto.setAmendNo(loggenerateSerialNo.getData());
+                List<EntityLogDTO> logDtos = convertToLogDTO(dtos);
+                Response<String> loggenerateSerialNo = entityLogService.generateSerialNo(logDtos, mode);
+                dto.setAmendNo(loggenerateSerialNo.getData());
 
-                        if (!loggenerateSerialNo.isSuccess()) {
-                                // Return log service's error
-                                return loggenerateSerialNo;
-                        }
-                        // <-----
-
-                        if (!errors.isEmpty()) {
-                                return Response.error(errors);
-                        }
-
-                        return Response.success(dto.getEtmCode());
-
-                } catch (Exception e) {
-                        e.printStackTrace();
-                        // Last resort fallback
-                        String fallbackCode = "CM01";
-                        dto.setEtmCode(fallbackCode);
-                        return Response.success(fallbackCode);
+                if (!loggenerateSerialNo.isSuccess()) {
+                        // Return log service's error
+                        return loggenerateSerialNo;
                 }
+                // <-----
+
+                if (!errors.isEmpty()) {
+                        return Response.error(errors);
+                }
+
+                return Response.success(dto.getEtmCode());
+
+                // } catch (Exception e) {
+                // e.printStackTrace();
+                // // Last resort fallback
+                // String fallbackCode = "CM01";
+                // dto.setEtmCode(fallbackCode);
+                // return Response.success(fallbackCode);
+                // }
         }
 
         // =================== 6️⃣ converttoEntity ===================
@@ -709,7 +798,6 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 entity.setEtmActiveYN(dto.getEtmActiveYN());
                 entity.setInactiveDate(dto.getInactiveDate());
                 entity.setEntityLogPK(dto.getEntityLogPK());
-                entity.setInactiveDate(dto.getInactiveDate());
                 entity.setMuzControlCodes(dto.getMuzControlCodes());
                 entity.setEtmIntPrefix(dto.getEtmIntPrefix());
                 entity.setEtmImage(dto.getImagePath());
@@ -727,6 +815,9 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                 if (dto.getAddressInfoMst() != null) {
                         entity.setAddressInfoMst(dto.getAddressInfoMst());
+                }
+                if (dto.getEntityHierarchyInfo() != null) {
+                        entity.setEntityHierarchyInfo(dto.getEntityHierarchyInfo());
                 }
 
                 return entity;
@@ -748,7 +839,6 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 dto.setInactiveDate(entity.getInactiveDate());
                 dto.setEtmActiveYN(entity.getEtmActiveYN());
                 dto.setEntityLogPK(entity.getEntityLogPK());
-                dto.setInactiveDate(entity.getInactiveDate());
                 dto.setMuzControlCodes(entity.getMuzControlCodes());
                 dto.setEtmIntPrefix(entity.getEtmIntPrefix());
                 dto.setImagePath(entity.getEtmImage());
@@ -767,7 +857,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 }
 
                 if (entity.getAddressInfoMst() != null) {
-                        dto.setAddressInfoID(entity.getAddressInfoID());
+                        dto.setAddressInfoID(entity.getAddressInfoMst().getAddressInfoID());
                         dto.setAddress(entity.getAddressInfoMst().getAddress());
                         dto.setAddress1(entity.getAddressInfoMst().getAddress1());
                         dto.setAddress2(entity.getAddressInfoMst().getAddress2());
@@ -783,7 +873,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         dto.setEmployerName(entity.getAddressInfoMst().getEmployerName());
                         dto.setEmployerNumber(entity.getAddressInfoMst().getEmployerNumber());
                         dto.setEmployerEmail(entity.getAddressInfoMst().getEmployerEmail());
-                        // dto.setWithaffectdate(entity.getWithaffectdate().getW);
+                        dto.setWithaffectdate(entity.getAddressInfoMst().getWithaffectdate());
                         dto.setAmendNo(entity.getAddressInfoMst().getAmendNo());
 
                 }
@@ -797,23 +887,136 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                 EntityMstDTO dto = dtos.get(0);
                 EntityMst savedEntity = null;
+                AddressInfoMst saveAddress = null;
+                EntityHierarchyInfo saveEntityInfo = null;
 
                 if ("INSERT".equalsIgnoreCase(mode)) {
 
                         // ===== SAVE Address info =====
                         AddressInfoMst addressInfoMst = entity.getAddressInfoMst();
-                        AddressInfoMst saveAddress = addressInfoMstRepository.save(addressInfoMst);
+                        saveAddress = addressInfoMstRepository.save(addressInfoMst);
 
                         // Set the entire object (NOT the ID)
                         entity.setAddressInfoID(saveAddress);
+                        dto.setAddressInfoID(saveAddress.getAddressInfoID());
+
+                        populateAddressPKfromEntity(dto.getAddressInfoID(), dto.getLogRowNo(), dto);
 
                         // ===== VALIDATION =====
                         if (entity.getAddressInfoID() == null) {
                                 throw new RuntimeException("Address Info ID is required");
                         }
 
-                        savedEntity = entityRepository.save(entity);
+                        if (dto.getEtmEntityTypeMccID().equals(13L)) {
 
+                                // =====================
+                                // BUSINESS GROUP
+                                // =====================
+                                EntityMst bg = new EntityMst();
+                                bg.setEtmEntityId(dto.getEhiBusinessGroupID()); // your PK logic
+                                bg.setEtmName("Business Group - " + dto.getEtmName());
+                                bg.setEtmCode(dto.getEtmCode());
+                                bg.setEtmShortName(dto.getEtmShortName());
+                                bg.setEtmPrefix("BG");
+                                bg.setActiveDate(dto.getActiveDate());
+                                bg.setMuzControlCodes(findMccById(10L)); // MCC for BG
+                                bg.setEtmActiveYN(true);
+
+                                EntityMst savedBG = entityRepository.save(bg);
+
+                                /// SAVE IN MenuThemeHdr
+                                MenuThemeHdr hdr1 = menuThemeHdrRepository
+                                                .save(createMenuTheme(1L, savedBG.getEtmEntityId()));
+                                menuThemeDtlRepository.insertFromTemplate(
+                                                hdr1.getMthMenuThemeID(),
+                                                1L);
+
+                                MenuThemeHdr hdr2 = menuThemeHdrRepository
+                                                .save(createMenuTheme(2L, savedBG.getEtmEntityId()));
+                                menuThemeDtlRepository.insertFromTemplate(
+                                                hdr2.getMthMenuThemeID(),
+                                                2L);
+                                // =====================
+                                // PARENT LEDGER
+                                // =====================
+                                EntityMst parent = new EntityMst();
+                                parent.setEtmEntityId(dto.getEhiParentLedgerID());
+                                parent.setEtmName("Parent Ledger - " + dto.getEtmName());
+                                parent.setEtmCode(dto.getEtmCode());
+                                parent.setEtmShortName(dto.getEtmShortName());
+                                parent.setEtmPrefix("PL");
+                                parent.setActiveDate(dto.getActiveDate());
+                                parent.setMuzControlCodes(findMccById(11L)); // MCC for Parent
+                                parent.setEtmActiveYN(true);
+
+                                EntityMst savedParent = entityRepository.save(parent);
+
+                                // =====================
+                                // SUB LEDGER
+                                // =====================
+                                EntityMst sub = new EntityMst();
+                                sub.setEtmEntityId(dto.getEhiSubLedgerID());
+                                sub.setEtmName("Sub Ledger - " + dto.getEtmName());
+                                sub.setEtmCode(dto.getEtmCode());
+                                sub.setEtmShortName(dto.getEtmShortName());
+                                sub.setEtmPrefix("SL");
+                                sub.setActiveDate(dto.getActiveDate());
+                                sub.setMuzControlCodes(findMccById(12L)); // MCC for Sub
+                                sub.setEtmActiveYN(true);
+
+                                EntityMst savedSub = entityRepository.save(sub);
+
+                                // =====================
+                                // COMPANY
+                                // =====================
+                                savedEntity = entityRepository.save(entity);
+
+                                // BG hierarchy
+                                EntityHierarchyInfo bgHierarchy = new EntityHierarchyInfo();
+                                bgHierarchy.setEhiEntityHierarchyID(savedBG);
+                                bgHierarchy.setEhiLevelNo(1L);
+                                bgHierarchy.setMuzControlCodes(findMccById(10L));
+                                bgHierarchy.setEhiBusinessGroupID(savedBG.getEtmEntityId());
+                                entityHierarchyInfoRepository.save(bgHierarchy);
+
+                                // Parent hierarchy
+                                EntityHierarchyInfo parentHierarchy = new EntityHierarchyInfo();
+                                parentHierarchy.setEhiEntityHierarchyID(savedParent);
+                                parentHierarchy.setEhiParentEntityHierarchyID(bgHierarchy.getEhiEntityHierarchyID());
+                                parentHierarchy.setEhiBusinessGroupID(bgHierarchy.getEhiBusinessGroupID());
+                                parentHierarchy.setEhiLevelNo(2L);
+                                parentHierarchy.setMuzControlCodes(findMccById(11L));
+                                parentHierarchy.setEhiParentLedgerID(savedParent.getEtmEntityId());
+                                entityHierarchyInfoRepository.save(parentHierarchy);
+
+                                // Sub hierarchy
+                                EntityHierarchyInfo subHierarchy = new EntityHierarchyInfo();
+                                subHierarchy.setEhiEntityHierarchyID(savedSub);
+                                subHierarchy.setEhiParentEntityHierarchyID(parentHierarchy.getEhiEntityHierarchyID());
+                                subHierarchy.setEhiBusinessGroupID(bgHierarchy.getEhiBusinessGroupID());
+                                subHierarchy.setEhiParentLedgerID(parentHierarchy.getEhiParentLedgerID());
+                                subHierarchy.setEhiLevelNo(3L);
+                                subHierarchy.setMuzControlCodes(findMccById(12L));
+                                subHierarchy.setEhiSubLedgerID(savedSub.getEtmEntityId());
+                                entityHierarchyInfoRepository.save(subHierarchy);
+
+                                // Company hierarchy
+                                EntityHierarchyInfo companyHierarchy = new EntityHierarchyInfo();
+                                companyHierarchy.setEhiEntityHierarchyID(savedEntity);
+                                companyHierarchy.setEhiParentEntityHierarchyID(subHierarchy.getEhiEntityHierarchyID());
+                                companyHierarchy.setEhiBusinessGroupID(bgHierarchy.getEhiBusinessGroupID());
+                                companyHierarchy.setEhiParentLedgerID(parentHierarchy.getEhiParentLedgerID());
+                                companyHierarchy.setEhiSubLedgerID(subHierarchy.getEhiSubLedgerID());
+                                // companyHierarchy.setCompanyMst(companyHierarchy.getEhiEntityHierarchyID());
+                                companyHierarchy.setCompanyMst(savedEntity);
+                                companyHierarchy.setEhiLevelNo(4L);
+                                companyHierarchy.setMuzControlCodes(findMccById(13L));
+                                entityHierarchyInfoRepository.save(companyHierarchy);
+
+                        } else {
+
+                                savedEntity = entityRepository.save(entity);
+                        }
                         // ===== SAVE AUTHORIZATION =====
                         Authorization auth = entity.getAuthorization();
                         auth.setMstId(savedEntity.getEtmEntityId());
@@ -821,9 +1024,67 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         Authorization savedAuth = authorizationRepository.save(auth);
                         dto.setAuthId(savedAuth.getAuthId());
 
+                        if (dto.getEtmEntityTypeMccID().equals(14L) || dto.getEtmEntityTypeMccID().equals(15L)) {
+
+                                Long companyId = dto.getCompanyMst().getEtmEntityId();
+
+                                EntityHierarchyInfo latest = entityHierarchyInfoRepository
+                                                .findLatestHierarchyByCompanyId(companyId)
+                                                .orElseThrow(() -> new RuntimeException("Hierarchy not found"));
+
+                                Long bgId = latest.getEhiBusinessGroupID();
+                                Long parentId = latest.getEhiParentLedgerID();
+                                Long subId = latest.getEhiSubLedgerID();
+                                Long nextLevel = latest.getEhiLevelNo() + 1;
+
+                                EntityHierarchyInfo hierarchy = new EntityHierarchyInfo();
+
+                                hierarchy.setEhiBusinessGroupID(bgId);
+                                hierarchy.setEhiParentLedgerID(parentId);
+                                hierarchy.setEhiSubLedgerID(subId);
+                                hierarchy.setEhiLevelNo(nextLevel);
+
+                                if (dto.getEtmEntityTypeMccID().equals(14L)) {
+
+                                        // Branch hierarchy
+                                        hierarchy.setEhiEntityHierarchyID(savedEntity);
+                                        hierarchy.setEhiParentEntityHierarchyID(dto.getCompanyMst());
+                                        hierarchy.setCompanyMst(dto.getCompanyMst());
+                                        hierarchy.setEhiLevelNo(4L);
+                                        hierarchy.setBranchMst(hierarchy.getEhiEntityHierarchyID());
+                                        hierarchy.setMuzControlCodes(findMccById(14L));
+                                        entityHierarchyInfoRepository.save(hierarchy);
+                                } else if (dto.getEtmEntityTypeMccID().equals(15L)) {
+
+                                        // Location hierarchy
+                                        hierarchy.setEhiEntityHierarchyID(savedEntity);
+                                        hierarchy.setEhiParentEntityHierarchyID(dto.getBranchMst());
+                                        hierarchy.setCompanyMst(dto.getCompanyMst());
+                                        hierarchy.setBranchMst(dto.getBranchMst());
+                                        hierarchy.setLocationMst(hierarchy.getEhiEntityHierarchyID());
+                                        hierarchy.setMuzControlCodes(findMccById(15L));
+                                        entityHierarchyInfoRepository.save(hierarchy);
+                                }
+
+                        }
                 } else if ("UPDATE".equalsIgnoreCase(mode)) {
 
                         if (Boolean.TRUE.equals(dto.getAuthorizationStatus())) {
+
+                                // ===== SAVE Address info =====
+                                AddressInfoMst addressInfoMst = entity.getAddressInfoMst();
+                                saveAddress = addressInfoMstRepository.save(addressInfoMst);
+
+                                // Set the entire object (NOT the ID)
+                                entity.setAddressInfoID(saveAddress);
+                                dto.setAddressInfoID(saveAddress.getAddressInfoID());
+
+                                populateAddressPKfromEntity(dto.getAddressInfoID(), dto.getLogRowNo(), dto);
+
+                                // ===== VALIDATION =====
+                                if (entity.getAddressInfoID() == null) {
+                                        throw new RuntimeException("Address Info ID is required");
+                                }
 
                                 // ===== SAVE ENTITY =====
                                 savedEntity = entityRepository.save(entity);
@@ -837,10 +1098,9 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                         } else {
 
-                                Long mstId = dto.getMstID();
+                                Long mstId = dto.getEtmEntityId();
 
                                 long count = authorizationRepository.countByMstId(mstId);
-
                                 if (count == 1) {
                                         // Exactly ONE row exists
                                         Optional<Boolean> statusOpt = authorizationRepository.findStatusByMstId(mstId);
@@ -849,6 +1109,12 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                 Boolean status = statusOpt.get();
 
                                                 if (Boolean.TRUE.equals(status)) {
+
+                                                        // saveAddress = addressInfoMst;
+
+                                                        populateAddressPKfromEntity(
+                                                                        dto.getAddressInfoMst().getAddressInfoID(),
+                                                                        dto.getLogRowNo(), dto);
                                                         // No save, return existing entity
                                                         savedEntity = entity;
                                                         // ===== SAVE AUTHORIZATION =====
@@ -858,6 +1124,26 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                         Authorization savedAuth = authorizationRepository.save(auth);
                                                         dto.setAuthId(savedAuth.getAuthId());
                                                 } else if (Boolean.FALSE.equals(status)) {
+
+                                                        // ===== SAVE Address info =====
+                                                        AddressInfoMst addressInfoMst = entity.getAddressInfoMst();
+                                                        saveAddress = addressInfoMstRepository
+                                                                        .save(addressInfoMst);
+
+                                                        // Set the entire object (NOT the ID)
+                                                        entity.setAddressInfoID(saveAddress);
+                                                        dto.setAddressInfoID(saveAddress.getAddressInfoID());
+
+                                                        populateAddressPKfromEntity(dto.getAddressInfoID(),
+                                                                        dto.getLogRowNo(),
+                                                                        dto);
+
+                                                        // ===== VALIDATION =====
+                                                        if (entity.getAddressInfoID() == null) {
+                                                                throw new RuntimeException(
+                                                                                "Address Info ID is required");
+                                                        }
+
                                                         // ===== SAVE ENTITY =====
                                                         savedEntity = entityRepository.save(entity);
 
@@ -872,6 +1158,9 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                         }
                                 } else if (count > 1) {
 
+                                        populateAddressPKfromEntity(
+                                                        dto.getAddressInfoMst().getAddressInfoID(),
+                                                        dto.getLogRowNo(), dto);
                                         // MORE THAN ONE row exists
                                         // No save, return existing entity
                                         savedEntity = entity;
@@ -881,6 +1170,8 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                         authorizationRepository.save(auth);
                                         Authorization savedAuth = authorizationRepository.save(auth);
                                         dto.setAuthId(savedAuth.getAuthId());
+                                } else if (count < 1) {
+                                        throw new IllegalArgumentException("Invalid Entity ID: " + mstId);
                                 }
 
                         }
@@ -889,10 +1180,10 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         throw new IllegalArgumentException("Invalid mode: " + mode);
                 }
 
-                // // ===== SAVE ENTITY LOG =====
-                // EntityLog logEntity = new EntityLog();
-                // List<EntityLogDTO> logDtos = convertToLogDTO(dtos);
-                // entityLogService.saveEntity(logEntity, logDtos, mode);
+                // ===== SAVE ENTITY LOG =====
+                EntityLog logEntity = new EntityLog();
+                List<EntityLogDTO> logDtos = convertToLogDTO(dtos);
+                entityLogService.saveEntity(logEntity, logDtos, mode);
 
                 return savedEntity;
         }
@@ -908,8 +1199,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 List<EntityLogDTO> DtoLogs = new ArrayList<>();
                 EntityLogDTO DtoLog = new EntityLogDTO();
 
-                DtoLog.setMstID(dto.getMstID());
-                DtoLog.setEtmEntityId(dto.getMstID());
+                DtoLog.setEtmEntityId(dto.getEtmEntityId());
                 DtoLog.setEtmName(dto.getEtmName());
                 DtoLog.setEtmCode(dto.getEtmCode());
                 DtoLog.setEtmShortName(dto.getEtmShortName());
@@ -936,6 +1226,13 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 DtoLog.setAuthorizationDate(dto.getAuthorizationDate());
                 DtoLog.setAuthorizationStatus(dto.getAuthorizationStatus());
                 DtoLog.setEntityLogPK(dto.getEntityLogPK());
+                DtoLog.setAddressInfoLogPK(dto.getAddressInfoLogPK());
+                DtoLog.setAddressInfoID(dto.getAddressInfoID());
+                DtoLog.setEtmIntPrefix(dto.getEtmIntPrefix());
+                DtoLog.setEtmPrefix(dto.getEtmPrefix());
+                DtoLog.setAuthId(dto.getAuthId());
+                DtoLog.setMuzControlCodes(dto.getMuzControlCodes());
+                DtoLog.setInactiveDate(dto.getInactiveDate());
 
                 DtoLogs.add(DtoLog);
                 return DtoLogs;
@@ -955,9 +1252,10 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                         EntityLogDTO logDto = new EntityLogDTO();
 
-                        logDto.setMstID(dto.getMstID());
+                        logDto.setEtmEntityId(dto.getEtmEntityId());
                         logDto.setAuthId(dto.getAuthId());
-                        // logDto.setAddressInfoID(dto.getAddressInfoID());
+                        logDto.setAddressInfoLogPK(dto.getAddressInfoLogPK());
+                        logDto.setAddressInfoID(dto.getAddressInfoID());
                         logDto.setEtmCode(dto.getEtmCode());
                         logDto.setEtmName(dto.getEtmName());
                         logDto.setEtmShortName(dto.getEtmShortName());
@@ -985,6 +1283,10 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         logDto.setImagePath(dto.getImagePath());
                         logDto.setEntityLogPK(dto.getEntityLogPK());
                         logDto.setAmendNo(dto.getAmendNo());
+                        logDto.setEtmIntPrefix(dto.getEtmIntPrefix());
+                        logDto.setEtmPrefix(dto.getEtmPrefix());
+                        logDto.setMuzControlCodes(dto.getMuzControlCodes());
+                        logDto.setInactiveDate(dto.getInactiveDate());
                         logDtos.add(logDto);
                 }
                 return logDtos;
@@ -1115,6 +1417,28 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 }
         }
 
+        private MuzControlCodes findMccById(Long id) {
+                return muzControlCodesRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("MCC ID not found: " + id));
+        }
+
+        private SolutionMst findSolutionById(Long id) {
+                return solutionRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Solution ID not found: " + id));
+        }
+
+        private MenuThemeHdr createMenuTheme(Long solutionId, Long entityId) {
+                MenuThemeHdr hdr = new MenuThemeHdr();
+                hdr.setMthEntityHierarchyID(entityId);
+                hdr.setMthMenuThemeCode("MENU");
+                hdr.setMthMenuThemeName("MENU");
+                hdr.setMthSystemDefined(1L);
+                hdr.setMthTransValidYN(true);
+                hdr.setSolutionEntity(findSolutionById(solutionId));
+                hdr.setMthAuthInfoID(0L);
+                return hdr;
+        }
+
         // To set LogEntityPK from Entity
         private void populateLogEntityPKfromEntity(Long logPk, Long logRowNo, EntityMstDTO entity) {
 
@@ -1124,6 +1448,19 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         entityLogPK.setRowNo(logRowNo);
                         entityLog.setEntityLogPK(entityLogPK);
                         entity.setEntityLogPK(entityLogPK);
+                        logRowNo++;
+                }
+
+        }
+
+        private void populateAddressPKfromEntity(Long logPk, Long logRowNo, EntityMstDTO entity) {
+
+                for (EntityLogDTO entityLog : entity.getEntityLogDTOs()) {
+                        AddressInfoLogPK LogPK = new AddressInfoLogPK();
+                        LogPK.setAddressInfoID(logPk);
+                        LogPK.setRowNo(logRowNo);
+                        entityLog.setAddressInfoLogPK(LogPK);
+                        entity.setAddressInfoLogPK(LogPK);
                         logRowNo++;
                 }
 

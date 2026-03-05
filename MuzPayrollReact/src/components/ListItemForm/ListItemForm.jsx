@@ -108,9 +108,11 @@ function ListItemForm({
     // show loader
     showRailLoader("Fetching available " + entity + "..");
     try {
-      console.log("Selected data", data)
+
+      // console.log("Selected data",data)
+
       const response = await fetchEntityById(data);
-      console.log("Data by id", response);
+      // console.log("Data by id", response);
       setSeconderyFormData(response.data);
       if (response.data.authorizationStatus === true) setIsVarified(true);
     } catch (error) {
@@ -157,7 +159,9 @@ function ListItemForm({
         //  For fresh insert
         await saveEntity(formData, "INSERT");
       else await saveEntity(formData, "UPDATE"); //for edit
-      toast.success(entity + " saved successfully")
+
+      toast.success(entity + " saved successfully");
+
       // console.log("Save response",response);
     } catch (error) {
       console.error("Error updating " + entity + ":", error);
@@ -573,7 +577,7 @@ function ListItemForm({
           </div>
 
           <div className="form-buttons">
-            <button
+            {/* <button
               type="submit"
               className="save-btn"
               disabled={isVarified}
@@ -581,15 +585,20 @@ function ListItemForm({
             // onClick={handleSubmit}
             >
               <FaSave size={20} />
-            </button>
+            </button> */}
             <button
               type="button"
               className="cancel-btn"
-              disabled={isVarified}
-              style={{ outline: "none" }}
               onClick={handleClear}
+              disabled={isVarified}
             >
-              <MdOutlineCancel size={20} />
+              <MdOutlineCancel size={18} />
+              <span>Cancel</span>
+            </button>
+
+            <button type="submit" className="save-btn" disabled={isVarified}>
+              <FaSave size={18} />
+              <span>Save</span>
             </button>
           </div>
         </form>

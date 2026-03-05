@@ -1,21 +1,34 @@
+/* ================= REACT ================= */
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
+/* ================= THIRD PARTY ================= */
+import { useNavigate } from "react-router-dom";
 import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
-import { TiTick } from "react-icons/ti";
-import { RxCross2 } from "react-icons/rx";
 
+/* ================= CONTEXT / HOOKS ================= */
+import { useAuth } from "../../context/AuthProvider";
+import { useLoader } from "../../context/LoaderContext";
+
+/* ================= SERVICES ================= */
+import {
+  fetchAllBranch,
+  fetchActiveBranch,
+  fetchInactiveBranch,
+} from "../../services/branchlist.service";
+
+/* ================= UTILS ================= */
+import { ensureMinDuration } from "../../utils/loaderDelay";
+import { handleApiError } from "../../utils/errorToastResolver";
+
+/* ================= COMPONENTS ================= */
 import Header from "../../components/Header/Header";
 import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import Loading from "../../components/Loaders/Loading";
-import { useLoader } from "../../context/LoaderContext";
-import { ensureMinDuration } from "../../utils/loaderDelay";
-import { useAuth } from "../../context/AuthProvider";
-import {fetchAllBranch, fetchActiveBranch, fetchInactiveBranch} from "../../services/branchlist.service";
+import { ListCard } from "../../components/List Card/ListCard";
+
 const BranchList = () => {
   /* ================= STATE ================= */
   const [listView, setListView] = useState(false);
@@ -27,15 +40,14 @@ const BranchList = () => {
   const [activeBranch, setActiveBranch] = useState([]);
   const [inactiveBranch, setInactiveBranch] = useState([]);
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const { showRailLoader, hideLoader } = useLoader();
-  
 
   const navigate = useNavigate();
 
   const { user } = useAuth();
 
-  const token = user.token;
+  // const token = user.token;
 
   /* ================= NAVIGATION ================= */
   const handleCardClick = (mstID) => {
@@ -65,10 +77,11 @@ const BranchList = () => {
         setAllBranch(res);
         setActiveBranch([]);
         setInactiveBranch([]);
-        setLoading(false);
+        // setLoading(false);
       }, 1000);
     } catch (err) {
-      setLoading(false);
+      handleApiError(err);
+      // setLoading(false);
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
@@ -96,9 +109,10 @@ const BranchList = () => {
       setTimeout(() => {
         setActiveBranch(activeRes);
         setInactiveBranch(inactiveRes);
-        setLoading(false);
+        // setLoading(false);
       }, 800);
     } catch (err) {
+      handleApiError(err);
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
@@ -108,42 +122,6 @@ const BranchList = () => {
   const handleClear = () => {
     loadAllBranch();
   };
-
-  /* ================= CARD ================= */
-  const renderCard = (item, status) => (
-    <div
-      key={item.code}
-      className={`advance-card ${status}`}
-      onClick={() => handleCardClick(item.mstID)}
-    >
-      {/* HEADER */}
-      <div className="card-header">
-        <span className="code">{item.code}</span>
-
-        {status === "inactive" ? (
-          <div className="status-stack">
-            <div className="status-item active">
-              <TiTick />
-              <span>{item.activeDate}</span>
-            </div>
-            <div className="status-item inactive">
-              <RxCross2 />
-              <span>{item.inactiveDate}</span>
-            </div>
-          </div>
-        ) : (
-          <div className="status-item active">
-            <TiTick />
-            <span>{item.activeDate}</span>
-          </div>
-        )}
-      </div>
-
-      {/* BODY */}
-      <div className="card-title">{item.name}</div>
-      <div className="card-shortname">{item.shortName}</div>
-    </div>
-  );
 
   /* ================= UI ================= */
   return (
@@ -195,29 +173,54 @@ const BranchList = () => {
           <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
         </div>
 
-        {/* CONTENT */}
-
         {
           <>
-            {!groupByStatus && (
-              <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                {allBranch.map((item) =>
-                  renderCard(item, item.inactiveDate ? "inactive" : "active"),
-                )}
-              </div>
-            )}
+            {!groupByStatus &&
+              (allBranch.length > 0 ? (
+                <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                  {allBranch.map((item) => (
+                    <ListCard
+                      key={item.mstID}
+                      item={item}
+                      status={item.inactiveDate ? "inactive" : "active"}
+                      handleDataToForm={handleCardClick}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="no-data-found">No branches available yet</div>
+              ))}
 
             {groupByStatus && (
               <>
-                <h3 className="group-title">Active</h3>
+                <h3 className="group-title active">Active</h3>
                 <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {activeBranch.map((item) => renderCard(item, "active"))}
+                  {activeBranch.map((item) => (
+                    <ListCard
+                      key={item.mstID}
+                      item={item}
+                      status="active"
+                      handleDataToForm={handleCardClick}
+                    />
+                  ))}
                 </div>
 
                 <h3 className="group-title inactive">Inactive</h3>
-                <div className={`card-grid ${listView ? "list" : "tile"}`}>
-                  {inactiveBranch.map((item) => renderCard(item, "inactive"))}
-                </div>
+
+                {inactiveBranch.length > 0 ? (
+                  <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                    {inactiveBranch.map((item) => (
+                      <ListCard
+                        key={item.mstID}
+                        item={item}
+                        status="inactive"
+                        handleDataToForm={handleCardClick}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-data-found">No branches available yet</div>
+                )}
               </>
             )}
           </>

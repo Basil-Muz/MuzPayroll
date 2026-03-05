@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
-import axios from "axios";
+// import axios from "axios";
 // import debounce from "lodash/debounce";
 
 import { useAuth } from "../../context/AuthProvider";
 import { useLoader } from "../../context/LoaderContext";
 import { ensureMinDuration } from "../../utils/loaderDelay";
 import { handleApiError } from "../../utils/errorToastResolver";
+import { fetchCompany } from "../../services/company.service";
 import { fetchBranchesByCompany } from "../../services/branch.service";
 import { fetchLocaion } from "../../services/location.service";
 import { HiOutlineSwitchHorizontal } from "react-icons/hi";
-
+import { fetchMainMenu } from "../../services/menu.service";
+import { organizeMenuFromBackend } from "../../utils/menuUtils";
 const API_CONFIG = {
   timeout: 10000,
   retries: 2,
@@ -50,13 +52,15 @@ export const ContextSwitcher = React.memo(
     initialData,
     //   onUpdate
   }) => {
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, updateMenus } = useAuth();
     const { showRailLoader, hideLoader } = useLoader();
     const apiCache = useApiCache();
 
     const hasResetRef = useRef(false); //ensure reseting only onece
     const errorShownRef = useRef(false); //ensuring the toast shows only onece
-
+    const [companyList, setCompanyList] = useState([]);
+    const [branchList, setBranchList] = useState([]);
+    const [locationList, setLocationList] = useState([]);
     const [loading, setLoading] = useState({
       company: false,
       branch: false,
@@ -74,11 +78,14 @@ export const ContextSwitcher = React.memo(
     });
 
     // Watch form values
+
     // const formValues = watch();
     const selectedCompany = watch("company");
     const selectedBranch = watch("branch");
-    const userId = 3;
-    // console.log("company and branch",selectedCompany.value,selectedBranch.value);
+    const selectedLocation = watch("location");
+
+    // console.log("sdfsd", selectedLocation.value);
+    const userId = user.userMstId;
     useEffect(() => {
       if (isOpen && initialData && !hasResetRef.current) {
         reset(initialData);
@@ -94,6 +101,54 @@ export const ContextSwitcher = React.memo(
       if (!isOpen) errorShownRef.current = false;
     }, [isOpen]);
 
+    // Debounced branch fetch
+    const fetchBranches = useCallback(
+      async (companyId) => {
+        if (!companyId) return;
+
+        const cacheKey = `branches_${companyId}`;
+        let formatted;
+
+        const cached = apiCache.get(cacheKey);
+
+        if (cached) {
+          formatted = cached;
+          setOptions((prev) => ({ ...prev, branches: formatted }));
+        } else {
+          setLoading((prev) => ({ ...prev, branch: true }));
+          try {
+            const response = await fetchBranchesByCompany(userId, companyId);
+
+            formatted = response.data.map((b) => ({
+              value: b.entityHierarchyId,
+              label: b.entityName,
+              data: b,
+            }));
+            setBranchList(formatted);
+            setOptions((prev) => ({
+              ...prev,
+              branches: formatted,
+              locations: [],
+            }));
+
+            apiCache.set(cacheKey, formatted);
+          } catch (error) {
+            handleApiError(error, { entity: "branch" });
+            return;
+          } finally {
+            setLoading((prev) => ({ ...prev, branch: false }));
+          }
+        }
+
+        const selectedBranchOption = formatted.find(
+          (b) => String(b.value) === String(user.branchEntityHierarchyId),
+        );
+
+        setValue("branch", selectedBranchOption || null);
+        setValue("location", null);
+      },
+      [setValue, apiCache, user.branchEntityHierarchyId, userId],
+    );
     // Fetch companies on open
     useEffect(() => {
       if (!isOpen) return;
@@ -105,17 +160,12 @@ export const ContextSwitcher = React.memo(
         setOptions((prev) => ({ ...prev, companies: cached }));
         return;
       }
-      // console.log("User details",user)
+      // console.log("User details", user);
       const fetchCompanies = async () => {
         setLoading((prev) => ({ ...prev, company: true }));
         try {
-          const response = await axios.get(
-            "http://localhost:8087/entity/fetchCompany",
-            {
-              params: { userId },
-            },
-          );
-          console.log("companies ", response.data);
+          const response = await fetchCompany(userId);
+          // console.log("companies ", response.data);
           const companies = Array.isArray(response.data)
             ? response.data
             : [response.data];
@@ -125,7 +175,7 @@ export const ContextSwitcher = React.memo(
             label: c.entityName,
             data: c,
           }));
-
+          setCompanyList(formatted);
           setOptions((prev) => ({ ...prev, companies: formatted }));
           apiCache.set(cacheKey, formatted);
         } catch (error) {
@@ -139,51 +189,14 @@ export const ContextSwitcher = React.memo(
       };
 
       fetchCompanies();
+      // fetchBranches(user.companyId);
     }, [isOpen, user.companyId]);
 
-    // Debounced branch fetch
-    const fetchBranches = useCallback(
-      async (companyId) => {
-        if (!companyId) return;
-
-        const cacheKey = `branches_${companyId}`;
-        const cached = apiCache.get(cacheKey);
-
-        if (cached) {
-          setOptions((prev) => ({ ...prev, branches: cached }));
-          return;
-        }
-
-        setLoading((prev) => ({ ...prev, branch: true }));
-        const startTime = Date.now();
-
-        try {
-          const response = await fetchBranchesByCompany(userId, companyId);
-
-          const formatted = response.data.map((b) => ({
-            value: b.entityHierarchyId,
-            label: b.entityName,
-            data: b,
-          }));
-
-          setOptions((prev) => ({
-            ...prev,
-            branches: formatted,
-            locations: [],
-          }));
-          apiCache.set(cacheKey, formatted);
-          setValue("branch", null);
-          setValue("location", null);
-        } catch (error) {
-          handleApiError(error, { entity: "branch" });
-        } finally {
-          await ensureMinDuration(startTime, 800);
-          setLoading((prev) => ({ ...prev, branch: false }));
-          hideLoader();
-        }
-      },
-      [setValue, hideLoader],
-    );
+    useEffect(() => {
+      if (selectedCompany?.value) {
+        fetchBranches(selectedCompany.value);
+      }
+    }, [selectedCompany]);
 
     // Fetch locations when branch changes
     useEffect(() => {
@@ -206,8 +219,13 @@ export const ContextSwitcher = React.memo(
             label: l.entityName,
             data: l,
           }));
-
+          setLocationList(formatted);
           setOptions((prev) => ({ ...prev, locations: formatted }));
+          const selectedLocationOption = formatted.find(
+            (b) => String(b.value) === String(user.defaultEntityHierarchyId),
+          );
+
+          setValue("location", selectedLocationOption || null);
         } catch (error) {
           handleApiError(error, { entity: "location" });
           setOptions((prev) => ({ ...prev, locations: [] }));
@@ -217,22 +235,74 @@ export const ContextSwitcher = React.memo(
       };
 
       fetchLocations();
-    }, [selectedBranch]);
+    }, [selectedBranch, selectedCompany]);
 
     // Handle apply
     const handleApply = useCallback(
-      (data) => {
+      async (data) => {
         if (data.company && data.branch) {
           onApply(data);
-          //   updateUser({
-          //     companyId: data.company.value,
-          //     branchId: data.branch.value,
-          //     locationId: data.location?.value || null,
-          //   });
+          const startTime = Date.now();
+          showRailLoader("Applying branch and location changes…");
+
+          try {
+            // const selectedCompany = companyList.find(
+            //   (b) => String(b.entityHierarchyId) === selectedCompany,
+            // );
+
+            // const selectedBranch = branchList.find(
+            //   (b) => String(b.entityHierarchyId) === selectedBranch,
+            // );
+
+            // const selectedLocation = locationList.find(
+            //   (l) => String(l.entityHierarchyId) === selectedLocation,
+            // );
+            // console.log("Comapny",selectedCompany.label);
+            updateUser({
+              ...user,
+              userEntityHierarchyId: selectedCompany.value,
+              companyName: selectedCompany?.label || "",
+              branchEntityHierarchyId: selectedBranch.value,
+              branchName: selectedBranch?.label || "",
+              defaultEntityHierarchyId: selectedLocation.value,
+              locationName: selectedLocation?.label || "",
+            });
+            const response = await fetchMainMenu(
+              "MAIN_MENU",
+              "LIST",
+              user.userMstId,
+              user.solutionId,
+              selectedLocation?.value,
+              1,
+              null,
+            );
+            console.log("Main Menu", response);
+            const organizedMenu = organizeMenuFromBackend(response.data);
+            console.log("Organized menu", organizedMenu);
+            updateMenus(organizedMenu);
+          } catch (error) {
+            // console.log("Error" + error);
+            handleApiError(error, {
+              entity: "menu",
+            });
+          } finally {
+            await ensureMinDuration(startTime, 1200);
+            hideLoader();
+          }
         }
-        onClose();
       },
-      [onApply, onClose, updateUser],
+
+      [
+        onApply,
+        updateUser,
+        user,
+        selectedCompany,
+        selectedBranch,
+        selectedLocation,
+        showRailLoader,
+        hideLoader,
+        updateMenus,
+      ],
     );
 
     // Handle close with escape
@@ -260,7 +330,7 @@ export const ContextSwitcher = React.memo(
         <div className="context-modal-content">
           <div className="context-modal-header">
             <h3>
-              <HiOutlineSwitchHorizontal className="icon"/>
+              <HiOutlineSwitchHorizontal className="icon" />
               Switch Context
             </h3>
             <button
@@ -289,9 +359,6 @@ export const ContextSwitcher = React.memo(
                       classNamePrefix="form-control-select"
                       onChange={(value) => {
                         field.onChange(value);
-                        if (value) {
-                          fetchBranches(value.value);
-                        }
                       }}
                     />
                   )}

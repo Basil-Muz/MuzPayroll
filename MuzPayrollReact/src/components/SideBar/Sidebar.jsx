@@ -431,6 +431,7 @@ export default function Sidebar({ forceOpen }) {
                       onClick={(e) => e.stopPropagation()} // prevent sidebar close
                     >
                       <div
+                      className="submenu-heading"
                         style={{
                           background: "#c71ebeff",
                           borderRadius: "8px 8px 0 0",
@@ -444,9 +445,10 @@ export default function Sidebar({ forceOpen }) {
                       </div>
 
                       <div
+                      // className="submenu-item"
                         style={{
-                          background: "#fff",
-                          color: "#111",
+                          // background: "#fff",
+                          // color: "#111",
                           padding: 8,
                         }}
                       >
@@ -454,7 +456,7 @@ export default function Sidebar({ forceOpen }) {
                           <button
                             key={`${item.id}-${index}`}
                             onClick={() => handleSubNav(child)}
-                            className="submenu-item"
+                          
                             style={{
                               display: "flex",
                               alignItems: "center",
@@ -489,9 +491,9 @@ export default function Sidebar({ forceOpen }) {
                               <VscActivateBreakpoints size={16} />
                             </span>
                             <span
+                            className="submenu-name"
                               style={{
                                 flex: 1,
-                                color: "#111827",
                                 fontSize: "14px",
                               }}
                             >

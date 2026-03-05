@@ -1,62 +1,107 @@
-import { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+
+import { BsGrid3X3GapFill } from "react-icons/bs";
+import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
+import { IoIosSearch } from "react-icons/io";
+
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import ShiftGroupSearch from "./shiftgroupsearch";
-import ShiftGroupList from "./shiftgrouplist";
-import { BsGrid3X3GapFill } from "react-icons/bs";
-import { FaListUl } from "react-icons/fa";
-import { IoIosSearch } from "react-icons/io";
-import Loading from "../../components/Loaders/Loading";
-import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
-import "./shiftgroup.css";
+import Search from "../../components/search/Search";
 import ListItemForm from "../../components/ListItemForm/ListItemForm";
+import { ListCard } from "../../components/List Card/ListCard";
 
 import {
-  saveShiftGroup,
+  getShiftGroupsList,
   getShiftGroupById,
+  saveShiftGroup,
+  searchShiftGroup,
 } from "../../services/shiftgroup.service";
 
 import { SHIFT_GROUP_FIELD_MAP } from "../../constants/shiftGroupMap";
+import { useAuth } from "../../context/AuthProvider";
+
+import "./shiftgroup.css";
 
 function ShiftGroup() {
+  const { user } = useAuth();
+  const companyId = user?.companyId;
+
+  const [shiftGroupList, setShiftGroupList] = useState([]);
+
+  const [boxView, setBoxView] = useState(true);
   const [listView, setListView] = useState(false);
-  const [showSearch, setShowSearch] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
+  const [groupByStatus, setGroupByStatus] = useState(false);
+
+  const [activeShiftGroups, setActiveShiftGroups] = useState([]);
+  const [inactiveShiftGroups, setInactiveShiftGroups] = useState([]);
+
   const [searchText, setSearchText] = useState("");
-  const [filters, setFilters] = useState(null);
-
-  const [showForm, setShowForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
-  const toggleForm = () => setShowForm((prev) => !prev);
+  /* ================= FETCH ALL ================= */
 
-  /* ================= DUMMY DATA ================= */
-  const ShiftGroups = [
-    {
-      mstID: 1,
-      code: "SG001",
-      name: "Morning Shift",
-      shortName: "MORN",
-      timeFrom: "09:00",
-      timeTo: "17:00",
-      activeDate: "10-01-2024",
-    },
-     {
-      mstID: 2,
-      code: "SG002",
-      name: "Night Shift",
-      shortName: "NIGHT",
-      timeFrom: "21:00",
-      timeTo: "05:00",
-      activeDate: "10-02-2024",
-    },
-  ];
+  const getAllShiftGroups = async (activeStatusYN = null) => {
+    try {
+      const response = await getShiftGroupsList(companyId, activeStatusYN);
+      setShiftGroupList(response.data);
+    } catch (error) {
+      console.error("Error fetching shift groups", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllShiftGroups(null);
+  }, [showForm]);
+
+  /* ================= SEARCH ================= */
+
+  const searchData = useCallback(async () => {
+    if (searchText.trim()) {
+      const response = await searchShiftGroup(searchText);
+      setShiftGroupList(response.data.content);
+    } else {
+      getAllShiftGroups(null);
+    }
+  }, [searchText, companyId]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      searchData();
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchText]);
+
+  /* ================= GROUPING ================= */
+
+  const handleGroupSubmit = async (checked) => {
+    setGroupByStatus(checked);
+    setShowSearch(false);
+
+    if (!checked) {
+      getAllShiftGroups(null);
+      return;
+    }
+
+    try {
+      const [activeRes, inactiveRes] = await Promise.all([
+        getShiftGroupsList(companyId, 1),
+        getShiftGroupsList(companyId, 0),
+      ]);
+
+      setActiveShiftGroups(activeRes.data);
+      setInactiveShiftGroups(inactiveRes.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   /* ================= HANDLERS ================= */
 
-  const handleDataToForm = (mstID) => {
-    setSelectedItem(mstID);
-    setShowForm(true);
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
   };
 
   const handleNew = () => {
@@ -64,97 +109,150 @@ function ShiftGroup() {
     setShowForm(true);
   };
 
-  const handleSearchApply = (searchFilters) => {
-    setFilters(searchFilters);
-    setShowSearch(false);
+  const toggleForm = () => {
+    setShowForm((prev) => !prev);
   };
 
-  const handleClear = () => {
-    setFilters(null);
-    setSearchText("");
-    setShowSearch(true);
+  const handleDataToForm = (mstID) => {
+    setSelectedItem(mstID);
+    setShowForm(true);
   };
-
-  const handleSearchInput = (e) => setSearchText(e.target.value);
-
-  const hasDataView = !showSearch;
 
   return (
     <>
-      <Header />
+      <Header backendError={[]} />
 
       <div className="shift-group-page">
 
-        {/* HEADER */}
-        {hasDataView && (
-          <div className="header-section">
-            <h2 className="page-title">Shift Group</h2>
+        {/* ================= HEADER ================= */}
+        <div className="header-section">
+          <h2 className="page-title">Shift Group</h2>
 
-            <div className="header-actions">
-              <div className="view-toggle">
-                <button
-                  className={`icon-btn ${!listView ? "active" : ""}`}
-                  onClick={() => setListView(false)}
-                >
-                  <BsGrid3X3GapFill size={18} />
-                </button>
+          <div className="header-actions">
+            <div className="view-toggle">
 
-                <button
-                  className={`icon-btn ${listView ? "active" : ""}`}
-                  onClick={() => setListView(true)}
-                >
-                  <FaListUl size={18} />
-                </button>
+              <button
+                className={`icon-btn ${boxView ? "active" : ""}`}
+                onClick={() => {
+                  setBoxView(true);
+                  setListView(false);
+                }}
+              >
+                <BsGrid3X3GapFill size={18} />
+              </button>
 
-                <button
-                  className={`icon-btn ${showSearch ? "active" : ""}`}
-                  onClick={() => setShowSearch(!showSearch)}
-                >
-                  <IoIosSearch size={18} />
-                </button>
-              </div>
+              <button
+                className={`icon-btn ${listView ? "active" : ""}`}
+                onClick={() => {
+                  setListView(true);
+                  setBoxView(false);
+                }}
+              >
+                <FaListUl size={18} />
+              </button>
 
-              <div className="search-box">
-                <IoIosSearch size={18} />
-                <input
-                  type="text"
-                  placeholder="Search here…"
-                  value={searchText}
-                  onChange={handleSearchInput}
-                />
-              </div>
+              <button
+                className={`icon-btn ${showSearch ? "active" : ""}`}
+                onClick={() => setShowSearch(!showSearch)}
+              >
+                <FaRegObjectGroup size={18} />
+              </button>
+            </div>
+
+            <div className="search-box">
+              <IoIosSearch size={18} />
+              <input
+                type="text"
+                placeholder="Search shift group…"
+                value={searchText}
+                onChange={handleSearchChange}
+              />
             </div>
           </div>
+        </div>
+
+        {/* ================= GROUP SLIDE ================= */}
+        <div className={`slide-container ${showSearch ? "show" : "hide"}`}>
+          <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
+        </div>
+
+        {/* ================= NORMAL VIEW ================= */}
+        {!groupByStatus &&
+          (shiftGroupList.length > 0 ? (
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {shiftGroupList.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status="active"
+                  handleDataToForm={handleDataToForm}
+                  cardType="shiftGroup"   // 🔥 IMPORTANT
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="no-data-found">
+              No shift groups available
+            </div>
+          ))}
+
+        {/* ================= GROUPED VIEW ================= */}
+        {groupByStatus && (
+          <>
+            <h3 className="group-title active">Active</h3>
+            {activeShiftGroups.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {activeShiftGroups.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="active"
+                    handleDataToForm={handleDataToForm}
+                    cardType="shiftGroup"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">
+                No active shift groups
+              </div>
+            )}
+
+            <h3 className="group-title inactive">Inactive</h3>
+            {inactiveShiftGroups.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {inactiveShiftGroups.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="inactive"
+                    handleDataToForm={handleDataToForm}
+                    cardType="shiftGroup"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">
+                No inactive shift groups
+              </div>
+            )}
+          </>
         )}
 
-        {/* SEARCH PANEL */}
-        {showSearch && <ShiftGroupSearch onApply={handleSearchApply} />}
+        {/* ================= FLOATING ACTION BAR ================= */}
+        <FloatingActionBar
+          actions={{
+            save: { disabled: true },
+            clear: {
+              onClick: () => getAllShiftGroups(null),
+            },
+            delete: { disabled: true },
+            print: { disabled: true },
+            new: { onClick: handleNew },
+          }}
+        />
 
-        {/* LIST */}
-        {!showSearch && (
-          <ShiftGroupList
-            data={ShiftGroups}
-            view={listView ? "list" : "tile"}
-            searchText={searchText}
-            handleDataToForm={handleDataToForm}
-          />
-        )}
-
-   
-
-        {/* FLOATING BAR */}
-        {!showSearch && (
-          <FloatingActionBar
-            actions={{
-              clear: { onClick: handleClear },
-              new: { onClick: handleNew },
-              refresh: { onClick: () => window.location.reload() },
-            }}
-          />
-        )}
-
-        {loading && <Loading />}
-             {/* FORM */}
+        {/* ================= FORM ================= */}
         {showForm && (
           <ListItemForm
             entity="Shift Group"
@@ -165,7 +263,6 @@ function ShiftGroup() {
             ENTITY_FIELD_MAP={SHIFT_GROUP_FIELD_MAP}
           />
         )}
-        <BackToTop />
       </div>
     </>
   );

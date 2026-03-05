@@ -9,6 +9,7 @@
 .page-title {
     padding-left: 15px;
     font-size: 24px;
+    color:var(--text);
     font-weight: 500;
     margin-bottom: 14px;
 }

@@ -1,37 +1,41 @@
-import React from "react";
-import { useState, useEffect, useCallback } from "react";
-import "./locationgroup.css";
+/* ================= REACT ================= */
+import React, { useState, useEffect, useCallback } from "react";
 
-import { BsGrid3X3GapFill } from "react-icons/bs";
-import { FaListUl } from "react-icons/fa";
-import { FaRegObjectGroup } from "react-icons/fa";
-import { IoIosSearch } from "react-icons/io";
-import { TiTick } from "react-icons/ti";
-import Search from "../../components/search/Search";
-import LocationGroupForm from "./locationgroupform";
-import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
-import Loading from "../../components/Loaders/Loading";
-import Header from "../../components/Header/Header";
-import ListItemForm from "../../components/ListItemForm/ListItemForm";
-import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-
+/* ================= THIRD PARTY ================= */
 import { toast } from "react-hot-toast";
+import { BsGrid3X3GapFill } from "react-icons/bs";
+import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
+import { IoIosSearch } from "react-icons/io";
 
-import { AuthProvider } from "../../context/AuthProvider";
+/* ================= CONTEXT / HOOKS ================= */
 import { useAuth } from "../../context/AuthProvider";
 import { useLoader } from "../../context/LoaderContext";
 
-import { handleApiError } from "../../utils/errorToastResolver";
-import { ensureMinDuration } from "../../utils/loaderDelay";
-
-import { LOCATION_GROUP_FIELD_MAP } from "../../constants/locationGroupMap";
-
+/* ================= SERVICES ================= */
 import {
   getLocationGroupsList,
   searchLocationGroup,
   saveLocationGroup,
   getLocationGroupById,
 } from "../../services/locationGroup.service";
+
+/* ================= UTILS ================= */
+import { handleApiError } from "../../utils/errorToastResolver";
+import { ensureMinDuration } from "../../utils/loaderDelay";
+
+/* ================= CONSTANTS ================= */
+import { LOCATION_GROUP_FIELD_MAP } from "../../constants/locationGroupMap";
+
+/* ================= COMPONENTS ================= */
+import Search from "../../components/search/Search";
+import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
+import { ListCard } from "../../components/List Card/ListCard";
+import Header from "../../components/Header/Header";
+import ListItemForm from "../../components/ListItemForm/ListItemForm";
+import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
+
+/* ================= STYLES ================= */
+import "./locationgroup.css";
 
 function LocationGroup() {
   const [locationGroupList, setLocationGroupList] = useState([]);
@@ -42,7 +46,10 @@ function LocationGroup() {
   const [showForm, setShowForm] = useState(false);
   const [searchData, setSearchdata] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
-  const [headerError, setHeaderError] = useState([]);
+  const [groupByStatus, setGroupByStatus] = useState(false);
+  const [activeLocations, setActiveLocations] = useState([]);
+  const [inactiveLocations, setInactiveLocations] = useState([]);
+  // const [[], set[]] = useState([]);
   const { showRailLoader, hideLoader } = useLoader();
   const { user } = useAuth();
 
@@ -54,14 +61,14 @@ function LocationGroup() {
       // show loader
       showRailLoader("Retrieving available location groups…");
     try {
-      const response = await getLocationGroupsList(entityId, true);
+      const response = await getLocationGroupsList(entityId, null);
       setLocationGroupList(response.data);
-      console.log("Location Group", response);
+      // console.log("Location Group", response);
     } catch (error) {
       handleApiError(error, { entity: "Location Group" });
     } finally {
       if (loadFirst === true) {
-        await ensureMinDuration(startTime, 700);
+        await ensureMinDuration(startTime, 800);
         hideLoader();
       }
     }
@@ -81,28 +88,29 @@ function LocationGroup() {
     toggleForm();
   };
 
-  const handleSave = () => {
-    console.log("Save clicked");
-    // API call / form submit logic
-  };
+  // const handleSave = () => {
+  //   console.log("Save clicked");
+  //   // API call / form submit logic
+  // };
 
-  const handleSearch = () => {
-    console.log("Search clicked");
-  };
+  // const handleSearch = () => {
+  //   console.log("Search clicked");
+  // };
 
   const handleClear = async () => {
-    await getAllLocationGroups();
+    await getAllLocationGroups(true);
+    setGroupByStatus(false);
     toast.success("Location groups have been updated.");
   };
 
-  const handleDelete = () => {
-    console.log("Delete clicked");
-  };
+  // const handleDelete = () => {
+  //   console.log("Delete clicked");
+  // };
 
   const handleSearchChange = (e) => {
     setSearchdata(e.target.value);
   };
-  const searchdata = useCallback(async () => {
+  const fetchSearchData = useCallback(async () => {
     if (searchData.trim()) {
       const response = await searchLocationGroup(searchData);
       setLocationGroupList(response.data.content);
@@ -115,7 +123,7 @@ function LocationGroup() {
   useEffect(() => {
     const handler = setTimeout(() => {
       if (searchData.trim() !== "") {
-        searchdata();
+        fetchSearchData();
       } else {
         getAllLocationGroups(false);
       }
@@ -130,11 +138,46 @@ function LocationGroup() {
       setSelectedItem(null);
     }
   };
-  const containerStyle = { display: "flex" };
+
+  /* ================= GROUPING ================= */
+  const handleGroupSubmit = async (checked) => {
+    setGroupByStatus(checked);
+    setShowSearch(false);
+
+    if (!checked) {
+      const res = await getLocationGroupsList(entityId, null);
+      setLocationGroupList(res.data);
+      return;
+    }
+
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Retrieving available locations…");
+    try {
+      const [activeRes, inactiveRes] = await Promise.all([
+        getLocationGroupsList(entityId, 1),
+        getLocationGroupsList(entityId, 0),
+      ]);
+      // console.log("inActive Locations", inactiveRes);
+      setTimeout(() => {
+        setActiveLocations(activeRes.data);
+        setInactiveLocations(inactiveRes.data);
+        // console.log("Active locations", activeLocations);
+      }, 800);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      await ensureMinDuration(startTime, 800);
+      // hide loader ONLY at the end
+      hideLoader();
+    }
+  };
+
+  // const containerStyle = { display: "flex" };
 
   return (
     <>
-      <Header backendError={headerError} />
+      <Header backendError={[]} />
       <div className="locationgroup-page">
         <div className="header-section">
           <h2 className="page-title">Location Group</h2>
@@ -184,65 +227,71 @@ function LocationGroup() {
           </div>
         </div>
         <div className={`slide-container ${showSearch ? "show" : "hide"}`}>
-          <Search />
+          <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
         </div>
 
-        <div className={`card-grid ${listView ? "list" : "tile"}`}>
-          {locationGroupList && locationGroupList.length > 0 ? (
-            locationGroupList.map((item) => (
-              <div className="advance-card" key={item.code}>
-                <div className="card-header">
-                  <span
-                    className="code"
-                    onClick={() => handleDataToForm(item.mstID)}
-                  >
-                    {item.code}
-                  </span>
-
-                  <div className="status">
-                    <TiTick className="check-icon" />
-                    <span className="date">{item.activeDate}</span>
-                  </div>
-                </div>
-
-                <div
-                  className="card-title"
-                  style={listView ? containerStyle : null}
-                  onClick={() => handleDataToForm(item.mstID)}
-                >
-                  {item.name}
-                </div>
-
-                <div
-                  className="card-shortname"
-                  style={listView ? containerStyle : null}
-                >
-                  {item.shortName}
-                </div>
-
-                <div
-                  className="card-description"
-                  style={listView ? containerStyle : null}
-                >
-                  {item.description}
-                </div>
-              </div>
-            ))
+        {!groupByStatus &&
+          (locationGroupList.length > 0 ? (
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {locationGroupList.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status={item.inactiveDate ? "inactive" : "active"}
+                  handleDataToForm={handleDataToForm}
+                />
+              ))}
+            </div>
           ) : (
-            <div className="no-data-found">No locations available yet</div>
-          )}
-        </div>
+            <div className="no-data-found">
+              No location groups available yet
+            </div>
+          ))}
+        {groupByStatus && (
+          <>
+            <h3 className="group-title active">Active</h3>
+            {activeLocations && (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {activeLocations.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="active"
+                    handleDataToForm={handleDataToForm}
+                  />
+                ))}
+              </div>
+            )}
 
-        {/* <Main toggleForm={toggleForm} onFlagChange={handleFlagChange}/> */}
+            <h3 className="group-title inactive">Inactive</h3>
+            {inactiveLocations.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {inactiveLocations.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="inactive"
+                    handleDataToForm={handleDataToForm}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">
+                No location groups available yet
+              </div>
+            )}
+          </>
+        )}
+
         <FloatingActionBar
           actions={{
             save: {
-              onClick: handleSave,
+              // onClick: handleSave,
               disabled: true,
               // disabled: isViewMode || isSubmitted
             },
             search: {
-              onClick: handleSearch,
+              // onClick: handleSearch,
               disabled: true,
             },
             clear: {
@@ -250,21 +299,13 @@ function LocationGroup() {
               // disabled:true,
             },
             delete: {
-              onClick: handleDelete,
+              // onClick: handleDelete,
               // disabled: !hasDeletePermission
               disabled: true,
             },
-            // print: {
-            //     onClick: handlePrint,
-            //     // disabled: isNewRecord
-            //     disabled: true,
-            // },
             new: {
               onClick: handleNew, //to toggle the locationgroup form
             },
-            // refresh: {
-            //   onClick: () => window.location.reload(),  // Refresh the page
-            // },
           }}
         />
 
