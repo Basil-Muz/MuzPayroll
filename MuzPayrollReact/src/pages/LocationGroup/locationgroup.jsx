@@ -311,7 +311,7 @@ function LocationGroup() {
 
         {showForm && (
           <ListItemForm
-            entity="User Group"
+            entity="Location Group"
             data={selectedItem}
             toggleForm={toggleForm}
             saveEntity={saveLocationGroup}

@@ -45,7 +45,7 @@ export default function Sidebar({ forceOpen }) {
   });
   const menuItems = Array.isArray(menus) ? menus : [];
 
-  console.log("console in sdebar", menuItems);
+  // console.log("console in sdebar", menuItems);
 
   const sidebarEnabled = user.sidebarOpen || forceOpen; //opens navigation
 

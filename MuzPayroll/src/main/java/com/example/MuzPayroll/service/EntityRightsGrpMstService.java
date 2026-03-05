@@ -242,14 +242,16 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         if (!errors.isEmpty()) {
             return Response.error(errors);
         }
-        // System.out.println("Entityfgvgdfgv"+dto.getEntityHierarchyInfoID());
+        System.out.println("Entityfgvgdfgv"+dto.getEntityHierarchyInfoID());
         //   System.out.println("Entity  "+dto.getEntityHierarchyInfoID().getInfoID());
         //Fetching business groupid with entity hierarchy id
-        Long businessGroupId =
-        entityHierarchyInfoRepository.findBusinessGroupIdByEntityHierarchyInfoId(
-                dto.getEntityHierarchyInfoID()
-        )
-        .orElseThrow(() -> new RuntimeException("Hierarchy not found"));
+//         Long businessGroupId =
+//         entityHierarchyInfoRepository.findBusinessGroupIdByEntityHierarchyInfoId(
+//                 dto.getEntityHierarchyInfoID()
+//         );
+//         if (businessGroupId == null) {
+//     throw new RuntimeException("Hierarchy not found");
+// }
 
         // Long businessGroupId = hierarchyInfo.getEhiBusinessGroupID();
 // System.out.println("Entity  "+businessGroupId);
@@ -257,7 +259,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         // entityManager.getReference(EntityHierarchyInfo.class, businessGroupId);
         // System.out.println("Entityfgvgdfgv"+businessGroupRef);
 
-    dto.setEntityHierarchyInfoID(businessGroupId);
+    // dto.setEntityHierarchyInfoID(businessGroupId);
         
 
         if ("INSERT".equals(mode)) {
@@ -651,11 +653,11 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         // Set ALL fields from the first DTO
         entity.setErmEntityGroupID(dto.getErmEntityRightsGroupID());
          if (dto.getEntityHierarchyInfoID() != null) {
-            EntityHierarchyInfo hierarchy =
-                entityHierarchyInfoRepository.findById(
-                        dto.getEntityHierarchyInfoID()
-                ).orElseThrow(() ->
-                        new RuntimeException("Hierarchy not found"));
+        System.out.println("dfgdfg"+dto.getEntityHierarchyInfoID());
+            Long hierarchy =
+                entityHierarchyInfoRepository
+                .findBusinessGroupIdByEntityHierarchyInfoId(dto.getEntityHierarchyInfoID());
+                
 
             entity.setEntityHierarchyInfoID(hierarchy);
         }
@@ -685,12 +687,8 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         dto.setWithaffectdate(entity.getWithaffectdate());
         dto.setAuthorization(entity.getAuthorization());
         dto.setActiveDate(entity.getActiveDate());
-        dto.setInactiveDate(entity.getInactiveDate());
-           if (entity.getEntityHierarchyInfoID() != null) {
-            dto.setEntityHierarchyInfoID(
-                entity.getEntityHierarchyInfoID().getInfoID()
-            );
-        }
+        dto.setInactiveDate(entity.getInactiveDate());         
+        dto.setEntityHierarchyInfoID(entity.getEntityHierarchyInfoID());
         // dto.setEntityMstID(entity.getEntityMst().getEtmEntityID());
         dto.setErmCode(entity.getErmCode());
         dto.setErmDesc(entity.getErmDesc());

@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
-import { FaFilter } from "react-icons/fa6";
+import { FaFilter, FaChevronDown, FaChevronRight } from "react-icons/fa6";
+import { FaSearch } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
@@ -10,180 +11,80 @@ import { ensureMinDuration } from "../../utils/loaderDelay";
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-
 //service
 import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
 import { getLocationGroupsList } from "../../services/locationGroup.service.js";
+import { getLocationGrpRightssList } from "../../services/locationGrpRights.service.js";
+
+import { useAuth } from "../../context/AuthProvider.jsx";
+import "./css/LocationGroupRights.css";
 // Utils(Helpers)
 import { handleApiError } from "../../utils/errorToastResolver";
+import {
+  OPTION_TYPE_MAP,
+  PERMISSION_PRESETS,
+} from "../../constants/permissionPresets.js";
 
-
-/* =========================================
-   Main Page
-========================================= */
-const GROUPS = [
-  { id: 1002, name: "ALAPPUZHA" },
-  { id: 1003, name: "CALICUT" },
-  { id: 1004, name: "ERNAKULAM" },
-  { id: 1005, name: "IDUKKI" },
-  { id: 1007, name: "KANNUR" },
-  { id: 1012, name: "KASARAGOD" },
-  { id: 1016, name: "KOCHI" },
-  { id: 1022, name: "KOLLAM" },
-  { id: 1023, name: "KOTTAYAM" },
-  { id: 1042, name: "MALAPPURAM" },
-  { id: 1025, name: "PALAKKAD" },
-  { id: 1019, name: "PATHANAMTHITTA" },
-  { id: 1018, name: "THRISSUR" },
-  { id: 1028, name: "TRIVANDRUM" },
-  { id: 1027, name: "WAYANAD" },
-];
-
-const initData = [
-  {
-    id: 1,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 7,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 2,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "103",
-      name: "CALICUT",
-    },
-    group: [
-      { id: 1022, name: "KOLLAM" },
-      { id: 1004, name: "ERNAKULAM" },
-    ],
-
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 3,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 2,
-      name: "Norms Tech Solutions",
-    },
-    location: {
-      id: "201",
-      name: "BANGALORE",
-    },
-    group: [{ id: 1003, name: "CALICUT" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 4,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 2,
-      name: "Norms Tech Solutions",
-    },
-    location: {
-      id: "202",
-      name: "MYSORE",
-    },
-    group: [
-      { id: 1019, name: "PATHANAMTHITTA" },
-      { id: 1018, name: "THRISSUR" },
-    ],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 10,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 18,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-];
-
-const PAGE_SIZE = 8;
+const MODULES_PER_PAGE = 3;
 
 export default function LocationGroupRights() {
-  const [rows, setRows] = useState(initData);
-
-  // const [branchFilter, setBranchFilter] = useState("ALL");
-
-  // const [locationQuery, setLocationQuery] = useState("");
   const { showRailLoader, hideLoader } = useLoader();
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
-  const [saveSelection, setSaveSelection] = useState(new Set());
-  const [originalMap, setOriginalMap] = useState(new Map()); // Capture the first state before edit
-  const [changedScreens, setChangedScreens] = useState(new Set());
   const [bulkGroup, setBulkGroup] = useState([]);
-
-  const [totalCount, setTotalCount] = useState(0);
+  const [modules, setModules] = useState([]);
+  const [originalModules, setOriginalModules] = useState([]);
   const [page, setPage] = useState(1);
-
-  const [showFilters, setShowFilters] = useState(true); // Toggle the filter component
-  const [isSearchApplied, setIsSearchApplied] = useState(false); //  Load the table data
-
+  const [showFilters, setShowFilters] = useState(true);
+  const [isSearchApplied, setIsSearchApplied] = useState(false);
   const [solutions, setSolutions] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [selectedPreset, setSelectedPreset] = useState(null);
 
-  const userId = 3;
+  // New state for UX improvements
+  const [moduleSearch, setModuleSearch] = useState({});
+  const [collapsedModules, setCollapsedModules] = useState({});
+
+  const { user } = useAuth();
+  console.log("User",user)
   const companyId = 4;
+
+  // Track changed screens count
+  const [changedScreensCount, setChangedScreensCount] = useState(0);
 
   useEffect(() => {
     fetchDropDown();
   }, []);
+
+  // Calculate changed screens whenever modules change
+  useEffect(() => {
+    if (!originalModules.length || !modules.length) {
+      setChangedScreensCount(0);
+      return;
+    }
+
+    let changed = 0;
+    modules.forEach((module) => {
+      module.screens.forEach((screen) => {
+        const originalScreen = originalModules
+          .find((m) => m.id === module.id)
+          ?.screens.find(
+            (s) => s.egrEntityGroupRightID === screen.egrEntityGroupRightID,
+          );
+
+        if (
+          originalScreen &&
+          (screen.egrView !== originalScreen.egrView ||
+            screen.egrAdd !== originalScreen.egrAdd ||
+            screen.egrEdit !== originalScreen.egrEdit ||
+            screen.egrDelete !== originalScreen.egrDelete ||
+            screen.egrPrint !== originalScreen.egrPrint)
+        ) {
+          changed++;
+        }
+      });
+    });
+    setChangedScreensCount(changed);
+  }, [modules, originalModules]);
 
   const fetchDropDown = async () => {
     const startTime = Date.now();
@@ -192,12 +93,8 @@ export default function LocationGroupRights() {
       const solutions = await getSolutionList();
       setSolutions(solutions.data);
 
-      const locationGrp = await getLocationGroupsList(companyId,true);
-      // const branchdata = Array.isArray(locationGrp.data)
-      //   ? locationGrp.data
-      //   : [locationGrp.data];
+      const locationGrp = await getLocationGroupsList(user.userEntityHierarchyId, true);
       setLocations(locationGrp.data);
-      console.log("Locaions",locationGrp.data)
     } catch (error) {
       console.error("Error fetching solutions:", error);
     } finally {
@@ -205,16 +102,11 @@ export default function LocationGroupRights() {
       hideLoader();
     }
   };
+
   const {
-    register,
-    // handleSubmit,
+    // register,
     trigger,
-    // setError,
-    // clearErrors,
     setValue,
-    // reset,
-    // setFocus,
-    // getValues,
     watch,
     control,
     formState: { errors },
@@ -226,14 +118,9 @@ export default function LocationGroupRights() {
       activeStatusYN: 1,
     },
   });
-  const branchFilter = watch("locations");
-  const locationQuery = watch("location");
+
+  const locationGrpRights = watch("locations");
   const businessSolution = watch("businessSolution");
-  // const totalPages = Math.ceil(rows.length / PAGE_SIZE);
-  // const pageRows = useMemo(() => {
-  //   const start = (page - 1) * PAGE_SIZE;
-  //   return rows.slice(start, start + PAGE_SIZE);
-  // }, [rows, page]);
 
   const solutionOptions = useMemo(
     () =>
@@ -246,142 +133,195 @@ export default function LocationGroupRights() {
 
   const branchOptions = useMemo(() => {
     return [
-      { value: "ALL", label: "All locations" },
       ...locations.map((s) => ({
         value: s.mstID,
         label: s.description,
       })),
     ];
   }, [locations]);
-  console.log("locations listaedfwef", branchOptions);
+
+  const groupByModule = (data) => {
+    const grouped = data.reduce((acc, item) => {
+      if (!acc[item.moduleName]) {
+        acc[item.moduleName] = {
+          id: item.moduleName,
+          name: item.moduleName.toUpperCase(),
+          screens: [],
+        };
+      }
+
+      const mappedItem = {
+        ...item,
+        optionType: OPTION_TYPE_MAP[item.optionType] || item.optionType,
+      };
+
+      acc[item.moduleName].screens.push(mappedItem);
+
+      return acc;
+    }, {});
+
+    return Object.values(grouped);
+  };
+
   const handlePermissionChange = (moduleId, screenId, permission, value) => {
-    setModules(prev => {
-      const newModules = prev.map(module => {
+    setModules((prev) =>
+      prev.map((module) => {
         if (module.id !== moduleId) return module;
-        
+
         return {
           ...module,
-          screens: module.screens.map(screen => {
-            if (screen.id !== screenId) return screen;
-            
-            // If allow is turned off, disable all other permissions
-            const newPermissions = { ...screen.permissions };
-            
-            if (permission === 'allow' && !value) {
-              // Turn off all permissions when allow is disabled
-              newPermissions.allow = false;
-              newPermissions.add = false;
-              newPermissions.edit = false;
-              newPermissions.delete = false;
-              newPermissions.print = false;
-              newPermissions.save = false;
+          screens: module.screens.map((screen) => {
+            if (screen.egrEntityGroupRightID !== screenId) return screen;
+
+            const updated = { ...screen };
+
+            if (permission === "egrView" && !value) {
+              updated.egrView = false;
+              updated.egrAdd = false;
+              updated.egrEdit = false;
+              updated.egrDelete = false;
+              updated.egrPrint = false;
             } else {
-              newPermissions[permission] = value;
+              updated[permission] = value;
             }
-            
+
+            return updated;
+          }),
+        };
+      }),
+    );
+    setSelectedPreset(null);
+  };
+
+  // Toggle entire column permission for a module
+  const toggleColumnPermission = (moduleId, permission, value) => {
+    setModules((prev) =>
+      prev.map((module) => {
+        if (module.id !== moduleId) return module;
+
+        return {
+          ...module,
+          screens: module.screens.map((screen) => ({
+            ...screen,
+            [permission]: value,
+          })),
+        };
+      }),
+    );
+    setSelectedPreset(null);
+  };
+
+  // Toggle module collapse
+  const toggleModule = (id) => {
+    setCollapsedModules((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  // Get filtered screens based on module search
+  const getFilteredScreens = (module) => {
+    const searchTerm = moduleSearch[module.id] || "";
+    if (!searchTerm) return module.screens;
+
+    return module.screens.filter(
+      (screen) =>
+        screen.optionCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        screen.optionType?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  };
+
+  const applyPresetToSelection = () => {
+    if (!selectedPreset || !selectedRowIds.size) return;
+
+    const preset = PERMISSION_PRESETS.find((p) => p.id === selectedPreset);
+    if (!preset) return;
+
+    setModules((prev) =>
+      prev.map((module) => ({
+        ...module,
+        screens: module.screens.map((screen) => {
+          if (selectedRowIds.has(screen.egrEntityGroupRightID)) {
             return {
               ...screen,
-              permissions: newPermissions
+              ...preset.permissions,
             };
-          })
-        };
-      });
-      
-      // Update changed screens set
-      const newChangedScreens = new Set();
-      newModules.forEach(module => {
-        module.screens.forEach(screen => {
-          const originalScreen = originalModules
-            .find(m => m.id === module.id)
-            ?.screens.find(s => s.id === screen.id);
-            
-          if (JSON.stringify(screen.permissions) !== JSON.stringify(originalScreen?.permissions)) {
-            newChangedScreens.add(`${module.id}-${screen.id}`);
           }
-        });
-      });
-      
-      setChangedScreens(newChangedScreens);
-      
-      // If preset was selected but we made manual changes, show "Custom"
-      if (preset && newChangedScreens.size > 0) {
-        setPreset({ value: 'custom', label: 'Custom' });
-      }
-      
-      return newModules;
-    });
+          return screen;
+        }),
+      })),
+    );
+
+    toast.success(
+      `Applied "${preset.name}" preset to ${selectedRowIds.size} screens`,
+    );
+    setSelectedPreset(null);
   };
-  // const filteredRows = useMemo(() => {
-  //   if (!isSearchApplied) return [];
-  //   trigger();
-  //   // console.log("Branch: ", branchFilter);
-  //   return rows.filter((r) => {
-  //     const branchMatch =
-  //       branchFilter === "ALL" || r.branch.id === Number(branchFilter);
 
-  //     const businessMatch =
-  //       !businessSolution || r.businessSolution.id === Number(businessSolution);
+  const applyPresetToAll = () => {
+    if (!selectedPreset) return;
 
-  //     const locationMatch =
-  //       !locationQuery ||
-  //       r.location.name.toLowerCase().includes(locationQuery.toLowerCase());
+    const preset = PERMISSION_PRESETS.find((p) => p.id === selectedPreset);
+    if (!preset) return;
 
-  //     return branchMatch && businessMatch && locationMatch;
-  //   });
-  // }, [rows, branchFilter, businessSolution, locationQuery, isSearchApplied]);
+    setModules((prev) =>
+      prev.map((module) => ({
+        ...module,
+        screens: module.screens.map((screen) => ({
+          ...screen,
+          ...preset.permissions,
+        })),
+      })),
+    );
 
-  const buildFilterPayload = () => ({
-    businessSolutionId: businessSolution || null,
-    branchId: branchFilter === "ALL" ? null : Number(branchFilter),
-    location: locationQuery?.trim() || null,
-    page,
-    pageSize: PAGE_SIZE,
-  });
+    toast.success(`Applied "${preset.name}" preset to all screens`);
+    setSelectedPreset(null);
+  };
 
   const fetchFilteredRows = async () => {
     try {
-      const payload = buildFilterPayload();
+      const res = await getLocationGrpRightssList(
+        businessSolution,
+        locationGrpRights,
+      );
 
-      // Replace with real API
-      // const res = await api.post("/location-group/filter", payload);
+      const grouped = groupByModule(res.data);
+      setModules(grouped);
+      setOriginalModules(JSON.parse(JSON.stringify(grouped)));
 
-      // MOCK (simulate backend pagination)
-      const start = (page - 1) * PAGE_SIZE;
-      const pagedData = initData.slice(start, start + PAGE_SIZE);
+      // Clear selections when new data loads
+      setSelectedRowIds(new Set());
+      setBulkGroup([]);
+      setSelectedPreset(null);
+      setModuleSearch({});
+      setCollapsedModules({});
 
-      const res = {
-        data: {
-          rows: pagedData,
-          totalCount: initData.length,
-        },
-      };
-
-      setRows(res.data.rows);
-      setTotalCount(res.data.totalCount);
+      setPage(1);
     } catch (err) {
       handleApiError(err);
     }
   };
 
   const handleApplySearch = async () => {
-    const isValid = await trigger();
+    const isValid = await trigger(["businessSolution", "locations"]);
     if (!isValid) return;
 
     setIsSearchApplied(true);
     setShowFilters(false);
-    setPage(1); // always reset page
-
+    setPage(1);
     await fetchFilteredRows();
   };
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
-
-  const pageRows = useMemo(() => rows, [rows]);
-
-  // useEffect(() => {
-  //   setPage(1);
-  //   setSelectedRowIds(new Set());
-  // }, [branchFilter, locationQuery]);
+  // Get all screen IDs from modules for selection
+  const allScreenIds = useMemo(() => {
+    const ids = [];
+    modules.forEach((module) => {
+      module.screens.forEach((screen) => {
+        ids.push(screen.egrEntityGroupRightID);
+      });
+    });
+    return ids;
+  }, [modules]);
 
   const toggleSet = (id) => {
     setSelectedRowIds((prev) => {
@@ -392,165 +332,128 @@ export default function LocationGroupRights() {
   };
 
   const selectAllOnPage = () => {
-    setSelectedRowIds((prev) => {
-      const next = new Set(prev);
-      pageRows.forEach((r) => next.add(r.id));
-      return next;
+    const ids = new Set(selectedRowIds);
+
+    paginatedModules.forEach((module) => {
+      const isCollapsed = collapsedModules[module.id];
+
+      // skip closed modules
+      if (isCollapsed) return;
+
+      const screens = getFilteredScreens(module);
+
+      screens.forEach((screen) => {
+        ids.add(screen.egrEntityGroupRightID);
+      });
     });
+
+    setSelectedRowIds(ids);
   };
   const selectAllAcrossPages = () => {
-    setSelectedRowIds(new Set(filteredRows.map((r) => r.id)));
+    const ids = new Set(selectedRowIds);
+
+    modules.forEach((module) => {
+      const isCollapsed = collapsedModules[module.id];
+
+      if (isCollapsed) return;
+
+      const screens = getFilteredScreens(module);
+
+      screens.forEach((screen) => {
+        ids.add(screen.egrEntityGroupRightID);
+      });
+    });
+
+    setSelectedRowIds(ids);
   };
 
   const clearSelection = () => {
     setSelectedRowIds(new Set());
     setBulkGroup([]);
+    setSelectedPreset(null);
   };
 
-  const applyBulk = () => {
-    if (!bulkGroup.length || !selectedRowIds.size) return;
-
-    setRows((prev) =>
-      prev.map((row) => {
-        if (!selectedRowIds.has(row.id)) return row;
-
-        // capture original ONLY once
-        if (!row._dirty) {
-          setOriginalMap((m) => {
-            const next = new Map(m);
-            next.set(row.id, [...row.group]); // defensive copy
-            return next;
-          });
-        }
-
-        return {
-          ...row,
-          group: bulkGroup,
-          _dirty: true,
-        };
-      }),
-    );
-
-    // mark rows as pending save
-    setSaveSelection((prev) => {
-      const next = new Set(prev);
-      selectedRowIds.forEach((id) => next.add(id));
-      return next;
-    });
-    // toast.success("Location groups updated. Previous groups were replaced.");
-    toast.success("Location groups changed to the new selection.");
-  };
-
-  // const undoRow = (id) => {
-  //   setRows((prev) =>
-  //     prev.map((r) =>
-  //       r.id === id ? { ...r, group: r._original, _dirty: false } : r,
-  //     ),
-  //   );
-  //   setSaveSelection((prev) => {
-  //     const n = new Set(prev);
-  //     n.delete(id);
-  //     return n;
-  //   });
-  // };
   const handleRefresh = () => {
     fetchDropDown();
   };
+
   const handleClear = () => {
     fetchDropDown();
     setValue("businessSolution", null);
     setValue("locations", null);
-    // Warn but DO NOT block
-    if (saveSelection.size) {
+
+    if (changedScreensCount) {
       toast("You have unsaved changes", {
         icon: "⚠️",
       });
     }
 
-    // Reset search state
     setIsSearchApplied(false);
     setShowFilters(true);
-
-    // Clear search inputs
-    // setBusinessSolution("");
-    // setBranchFilter("");
-    // setLocationQuery("");
-
-    //  RESET SELECT BOX IN TABLE DATA
-    setRows(
-      initData.map((r) => ({
-        ...r,
-        group: [...r.group],
-        _dirty: false,
-      })),
-    );
-
-    // Reset table-related state
+    setModules([]);
+    setOriginalModules([]);
     setPage(1);
     setSelectedRowIds(new Set());
-    setSaveSelection(new Set());
     setBulkGroup([]);
-
-    // Optional: clear undo snapshots
-    setOriginalMap(new Map());
+    setChangedScreensCount(0);
+    setSelectedPreset(null);
+    setModuleSearch({});
+    setCollapsedModules({});
   };
 
   const handleSave = async () => {
-    if (!saveSelection.size) return;
+    const changed = [];
 
-    // collect dirty rows
-    const dirtyRows = rows.filter((r) => saveSelection.has(r.id));
+    modules.forEach((module) => {
+      module.screens.forEach((screen) => {
+        const originalScreen = originalModules
+          .find((m) => m.id === module.id)
+          ?.screens.find(
+            (s) => s.egrEntityGroupRightID === screen.egrEntityGroupRightID,
+          );
 
-    // build payload
-    const payload = dirtyRows.map((r) => ({
-      branchId: r.branch.id,
-      locationId: r.location.id,
-      groupIds: r.group.map((g) => g.id),
-    }));
+        if (
+          originalScreen &&
+          (screen.egrView !== originalScreen.egrView ||
+            screen.egrAdd !== originalScreen.egrAdd ||
+            screen.egrEdit !== originalScreen.egrEdit ||
+            screen.egrDelete !== originalScreen.egrDelete ||
+            screen.egrPrint !== originalScreen.egrPrint)
+        ) {
+          changed.push(screen);
+        }
+      });
+    });
 
-    try {
-      console.log("Saving payload:", payload);
+    console.log("Changed payload:", changed);
 
-      // API call
-      // await saveLocationGroupMapping(payload);
-
-      // Commit state on success
-      setRows((prev) =>
-        prev.map((row) =>
-          saveSelection.has(row.id)
-            ? {
-                ...row,
-                _dirty: false,
-              }
-            : row,
-        ),
-      );
-
-      // cleanup control state
-      setSaveSelection(new Set());
-      setSelectedRowIds(new Set());
-      setBulkGroup([]);
-      setOriginalMap(new Map());
-    } catch (err) {
-      handleApiError(err);
-      console.error("Save failed", err);
-      // TODO: show toast / banner
+    if (changed.length) {
+      toast.success(`Saved ${changed.length} changes`);
+      setOriginalModules(JSON.parse(JSON.stringify(modules)));
     }
   };
 
-  useEffect(() => {
-    if (isSearchApplied) {
-      fetchFilteredRows();
-    }
-  }, [page]);
+  // Get paginated modules based on current page
+  const paginatedModules = useMemo(() => {
+    const start = (page - 1) * MODULES_PER_PAGE;
+    const end = start + MODULES_PER_PAGE;
+    return modules.slice(start, end);
+  }, [modules, page]);
+
+  // // Calculate total pages based on modules count
+  // const totalPages = Math.ceil(modules.length / MODULES_PER_PAGE) || 1;
+
+  // const goToPage = (newPage) => {
+  //   setPage(newPage);
+  // };
 
   return (
     <>
-      <div className="lgr-layout">
-        <div className="lgr-main">
-          {/* Header */}
+      <div className="lgrs-layout">
+        <div className="lgrs-main">
           <Header backendError={[]} />
-          <div className="lgr-header">
+
+          <div className="lgrs-header">
             <div>
               <h2>Location Group Rights</h2>
               <p>Manage screen-level permissions for selected location group</p>
@@ -565,24 +468,18 @@ export default function LocationGroupRights() {
               </button>
 
               <div
-                className={`save-indicator ${saveSelection.size ? "active" : ""}`}
+                className={`save-indicator ${changedScreensCount ? "active" : ""}`}
                 aria-live="polite"
               >
-                {/* {saveSelection.size > 0 ? ( */}
-                {/* <> */}
                 <span className="dot" />
-                {saveSelection.size} row{saveSelection.size > 1 ? "s" : ""}{" "}
-                changed
-                {/* </> */}
-                {/* ) : (
-                "No pending chnages"
-              )} */}
+                {changedScreensCount} screen
+                {changedScreensCount !== 1 ? "s" : ""} changed
               </div>
             </div>
           </div>
 
           {showFilters && (
-            <div className="lgr-filters">
+            <div className="lgrs-filters">
               <div>
                 <Controller
                   name="businessSolution"
@@ -596,9 +493,9 @@ export default function LocationGroupRights() {
                       isDisabled={isSearchApplied}
                       classNamePrefix="form-control-select"
                       className={`
-  ${errors.businessSolution ? "error" : ""}
-  ${isSearchApplied ? "read-only" : ""}
-`}
+                        ${errors.businessSolution ? "error" : ""}
+                        ${isSearchApplied ? "read-only" : ""}
+                      `}
                       value={
                         solutionOptions.find(
                           (opt) => opt.value === field.value,
@@ -619,17 +516,16 @@ export default function LocationGroupRights() {
                 <Controller
                   name="locations"
                   control={control}
-                  rules={{ required: "Branch is required" }}
+                  rules={{ required: "Location group is required" }}
                   render={({ field }) => (
                     <Select
                       isDisabled={isSearchApplied}
                       classNamePrefix="form-control-select"
                       className={`
-        ${errors.locations ? "error" : ""}
-        ${isSearchApplied ? "read-only" : ""}
-      `}
+                        ${errors.locations ? "error" : ""}
+                        ${isSearchApplied ? "read-only" : ""}
+                      `}
                       options={branchOptions}
-                      /* 🔥 IMPORTANT FIX */
                       value={
                         branchOptions.find(
                           (opt) => opt.value === field.value,
@@ -647,16 +543,6 @@ export default function LocationGroupRights() {
                 )}
               </div>
 
-              {/* <div>
-                <input
-                  type="search"
-                  disabled={isSearchApplied}
-                  className={`form-control input${errors.location ? "error" : ""} ${isSearchApplied ? "read-only" : ""}`}
-                  placeholder="Search by location"
-                  {...register("location")}
-                />
-              </div> */}
-
               <div className="search-actions">
                 {!isSearchApplied ? (
                   <button className="btn btn-apply" onClick={handleApplySearch}>
@@ -666,14 +552,16 @@ export default function LocationGroupRights() {
                   <button
                     className="btn btn-change"
                     onClick={() => {
-                      if (saveSelection.size) {
-                        alert("You have unsaved changes");
-                        return;
+                      if (changedScreensCount) {
+                        if (!confirm("You have unsaved changes. Continue?")) {
+                          return;
+                        }
                       }
                       setIsSearchApplied(false);
-
+                      setShowFilters(true);
                       setSelectedRowIds(new Set());
                       setBulkGroup([]);
+                      setSelectedPreset(null);
                     }}
                   >
                     Change Search
@@ -683,14 +571,6 @@ export default function LocationGroupRights() {
             </div>
           )}
 
-          {/* Bulk Panel */}
-          {/* {selectedRowIds.size === 0 && (
-            <div className="bulk-hint" role="status" aria-live="polite">
-              Select one or more rows to enable bulk actions
-            </div>
-          )} */}
-
-          {/* ===== Bulk Context Bar ===== */}
           {selectedRowIds.size > 0 && (
             <div
               className="bulk-bar"
@@ -700,7 +580,7 @@ export default function LocationGroupRights() {
             >
               <div className="bulk-info">
                 <strong>{selectedRowIds.size}</strong>
-                <span>locations selected for bulk assignment</span>
+                <span>screens selected for bulk assignment</span>
               </div>
 
               <div
@@ -709,11 +589,11 @@ export default function LocationGroupRights() {
                 aria-label="Bulk selection actions"
               >
                 <button className="link" onClick={selectAllOnPage}>
-                  Select all on page
+                  Select rows in open modules
                 </button>
 
                 <button className="link" onClick={selectAllAcrossPages}>
-                  Select all across pages
+                  Select all ({allScreenIds.length})
                 </button>
 
                 <button className="link danger" onClick={clearSelection}>
@@ -722,228 +602,369 @@ export default function LocationGroupRights() {
               </div>
 
               <div className="bulk-assign">
-                <LocationGroupMultiSelect
-                  options={GROUPS}
-                  value={bulkGroup}
-                  onChange={setBulkGroup}
-                  placeholder="Assign location groups"
-                />
-                <button
-                  className="btn btn-apply"
-                  disabled={!bulkGroup.length}
-                  onClick={applyBulk}
-                >
-                  Apply
-                </button>
+                <div className="preset-selector">
+                  <Select
+                    options={PERMISSION_PRESETS.map((preset) => ({
+                      value: preset.id,
+                      label: preset.name,
+                      description: preset.description,
+                    }))}
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                    placeholder="Apply permission preset..."
+                    isSearchable={false}
+                    value={
+                      selectedPreset
+                        ? {
+                            value: selectedPreset,
+                            label: PERMISSION_PRESETS.find(
+                              (p) => p.id === selectedPreset,
+                            )?.name,
+                          }
+                        : null
+                    }
+                    onChange={(option) => setSelectedPreset(option?.value)}
+                    className="preset-select"
+                    classNamePrefix="form-control-select"
+                    formatOptionLabel={(option) => (
+                      <div className="preset-option">
+                        <div className="preset-name">{option.label}</div>
+                        <div className="preset-description">
+                          {option.description}
+                        </div>
+                      </div>
+                    )}
+                  />
+                  <button
+                    className="btn btn-apply"
+                    disabled={!selectedPreset}
+                    onClick={applyPresetToSelection}
+                  >
+                    Apply to Selected
+                  </button>
+                  <button
+                    className="btn btn-apply-outline"
+                    disabled={!selectedPreset}
+                    onClick={applyPresetToAll}
+                  >
+                    Apply to All
+                  </button>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Table */}
+          {/* Module Pagination
+          {isSearchApplied && modules.length > 0 && (
+            <div className="pager">
+              <button
+                disabled={page === 1}
+                onClick={() => goToPage(page - 1)}
+                aria-label="Previous page"
+              >
+                Prev
+              </button>
+              <span>
+                Page {page} of {totalPages}
+                <span className="page-info">
+                  {" "}
+                  (Showing modules {(page - 1) * MODULES_PER_PAGE + 1} -{" "}
+                  {Math.min(page * MODULES_PER_PAGE, modules.length)} of{" "}
+                  {modules.length})
+                </span>
+              </span>
+              <button
+                disabled={page === totalPages}
+                onClick={() => goToPage(page + 1)}
+                aria-label="Next page"
+              >
+                Next
+              </button>
+            </div>
+          )} */}
 
-          <div className="card">
-            <table className="grid">
-              <thead>
-                <tr>
-                  <th>Set</th>
-                  <th>Branch</th>
-                  <th>Location</th>
-                  <th className="group-fixed">Location Groups</th>
-                  <th className="assign-fixed">Assign</th>
-                  <th>Save</th>
-                </tr>
-              </thead>
+          {isSearchApplied ? (
+            modules.length ? (
+              paginatedModules.map((module) => {
+                const filteredScreens = getFilteredScreens(module);
+                const isCollapsed = collapsedModules[module.id];
 
-              <tbody>
-                {isSearchApplied ? (
-                  pageRows.length ? (
-                    pageRows.map((r) => (
-                      <tr key={r.id} className={r._dirty ? "dirty" : ""}>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={selectedRowIds.has(r.id)}
-                            onChange={() => toggleSet(r.id)}
-                          />
-                        </td>
-                        <td>{r.branch.name}</td>
-                        <td>{r.location.name}</td>
-                        <td className="muted">
-                          {r.group.length
-                            ? r.group.map((g) => g.name).join(", ")
-                            : "Not assigned"}
-                        </td>
-                        <td>
-                          <LocationGroupMultiSelect
-                            options={GROUPS}
-                            value={r.group}
-                            onChange={(value) => {
-                              setSelectedRowIds((p) => new Set(p).add(r.id));
+                return (
+                  <div
+                    className={`card ${isCollapsed ? "collapsed" : ""}`}
+                    key={module.id}
+                  >
+                    <div
+                      className={`module-header ${isCollapsed ? "collapsed" : ""}`}
+                      onClick={() => toggleModule(module.id)}
+                    >
+                      <h4 className="module-title">
+                        {isCollapsed ? <FaChevronRight /> : <FaChevronDown />}
+                        {module.name}
+                        <span className="screen-count">
+                          ({filteredScreens.length} of {module.screens.length}{" "}
+                          screens)
+                        </span>
+                      </h4>
+                      {!isCollapsed && (
+                        <div className="module-toolbar">
+                          <div className="search-box">
+                            <FaSearch className="search-icon" />
+                            <input
+                              type="text"
+                              placeholder="Search screens..."
+                              value={moduleSearch[module.id] || ""}
+                              onChange={(e) =>
+                                setModuleSearch((prev) => ({
+                                  ...prev,
+                                  [module.id]: e.target.value,
+                                }))
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            {moduleSearch[module.id] && (
+                              <button
+                                className="clear-search"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setModuleSearch((prev) => ({
+                                    ...prev,
+                                    [module.id]: "",
+                                  }));
+                                }}
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
-                              setRows((prev) =>
-                                prev.map((row) => {
-                                  if (row.id !== r.id) return row;
+                    {!isCollapsed && (
+                      <>
+                        {/* Module Toolbar with Search */}
 
-                                  if (!row._dirty) {
-                                    setOriginalMap((m) => {
-                                      const next = new Map(m);
-                                      next.set(r.id, row.group);
-                                      return next;
-                                    });
-                                  }
+                        {filteredScreens.length > 0 ? (
+                          <table className="grid">
+                            <thead>
+                              <tr>
+                                <th>Select</th>
+                                <th>Option Type</th>
+                                <th>Option Name</th>
+                                <th className="permission-header">
+                                  View
+                                  {/* <input
+                                    type="checkbox"
+                                    onChange={(e) =>
+                                      toggleColumnPermission(
+                                        module.id,
+                                        "egrView",
+                                        e.target.checked,
+                                      )
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                  /> */}
+                                </th>
+                                <th className="permission-header">
+                                  Add
+                                  {/* <input
+                                    type="checkbox"
+                                    onChange={(e) =>
+                                      toggleColumnPermission(
+                                        module.id,
+                                        "egrAdd",
+                                        e.target.checked,
+                                      )
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                  /> */}
+                                </th>
+                                <th className="permission-header">
+                                  Edit
+                                  {/* <input
+                                    type="checkbox"
+                                    onChange={(e) =>
+                                      toggleColumnPermission(
+                                        module.id,
+                                        "egrEdit",
+                                        e.target.checked,
+                                      )
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                  /> */}
+                                </th>
+                                <th className="permission-header">
+                                  Delete
+                                  {/* <input
+                                    type="checkbox"
+                                    onChange={(e) =>
+                                      toggleColumnPermission(
+                                        module.id,
+                                        "egrDelete",
+                                        e.target.checked,
+                                      )
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                  /> */}
+                                </th>
+                                <th className="permission-header">
+                                  Print
+                                  {/* <input
+                                    type="checkbox"
+                                    onChange={(e) =>
+                                      toggleColumnPermission(
+                                        module.id,
+                                        "egrPrint",
+                                        e.target.checked,
+                                      )
+                                    }
+                                    onClick={(e) => e.stopPropagation()}
+                                  /> */}
+                                </th>
+                              </tr>
+                            </thead>
 
-                                  return {
-                                    ...row,
-                                    group: value,
-                                    _dirty: true,
-                                  };
-                                }),
-                              );
-
-                              setSaveSelection((p) => new Set(p).add(r.id));
-                            }}
-                            onCancel={() => {
-                              setRows((prev) =>
-                                prev.map((row) =>
-                                  row.id === r.id
-                                    ? {
-                                        ...row,
-                                        group:
-                                          originalMap.get(r.id) ?? row.group,
-                                        _dirty: false,
+                            <tbody>
+                              {filteredScreens.map((screen) => (
+                                <tr key={screen.egrEntityGroupRightID}>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedRowIds.has(
+                                        screen.egrEntityGroupRightID,
+                                      )}
+                                      onChange={() =>
+                                        toggleSet(screen.egrEntityGroupRightID)
                                       }
-                                    : row,
-                                ),
-                              );
+                                    />
+                                  </td>
 
-                              setSaveSelection((prev) => {
-                                const next = new Set(prev);
-                                next.delete(r.id);
-                                return next;
-                              });
+                                  <td>{screen.optionType}</td>
+                                  <td className="option-name">
+                                    <div className="option-title">
+                                      {screen.optionCode}
+                                    </div>
+                                  </td>
+                                  {/* <td>{screen.optionCode}</td> */}
 
-                              setOriginalMap((m) => {
-                                const next = new Map(m);
-                                next.delete(r.id);
-                                return next;
-                              });
-                            }}
-                          />
-                          {/* {r._dirty && (
-                        <button className="link" onClick={() => undoRow(r.id)}>
-                          Undo
-                        </button>
-                      )} */}
-                        </td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            disabled={!r._dirty}
-                            checked={saveSelection.has(r.id)}
-                            readOnly
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={6} className="no-table-data">
-                        No mapping details found for selected criteria
-                      </td>
-                    </tr>
-                  )
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="no-table-data">
-                      Select filters and click <strong>Apply</strong> to view
-                      mappings
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={screen.egrView}
+                                      onChange={(e) =>
+                                        handlePermissionChange(
+                                          module.id,
+                                          screen.egrEntityGroupRightID,
+                                          "egrView",
+                                          e.target.checked,
+                                        )
+                                      }
+                                    />
+                                  </td>
 
-          {/* Pagination */}
-          <div className="pager">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-              aria-label="Previous page"
-            >
-              Prev
-            </button>
-            <span>
-              Page {page} / {totalPages}
-            </span>
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-              aria-label="Next page"
-            >
-              Next
-            </button>
-          </div>
-            {isSearchApplied ? (
-                  pageRows.length ? (
-                    pageRows.map((r) => (
-           <ModulePermissionCard
-                key={r.id}
-                module={r}
-                screens={r.screens}
-                onPermissionChange={handlePermissionChange}
-                isChanged={r.screens.some(screen => 
-                  changedScreens.has(`${r.id}-${screen.id}`)
-                )}
-              />
-              ))
-                  ) : (
-                    <tr>
-                      <td colSpan={6} className="no-table-data">
-                        No mapping details found for selected criteria
-                      </td>
-                    </tr>
-                  )
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="no-table-data">
-                      Select filters and click <strong>Apply</strong> to view
-                      mappings
-                    </td>
-                  </tr>
-                )}
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={screen.egrAdd}
+                                      onChange={(e) =>
+                                        handlePermissionChange(
+                                          module.id,
+                                          screen.egrEntityGroupRightID,
+                                          "egrAdd",
+                                          e.target.checked,
+                                        )
+                                      }
+                                    />
+                                  </td>
+
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={screen.egrEdit}
+                                      onChange={(e) =>
+                                        handlePermissionChange(
+                                          module.id,
+                                          screen.egrEntityGroupRightID,
+                                          "egrEdit",
+                                          e.target.checked,
+                                        )
+                                      }
+                                    />
+                                  </td>
+
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={screen.egrDelete}
+                                      onChange={(e) =>
+                                        handlePermissionChange(
+                                          module.id,
+                                          screen.egrEntityGroupRightID,
+                                          "egrDelete",
+                                          e.target.checked,
+                                        )
+                                      }
+                                    />
+                                  </td>
+
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={screen.egrPrint}
+                                      onChange={(e) =>
+                                        handlePermissionChange(
+                                          module.id,
+                                          screen.egrEntityGroupRightID,
+                                          "egrPrint",
+                                          e.target.checked,
+                                        )
+                                      }
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        ) : (
+                          <div className="no-search-results">
+                            No screens found matching "{moduleSearch[module.id]}
+                            "
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="no-table-data">
+                No mapping details found for selected criteria
+              </div>
+            )
+          ) : (
+            <div className="no-table-data">
+              Select filters and click <strong>Apply</strong> to view mappings
+            </div>
+          )}
         </div>
 
-        <aside className="lgr-actions">
+        <aside className="lgrs-actions">
           <FloatingActionBar
             actions={{
               save: {
                 onClick: handleSave,
-                disabled: !saveSelection.size,
-                // disabled: isViewMode || isSubmitted
+                disabled: !changedScreensCount,
               },
               search: {
-                //onClick: handleSearch,
                 disabled: true,
               },
               clear: {
                 onClick: handleClear,
-                // disabled:true,
               },
               delete: {
-                //onClick: handleDelete,
-                // disabled: !hasDeletePermission
                 disabled: true,
               },
-
-              // print: {
-              //   onClick: handlePrint,
-              //   // disabled: isNewRecord
-              //   disabled: true,
-              // },
-              // new: {
-              //    onClick: toggleForm, //to toggle the designation form
-              // },
               refresh: {
                 onClick: handleRefresh,
               },

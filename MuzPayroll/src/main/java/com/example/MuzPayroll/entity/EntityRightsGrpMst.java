@@ -54,16 +54,15 @@ public class EntityRightsGrpMst {
     @JoinColumn(name = "ErmEntityHierarchyID", nullable = true)
     private EntityMst entityMst;
 
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "ErmEntityHierarchyInfoID", nullable = true)
-    private EntityHierarchyInfo entityHierarchyInfoID;
 
-    public EntityHierarchyInfo getEntityHierarchyInfoID() {
+    @Column(name = "ErmBusinessGroupID", nullable = true)
+    private Long entityHierarchyInfoID;
+
+    public Long getEntityHierarchyInfoID() {
         return entityHierarchyInfoID;
     }
 
-    public void setEntityHierarchyInfoID(EntityHierarchyInfo entityHierarchyInfoID) {
+    public void setEntityHierarchyInfoID(Long entityHierarchyInfoID) {
         this.entityHierarchyInfoID = entityHierarchyInfoID;
     }
     @Column(nullable = true)

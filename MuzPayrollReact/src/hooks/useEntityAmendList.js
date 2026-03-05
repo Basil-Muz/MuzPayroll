@@ -19,12 +19,12 @@ export const useEntityAmendList = ({
       showRailLoader("Fetching " + entity + "details…");
 
       try {
-        const entityLogs = entity + "DtoLogs";
+        // const entityLogs = entity + "DtoLogs";
         const response = await getEntityAmendList(entityId);
 
         //const list = response.data[entityLogs] || [];// Use the amends data
-
-        setAmendments(response.data[entityLogs] || []); // new reference
+        // console.log("AMENDERF",response.data.entityLogDTOs)
+        setAmendments(response.data.entityLogDTOs || []); // new reference
 
         // Select latest ENTRY amendment (or fallback)
         //const latest =
@@ -35,7 +35,7 @@ export const useEntityAmendList = ({
         setAddingNewAmend(false);
         // setSelectedAmendment(latest); //data form master table
         // // delete response.data.companyDtoLogs;
-        console.log("Amend response", response.data);
+        // console.log("Amend response", response.data);
       } catch (error) {
         handleApiError(error, {
           operation: "fetch", //    Opration name

@@ -168,12 +168,13 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         log.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
        
         if (dto.getEntityHierarchyInfoID() != null) {
-            EntityHierarchyInfo hierarchy =
-                entityHierarchyInfoRepository.findById(
+            Long hierarchy =
+                entityHierarchyInfoRepository.findBusinessGroupIdByEntityHierarchyInfoId(
                         dto.getEntityHierarchyInfoID()
-                ).orElseThrow(() ->
-                        new RuntimeException("Hierarchy not found"));
-
+                );
+                if(hierarchy == null){
+                    new RuntimeException("Hierarchy not found");
+                }
             log.setEntityHierarchyInfoID(hierarchy);
         }
         log.setErmCode(dto.getErmCode());
@@ -196,11 +197,10 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
 
         dto.setEntityRightsGrpLogPK(entity.getEntityRightsGrpLogPK());
        
-        if (entity.getEntityHierarchyInfoID() != null) {
+
             dto.setEntityHierarchyInfoID(
-                entity.getEntityHierarchyInfoID().getInfoID()
+                entity.getEntityHierarchyInfoID()
             );
-        }
         dto.setErmCode(entity.getErmCode());
         dto.setErmDesc(entity.getErmDesc());
         dto.setErmName(entity.getErmName());
@@ -233,12 +233,14 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         if ("INSERT".equalsIgnoreCase(mode) || "UPDATE".equalsIgnoreCase(mode)) {
 
             log.setErmName(dto.getErmName());
+            
             if (dto.getEntityHierarchyInfoID() != null) {
-            EntityHierarchyInfo hierarchy =
-                entityHierarchyInfoRepository.findById(
-                        dto.getEntityHierarchyInfoID()
-                ).orElseThrow(() ->
-                        new RuntimeException("Hierarchy not found"));
+            Long hierarchy =
+                entityHierarchyInfoRepository.findBusinessGroupIdByEntityHierarchyInfoId(
+                        dto.getEntityHierarchyInfoID());
+                if(hierarchy == null){
+                     new RuntimeException("Business group id not found");
+                }
 
             log.setEntityHierarchyInfoID(hierarchy);
         }
