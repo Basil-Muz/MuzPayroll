@@ -216,6 +216,8 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
         Log.setEtmActiveYN(dto.getEtmActiveYN());
         Log.setAmendNo(dto.getAmendNo());
         Log.setAuthorization(dto.getAuthorization());
+        Log.setAddressInfoLog(dto.getAddressInfoLogID());
+        // Log.setAddressInfoLog(dto.getLogRowNo());
 
         AddressInfoLog addressinfoLog = new AddressInfoLog();
 
@@ -238,9 +240,9 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
         addressinfoLog.setAmendNo(dto.getAmendNo());
         addressinfoLog.setAddressInfoLogPK(dto.getAddressInfoLogPK());
 
-        // if (dto.getAddressInfoLog() != null) {
-        // Log.setAddressInfoLog(dto.getAddressInfoLog());
-        // }
+        if (dto.getAddressInfoLog() != null) {
+            Log.setAddressInfoLog(dto.getAddressInfoLog());
+        }
 
         return Log;
     }
@@ -261,6 +263,10 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
         dto.setActiveDate(entity.getActiveDate());
         dto.setImagePath(entity.getEtmImage());
         dto.setInactiveDate(entity.getInactiveDate());
+        dto.setAmendNo(entity.getAmendNo());
+        dto.setEtmEntityId(entity.getEntityLogPK().getEtmEntityID());
+        dto.setAddressInfoID(entity.getAddressInfoLogPK().getAddressInfoID());
+        dto.setMuzControlCodes(entity.getMuzControlCodes());
 
         if (entity.getAuthorization() != null) {
             dto.setAuthId(entity.getAuthorization().getAuthId());
@@ -270,6 +276,28 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
             if (entity.getAuthorization().getUserMst() != null) {
                 dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
             }
+        }
+
+        if (entity.getAddressInfoLog() != null) {
+
+            dto.setAddressInfoLogPK(entity.getAddressInfoLog().getAddressInfoLogPK());
+            dto.setAddress(entity.getAddressInfoLog().getAddress());
+            dto.setAddress1(entity.getAddressInfoLog().getAddress1());
+            dto.setAddress2(entity.getAddressInfoLog().getAddress2());
+            dto.setCountry(entity.getAddressInfoLog().getCountry());
+            dto.setState(entity.getAddressInfoLog().getState());
+            dto.setDistrict(entity.getAddressInfoLog().getDistrict());
+            dto.setPlace(entity.getAddressInfoLog().getPlace());
+            dto.setPincode(entity.getAddressInfoLog().getPincode());
+            dto.setLandlineNumber(entity.getAddressInfoLog().getLandlineNumber());
+            dto.setMobileNumber(entity.getAddressInfoLog().getMobileNumber());
+            dto.setEmail(entity.getAddressInfoLog().getEmail());
+            dto.setDesignation(entity.getAddressInfoLog().getDesignation());
+            dto.setEmployerName(entity.getAddressInfoLog().getEmployerName());
+            dto.setEmployerNumber(entity.getAddressInfoLog().getEmployerNumber());
+            dto.setEmployerEmail(entity.getAddressInfoLog().getEmployerEmail());
+            dto.setWithaffectdate(entity.getAddressInfoLog().getWithaffectdate());
+
         }
 
         return dto;
@@ -311,8 +339,12 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
 
             AddressInfoLog savedAddress = addressInfoLogRepository.save(addressinfoLog);
 
-            // log.setAddressInfoLog(savedAddress);
-
+            // MANUALLY SET THE FK FIELDS
+            if (savedAddress != null && savedAddress.getAddressInfoLogPK() != null) {
+                // You need to have these setter methods in your EntityLog class
+                log.setAddressInfoID(savedAddress.getAddressInfoLogPK().getAddressInfoID());
+                log.setRowNo(savedAddress.getAddressInfoLogPK().getRowNo());
+            }
             log.setEntityLogPK(dto.getEntityLogPK());
             log.setEtmName(dto.getEtmName());
             log.setEtmCode(dto.getEtmCode());
@@ -355,7 +387,7 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
     public List<EntityLogDTO> getLogsByCompanyMstID(Long companyMstID) {
 
         List<EntityLog> logs = entityLogRepository
-                .findByEntityLogPK_EtmEntityIDOrderByEntityLogPK_RowNoDesc(companyMstID);
+                .findAllEntityLogs(companyMstID);
 
         return logs.stream()
                 .map(this::entityToDto)

@@ -7,8 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 
 @Entity
@@ -53,12 +54,27 @@ public class EntityLog {
     private LocalDate InactiveDate;
 
     @ManyToOne
-    @JsonIgnore
+    // @JsonIgnore
     @JoinColumn(name = "EtmAuthInfoID", nullable = false)
     private Authorization authorization;
 
     @Column(nullable = false, name = "AmendNo")
     private String amendNo;
+
+    // Foreign key columns
+    @Column(name = "AddressInfoID")
+    private Long AddressInfoID;
+
+    @Column(name = "AddRow_no")
+    private Long rowNo;
+
+    // Many-to-one relationship to AddressInfoLog (parent entity)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "AddressInfoID", referencedColumnName = "AddressInfoID", insertable = false, updatable = false),
+            @JoinColumn(name = "AddRow_no", referencedColumnName = "AddRow_no", insertable = false, updatable = false)
+    })
+    private AddressInfoLog addressInfoLog;
 
     // =========================
     // Getters and Setters
@@ -167,20 +183,49 @@ public class EntityLog {
         this.InactiveDate = InactiveDate;
     }
 
-    // public AddressInfoLog getAddressInfoLog() {
-    // return addressInfoLog;
-    // }
-
-    // public void setAddressInfoLog(AddressInfoLog addressInfoLog) {
-    // this.addressInfoLog = addressInfoLog;
-    // }
-
     public String getAmendNo() {
         return amendNo;
     }
 
     public void setAmendNo(String amendNo) {
         this.amendNo = amendNo;
+    }
+
+    public Long getRowNo() {
+        return rowNo;
+    }
+
+    public Long getAddressInfoID() {
+        return AddressInfoID;
+    }
+
+    public AddressInfoLog getAddressInfoLog() {
+        return addressInfoLog;
+    }
+
+    public void setAddressInfoLog(AddressInfoLog addressInfoLog) {
+        this.addressInfoLog = addressInfoLog;
+        // Automatically set the individual fields when relationship is set
+        if (addressInfoLog != null && addressInfoLog.getAddressInfoLogPK() != null) {
+            this.AddressInfoID = addressInfoLog.getAddressInfoLogPK().getAddressInfoID();
+            this.rowNo = addressInfoLog.getAddressInfoLogPK().getRowNo();
+        } else {
+            this.AddressInfoID = null;
+            this.rowNo = null;
+        }
+    }
+
+    // Optional: Helper method to get the composite key directly
+    public AddressInfoLogPK getAddressInfoLogPK() {
+        return addressInfoLog != null ? addressInfoLog.getAddressInfoLogPK() : null;
+    }
+
+    public void setAddressInfoID(Long AddressInfoID) {
+        this.AddressInfoID = AddressInfoID;
+    }
+
+    public void setRowNo(Long rowNo) {
+        this.rowNo = rowNo;
     }
 
 }

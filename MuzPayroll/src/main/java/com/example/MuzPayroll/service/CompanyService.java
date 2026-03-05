@@ -916,9 +916,9 @@ public class CompanyService extends MuzirisAbstractService<CompanyDTO, CompanyMs
         MultipartFile file = dto.getCompanyImage();
 
         // If no new image uploaded and no existing image path, image is required
-        if ((file == null || file.isEmpty()) && isEmpty(dto.getCompanyImagePath())) {
-            return Response.error("Company image is required");
-        }
+        // if ((file == null || file.isEmpty()) && isEmpty(dto.getCompanyImagePath())) {
+        //     return Response.error("Company image is required");
+        // }
 
         // If new image is uploaded, validate and process it
         if (file != null && !file.isEmpty()) {

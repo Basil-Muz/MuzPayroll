@@ -50,6 +50,14 @@ public class EntityController {
         }
     }
 
+    // TO get the amend the List of Logs y using MstID
+    @GetMapping("/gelist")
+    public List<EntityMstDTO> getEntityAmendList(
+            @RequestParam Long Id) {
+
+        return entityService.getAmendList(Id);
+    }
+
     // TO get the companyMst and the List of Logs y using MstID
     @GetMapping("/getamendlist/{ID}")
     public ResponseEntity<EntityMstDTO> getEntityById(@PathVariable Long ID) {

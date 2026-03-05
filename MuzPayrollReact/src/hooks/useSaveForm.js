@@ -50,17 +50,17 @@ export const useSaveForm = ({
       const formData = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
-        if (key !== "companyImage") {
+        if (key !== "entityImage") {
           formData.append(key, value);
         }
       });
 
-      if (payload.companyImage instanceof File) {
+      if (payload.entityImage instanceof File) {
         //  New Image file from user
-        formData.append("companyImage", payload.companyImage);
-      } else if (typeof payload.companyImage === "string") {
+        formData.append("entityImage", payload.entityImage);
+      } else if (typeof payload.entityImage === "string") {
         //Old image in amends
-        formData.append("companyImagePath", payload.companyImage);
+        formData.append("ImagePath", payload.entityImage);
       }
 
       // console.log("FormData contents:");
