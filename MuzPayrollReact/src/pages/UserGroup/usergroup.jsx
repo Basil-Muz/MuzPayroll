@@ -239,7 +239,7 @@ function UserGroup() {
                   item={item}
                   status="active"
                   handleDataToForm={handleDataToForm}
-                
+
                 />
               ))}
             </div>
@@ -308,7 +308,7 @@ function UserGroup() {
               disabled: true,
             },
             new: {
-               onClick: handleNew, //to toggle the usergroup form
+              onClick: handleNew, //to toggle the usergroup form
             },
             // refresh: {
             //   onClick: () => window.location.reload(),  // Refresh the page
@@ -324,7 +324,29 @@ function UserGroup() {
             saveEntity={saveUserGroup}
             fetchEntityById={getUserGroupById}
             ENTITY_FIELD_MAP={USER_GROUP_FIELD_MAP}
-          />
+          >
+            {({ register, errors, isVarified }) => (
+              <div className="full-content">
+                <div className="form-row">
+                  <label className="group-form-label">Description</label>
+
+                  <textarea
+                    className={`form-control ${errors[USER_GROUP_FIELD_MAP.description] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                    placeholder="Enter Description"
+                    disabled={isVarified}
+                    {...register(USER_GROUP_FIELD_MAP.description)}
+                  />
+
+                  {errors[USER_GROUP_FIELD_MAP.description] && (
+                    <span className="error-message">
+                      {errors[USER_GROUP_FIELD_MAP.description].message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </ListItemForm>
         )}
         {/* {flag && <Loading />} */}
         <BackToTop />

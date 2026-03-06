@@ -37,6 +37,7 @@ function ListItemForm({
   saveEntity,
   fetchEntityById,
   ENTITY_FIELD_MAP,
+  children
 }) {
 
   //   const [position, setPosition] = useState({ x: 355, y: 43 });
@@ -341,151 +342,17 @@ function ListItemForm({
             </div>
             {/* ================= CONDITIONAL SECTION ================= */}
 
-            {entity === "Shift Group" ? (
-              <>
-                {/* Time From */}
-                <div className="form-row">
-                  <label className="group-form-label required">Time From</label>
+            {children &&
+              children({
+                register,
+                control,
+                errors,
+                setValue,
+                watch,
+                isVarified,
+              })}
 
-                  <Controller
-                    name={ENTITY_FIELD_MAP.timeFrom}
-                    control={control}
-                    rules={{ required: "Time From is required" }}
-                    render={({ field }) => (
-                      <TimePicker
-                        {...field}
-                        format="HH:mm"
-                        disableClock={true}
-                        clearIcon={null}
-                        clockIcon={null}
-                        className={`custom-time-picker ${errors[ENTITY_FIELD_MAP.timeFrom] ? "error" : ""
-                          }`}
-                      />
-                    )}
-                  />
 
-                  {errors[ENTITY_FIELD_MAP.timeFrom] && (
-                    <span className="error-message">
-                      {errors[ENTITY_FIELD_MAP.timeFrom].message}
-                    </span>
-                  )}
-                </div>
-
-                {/* Time To */}
-                <div className="form-row">
-                  <label className="group-form-label required">Time To</label>
-                  <Controller
-                    name={ENTITY_FIELD_MAP.timeTo}
-                    control={control}
-                    rules={{ required: "Time To is required" }}
-                    render={({ field }) => (
-                      <TimePicker
-                        {...field}
-                        format="HH:mm"
-                        disableClock={true}
-                        clearIcon={null}
-                        clockIcon={null}
-                        className={`custom-time-picker ${errors[ENTITY_FIELD_MAP.timeTo] ? "error" : ""
-                          }`}
-                      />
-                    )}
-                  />
-
-                  {errors[ENTITY_FIELD_MAP.timeTo] && (
-                    <span className="error-message">
-                      {errors[ENTITY_FIELD_MAP.timeTo].message}
-                    </span>
-                  )}
-                </div>
-
-                <div className="full-content">
-                  <div className="form-row">
-                    <label className="group-form-label required">Shift Type</label>
-
-                    <div className="shift-type-container">
-                      <div
-                        className={`shift-type ${watch(ENTITY_FIELD_MAP.shiftType) === "DAY" ? "active" : ""
-                          } ${isVarified ? "disabled" : ""}`}
-                        onClick={() =>
-                          !isVarified &&
-                          setValue(ENTITY_FIELD_MAP.shiftType, "DAY", {
-                            shouldValidate: true,
-                          })
-                        }
-                      >
-                        <GrSun />
-                      </div>
-
-                      <div
-                        className={`shift-type ${watch(ENTITY_FIELD_MAP.shiftType) === "NIGHT" ? "active" : ""
-                          } ${isVarified ? "disabled" : ""}`}
-                        onClick={() =>
-                          !isVarified &&
-                          setValue(ENTITY_FIELD_MAP.shiftType, "NIGHT", {
-                            shouldValidate: true,
-                          })
-                        }
-                      >
-                        <GrMoon />
-                      </div>
-
-                      <div
-                        className={`shift-type ${watch(ENTITY_FIELD_MAP.shiftType) === "GENERAL"
-                          ? "active"
-                          : ""
-                          } ${isVarified ? "disabled" : ""}`}
-                        onClick={() =>
-                          !isVarified &&
-                          setValue(ENTITY_FIELD_MAP.shiftType, "GENERAL", {
-                            shouldValidate: true,
-                          })
-                        }
-                      >
-                        <LiaAdjustSolid />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Hidden input for RHF */}
-                  <input
-                    type="hidden"
-                    {...register(ENTITY_FIELD_MAP.shiftType, {
-                      required: "Shift Type is required",
-                    })}
-                  />
-
-                  {errors[ENTITY_FIELD_MAP.shiftType] && (
-                    <span className="error-message">
-                      {errors[ENTITY_FIELD_MAP.shiftType].message}
-                    </span>
-                  )}
-                </div>
-              </>
-            ) : (
-              /* ================= DESCRIPTION ================= */
-              <div className="full-content description">
-                <div className="form-row group-form-textarea">
-                  <label className="group-form-label required">Description</label>
-                  <div>
-                    <textarea
-                      className={`form-control ${errors[ENTITY_FIELD_MAP.desc] ? "error" : ""} ${isVarified ? "read-only" : ""
-                        }`}
-                      placeholder="Enter Description"
-                      rows={3}
-                      disabled={isVarified}
-                      {...register(ENTITY_FIELD_MAP.desc, {
-                        required: "Description is required",
-                      })}
-                    />
-                    {errors[ENTITY_FIELD_MAP.desc] && (
-                      <span className="error-message">
-                        {errors[ENTITY_FIELD_MAP.desc].message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Active Date */}
             <div className="full-content">

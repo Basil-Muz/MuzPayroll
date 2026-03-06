@@ -239,7 +239,9 @@ function LocationGroup() {
                   item={item}
                   status={item.inactiveDate ? "inactive" : "active"}
                   handleDataToForm={handleDataToForm}
-                />
+                >
+                  <div>{item.description}</div>
+                </ListCard>
               ))}
             </div>
           ) : (
@@ -258,7 +260,9 @@ function LocationGroup() {
                     item={item}
                     status="active"
                     handleDataToForm={handleDataToForm}
-                  />
+                  >
+                    <div>{item.description}</div>
+                  </ListCard>
                 ))}
               </div>
             )}
@@ -272,7 +276,9 @@ function LocationGroup() {
                     item={item}
                     status="inactive"
                     handleDataToForm={handleDataToForm}
-                  />
+                  >
+                    <div>{item.description}</div>
+                  </ListCard>
                 ))}
               </div>
             ) : (
@@ -311,13 +317,35 @@ function LocationGroup() {
 
         {showForm && (
           <ListItemForm
-            entity="User Group"
+            entity="Location Group"
             data={selectedItem}
             toggleForm={toggleForm}
             saveEntity={saveLocationGroup}
             fetchEntityById={getLocationGroupById}
             ENTITY_FIELD_MAP={LOCATION_GROUP_FIELD_MAP}
-          />
+          >
+            {({ register, errors, isVarified }) => (
+              <div className="full-content">
+                <div className="form-row">
+                  <label className="group-form-label">Description</label>
+
+                  <textarea
+                    className={`form-control ${errors[LOCATION_GROUP_FIELD_MAP.description] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                    placeholder="Enter Description"
+                    disabled={isVarified}
+                    {...register(LOCATION_GROUP_FIELD_MAP.description)}
+                  />
+
+                  {errors[LOCATION_GROUP_FIELD_MAP.description] && (
+                    <span className="error-message">
+                      {errors[LOCATION_GROUP_FIELD_MAP.description].message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </ListItemForm>
         )}
 
         {/* {flag && <Loading />} */}

@@ -14,7 +14,7 @@ import ListItemForm from "../../components/ListItemForm/ListItemForm";
 import { ListCard } from "../../components/List Card/ListCard";
 
 // Services
-import {getPayrollGroupsList,getPayrollGroupById,savePayrollGroup,searchPayrollGroup,} from "../../services/payrollgroup.service";
+import { getPayrollGroupsList, getPayrollGroupById, savePayrollGroup, searchPayrollGroup, } from "../../services/payrollgroup.service";
 import { PAYROLL_GROUP_FIELD_MAP } from "../../constants/payrollGroupMap";
 import { useAuth } from "../../context/AuthProvider";
 
@@ -182,7 +182,11 @@ function PayrollGroup() {
                   item={item}
                   status="active"
                   handleDataToForm={handleDataToForm}
-                />
+                >
+                  <div>{item.description}</div>
+
+                </ListCard>
+
               ))}
             </div>
           ) : (
@@ -203,7 +207,10 @@ function PayrollGroup() {
                     item={item}
                     status="active"
                     handleDataToForm={handleDataToForm}
-                  />
+                  >
+                    <div>{item.description}</div>
+
+                  </ListCard>
                 ))}
               </div>
             ) : (
@@ -221,7 +228,10 @@ function PayrollGroup() {
                     item={item}
                     status="inactive"
                     handleDataToForm={handleDataToForm}
-                  />
+                  >
+                    <div>{item.description}</div>
+
+                  </ListCard>
                 ))}
               </div>
             ) : (
@@ -247,7 +257,6 @@ function PayrollGroup() {
           }}
         />
 
-        {/* ================= FORM ================= */}
         {showForm && (
           <ListItemForm
             entity="Payroll Group"
@@ -256,7 +265,29 @@ function PayrollGroup() {
             saveEntity={savePayrollGroup}
             fetchEntityById={getPayrollGroupById}
             ENTITY_FIELD_MAP={PAYROLL_GROUP_FIELD_MAP}
-          />
+          >
+            {({ register, errors, isVarified }) => (
+              <div className="full-content">
+                <div className="form-row">
+                  <label className="group-form-label">Description</label>
+
+                  <textarea
+                    className={`form-control ${errors[PAYROLL_GROUP_FIELD_MAP.desc] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                    placeholder="Enter Description"
+                    disabled={isVarified}
+                    {...register(PAYROLL_GROUP_FIELD_MAP.desc)}
+                  />
+
+                  {errors[PAYROLL_GROUP_FIELD_MAP.desc] && (
+                    <span className="error-message">
+                      {errors[PAYROLL_GROUP_FIELD_MAP.desc].message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </ListItemForm>
         )}
       </div>
     </>

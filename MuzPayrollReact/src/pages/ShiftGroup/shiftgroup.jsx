@@ -9,6 +9,10 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import Search from "../../components/search/Search";
 import ListItemForm from "../../components/ListItemForm/ListItemForm";
 import { ListCard } from "../../components/List Card/ListCard";
+import { Controller } from "react-hook-form";
+import TimePicker from "react-time-picker";
+import { GrSun, GrMoon } from "react-icons/gr";
+import { LiaAdjustSolid } from "react-icons/lia";
 
 import {
   getShiftGroupsList,
@@ -186,8 +190,12 @@ function ShiftGroup() {
                   item={item}
                   status="active"
                   handleDataToForm={handleDataToForm}
-                  cardType="shiftGroup"   // 🔥 IMPORTANT
-                />
+
+                >
+                  <div>{item.shiftType}</div>
+                  <div>{item.timeFrom}</div>
+                  <div>{item.timeTo}</div>
+                </ListCard>
               ))}
             </div>
           ) : (
@@ -208,8 +216,12 @@ function ShiftGroup() {
                     item={item}
                     status="active"
                     handleDataToForm={handleDataToForm}
-                    cardType="shiftGroup"
-                  />
+
+                  >
+                    <div>{item.shiftType}</div>
+                    <div>{item.timeFrom}</div>
+                    <div>{item.timeTo}</div>
+                  </ListCard>
                 ))}
               </div>
             ) : (
@@ -227,8 +239,12 @@ function ShiftGroup() {
                     item={item}
                     status="inactive"
                     handleDataToForm={handleDataToForm}
-                    cardType="shiftGroup"
-                  />
+
+                  >
+                    <div>{item.shiftType}</div>
+                    <div>{item.timeFrom}</div>
+                    <div>{item.timeTo}</div>
+                  </ListCard>
                 ))}
               </div>
             ) : (
@@ -261,7 +277,140 @@ function ShiftGroup() {
             saveEntity={saveShiftGroup}
             fetchEntityById={getShiftGroupById}
             ENTITY_FIELD_MAP={SHIFT_GROUP_FIELD_MAP}
-          />
+          >
+            {({ register, control, errors, watch, setValue, isVarified }) => (
+              <>
+                {/* TIME FROM */}
+                <div className="form-row">
+                  <label className="group-form-label required">Time From</label>
+
+                  <Controller
+                    name={SHIFT_GROUP_FIELD_MAP.timeFrom}
+                    control={control}
+                    rules={{ required: "Time From is required" }}
+                    render={({ field }) => (
+                      <TimePicker
+                        {...field}
+                        format="HH:mm"
+                        disableClock={true}
+                        clearIcon={null}
+                        clockIcon={null}
+                        className={`custom-time-picker ${errors[SHIFT_GROUP_FIELD_MAP.timeFrom] ? "error" : ""
+                          }`}
+                        disabled={isVarified}
+                      />
+                    )}
+                  />
+
+                  {errors[SHIFT_GROUP_FIELD_MAP.timeFrom] && (
+                    <span className="error-message">
+                      {errors[SHIFT_GROUP_FIELD_MAP.timeFrom].message}
+                    </span>
+                  )}
+                </div>
+
+                {/* TIME TO */}
+                <div className="form-row">
+                  <label className="group-form-label required">Time To</label>
+
+                  <Controller
+                    name={SHIFT_GROUP_FIELD_MAP.timeTo}
+                    control={control}
+                    rules={{ required: "Time To is required" }}
+                    render={({ field }) => (
+                      <TimePicker
+                        {...field}
+                        format="HH:mm"
+                        disableClock={true}
+                        clearIcon={null}
+                        clockIcon={null}
+                        className={`custom-time-picker ${errors[SHIFT_GROUP_FIELD_MAP.timeTo] ? "error" : ""
+                          }`}
+                        disabled={isVarified}
+                      />
+                    )}
+                  />
+
+                  {errors[SHIFT_GROUP_FIELD_MAP.timeTo] && (
+                    <span className="error-message">
+                      {errors[SHIFT_GROUP_FIELD_MAP.timeTo].message}
+                    </span>
+                  )}
+                </div>
+
+                {/* SHIFT TYPE ICONS */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label required">Shift Type</label>
+
+                    <div className="shift-type-container">
+                      {/* DAY */}
+                      <div
+                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "DAY"
+                            ? "active"
+                            : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "DAY", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <GrSun />
+                      </div>
+
+                      {/* NIGHT */}
+                      <div
+                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "NIGHT"
+                            ? "active"
+                            : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "NIGHT", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <GrMoon />
+                      </div>
+
+                      {/* GENERAL */}
+                      <div
+                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "GENERAL"
+                            ? "active"
+                            : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "GENERAL", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <LiaAdjustSolid />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hidden RHF input */}
+                  <input
+                    type="hidden"
+                    {...register(SHIFT_GROUP_FIELD_MAP.shiftType, {
+                      required: "Shift Type is required",
+                    })}
+                  />
+
+                  {errors[SHIFT_GROUP_FIELD_MAP.shiftType] && (
+                    <span className="error-message">
+                      {errors[SHIFT_GROUP_FIELD_MAP.shiftType].message}
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
+          </ListItemForm>
         )}
       </div>
     </>
