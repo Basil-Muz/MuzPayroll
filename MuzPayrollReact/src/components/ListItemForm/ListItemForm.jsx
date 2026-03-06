@@ -73,6 +73,7 @@ function ListItemForm({
       //   mode:"INSERT",
       [ENTITY_FIELD_MAP.entityMst]: user.userEntityHierarchyId,
       userId: user.userMstId,
+      userCode : user.userCode,
       authorizationDate: toLocalIsoDate(),
       activeDate: toLocalIsoDate(),
       [ENTITY_FIELD_MAP.activeYN]: true,
@@ -97,7 +98,7 @@ function ListItemForm({
     if (!flag) {
       codeInputRef.current?.focus();
     }
-    // console.log("User dfhgdfgh",user)
+    console.log("User dfhgdfgh",user)
   }, [flag]);
 
   useEffect(() => {
