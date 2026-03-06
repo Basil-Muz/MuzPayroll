@@ -223,7 +223,7 @@ export default function GenaralCompanyForm() {
     // Read-only VERIFIED mode
     return selectedAmendment?.authorizationStatus === true && !addingNewAmend;
   }, [selectedAmendment, addingNewAmend]);
-  console.log("Is varified", isVerifiedAmendment);
+  // console.log("Is varified", isVerifiedAmendment);
   // const hasUserChanges = Object.keys(dirtyFields).length > 0;
   const isLastStep = step === steps.length - 1;
   // const documentsValid = submitStatus === 0;
@@ -581,7 +581,6 @@ export default function GenaralCompanyForm() {
                         )}
                       />
 
-                      {console.log("asfafasdf")}
                       <input type="hidden" {...register("userCode")} />
                       <input type="hidden" {...register("authorizationDate")} />
                     </div>

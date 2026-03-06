@@ -4,6 +4,7 @@ import { RxCross2 } from "react-icons/rx";
 import { TiTick } from "react-icons/ti";
 
 export const ListCard = ({ item, status, handleDataToForm, children }) => {
+
   return (
     <div
       key={item.mstID}

@@ -31,6 +31,51 @@
   box-shadow: var(--shadow-sm); */
 }
 
+
+.preset-selector {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.preset-select {
+  min-width: 200px;
+}
+
+.preset-option {
+  padding: 4px 0;
+}
+
+.preset-name {
+  font-weight: 500;
+}
+
+.preset-description {
+  font-size: 0.85em;
+  color: #666;
+}
+
+.btn-apply-outline {
+  background: white;
+  border: 1px solid var(--brand);
+  color: var(--brand);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-apply-outline:hover {
+  background: #fcf0ff;
+}
+
+.btn-apply-outline:disabled {
+  border-color: #ccc;
+  color: #999;
+  cursor: not-allowed;
+  background: white;
+}
+
 .lgr-actions .floating-action-bar {
   position: static; /* or relative */
   right: 0;
@@ -166,7 +211,7 @@
    APPLY (Primary Action)
    Meaning: Lock search & load data
 ================================ */
-.lgr-layout .btn-apply {
+.btn-apply {
   background-color: var(--button-primary);
   color: #ffffff;
   border-color: var(--button-primary);
@@ -183,7 +228,7 @@
   border-color: var(--brand-dark);
 }
 
-.lgr-layout .btn-apply:focus {
+.btn-apply:focus {
   outline: none;
   box-shadow:
     0 0 0 3px var(--brand-border),
@@ -528,16 +573,16 @@ th.group-fixed {
   border-left: 3px solid var(--warning);
 } */
 
-.grid tr {
+.lgr-layout .grid tr {
   position: relative;
 }
 
-.grid tr.selected {
+.lgr-layout .grid tr.selected {
   font-weight: 500;
   background: var(--success-light);
 }
 
-.grid tr.selected::before {
+.lgr-layout .grid tr.selected::before {
   content: "✓";
   position: absolute;
   left: 6px;
@@ -545,7 +590,7 @@ th.group-fixed {
   font-size: 12px;
 }
 
-.grid td:last-child {
+.lgr-layout .grid td:last-child {
   opacity: 0.6;
 }
 

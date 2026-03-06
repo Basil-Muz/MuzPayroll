@@ -56,9 +56,11 @@ export const useSaveForm = ({
       });
 
       if (payload.entityImage instanceof File) {
+        console.log("Company file", payload.entityImage);
         //  New Image file from user
         formData.append("entityImage", payload.entityImage);
       } else if (typeof payload.entityImage === "string") {
+        console.log("Company path", payload.entityImage);
         //Old image in amends
         formData.append("ImagePath", payload.entityImage);
       }

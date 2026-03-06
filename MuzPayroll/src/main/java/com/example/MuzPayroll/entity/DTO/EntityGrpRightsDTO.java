@@ -19,6 +19,37 @@ public class EntityGrpRightsDTO {
 
     private LocalDate egrLastModDate;
 
+    private String optionCode;
+    
+    private String optionType;
+    
+    private String moduleName;
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public String getOptionType() {
+        return optionType;
+    }
+
+    public void setOptionType(String optionType) {
+        this.optionType = optionType;
+    }
+
+
+    public String getOptionCode() {
+        return optionCode;
+    }
+
+    public void setOptionCode(String optionCode) {
+        this.optionCode = optionCode;
+    }
+
     // Constructors
     public EntityGrpRightsDTO() {
     }

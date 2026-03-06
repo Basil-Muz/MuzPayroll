@@ -33,10 +33,15 @@ public interface EntityHierarchyInfoRepository extends JpaRepository<EntityHiera
             FROM entity_hierarchy_info eh
             WHERE eh.ehi_entity_hierarchyid = :entityHierarchyInfoID
             """, nativeQuery = true)
-    Optional<Long> findBusinessGroupIdByEntityHierarchyInfoId(
+    Long findBusinessGroupIdByEntityHierarchyInfoId(
             @Param("entityHierarchyInfoID") Long entityHierarchyInfoID);
-
-    Optional<EntityHierarchyInfo> findById(Long id);
+@Query(value = """
+        SELECT *
+        FROM entity_hierarchy_info eh
+        WHERE eh.ehi_entity_hierarchyid = :hierarchyId
+        """, nativeQuery = true)
+Optional<EntityHierarchyInfo> findByHierarchyId(
+        @Param("hierarchyId") Long hierarchyId);
 
     @Query(value = """
             SELECT eh.ehi_business_groupid

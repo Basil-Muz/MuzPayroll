@@ -451,7 +451,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
               <div className="image-upload-container">
                 <Controller
-                  name="EtmImage"
+                  name="entityImage"
                   control={control}
                   rules={{ required: "Company image is required" }}
                   render={({ field }) => (

@@ -1,4 +1,5 @@
 export const COMMON_ENTITY_FIELD_MAP = {
+    //Form feild name : backend dataKey
   etmEntityId: "etmEntityId",
   EtmShortName: "etmShortName",
   authorizationStatus: "authorizationStatus",

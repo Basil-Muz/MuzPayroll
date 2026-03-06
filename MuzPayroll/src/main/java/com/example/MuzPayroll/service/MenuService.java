@@ -14,4 +14,12 @@ public interface MenuService {
             Integer entityHierarchyId,
             Integer menu_row_no,
             Integer productid);
+
+    List<MenuDTO> getSideBar(
+            String transtype,
+            String transsubtype,
+            Integer userId,
+            Integer solutionId,
+            Integer optionid,
+            Integer entity_hierarchy_id);
 }
