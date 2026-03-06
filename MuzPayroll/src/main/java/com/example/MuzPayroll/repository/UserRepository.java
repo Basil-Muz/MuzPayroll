@@ -12,6 +12,13 @@ public interface UserRepository extends JpaRepository<UserMst, Long> {
    
     UserMst findByUserCode(String userCode);
 
+     @Query(value = """
+            SELECT *
+            FROM user_mst
+            WHERE user_mstid = :userCode 
+            """, nativeQuery = true)
+    UserMst findByUserMstId(Long userCode);
+
         @Query(value = """
             SELECT usm_entity_hierarchyid
             FROM user_mst

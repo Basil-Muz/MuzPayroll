@@ -6,10 +6,12 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.example.MuzPayroll.entity.EntityRightsGrpMst;
+import com.example.MuzPayroll.entity.OptionMst;
 import com.example.MuzPayroll.entity.UserGrpMst;
 
 @Repository
@@ -22,6 +24,12 @@ public interface EntityRightsGrpMstRepo extends JpaRepository<EntityRightsGrpMst
 // @Query("SELECT MAX(e.ErmEntityGroupID) FROM EntityRightsGrpMst e")
 // Long findMaxErmEntityRightsGroupID();
 
+         @Query(value = """
+            SELECT *
+            FROM entity_rights_grp_mst
+            WHERE erm_entity_groupid = :entityRightsGrpId 
+            """, nativeQuery = true)
+    EntityRightsGrpMst findByEntityRightsGrpId(Long entityRightsGrpId);
 
     // Find maximum ID
     @Query("SELECT MAX(e.ErmEntityGroupID) FROM EntityRightsGrpMst e WHERE e.ErmEntityGroupID >= 10100010")
@@ -54,5 +62,33 @@ Page<EntityRightsGrpMst> searchEntityRightsGroup(
         Pageable pageable
 );
 
+@Modifying(clearAutomatically = true)
+    @Query(value = """
+        INSERT INTO entity_grp_rights
+        (egr_entity_groupid,
+         egr_optionid,
+         egr_solutionid,
+         egr_add,
+         egr_edit,
+         egr_view,
+         egr_delete,
+         egr_print,
+         egr_last_mod_userid,
+         egr_last_mod_date)
+        SELECT
+            :grpId,
+            t.option_id,
+            t.solutionid,
+            false,
+            false,
+            false,
+            false,
+            false,
+            :userId,
+            CURRENT_DATE
+        FROM tem_permission_table t
+        """, nativeQuery = true)
+    void insertDefaultPermissions(Long grpId, Long userId);
 }
+
 

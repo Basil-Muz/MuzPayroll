@@ -85,6 +85,7 @@
   background: var(--brand-border);
   color: var(--dark-background);
   padding: 6px 10px;
+  width: max-content;
   border-radius: 8px;
   font-size: 12px;
   white-space: nowrap;
@@ -92,7 +93,20 @@
   pointer-events: none;
   transform: translateX(4px);
   transition: all 0.2s ease;
+  z-index: 9999;
+
 }
+/* 
+.tooltip::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent var(--brand-border);
+} */
 
 .fab-btn:hover .tooltip {
   opacity: 1;

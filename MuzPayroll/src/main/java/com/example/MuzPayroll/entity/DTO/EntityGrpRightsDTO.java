@@ -50,36 +50,6 @@ public class EntityGrpRightsDTO {
         this.optionCode = optionCode;
     }
 
-    // Constructors
-    public EntityGrpRightsDTO() {
-    }
-
-    public EntityGrpRightsDTO(
-            Long egrEntityGroupRightID,
-            Long entityRightsGrpMstId,
-            Long solutionMstId,
-            Long optionMstId,
-            Boolean egrAdd,
-            Boolean egrEdit,
-            Boolean egrView,
-            Boolean egrDelete,
-            Boolean egrPrint,
-            Long lastModUserId,
-            LocalDate egrLastModDate) {
-
-        this.egrEntityGroupRightID = egrEntityGroupRightID;
-        this.entityRightsGrpMstId = entityRightsGrpMstId;
-        this.solutionMstId = solutionMstId;
-        this.optionMstId = optionMstId;
-        this.egrAdd = egrAdd;
-        this.egrEdit = egrEdit;
-        this.egrView = egrView;
-        this.egrDelete = egrDelete;
-        this.egrPrint = egrPrint;
-        this.lastModUserId = lastModUserId;
-        this.egrLastModDate = egrLastModDate;
-    }
-
     // Getters & Setters
 
     public Long getEgrEntityGroupRightID() {

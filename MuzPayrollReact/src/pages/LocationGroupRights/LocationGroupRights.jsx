@@ -14,7 +14,10 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 //service
 import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
 import { getLocationGroupsList } from "../../services/locationGroup.service.js";
-import { getLocationGrpRightssList } from "../../services/locationGrpRights.service.js";
+import {
+  getLocationGrpRightssList,
+  saveLocationGrpRights,
+} from "../../services/locationGrpRights.service.js";
 
 import { useAuth } from "../../context/AuthProvider.jsx";
 import "./css/LocationGroupRights.css";
@@ -45,8 +48,8 @@ export default function LocationGroupRights() {
   const [collapsedModules, setCollapsedModules] = useState({});
 
   const { user } = useAuth();
-  console.log("User",user)
-  const companyId = 4;
+  // console.log("User",user)
+  // const companyId = 4;
 
   // Track changed screens count
   const [changedScreensCount, setChangedScreensCount] = useState(0);
@@ -88,12 +91,15 @@ export default function LocationGroupRights() {
 
   const fetchDropDown = async () => {
     const startTime = Date.now();
-    showRailLoader("Fetching details…");
+    showRailLoader("Loading group details...");
     try {
       const solutions = await getSolutionList();
       setSolutions(solutions.data);
 
-      const locationGrp = await getLocationGroupsList(user.userEntityHierarchyId, true);
+      const locationGrp = await getLocationGroupsList(
+        user.userEntityHierarchyId,
+        true,
+      );
       setLocations(locationGrp.data);
     } catch (error) {
       console.error("Error fetching solutions:", error);
@@ -135,7 +141,7 @@ export default function LocationGroupRights() {
     return [
       ...locations.map((s) => ({
         value: s.mstID,
-        label: s.description,
+        label: s.name,
       })),
     ];
   }, [locations]);
@@ -279,12 +285,15 @@ export default function LocationGroupRights() {
   };
 
   const fetchFilteredRows = async () => {
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Loading permissions...");
     try {
       const res = await getLocationGrpRightssList(
         businessSolution,
         locationGrpRights,
       );
-
+      // console.log("DEMO", res.data);
       const grouped = groupByModule(res.data);
       setModules(grouped);
       setOriginalModules(JSON.parse(JSON.stringify(grouped)));
@@ -299,6 +308,10 @@ export default function LocationGroupRights() {
       setPage(1);
     } catch (err) {
       handleApiError(err);
+    } finally {
+      await ensureMinDuration(startTime, 800);
+      // hide loader ONLY at the end
+      hideLoader();
     }
   };
 
@@ -374,7 +387,7 @@ export default function LocationGroupRights() {
   };
 
   const handleRefresh = () => {
-    fetchDropDown();
+    fetchFilteredRows();
   };
 
   const handleClear = () => {
@@ -425,11 +438,19 @@ export default function LocationGroupRights() {
       });
     });
 
-    console.log("Changed payload:", changed);
-
-    if (changed.length) {
+    // console.log("Changed payload:", changed);
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Saving permission changes...");
+    try {
+      await saveLocationGrpRights(changed);
       toast.success(`Saved ${changed.length} changes`);
-      setOriginalModules(JSON.parse(JSON.stringify(modules)));
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      await ensureMinDuration(startTime, 800);
+      // hide loader ONLY at the end
+      hideLoader();
     }
   };
 
@@ -956,17 +977,21 @@ export default function LocationGroupRights() {
                 onClick: handleSave,
                 disabled: !changedScreensCount,
               },
-              search: {
-                disabled: true,
-              },
+              // search: {
+              //   disabled: true,
+              // },
               clear: {
-                onClick: handleClear,
+                onClick: handleRefresh,
               },
+
               delete: {
                 disabled: true,
               },
               refresh: {
                 onClick: handleRefresh,
+              },
+              new: {
+                onClick: handleClear,
               },
             }}
           />

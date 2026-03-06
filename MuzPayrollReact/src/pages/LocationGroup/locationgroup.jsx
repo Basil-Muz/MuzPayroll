@@ -165,6 +165,7 @@ function LocationGroup() {
         // console.log("Active locations", activeLocations);
       }, 800);
     } catch (err) {
+      handleApiError(err);
       console.error(err);
     } finally {
       await ensureMinDuration(startTime, 800);

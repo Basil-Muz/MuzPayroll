@@ -64,7 +64,7 @@ function ListItemForm({
       authorizationStatus: 0,
       //   mode:"INSERT",
       [ENTITY_FIELD_MAP.entityMst]: user.userEntityHierarchyId,
-      userCode: user.userCode,
+      userId: user.userMstId,
       authorizationDate: toLocalIsoDate(),
       activeDate: toLocalIsoDate(),
       [ENTITY_FIELD_MAP.activeYN]: true,

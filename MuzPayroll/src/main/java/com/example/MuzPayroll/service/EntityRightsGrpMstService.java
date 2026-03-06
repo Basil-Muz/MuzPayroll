@@ -157,8 +157,8 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                         rowErrors.add("Authorization date is required");
                     if (dto.getAuthorizationStatus() == null)
                         rowErrors.add("Authorization status is required");
-                    if (isEmpty(dto.getUserCode()))
-                        rowErrors.add("User code is required");
+                    if (dto.getUserId() == null)
+                        rowErrors.add("User Id is required");
 
                     // Add row errors to main error list with row number
                     if (!rowErrors.isEmpty()) {
@@ -220,7 +220,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
             logDto.setWithaffectdate(dto.getWithaffectdate());
             logDto.setAuthorizationDate(dto.getAuthorizationDate());
             logDto.setAuthorizationStatus(dto.getAuthorizationStatus());
-            logDto.setUserCode(dto.getUserCode());
+            logDto.setUserId(dto.getUserId());
             logDto.setAmendNo(dto.getAmendNo());
             logDto.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
             logDto.setEntityHierarchyInfoID(dto.getEntityHierarchyInfoID());
@@ -234,15 +234,15 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
     public Response<Boolean> entityPopulate(List<EntityRightsGrpMstDTO> dtos, String mode) {
         List<String> errors = new ArrayList<>();
         EntityRightsGrpMstDTO dto = dtos.get(0);
-
-        UserMst user = userRepository.findByUserCode(dto.getUserCode());
+        // System.out.println("dfsgdsgsdfg"+dto.getUserId());
+        UserMst user = userRepository.findByUserMstId(dto.getUserId());
         if (user == null)
-            errors.add("Invalid user code");
+            errors.add("Invalid user Id");
 
         if (!errors.isEmpty()) {
             return Response.error(errors);
         }
-        System.out.println("Entityfgvgdfgv"+dto.getEntityHierarchyInfoID());
+        // System.out.println("Entityfgvgdfgv"+dto.getEntityHierarchyInfoID());
         //   System.out.println("Entity  "+dto.getEntityHierarchyInfoID().getInfoID());
         //Fetching business groupid with entity hierarchy id
 //         Long businessGroupId =
@@ -653,7 +653,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         // Set ALL fields from the first DTO
         entity.setErmEntityGroupID(dto.getErmEntityRightsGroupID());
          if (dto.getEntityHierarchyInfoID() != null) {
-        System.out.println("dfgdfg"+dto.getEntityHierarchyInfoID());
+        // System.out.println("dfgdfg"+dto.getEntityHierarchyInfoID());
             Long hierarchy =
                 entityHierarchyInfoRepository
                 .findBusinessGroupIdByEntityHierarchyInfoId(dto.getEntityHierarchyInfoID());
@@ -704,7 +704,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
             dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
 
             if (entity.getAuthorization().getUserMst() != null) {
-                dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
+                dto.setUserId(entity.getAuthorization().getUserMst().getUserMstID());
             }
         }
 
@@ -726,7 +726,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                 // ===== SAVE AUTHORIZATION WITH ID =====
                 // Get the authorization created in entityPopulate
                 Authorization auth = entity.getAuthorization();
-
+                entityRightsGrpMstRepo.insertDefaultPermissions(savedEntity.getErmEntityGroupID(),dto.getUserId());//user code is in string 
                 // Set the ID
                 auth.setMstId(savedEntity.getErmEntityGroupID());
 
@@ -897,8 +897,8 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
             dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
 
             if (log.getAuthorization().getUserMst() != null) {
-                dto.setUserCode(
-                        log.getAuthorization().getUserMst().getUserCode());
+                dto.setUserId(
+                        log.getAuthorization().getUserMst().getUserMstID());
             }
         });
 

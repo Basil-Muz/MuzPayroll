@@ -9,3 +9,7 @@ export const getLocationGrpRightssList = (solutionId, entityGroupId) => {
     },
   });
 };
+
+export const saveLocationGrpRights = (formData) => {
+  return api.post("/entityGrpRights/save", formData);
+};
