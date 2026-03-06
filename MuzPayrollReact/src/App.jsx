@@ -57,12 +57,15 @@ function App() {
           <Route path="/" element={<Navigate to="/payroll" replace />} />
           <Route path="/payroll" element={<LoginPage />} />
           <Route path="/payrollemp" element={<LoginPage />} />
-          <Route path="/home" element={<LoggedPage />} />
+          <Route path="/home" element={<ProtectedRoute><LoggedPage /></ProtectedRoute>} />
           {/* <Route path="/company" element={<Companyform />} />
           <Route path="/generalform" element={<GeneralForm />} /> */}
           <Route path="/documentsinfo" element={<DocumentsInfo />} />
           <Route path="/masters/:rowNumber" element={<MasterPage />} />
-          <Route path="/changepassword" element={<ChangePassword />} />
+          <Route path="/changepassword" element={
+            <ProtectedRoute>
+              <ChangePassword />
+            </ProtectedRoute>} />
 
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/settings/:rowNumber" element={<Settings />} />

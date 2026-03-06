@@ -1,190 +1,417 @@
-import { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+
+import { BsGrid3X3GapFill } from "react-icons/bs";
+import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
+import { IoIosSearch } from "react-icons/io";
+
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import ShiftGroupSearch from "./shiftgroupsearch";
-import ShiftGroupList from "./shiftgrouplist";
-import { BsGrid3X3GapFill } from "react-icons/bs";
-import { FaListUl } from "react-icons/fa";
-import { IoIosSearch } from "react-icons/io";
-import ShiftGroupForm from "./shiftgroupform";
-import Loading from "../../components/Loaders/Loading";
-import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
+import Search from "../../components/search/Search";
+import ListItemForm from "../../components/ListItemForm/ListItemForm";
+import { ListCard } from "../../components/List Card/ListCard";
+import { Controller } from "react-hook-form";
+import TimePicker from "react-time-picker";
+import { GrSun, GrMoon } from "react-icons/gr";
+import { LiaAdjustSolid } from "react-icons/lia";
+
+import {
+  getShiftGroupsList,
+  getShiftGroupById,
+  saveShiftGroup,
+  searchShiftGroup,
+} from "../../services/shiftgroup.service";
+
+import { SHIFT_GROUP_FIELD_MAP } from "../../constants/shiftGroupMap";
+import { useAuth } from "../../context/AuthProvider";
+
 import "./shiftgroup.css";
 
 function ShiftGroup() {
+  const { user } = useAuth();
+  const companyId = user?.companyId;
 
+  const [shiftGroupList, setShiftGroupList] = useState([]);
+
+  const [boxView, setBoxView] = useState(true);
   const [listView, setListView] = useState(false);
-  const [showSearch, setShowSearch] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
+  const [groupByStatus, setGroupByStatus] = useState(false);
+
+  const [activeShiftGroups, setActiveShiftGroups] = useState([]);
+  const [inactiveShiftGroups, setInactiveShiftGroups] = useState([]);
+
   const [searchText, setSearchText] = useState("");
-  const [filters, setFilters] = useState(null);
-  const [headerError] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
-const [showForm, setShowForm] = useState(false);
-const [selectedItem, setSelectedItem] = useState(null);
-const [loading, setLoading] = useState(false);
-const [flag, setFlag] = useState(false);
+  /* ================= FETCH ALL ================= */
 
-const toggleForm = () => {
-  setShowForm(prev => !prev);
-};
+  const getAllShiftGroups = async (activeStatusYN = null) => {
+    try {
+      const response = await getShiftGroupsList(companyId, activeStatusYN);
+      setShiftGroupList(response.data);
+    } catch (error) {
+      console.error("Error fetching shift groups", error);
+    }
+  };
 
+  useEffect(() => {
+    getAllShiftGroups(null);
+  }, [showForm]);
 
-  // Dummy data
-  const ShiftGroups = [
-    { code: "SG001", name: "Morning Shift" },
-    { code: "SG002", name: "Evening Shift" },
-    { code: "SG003", name: "Night Shift" } ,
-    { code: "SG001", name: "Morning Shift" },
-    { code: "SG002", name: "Evening Shift" },
-    { code: "SG003", name: "Night Shift" },
-     { code: "SG001", name: "Morning Shift" },
-    { code: "SG002", name: "Evening Shift" },
-    { code: "SG003", name: "Night Shift" },
-     { code: "SG001", name: "Morning Shift" },
-    { code: "SG002", name: "Evening Shift" },
-    { code: "SG003", name: "Night Shift" }
-   
-  ];
+  /* ================= SEARCH ================= */
+
+  const searchData = useCallback(async () => {
+    if (searchText.trim()) {
+      const response = await searchShiftGroup(searchText);
+      setShiftGroupList(response.data.content);
+    } else {
+      getAllShiftGroups(null);
+    }
+  }, [searchText, companyId]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      searchData();
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchText]);
+
+  /* ================= GROUPING ================= */
+
+  const handleGroupSubmit = async (checked) => {
+    setGroupByStatus(checked);
+    setShowSearch(false);
+
+    if (!checked) {
+      getAllShiftGroups(null);
+      return;
+    }
+
+    try {
+      const [activeRes, inactiveRes] = await Promise.all([
+        getShiftGroupsList(companyId, 1),
+        getShiftGroupsList(companyId, 0),
+      ]);
+
+      setActiveShiftGroups(activeRes.data);
+      setInactiveShiftGroups(inactiveRes.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   /* ================= HANDLERS ================= */
 
-  const handleSearchApply = (searchFilters) => {
-    setFilters(searchFilters);
-    setShowSearch(false); // close slide search
-  };
-
-  const handleClear = () => {
-    setFilters(null);
-    setSearchText("");
-    setShowSearch(true); // go back to search-only screen
-  };
-
-  const handleSearchInput = (e) => {
+  const handleSearchChange = (e) => {
     setSearchText(e.target.value);
   };
 
-const handleSelect = (item) => {
-  setSelectedItem(item);   // pass data to form
-  setShowForm(true);       // open modal
-};
+  const handleNew = () => {
+    setSelectedItem(null);
+    setShowForm(true);
+  };
 
+  const toggleForm = () => {
+    setShowForm((prev) => !prev);
+  };
 
-  const hasDataView = !showSearch; 
+  const handleDataToForm = (mstID) => {
+    setSelectedItem(mstID);
+    setShowForm(true);
+  };
 
   return (
     <>
-    
-      <Header backendError={headerError} />
+      <Header backendError={[]} />
 
       <div className="shift-group-page">
-            
-              {/* ================= HEADER (ONLY WHEN DATA SHOWN) ================= */}
-             
-        {hasDataView && (
-          <div className="header-section">
-           <h2 className="page-title">Shift Group</h2>
 
-            <div className="header-actions">
-              {/* View Toggle */}
-              <div className="view-toggle">
-              <button className={`icon-btn ${!listView ? "active" : ""}`} 
-              title="Tile View" onClick={() => setListView(false)}>
+        {/* ================= HEADER ================= */}
+        <div className="header-section">
+          <h2 className="page-title">Shift Group</h2>
+
+          <div className="header-actions">
+            <div className="view-toggle">
+
+              <button
+                className={`icon-btn ${boxView ? "active" : ""}`}
+                onClick={() => {
+                  setBoxView(true);
+                  setListView(false);
+                }}
+              >
                 <BsGrid3X3GapFill size={18} />
-                </button>
-                <button className={`icon-btn ${listView ? "active" : ""}`}
-                title="List View" onClick={() => setListView(true)}>
-                  <FaListUl size={18} />
-                  </button>
+              </button>
 
-                {/*  SEARCH ICON (NO GROUP ICON) */}
-                <button
-                  className={`icon-btn ${showSearch ? "active" : ""}`}
-                  title="Search"
-                  onClick={() => setShowSearch(!showSearch)}
-                >
-                  <IoIosSearch size={18} />
-                </button>
-              </div>
+              <button
+                className={`icon-btn ${listView ? "active" : ""}`}
+                onClick={() => {
+                  setListView(true);
+                  setBoxView(false);
+                }}
+              >
+                <FaListUl size={18} />
+              </button>
 
-              {/* Inline Search */}
-              <div className="search-box">
-                <IoIosSearch size={18} />
-                <input
-                  type="text"
-                  placeholder="Search here…"
-                  value={searchText}
-                  onChange={handleSearchInput}
-                />
-              </div>
+              <button
+                className={`icon-btn ${showSearch ? "active" : ""}`}
+                onClick={() => setShowSearch(!showSearch)}
+              >
+                <FaRegObjectGroup size={18} />
+              </button>
+            </div>
+
+            <div className="search-box">
+              <IoIosSearch size={18} />
+              <input
+                type="text"
+                placeholder="Search shift group…"
+                value={searchText}
+                onChange={handleSearchChange}
+              />
             </div>
           </div>
+        </div>
+
+        {/* ================= GROUP SLIDE ================= */}
+        <div className={`slide-container ${showSearch ? "show" : "hide"}`}>
+          <Search onSubmit={handleGroupSubmit} initialChecked={groupByStatus} />
+        </div>
+
+        {/* ================= NORMAL VIEW ================= */}
+        {!groupByStatus &&
+          (shiftGroupList.length > 0 ? (
+            <div className={`card-grid ${listView ? "list" : "tile"}`}>
+              {shiftGroupList.map((item) => (
+                <ListCard
+                  key={item.mstID}
+                  item={item}
+                  status="active"
+                  handleDataToForm={handleDataToForm}
+
+                >
+                  <div>{item.shiftType}</div>
+                  <div>{item.timeFrom}</div>
+                  <div>{item.timeTo}</div>
+                </ListCard>
+              ))}
+            </div>
+          ) : (
+            <div className="no-data-found">
+              No shift groups available
+            </div>
+          ))}
+
+        {/* ================= GROUPED VIEW ================= */}
+        {groupByStatus && (
+          <>
+            <h3 className="group-title active">Active</h3>
+            {activeShiftGroups.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {activeShiftGroups.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="active"
+                    handleDataToForm={handleDataToForm}
+
+                  >
+                    <div>{item.shiftType}</div>
+                    <div>{item.timeFrom}</div>
+                    <div>{item.timeTo}</div>
+                  </ListCard>
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">
+                No active shift groups
+              </div>
+            )}
+
+            <h3 className="group-title inactive">Inactive</h3>
+            {inactiveShiftGroups.length > 0 ? (
+              <div className={`card-grid ${listView ? "list" : "tile"}`}>
+                {inactiveShiftGroups.map((item) => (
+                  <ListCard
+                    key={item.mstID}
+                    item={item}
+                    status="inactive"
+                    handleDataToForm={handleDataToForm}
+
+                  >
+                    <div>{item.shiftType}</div>
+                    <div>{item.timeFrom}</div>
+                    <div>{item.timeTo}</div>
+                  </ListCard>
+                ))}
+              </div>
+            ) : (
+              <div className="no-data-found">
+                No inactive shift groups
+              </div>
+            )}
+          </>
         )}
 
-        {/* ================= SLIDE SEARCH ================= */}
-        {showSearch && (
-          <ShiftGroupSearch onApply={handleSearchApply} />
+        {/* ================= FLOATING ACTION BAR ================= */}
+        <FloatingActionBar
+          actions={{
+            save: { disabled: true },
+            clear: {
+              onClick: () => getAllShiftGroups(null),
+            },
+            delete: { disabled: true },
+            print: { disabled: true },
+            new: { onClick: handleNew },
+          }}
+        />
+
+        {/* ================= FORM ================= */}
+        {showForm && (
+          <ListItemForm
+            entity="Shift Group"
+            data={selectedItem}
+            toggleForm={toggleForm}
+            saveEntity={saveShiftGroup}
+            fetchEntityById={getShiftGroupById}
+            ENTITY_FIELD_MAP={SHIFT_GROUP_FIELD_MAP}
+          >
+            {({ register, control, errors, watch, setValue, isVarified }) => (
+              <>
+                {/* TIME FROM */}
+                <div className="form-row">
+                  <label className="group-form-label required">Time From</label>
+
+                  <Controller
+                    name={SHIFT_GROUP_FIELD_MAP.timeFrom}
+                    control={control}
+                    rules={{ required: "Time From is required" }}
+                    render={({ field }) => (
+                      <TimePicker
+                        {...field}
+                        format="HH:mm"
+                        disableClock={true}
+                        clearIcon={null}
+                        clockIcon={null}
+                        className={`custom-time-picker ${errors[SHIFT_GROUP_FIELD_MAP.timeFrom] ? "error" : ""
+                          }`}
+                        disabled={isVarified}
+                      />
+                    )}
+                  />
+
+                  {errors[SHIFT_GROUP_FIELD_MAP.timeFrom] && (
+                    <span className="error-message">
+                      {errors[SHIFT_GROUP_FIELD_MAP.timeFrom].message}
+                    </span>
+                  )}
+                </div>
+
+                {/* TIME TO */}
+                <div className="form-row">
+                  <label className="group-form-label required">Time To</label>
+
+                  <Controller
+                    name={SHIFT_GROUP_FIELD_MAP.timeTo}
+                    control={control}
+                    rules={{ required: "Time To is required" }}
+                    render={({ field }) => (
+                      <TimePicker
+                        {...field}
+                        format="HH:mm"
+                        disableClock={true}
+                        clearIcon={null}
+                        clockIcon={null}
+                        className={`custom-time-picker ${errors[SHIFT_GROUP_FIELD_MAP.timeTo] ? "error" : ""
+                          }`}
+                        disabled={isVarified}
+                      />
+                    )}
+                  />
+
+                  {errors[SHIFT_GROUP_FIELD_MAP.timeTo] && (
+                    <span className="error-message">
+                      {errors[SHIFT_GROUP_FIELD_MAP.timeTo].message}
+                    </span>
+                  )}
+                </div>
+
+                {/* SHIFT TYPE ICONS */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label required">Shift Type</label>
+
+                    <div className="shift-type-container">
+                      {/* DAY */}
+                      <div
+                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "DAY"
+                            ? "active"
+                            : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "DAY", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <GrSun />
+                      </div>
+
+                      {/* NIGHT */}
+                      <div
+                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "NIGHT"
+                            ? "active"
+                            : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "NIGHT", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <GrMoon />
+                      </div>
+
+                      {/* GENERAL */}
+                      <div
+                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "GENERAL"
+                            ? "active"
+                            : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                        onClick={() =>
+                          !isVarified &&
+                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "GENERAL", {
+                            shouldValidate: true,
+                          })
+                        }
+                      >
+                        <LiaAdjustSolid />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Hidden RHF input */}
+                  <input
+                    type="hidden"
+                    {...register(SHIFT_GROUP_FIELD_MAP.shiftType, {
+                      required: "Shift Type is required",
+                    })}
+                  />
+
+                  {errors[SHIFT_GROUP_FIELD_MAP.shiftType] && (
+                    <span className="error-message">
+                      {errors[SHIFT_GROUP_FIELD_MAP.shiftType].message}
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
+          </ListItemForm>
         )}
-
-        {/* ================= LIST / TILE VIEW ================= */}
-        {!showSearch && (
-          <ShiftGroupList
-            data={ShiftGroups}
-            view={listView ? "list" : "tile"}
-            searchText={searchText}
-            filters={filters}
-            onSelect={handleSelect}
-          />
-        )}
-
-        {/* ================= FLOATING ACTION BAR (DATA ONLY) ================= */}
-        {!showSearch && (
-          <FloatingActionBar
-            actions={{
-              save: {
-                onClick: () => console.log("Save Shift Group"),
-                disabled: true,
-              },
-              // search: {
-              //   onClick: () => setShowSearch(true),
-              // },
-              clear: {
-                onClick: handleClear,
-              },
-              delete: {
-                onClick: () => console.log("Delete Shift Group"),
-                disabled: true,
-              },
-              // print: {
-              //   onClick: () => console.log("Print Shift Group"),
-              //   disabled: true,
-              // },
-              new: {
-                onClick: () => {
-                    setSelectedItem(null);
-                    setShowForm(true);
-                },
-              },
-              refresh: {
-                onClick: () => window.location.reload(),
-              },
-            }}
-          />
-          
-        )}
-{/* ================= SHIFT GROUP FORM ================= */}
-{showForm && loading && <Loading />}
-
-{showForm && !loading && (
-  <ShiftGroupForm
-    data={selectedItem}
-    toggleForm={toggleForm}
-  />
-)}
-
-{flag && <Loading />}
-
-<BackToTop />
-
       </div>
     </>
   );

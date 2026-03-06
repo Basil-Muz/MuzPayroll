@@ -10,6 +10,7 @@ import { ensureMinDuration } from "../../utils/loaderDelay";
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
+import { useAuth } from "../../context/AuthProvider";
 
 //service
 import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
@@ -23,169 +24,23 @@ import "./LocationGroupRightsMapping.css";
 /* =========================================
    Main Page
 ========================================= */
-const GROUPS = [
-  { id: 1002, name: "ALAPPUZHA" },
-  { id: 1003, name: "CALICUT" },
-  { id: 1004, name: "ERNAKULAM" },
-  { id: 1005, name: "IDUKKI" },
-  { id: 1007, name: "KANNUR" },
-  { id: 1012, name: "KASARAGOD" },
-  { id: 1016, name: "KOCHI" },
-  { id: 1022, name: "KOLLAM" },
-  { id: 1023, name: "KOTTAYAM" },
-  { id: 1042, name: "MALAPPURAM" },
-  { id: 1025, name: "PALAKKAD" },
-  { id: 1019, name: "PATHANAMTHITTA" },
-  { id: 1018, name: "THRISSUR" },
-  { id: 1028, name: "TRIVANDRUM" },
-  { id: 1027, name: "WAYANAD" },
-];
 
 const initData = [
-  {
-    id: 1,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 7,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 2,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "103",
-      name: "CALICUT",
-    },
-    group: [
-      { id: 1022, name: "KOLLAM" },
-      { id: 1004, name: "ERNAKULAM" },
-    ],
-
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 3,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 2,
-      name: "Norms Tech Solutions",
-    },
-    location: {
-      id: "201",
-      name: "BANGALORE",
-    },
-    group: [{ id: 1003, name: "CALICUT" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 4,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 2,
-      name: "Norms Tech Solutions",
-    },
-    location: {
-      id: "202",
-      name: "MYSORE",
-    },
-    group: [
-      { id: 1019, name: "PATHANAMTHITTA" },
-      { id: 1018, name: "THRISSUR" },
-    ],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 10,
-    businessSolution: { id: 2, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 18,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-  {
-    id: 16,
-
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
-
-  {
-    id: 12,
-    businessSolution: { id: 1, name: "Employee portal" },
-    branch: {
-      id: 1,
-      name: "Norms Management Pvt Ltd",
-    },
-    location: {
-      id: "1002",
-      name: "ALAPPUZHA",
-    },
-    group: [{ id: 1027, name: "WAYANAD" }],
-    // _original: [],
-    _dirty: false,
-  },
+  // {
+  //   id: 1,
+  //   businessSolution: { id: 1, name: "Employee portal" },
+  //   branch: {
+  //     id: 1,
+  //     name: "Norms Management Pvt Ltd",
+  //   },
+  //   location: {
+  //     id: "1002",
+  //     name: "ALAPPUZHA",
+  //   },
+  //   group: [{ id: 1027, name: "WAYANAD" }],
+  //   // _original: [],
+  //   _dirty: false,
+  // },
 ];
 
 const PAGE_SIZE = 8;
@@ -212,8 +67,10 @@ export default function LocationGroupRightsMapping() {
   const [solutions, setSolutions] = useState([]);
   const [branches, setBranches] = useState([]);
 
-  const userId = 3;
-  const companyId = 4;
+  const { user } = useAuth();
+
+  const userId = user.userMstId;
+  const companyId = user.userEntityHierarchyId;
 
   useEffect(() => {
     fetchDropDown();
@@ -227,15 +84,20 @@ export default function LocationGroupRightsMapping() {
       setSolutions(solutions.data);
 
       const branchs = await getBranchList(userId, companyId);
-      // const branchdata = Array.isArray(branchs.data)
-      //   ? branchs.data
-      //   : [branchs.data];
       setBranches(branchs.data);
     } catch (error) {
-      console.error("Error fetching solutions:", error);
+      console.error("Error fetching solutions or Branchs:", error);
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
+    }
+
+    try {
+      const branchs = await getBranchList(userId, companyId);
+      console.log("Branches fetched:", branchs);
+      setBranches(branchs.data);
+    } catch (err) {
+      console.error("Branch fetch failed:", err);
     }
   };
   const {
@@ -598,13 +460,13 @@ export default function LocationGroupRightsMapping() {
                   rules={{ required: "Branch is required" }}
                   render={({ field }) => (
                     <Select
+                      options={branchOptions}
                       isDisabled={isSearchApplied}
                       classNamePrefix="form-control-select"
                       className={`
         ${errors.branches ? "error" : ""}
         ${isSearchApplied ? "read-only" : ""}
       `}
-                      options={branchOptions}
                       /* 🔥 IMPORTANT FIX */
                       value={
                         branchOptions.find(

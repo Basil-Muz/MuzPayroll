@@ -3,7 +3,8 @@
 import { RxCross2 } from "react-icons/rx";
 import { TiTick } from "react-icons/ti";
 
-export const ListCard = ({ item, status, handleDataToForm,name }) => {
+export const ListCard = ({ item, status, handleDataToForm, children }) => {
+
   return (
     <div
       key={item.mstID}
@@ -36,12 +37,21 @@ export const ListCard = ({ item, status, handleDataToForm,name }) => {
       {/* BODY */}
       <div className="card-title">{item.name}</div>
       <div className="card-shortname">{item.shortName}</div>
-      <div
-        className="card-description"
-        // style={listView ? containerStyle : null}
-      >
-        {item.description}
-      </div>
+
+      {/* ===== CONDITIONAL RENDERING ===== */}
+
+      {/* {cardType === "shiftType" ? (
+        <div className="shift-details">
+          <div>Shift Type: {item.shiftType}</div>
+          <div>From: {item.timeFrom}</div>
+          <div>To: {item.timeTo}</div>
+        </div>
+      ) : (
+        <div className="card-description">
+          {item.description}
+        </div>
+      )} */}
+      {children}
     </div>
   );
 };

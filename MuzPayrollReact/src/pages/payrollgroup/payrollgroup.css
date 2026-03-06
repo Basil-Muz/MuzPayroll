@@ -1,7 +1,8 @@
 .payroll-group-page {
   min-height: calc(100vh - 60px);
   /* background: var(--background); */
-  padding-top: 65px;
+  padding: 75px 24px 24px 24px; 
+  /* padding-top: 65px; */
   overflow: hidden;
 }
 
@@ -36,7 +37,7 @@
 .search-section {
   padding-bottom: 15px;
   margin-bottom: 15px;
-  border-bottom: 1px dotted #999; /* ✅ SEPARATOR */
+  border-bottom: 1px dotted #999; /*  SEPARATOR */
 }
 
 .search-sidebar h3 {
@@ -83,5 +84,40 @@ input[type="radio"] {
   flex-direction: column;
   gap: 10px;
   z-index: 1000;
+}
+/* ================= HEADER LAYOUT ================= */
+
+.header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* pushes right section to end */
+  padding: 13px 15px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  font-size: 14px;
 }
 

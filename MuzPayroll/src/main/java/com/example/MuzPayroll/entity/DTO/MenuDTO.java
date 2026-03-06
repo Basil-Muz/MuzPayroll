@@ -12,6 +12,13 @@ public class MenuDTO {
     private String optionType;
     private Integer parentMenuRowNo;
     private Integer levelNo;
+    private Integer solutionId;
+    private Boolean Add;
+    private Boolean Edit;
+    private Boolean View;
+    private Boolean Delete;
+    private Boolean Print;
+    private Boolean Deny;
 
     // getters + setters
 
@@ -93,5 +100,61 @@ public class MenuDTO {
 
     public void setLevelNo(Integer levelNo) {
         this.levelNo = levelNo;
+    }
+
+    public Integer getSolutionId() {
+        return solutionId;
+    }
+
+    public void setSolutionId(Integer solutionId) {
+        this.solutionId = solutionId;
+    }
+
+    public Boolean getAdd() {
+        return Add;
+    }
+
+    public void setAdd(Boolean Add) {
+        this.Add = Add;
+    }
+
+    public Boolean getEdit() {
+        return Edit;
+    }
+
+    public void setEdit(Boolean Edit) {
+        this.Edit = Edit;
+    }
+
+    public Boolean getView() {
+        return View;
+    }
+
+    public void setView(Boolean View) {
+        this.View = View;
+    }
+
+    public Boolean getPrint() {
+        return Print;
+    }
+
+    public void setPrint(Boolean Print) {
+        this.Print = Print;
+    }
+
+    public Boolean getDelete() {
+        return Delete;
+    }
+
+    public void setDelete(Boolean Delete) {
+        this.Delete = Delete;
+    }
+
+    public Boolean getDeny() {
+        return Deny;
+    }
+
+    public void setDeny(Boolean Deny) {
+        this.Deny = Deny;
     }
 }

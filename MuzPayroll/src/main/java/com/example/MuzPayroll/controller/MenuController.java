@@ -35,4 +35,16 @@ public class MenuController {
         return menuService.getMenu(transtype, transsubtype, userId, solutionId, entityHierarchyId, productid,
                 menu_row_no);
     }
+
+    @GetMapping("/sidebar")
+    public List<MenuDTO> getSideBar(
+            @RequestParam String transtype,
+            @RequestParam String transsubtype,
+            @RequestParam Integer userId,
+            @RequestParam Integer solutionId,
+            @RequestParam Integer optionid,
+            @RequestParam Integer entity_hierarchy_id) {
+
+        return menuService.getSideBar(transtype, transsubtype, userId, solutionId, optionid, entity_hierarchy_id);
+    }
 }

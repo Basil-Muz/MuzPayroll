@@ -14,12 +14,13 @@
   z-index: 1000;
 }
 
-.modal-content {
+.shift-group-page .modal-content {
     /* background-color: white; */
     padding: 10px 15px;
     position: absolute;
     top: 5%;
     left: 26%;
+    margin:0;
     width: 38rem;
     height: fit-content;
     overflow: hidden; 
@@ -39,12 +40,12 @@
   }
 }
 
-/* .main-model-content {
+.shift-group-page .main-model-content {
    display:grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin-top: 10px;
-} */
+} 
 
 .modal-header {
     display: flex;
