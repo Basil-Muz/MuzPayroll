@@ -17,12 +17,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.MuzPayroll.entity.EntityHierarchyInfo;
+import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.EntityRightsGrpMst;
 import com.example.MuzPayroll.entity.UserGrpMst;
 import com.example.MuzPayroll.entity.DTO.EntityRightsGrpMstDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.entity.DTO.UserGrpMstDTO;
+import com.example.MuzPayroll.repository.EntityHierarchyInfoRepository;
+import com.example.MuzPayroll.repository.EntityRepository;
 import com.example.MuzPayroll.repository.EntityRightsGrpMstRepo;
 import com.example.MuzPayroll.service.EntityRightsGrpMstService;
 
@@ -30,15 +34,19 @@ import com.example.MuzPayroll.service.EntityRightsGrpMstService;
 @RequestMapping("/locationGrp")
 @CrossOrigin(origins = "*")
 public class EntityRightsGrpMstController {
-    
+
     @Autowired
     private EntityRightsGrpMstService entityRightsGrpMstService;
-    
+
     @Autowired
     private EntityRightsGrpMstRepo entityRightsGrpMstRepo;
 
-        @PostMapping("/save")
-    public Response<EntityRightsGrpMstDTO> saveEntityRightsGrp(@ModelAttribute EntityRightsGrpMstDTO dto, @RequestParam String mode) {
+    @Autowired
+    private EntityHierarchyInfoRepository entityHierarchyInfoRepository;
+
+    @PostMapping("/save")
+    public Response<EntityRightsGrpMstDTO> saveEntityRightsGrp(@ModelAttribute EntityRightsGrpMstDTO dto,
+            @RequestParam String mode) {
         return entityRightsGrpMstService.saveWrapper(dto, mode);
     }
 
@@ -47,16 +55,17 @@ public class EntityRightsGrpMstController {
     public ResponseEntity<EntityRightsGrpMstDTO> getUserGrpById(
             @PathVariable @NonNull Long ErmEntityGroupID) {
 
-                EntityRightsGrpMstDTO dto = entityRightsGrpMstService.getEntityRightsGrpWithAuth(ErmEntityGroupID);
-                return ResponseEntity.ok(dto);
+        EntityRightsGrpMstDTO dto = entityRightsGrpMstService.getEntityRightsGrpWithAuth(ErmEntityGroupID);
+        return ResponseEntity.ok(dto);
         // return userGrpMstRepo.findById(UgmUserGroupID)
-        //         .map(ResponseEntity::ok)
-        //         .orElse(ResponseEntity.notFound().build());
+        // .map(ResponseEntity::ok)
+        // .orElse(ResponseEntity.notFound().build());
     }
 
     // TO get the Mst and the List of Logs y using MstID
     @GetMapping("/getamendlist/{ErmEntityGroupID}")
-    public ResponseEntity<EntityRightsGrpMstDTO> getEntityRightsGrpByMstId(@NonNull @PathVariable Long ErmEntityGroupID) {
+    public ResponseEntity<EntityRightsGrpMstDTO> getEntityRightsGrpByMstId(
+            @NonNull @PathVariable Long ErmEntityGroupID) {
 
         EntityRightsGrpMstDTO dto = entityRightsGrpMstService.getEntityRightsGrpWithLogs(ErmEntityGroupID);
         return ResponseEntity.ok(dto);
@@ -68,7 +77,10 @@ public class EntityRightsGrpMstController {
             @RequestParam Long bussinessGroupId,
             @RequestParam(required = false) Boolean activeStatusYN) {
 
-        List<EntityRightsGrpMst> list = entityRightsGrpMstRepo.findEntityRightsGrpByStatus(bussinessGroupId, activeStatusYN);
+        EntityHierarchyInfo ent = entityHierarchyInfoRepository.findByHierarchyId(bussinessGroupId);
+
+        List<EntityRightsGrpMst> list = entityRightsGrpMstRepo.findEntityRightsGrpByStatus(ent.getEhiBusinessGroupID(),
+                activeStatusYN);
 
         List<FormListDTO> response = list.stream()
                 .map(entity -> {
@@ -88,26 +100,25 @@ public class EntityRightsGrpMstController {
         return ResponseEntity.ok(response);
     }
 
-@GetMapping("/search-locationGroups")
-public Page<FormListDTO> searchLocationGroups(
-        @RequestParam(required = false) String search,
-        @PageableDefault(size = 10) Pageable pageable) {
+    @GetMapping("/search-locationGroups")
+    public Page<FormListDTO> searchLocationGroups(
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 10) Pageable pageable) {
 
-    Page<EntityRightsGrpMst> page = entityRightsGrpMstRepo.searchEntityRightsGroup(search, pageable);
+        Page<EntityRightsGrpMst> page = entityRightsGrpMstRepo.searchEntityRightsGroup(search, pageable);
 
-    return page.map(entity -> {
-        FormListDTO dto = new FormListDTO();
-        dto.setMstID(entity.getErmEntityGroupID());
-        dto.setCode(entity.getErmCode());
-        dto.setName(entity.getErmName());
-        dto.setShortName(entity.getErmShortName());
-        dto.setDescription(entity.getErmDesc());
-        dto.setActiveDate(entity.getActiveDate());
-        dto.setInactiveDate(entity.getInactiveDate());
-        dto.setActiveStatusYN(entity.getErmActiveYN());
-        return dto;
-    });
-}
-
+        return page.map(entity -> {
+            FormListDTO dto = new FormListDTO();
+            dto.setMstID(entity.getErmEntityGroupID());
+            dto.setCode(entity.getErmCode());
+            dto.setName(entity.getErmName());
+            dto.setShortName(entity.getErmShortName());
+            dto.setDescription(entity.getErmDesc());
+            dto.setActiveDate(entity.getActiveDate());
+            dto.setInactiveDate(entity.getInactiveDate());
+            dto.setActiveStatusYN(entity.getErmActiveYN());
+            return dto;
+        });
+    }
 
 }

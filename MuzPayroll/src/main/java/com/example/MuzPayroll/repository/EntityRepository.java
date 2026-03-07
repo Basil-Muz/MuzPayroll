@@ -396,44 +396,44 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
     Optional<Long> findAddressInfoIdByMstId(@Param("mstId") Long mstId);
 
     @Query(value = """
-            SELECT
-            em.etm_entityid AS etmEntityId,
-            em.etm_prefix AS etmPrefix,
-            em.etm_code AS etmCode,
-            em.etm_name AS etmName,
-            em.etm_short_name AS etmShortName,
-            em.etm_activeyn AS etmActiveYN,
-            em.etm_image AS imagePath,
-            em.etm_int_prefix AS etmIntPrefix,
-            em.active_date AS activeDate,
-            em.in_active_date AS inactiveDate,
-            em.etm_entity_type_mccid AS etmEntityTypeMccID,
-            em.etm_doc_infoid AS etmDocInfoID,
-            em.address_infoid AS AddressInfoID,
-			ad.address AS Address,
-			ad.address1 AS Address1,
-			ad.address2 AS Address2,
-			ad.country AS Country,
-			ad.designation AS Designation,
-		    ad.district AS District,
-			ad.email AS Email,
-			ad.employer_email AS EmployerEmail,
-			ad.employer_name AS EmployerName,
-			ad.employer_number AS EmployerNumber,
-			ad.landline_number AS LandlineNumber,
-			ad.mobile_number AS MobileNumber,
-			ad.pincode AS Pincode,
-			ad.place AS Place,
-			ad.state AS State,
-			ad.withaffectdate AS Withaffectdate
-            FROM entity_mst em
-            JOIN entity_hierarchy_info eh
-            ON eh.ehi_entity_hierarchyid = em.etm_entityid
-            JOIN address_info_mst ad
-            ON ad.address_infoid = em.address_infoid
-            WHERE eh.ehi_leaf_entity_type_mccid = :mccId
-            AND eh.ehi_entity_hierarchyid = :etmEntityID
-            """, nativeQuery = true)
+                     SELECT
+                     em.etm_entityid AS etmEntityId,
+                     em.etm_prefix AS etmPrefix,
+                     em.etm_code AS etmCode,
+                     em.etm_name AS etmName,
+                     em.etm_short_name AS etmShortName,
+                     em.etm_activeyn AS etmActiveYN,
+                     em.etm_image AS imagePath,
+                     em.etm_int_prefix AS etmIntPrefix,
+                     em.active_date AS activeDate,
+                     em.in_active_date AS inactiveDate,
+                     em.etm_entity_type_mccid AS etmEntityTypeMccID,
+                     em.etm_doc_infoid AS etmDocInfoID,
+                     em.address_infoid AS AddressInfoID,
+            ad.address AS Address,
+            ad.address1 AS Address1,
+            ad.address2 AS Address2,
+            ad.country AS Country,
+            ad.designation AS Designation,
+               ad.district AS District,
+            ad.email AS Email,
+            ad.employer_email AS EmployerEmail,
+            ad.employer_name AS EmployerName,
+            ad.employer_number AS EmployerNumber,
+            ad.landline_number AS LandlineNumber,
+            ad.mobile_number AS MobileNumber,
+            ad.pincode AS Pincode,
+            ad.place AS Place,
+            ad.state AS State,
+            ad.withaffectdate AS Withaffectdate
+                     FROM entity_mst em
+                     JOIN entity_hierarchy_info eh
+                     ON eh.ehi_entity_hierarchyid = em.etm_entityid
+                     JOIN address_info_mst ad
+                     ON ad.address_infoid = em.address_infoid
+                     WHERE eh.ehi_leaf_entity_type_mccid = :mccId
+                     AND eh.ehi_entity_hierarchyid = :etmEntityID
+                     """, nativeQuery = true)
     List<EntityDataDTO> getEntityMsts(
             @Param("etmEntityID") Long etmEntityID,
             @Param("mccId") Long mccId);
