@@ -194,7 +194,10 @@ function App() {
             element={<LocationGroupRightsMapping />}
           />
 
-          <Route path="/locationgrouprights" element={<LocationGroupRights />} />
+          <Route
+            path="/locationgrouprights"
+            element={<LocationGroupRights />}
+          />
         </Routes>
       </AuthProvider>
       <Toaster

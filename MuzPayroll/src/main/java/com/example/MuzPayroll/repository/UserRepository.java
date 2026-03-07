@@ -1,5 +1,7 @@
 package com.example.MuzPayroll.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,27 +11,29 @@ import com.example.MuzPayroll.entity.UserMst;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserMst, Long> {
-   
+
     UserMst findByUserCode(String userCode);
 
-     @Query(value = """
+    @Query(value = """
             SELECT *
             FROM user_mst
-            WHERE user_mstid = :userCode 
+            WHERE user_mstid = :userCode
             """, nativeQuery = true)
     UserMst findByUserMstId(Long userCode);
 
-        @Query(value = """
+    @Query(value = """
             SELECT usm_entity_hierarchyid
             FROM user_mst
-            WHERE user_code = :userCode 
+            WHERE user_code = :userCode
             """, nativeQuery = true)
     Long findBranchIdByUserCode(@Param("userCode") String userCode);
 
-            @Query(value = """
+    @Query(value = """
             SELECT usm_default_entity_hierarchyid
             FROM user_mst
-            WHERE user_code = :userCode 
+            WHERE user_code = :userCode
             """, nativeQuery = true)
     Long findLocationIdByUserCode(@Param("userCode") String userCode);
+
+    Optional<UserMst> findByUserMstID(Long userMstID);
 }

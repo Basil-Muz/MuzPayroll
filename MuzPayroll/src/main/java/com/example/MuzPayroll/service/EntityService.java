@@ -868,28 +868,6 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         }
                 }
 
-                // if (entity.getAddressInfoID() != null) {
-
-                // dto.setAddressInfoID(entity.getAddressInfoID().getAddressInfoID());
-                // dto.setAddress(entity.getAddressInfoID().getAddress());
-                // dto.setAddress1(entity.getAddressInfoID().getAddress1());
-                // dto.setAddress2(entity.getAddressInfoID().getAddress2());
-                // dto.setCountry(entity.getAddressInfoID().getCountry());
-                // dto.setState(entity.getAddressInfoID().getState());
-                // dto.setDistrict(entity.getAddressInfoID().getDistrict());
-                // dto.setPlace(entity.getAddressInfoID().getPlace());
-                // dto.setPincode(entity.getAddressInfoID().getPincode());
-                // dto.setLandlineNumber(entity.getAddressInfoID().getLandlineNumber());
-                // dto.setMobileNumber(entity.getAddressInfoID().getMobileNumber());
-                // dto.setEmail(entity.getAddressInfoID().getEmail());
-                // dto.setDesignation(entity.getAddressInfoID().getDesignation());
-                // dto.setEmployerName(entity.getAddressInfoID().getEmployerName());
-                // dto.setEmployerNumber(entity.getAddressInfoID().getEmployerNumber());
-                // dto.setEmployerEmail(entity.getAddressInfoID().getEmployerEmail());
-                // dto.setWithaffectdate(entity.getAddressInfoID().getWithaffectdate());
-                // // dto.setAmendNo(entity.getAddressInfoID().getAmendNo());
-
-                // }
                 return dto;
         }
 
@@ -1569,9 +1547,10 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 return dto;
         }
 
-        public List<UserEntityDTO> getCompany(Long userId, Long mccId) {
+        public List<UserEntityDTO> getCompany(Long userMstID, Long mccId) {
 
-                UserMst user = userRepository.findById(userId)
+                System.out.println("Userid" + userMstID);
+                UserMst user = userRepository.findByUserMstID(userMstID)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
                 Long userType = user.getUserTypeMst().getUgmUserGroupID();
@@ -1581,7 +1560,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 if (userType == 100011) {
                         rows = entityRepository.getAdminCompany(mccId);
                 } else {
-                        rows = entityRepository.getUserCompany(userId, mccId);
+                        rows = entityRepository.getUserCompany(userMstID, mccId);
                 }
                 return rows.stream()
                                 .map(r -> new UserEntityDTO(
@@ -1633,10 +1612,6 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                                                 (String) r[1], // entityName
                                                 (String) r[2]))
                                 .toList();
-        }
-
-        public List<EntityMstDTO> getAmendList(Long Id) {
-                throw new UnsupportedOperationException("Not supported yet.");
         }
 
 }
