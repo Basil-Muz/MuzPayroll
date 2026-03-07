@@ -63,7 +63,7 @@
   z-index: 1000;
 }
 
-.modal-content {
+.modal-designation-form  .modal-content {
     background-color: white;
     padding: 10px 15px;
     position: absolute;

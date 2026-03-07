@@ -1,138 +1,3 @@
-/* ======================================================
-   LOCATION GROUP RIGHTS - MAIN STYLES
-   File: LocationGroupRights.module.css
-====================================================== */
-
-/* ======================================================
-   CSS VARIABLES (should be in global scope)
-====================================================== */
-:root {
-  /* Brand Colors - Purple Theme */
-  --brand: #d218d8ff;
-  --brand-light: #e525ebff;
-  --brand-dark: #c31ed2ff;
-  --brand-border: rgba(210, 24, 216, 0.35);
-
-  /* Primary Colors */
-  --primary: #7d6b80ff;
-  --primary-hover: #251127ff;
-  --primary-light: #f0dcf3ff;
-
-  /* Button Colors */
-  --button-primary: #e525ebff;
-  --button-primary-hover: #c31ed2ff;
-
-  /* Status Colors */
-  --success: #d218d8ff;
-  --success-light: rgba(210, 24, 216, 0.08);
-  --success-dark: #a315a8ff;
-  --danger: #d44242ff;
-  --danger-light: rgba(212, 69, 69, 0.12);
-  --danger-dark: #a32929ff;
-  --warning: #f59e0b;
-
-  /* Inactive Container */
-  --inactive-bg: #f6f6f6;
-  --inactive-border: #d3d3d3;
-
-  /* Text Colors */
-  --text: #2f2f2fff;
-  --text-dark: #070606ff;
-  --text-muted: #6f6f6f;
-  --text-light: #b094b8ff;
-
-  /* Border Colors */
-  --border: rgba(0, 0, 0, 0.08);
-  --border-light: rgba(0, 0, 0, 0.08);
-
-  /* Background Colors */
-  --background: #ffffffff;
-  --bg: #f9f3f9;
-  --surface: #ffffff;
-  --dark-background: #381e3bff;
-  --background-alt: #ffefffff;
-  --glass-bg: rgba(255, 255, 255, 0.88);
-
-  /* Shadow Effects */
-  --shadow-sm: 0 2px 8px rgba(224, 99, 241, 0.3);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-
-  /* Border Radius */
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-
-  /* Disabled */
-  --disabled-bg: #f3f3f3;
-  --disabled-opacity: 0.6;
-
-  /* Text sizes */
-  --text-sm: 13px;
-  --text-md: 16px;
-  --text-lg: 19px;
-  --text-xl: 24px;
-
-  /* Layout */
-  --header-padding: 80px;
-}
-
-[data-theme="dark"] {
-  /* Brand Colors - Purple Theme (Dark Mode) */
-  --brand: #d218d8ff;
-  --brand-light: #e86af0;
-  --brand-dark: #b012b8;
-  --brand-border: rgba(210, 24, 216, 0.45);
-
-  /* Primary Colors */
-  --primary: #c8a6d4;
-  --primary-hover: #e9b8f0;
-  --primary-light: #3a1f3f;
-
-  /* Button Colors */
-  --button-primary: #d218d8ff;
-  --button-primary-hover: #e525ebff;
-
-  /* Status Colors */
-  --success: #d218d8ff;
-  --success-light: rgba(210, 24, 216, 0.18);
-  --success-dark: #e86af0;
-  --danger: #f87171;
-  --danger-light: rgba(248, 113, 113, 0.22);
-  --warning: #fbbf24;
-
-  /* Inactive Container */
-  --inactive-bg: #1f1423;
-  --inactive-border: #3a2a3f;
-
-  /* Text Colors */
-  --text: #f3e8ff;
-  --text-dark: #ffffff;
-  --text-muted: #b6a3c6;
-  --text-light: #9f8fb1;
-
-  /* Border Colors */
-  --border: rgba(255, 255, 255, 0.12);
-  --border-light: rgba(255, 255, 255, 0.08);
-
-  /* Background Colors */
-  --background: #140916;
-  --bg: #241126;
-  --surface: #1c0d1f;
-  --dark-background: #1c0d1f;
-  --background-alt: #241126;
-  --glass-bg: rgba(36, 17, 38, 0.85);
-
-  /* Shadow Effects */
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.7);
-
-  /* Disabled */
-  --disabled-bg: #2a1a2e;
-  --disabled-opacity: 0.55;
-}
 
 /* ======================================================
    PAGE LAYOUT
@@ -143,7 +8,7 @@
   gap: 8px;
   align-items: start;
   padding-right: 1%;
-  margin-top: calc(var(--header-padding) + 2px);
+  margin-top: calc(var(--header-padding) + 5px);
   padding-left: 2%;
 }
 
@@ -157,12 +22,14 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  z-index: 100;
   padding: 10px;
   padding-left: 1px;
 }
 
 .lgrs-actions .floating-action-bar {
-  position: static;
+  position: sticky;
+  /* z-index: 1000; */
   right: 0;
   top: 0;
   transform: none;
@@ -358,7 +225,9 @@
   align-items: center;
   justify-content: space-evenly;
 }
-
+.lgrs-layout .btn-change {
+  border: 1px solid var(--brand-border);
+}
 /* ======================================================
    BULK CONTEXT BAR
 ====================================================== */
@@ -625,7 +494,7 @@
   border-collapse: collapse;
   background: var(--background);
   border-radius: var(--radius-sm);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .lgrs-layout .grid th {
@@ -638,7 +507,7 @@
   font-weight: 600;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 10;
 }
 
 .lgrs-layout .grid td {

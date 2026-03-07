@@ -9,7 +9,8 @@ import { changePassword, changePasswordForgot } from "../../services/changepassw
 function ChangePassword() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { solutionId } = useAuth();
+  const { logout, user } = useAuth();
+  const solutionId = user?.solutionId;
 
   //Detect forgot-password flow
   const isForgotFlow = location.state?.forgotFlow === true;
@@ -201,8 +202,16 @@ function ChangePassword() {
         <button type="submit" className="login-btn" disabled={loading}>
           {loading ? "SUBMITTING..." : "SUBMIT"}
         </button>
+        <p
+          className="forgot-link"
+          onClick={() => {
+            const redirectPath =
+              solutionId === 1 ? "/payroll" : "/payrollemp";
 
-        <p className="forgot-link" onClick={() => navigate(solutionId === 1 ? "/payroll" : "/payrollemp")}>
+            logout(); // clears auth + storage
+            navigate(redirectPath, { replace: true });
+          }}
+        >
           Back to Login
         </p>
       </form>

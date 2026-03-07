@@ -362,6 +362,39 @@ background: var(--background) !important
   opacity: var(--disabled-opacity);
   box-shadow: none;
 }
+.shift-type-container {
+  display: flex;
+  gap: 12px;
+}
+
+.shift-type {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f9f9f9;
+  font-size: 18px;
+}
+
+.shift-type:hover {
+  border-color: var(--brand);
+}
+
+.shift-type.active {
+  background: var(--brand);
+  color: white;
+  border-color: var(--brand);
+}
+
+.shift-type.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 @media (min-width: 1726px) {
   /* large screens */
@@ -512,6 +545,7 @@ background: var(--background) !important
   .modal-usergroup-form textarea {
     min-height: 60px;
   }
+  
 }
 
 @keyframes slideUpMobile {
@@ -522,4 +556,32 @@ background: var(--background) !important
   to {
     transform: translateY(0);
   }
+}
+/* Wrapper */
+.custom-time-picker {
+  width: 100%;
+}
+
+/* Input box */
+.custom-time-picker .react-time-picker__wrapper {
+  border:1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: white;
+}
+
+/* Focus effect */
+/* .custom-time-picker .react-time-picker__wrapper:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(178, 102, 255, 0.2);
+} */
+
+/* Remove default outline */
+.custom-time-picker input:focus {
+  outline: none;
+}
+
+/* Dropdown button hover */
+.custom-time-picker button:hover {
+  background-color: var(--brand--hover);
 }

@@ -37,7 +37,7 @@ public class EntityRightsGrpMstDTO {
 
     private Long ErmAuthInfoID;
 
-    private String userCode;
+    private Long userId;
 
     private LocalDate activeDate;
 
@@ -143,12 +143,12 @@ public class EntityRightsGrpMstDTO {
         this.InactiveDate = InactiveDate;
     }
 
-    public String getUserCode() {
-        return userCode;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUserCode(String userCode) {
-        this.userCode = userCode;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public LocalDate getAuthorizationDate() {

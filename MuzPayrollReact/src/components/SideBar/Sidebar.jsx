@@ -348,11 +348,11 @@ export default function Sidebar({ forceOpen }) {
           >
             {menuItems.map((item) => {
               if (!item) return null;
-              const IconComponent = MAIN_MENU_ICON_MAP[item.label]|| MdOutlineDashboard;
+              const IconComponent = MAIN_MENU_ICON_MAP[item.label] || MdOutlineDashboard;
               const hasChildren = item.children?.length > 0;
               return (
                 <div
-                  key={item.id}
+                  key={item.id ?? item.label}
                   className="nav-item-wrapper"
                   data-item-id={item.id}
                   onMouseEnter={(e) => {
@@ -417,7 +417,7 @@ export default function Sidebar({ forceOpen }) {
                       </div>
                     )}
 
-                    {!sidebarOpen && !isMobile && (item.label == "Dashboard"  || item.label === "Sitemap") && (
+                    {!sidebarOpen && !isMobile && (item.label == "Dashboard" || item.label === "Sitemap") && (
                       <span className="tooltip">{item.label}</span>
                     )}
                   </button>
@@ -452,9 +452,9 @@ export default function Sidebar({ forceOpen }) {
                           padding: 8,
                         }}
                       >
-                        {item.children.map((child) => (
+                        {item.children.map((child,index) => (
                           <button
-                            key={child.id}
+                            key={`${item.id}-${index}`}
                             onClick={() => handleSubNav(child)}
                           
                             style={{

@@ -30,7 +30,7 @@ public class EntityRightsGrpLogDTO {
 
     private Authorization authorization;
 
-    private String userCode;
+    private Long userId;
 
     private LocalDate authorizationDate;
 
@@ -110,12 +110,12 @@ public class EntityRightsGrpLogDTO {
         this.authorization = authorization;
     }
 
-    public String getUserCode() {
-        return userCode;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUserCode(String userCode) {
-        this.userCode = userCode;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Boolean getAuthorizationStatus() {

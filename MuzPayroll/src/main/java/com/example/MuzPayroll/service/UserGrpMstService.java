@@ -660,6 +660,7 @@ public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, Use
                 dto.setUgmAuthInfoID(savedAuth.getAuthId());
 
             } else {
+                savedEntity = userGrpMstRepo.save(entity);
                 Long mstId = dto.getUgmUserGroupID();
 
                 long count = authorizationRepository.countByMstId(mstId);

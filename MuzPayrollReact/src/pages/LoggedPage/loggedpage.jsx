@@ -40,6 +40,8 @@ function LoggedPage() {
   const [companyList, setCompanyList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
+  const [userChangedCompany, setUserChangedCompany] = useState(false);
+  const [userChangedBranch, setUserChangedBranch] = useState(false);
   const [selectedLocationId, setSelectedLocationId] = useState(
     user?.defaultEntityHierarchyId || "",
   );
@@ -48,6 +50,7 @@ function LoggedPage() {
   const [finYear, setFinYear] = useState(currentFinYear);
   const finYearOptions = getFinYearOptions(currentFinYear);
 
+
   const [selectedCompanyId, setSelectedCompanyId] = useState(
     user?.userEntityHierarchyId || "",
   );
@@ -55,7 +58,7 @@ function LoggedPage() {
     user?.branchEntityHierarchyId || "",
   );
 
-  const fieldsLocked = user?.fieldsLocked ?? true;
+  const fieldsLocked = user?.fieldsLocked ?? false;
   const sidebarOpen = user?.sidebarOpen ?? false;
   const okEnabled = user?.okEnabled ?? true;
   const changeEnabled = user?.changeEnabled ?? false;
@@ -85,6 +88,7 @@ function LoggedPage() {
   }, [user, solutionId, navigate]);
   // console.log("Use id", user);
   // ================= Load companies =================
+
   useEffect(() => {
     if (!user?.userMstId) return;
 
@@ -92,22 +96,34 @@ function LoggedPage() {
       try {
         const data = await fetchCompanies(user.userMstId);
         const companies = Array.isArray(data) ? data : [];
-        console.log("companies");
+
+        if (companies.length === 0) {
+          toast.error("No companies available");
+          setCompanyList([]);
+          return;
+        }
+
         setCompanyList(companies);
 
-        if (companies.length > 0) {
-          const firstCompany =
-            companies.find(
-              (c) => String(c.entityHierarchyId) === String(selectedCompanyId),
-            ) || companies[0];
-          setSelectedCompanyId(String(firstCompany.entityHierarchyId));
-          setValue("companyId", String(firstCompany.entityHierarchyId));
-        }
-      } catch {
+        const defaultCompany =
+          companies.find(
+            (c) =>
+              String(c.entityHierarchyId) ===
+              String(user?.userEntityHierarchyId)
+          ) || companies[0];
+
+        const companyId = String(defaultCompany.entityHierarchyId);
+
+        setSelectedCompanyId(companyId);
+        setValue("companyId", companyId);
+
+       
+      } catch (error) {
         toast.error("Failed to load companies");
         setCompanyList([]);
       }
     };
+
     loadCompanies();
   }, [user?.userMstId]);
 
@@ -119,81 +135,107 @@ function LoggedPage() {
       try {
         const data = await fetchBranch(user.userMstId, selectedCompanyId);
         const branches = Array.isArray(data) ? data : [];
+
         setBranchList(branches);
 
-        if (branches.length > 0) {
-          const firstBranch =
-            branches.find(
-              (b) => String(b.entityHierarchyId) === String(selectedBranchId),
-            ) || branches[0];
-          setSelectedBranchId(String(firstBranch.entityHierarchyId));
-          setValue("branchId", String(firstBranch.entityHierarchyId));
+        if (branches.length === 0) {
+          if (userChangedCompany) {
+            toast.error("No branches available for selected company");
+          }
+
+          setSelectedBranchId("");
+          setLocationList([]);
+          setSelectedLocationId("");
+          setValue("branchId", "");
+          setValue("locationId", "");
+          return;
         }
-      } catch {
+
+        const defaultBranch =
+          branches.find(
+            (b) =>
+              String(b.entityHierarchyId) ===
+              String(user?.branchEntityHierarchyId)
+          ) || branches[0];
+
+        const branchId = String(defaultBranch.entityHierarchyId);
+
+        setSelectedBranchId(branchId);
+        setValue("branchId", branchId);
+
+      } catch (error) {
         toast.error("Failed to load branches");
         setBranchList([]);
+        setSelectedBranchId("");
       }
     };
+
     loadBranches();
   }, [user?.userMstId, selectedCompanyId]);
 
   /* ================= Load locations ================= */
   useEffect(() => {
-    if (!user?.userMstId) return;
-    if (!selectedCompanyId) return;
-    if (!selectedBranchId) {
+    if (!user?.userMstId || !selectedCompanyId || !selectedBranchId) {
       setLocationList([]);
       setSelectedLocationId("");
       setValue("locationId", "");
       return;
     }
 
-    let isMounted = true;
-
-    const fetchLocations = async () => {
+    const loadLocations = async () => {
       const startTime = Date.now();
-      showRailLoader("Loading locations…");
+      showRailLoader("Loading locations...");
 
       try {
         const data = await fetchLocation(
           user.userMstId,
           selectedCompanyId,
-          selectedBranchId,
+          selectedBranchId
         );
 
-        if (!isMounted) return;
-
         const locations = Array.isArray(data) ? data : [];
+
         setLocationList(locations);
 
-        if (locations.length === 0) return;
+        if (locations.length === 0) {
+          if (userChangedBranch) {
+            toast.error("No locations available for selected branch");
+          }
 
-        const userLocId = user?.defaultEntityHierarchyId;
+          setSelectedLocationId("");
+          setValue("locationId", "");
+          return;
+        }
 
-        const savedLocation =
+        const defaultLocation =
           locations.find(
-            (l) => String(l.entityHierarchyId) === String(userLocId),
+            (l) =>
+              String(l.entityHierarchyId) ===
+              String(user?.defaultEntityHierarchyId)
           ) || locations[0];
 
-        setSelectedLocationId(String(savedLocation.entityHierarchyId));
-        setValue("locationId", String(savedLocation.entityHierarchyId), {
-          shouldValidate: false,
-        });
-      } catch {
-        if (isMounted) setLocationList([]);
+        const locationId = String(defaultLocation.entityHierarchyId);
+
+        setSelectedLocationId(locationId);
+        setValue("locationId", locationId);
+
+      } catch (error) {
         toast.error("Failed to load locations");
+        setLocationList([]);
+        setSelectedLocationId("");
       } finally {
         await ensureMinDuration(startTime, 600);
         hideLoader();
       }
     };
 
-    fetchLocations();
+    loadLocations();
+  }, [
+    user?.userMstId,
+    selectedCompanyId,
+    selectedBranchId,
 
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedCompanyId, selectedBranchId, user?.userMstId]);
+  ]);
 
   // ================= Select options =================
   const companyOptions = companyList.map((c) => ({
@@ -322,10 +364,14 @@ function LoggedPage() {
                   options={companyOptions}
                   onChange={(opt) => {
                     const newId = opt?.value || "";
+                    setUserChangedCompany(true);   //  mark manual change
                     setSelectedCompanyId(newId);
                     setSelectedBranchId("");
+                    setSelectedLocationId("");
                     setBranchList([]);
+                    setLocationList([]);
                     setValue("branchId", "");
+                    setValue("locationId", "");
                   }}
                   isDisabled={fieldsLocked}
                   classNamePrefix="form-control-select"
@@ -368,9 +414,11 @@ function LoggedPage() {
                       options={branchOptions}
                       onChange={(opt) => {
                         const newId = opt?.value || "";
+                        setUserChangedBranch(true);   // mark manual change
                         field.onChange(newId);
                         setSelectedBranchId(newId);
                         setSelectedLocationId("");
+                        setLocationList([]);
                         setValue("locationId", "");
                       }}
                       isDisabled={fieldsLocked}
@@ -418,10 +466,16 @@ function LoggedPage() {
                 <button
                   className="logged-btn"
                   onClick={handleOk}
-                  disabled={!okEnabled}
+                  disabled={
+                    !selectedCompanyId ||
+                    !selectedBranchId ||
+                    !selectedLocationId ||
+                    !okEnabled
+                  }
                 >
                   OK
                 </button>
+
                 <button
                   className="logged-btn"
                   onClick={handleChangeCredentials}

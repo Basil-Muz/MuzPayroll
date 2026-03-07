@@ -61,9 +61,9 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
             List<String> errors = new ArrayList<>();
             EntityRightsGrpLogDTO dto = dtos.get(0);
 
-            UserMst user = userRepository.findByUserCode(dto.getUserCode());
+            UserMst user = userRepository.findByUserMstId(dto.getUserId());
             if (user == null)
-                errors.add("Invalid user code");
+                errors.add("Invalid user Id");
 
             if (!errors.isEmpty()) {
                 return Response.error(errors);
@@ -217,7 +217,7 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
             dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
 
             if (entity.getAuthorization().getUserMst() != null) {
-                dto.setUserCode(entity.getAuthorization().getUserMst().getUserCode());
+                dto.setUserId(entity.getAuthorization().getUserMst().getUserMstID());
             }
         }
 

@@ -249,14 +249,14 @@
    CHANGE SEARCH (Secondary)
    Meaning: Unlock & re-query
 ================================ */
-.lgr-filters .btn-change {
+ .btn-change {
   background-color: var(--background);
 
   color: var(--text);
   border-color: var(--border);
 }
 
-.lgr-filters .btn-change:hover {
+ .btn-change:hover {
   background-color: var(--option-light);
   border-color: var(--brand-border);
 }

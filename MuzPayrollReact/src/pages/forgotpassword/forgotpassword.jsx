@@ -15,7 +15,8 @@ function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [otp, setOtp] = useState("");
-  const { solutionId } = useAuth();
+  const { logout, user } = useAuth();
+  const solutionId = user?.solutionId;
 
 
   // Normalize user code (append @muziris if missing)
@@ -176,7 +177,13 @@ function ForgotPassword() {
             </>
           )}
         </form>
-        <p className="forgot-link" onClick={() => navigate(solutionId === 1 ? "/payroll" : "/payrollemp")}>
+        <p
+          className="forgot-link"
+          onClick={() => {
+            logout(); // safe even if user null
+            navigate("/payroll", { replace: true });
+          }}
+        >
           Back to Login
         </p>
       </div>
