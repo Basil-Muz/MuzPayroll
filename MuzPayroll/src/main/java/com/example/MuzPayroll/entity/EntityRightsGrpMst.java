@@ -49,22 +49,12 @@ public class EntityRightsGrpMst {
     public Long getErmEntityGroupID() {
         return ErmEntityGroupID;
     }
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "ErmEntityHierarchyID", nullable = true)
     private EntityMst entityMst;
 
-
-    @Column(name = "ErmBusinessGroupID", nullable = true)
-    private Long entityHierarchyInfoID;
-
-    public Long getEntityHierarchyInfoID() {
-        return entityHierarchyInfoID;
-    }
-
-    public void setEntityHierarchyInfoID(Long entityHierarchyInfoID) {
-        this.entityHierarchyInfoID = entityHierarchyInfoID;
-    }
     @Column(nullable = true)
     private LocalDate withaffectdate;
 
@@ -127,6 +117,7 @@ public class EntityRightsGrpMst {
     public void setInactiveDate(LocalDate InactiveDate) {
         this.InactiveDate = InactiveDate;
     }
+
     public LocalDate getWithaffectdate() {
         return withaffectdate;
     }
@@ -142,12 +133,13 @@ public class EntityRightsGrpMst {
     public void setEntityMst(EntityMst entityMst) {
         this.entityMst = entityMst;
     }
-        public Authorization getAuthorization() {
+
+    public Authorization getAuthorization() {
         return authorization;
     }
 
     public void setAuthorization(Authorization authorization) {
         this.authorization = authorization;
     }
-    
+
 }

@@ -21,13 +21,13 @@ public interface EntityRightsGrpMstRepo extends JpaRepository<EntityRightsGrpMst
 
     EntityRightsGrpMst save(EntityRightsGrpMst entity);
 
-// @Query("SELECT MAX(e.ErmEntityGroupID) FROM EntityRightsGrpMst e")
-// Long findMaxErmEntityRightsGroupID();
+    // @Query("SELECT MAX(e.ErmEntityGroupID) FROM EntityRightsGrpMst e")
+    // Long findMaxErmEntityRightsGroupID();
 
-         @Query(value = """
+    @Query(value = """
             SELECT *
             FROM entity_rights_grp_mst
-            WHERE erm_entity_groupid = :entityRightsGrpId 
+            WHERE erm_entity_groupid = :entityRightsGrpId
             """, nativeQuery = true)
     EntityRightsGrpMst findByEntityRightsGrpId(Long entityRightsGrpId);
 
@@ -35,60 +35,56 @@ public interface EntityRightsGrpMstRepo extends JpaRepository<EntityRightsGrpMst
     @Query("SELECT MAX(e.ErmEntityGroupID) FROM EntityRightsGrpMst e WHERE e.ErmEntityGroupID >= 10100010")
     Long findMaxErmEntityRightsGroupID();
 
-@Query(value = """
-    SELECT e.*
-    FROM entity_rights_grp_mst e
-    JOIN entity_hierarchy_info eh
-      ON e.erm_business_groupid = eh.ehi_business_groupid
-    WHERE eh.ehi_entity_hierarchyid = :companyId
-    AND (:activeStatusYN IS NULL OR e.erm_activeyn = :activeStatusYN)
-    """, nativeQuery = true)
-List<EntityRightsGrpMst> findEntityRightsGrpByStatus(
-        @Param("companyId") Long companyId,
-        @Param("activeStatusYN") Boolean activeStatusYN
-);
-
-@Query("""
-    SELECT e FROM EntityRightsGrpMst e
-    WHERE (:search IS NULL OR :search = '' OR
-        LOWER(e.ErmCode) LIKE LOWER(CONCAT('%', :search, '%')) OR
-        LOWER(e.ErmName) LIKE LOWER(CONCAT('%', :search, '%')) OR
-        LOWER(e.ErmShortName) LIKE LOWER(CONCAT('%', :search, '%')) OR
-        LOWER(e.ErmDesc) LIKE LOWER(CONCAT('%', :search, '%'))
-    )
-""")
-Page<EntityRightsGrpMst> searchEntityRightsGroup(
-        @Param("search") String search,
-        Pageable pageable
-);
-
-@Modifying(clearAutomatically = true)
     @Query(value = """
-        INSERT INTO entity_grp_rights
-        (egr_entity_groupid,
-         egr_optionid,
-         egr_solutionid,
-         egr_add,
-         egr_edit,
-         egr_view,
-         egr_delete,
-         egr_print,
-         egr_last_mod_userid,
-         egr_last_mod_date)
-        SELECT
-            :grpId,
-            t.option_id,
-            t.solutionid,
-            false,
-            false,
-            false,
-            false,
-            false,
-            :userId,
-            CURRENT_DATE
-        FROM tem_permission_table t
-        """, nativeQuery = true)
+            SELECT e.*
+            FROM entity_rights_grp_mst e
+            JOIN entity_hierarchy_info eh
+              ON e.erm_entity_hierarchyid = eh.ehi_business_groupid
+            WHERE eh.ehi_entity_hierarchyid = :companyId
+            AND (:activeStatusYN IS NULL OR e.erm_activeyn = :activeStatusYN)
+            """, nativeQuery = true)
+    List<EntityRightsGrpMst> findEntityRightsGrpByStatus(
+            @Param("companyId") Long companyId,
+            @Param("activeStatusYN") Boolean activeStatusYN);
+
+    @Query("""
+                SELECT e FROM EntityRightsGrpMst e
+                WHERE (:search IS NULL OR :search = '' OR
+                    LOWER(e.ErmCode) LIKE LOWER(CONCAT('%', :search, '%')) OR
+                    LOWER(e.ErmName) LIKE LOWER(CONCAT('%', :search, '%')) OR
+                    LOWER(e.ErmShortName) LIKE LOWER(CONCAT('%', :search, '%')) OR
+                    LOWER(e.ErmDesc) LIKE LOWER(CONCAT('%', :search, '%'))
+                )
+            """)
+    Page<EntityRightsGrpMst> searchEntityRightsGroup(
+            @Param("search") String search,
+            Pageable pageable);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = """
+            INSERT INTO entity_grp_rights
+            (egr_entity_groupid,
+             egr_optionid,
+             egr_solutionid,
+             egr_add,
+             egr_edit,
+             egr_view,
+             egr_delete,
+             egr_print,
+             egr_last_mod_userid,
+             egr_last_mod_date)
+            SELECT
+                :grpId,
+                t.option_id,
+                t.solutionid,
+                false,
+                false,
+                false,
+                false,
+                false,
+                :userId,
+                CURRENT_DATE
+            FROM tem_permission_table t
+            """, nativeQuery = true)
     void insertDefaultPermissions(Long grpId, Long userId);
 }
-
-
