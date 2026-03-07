@@ -38,6 +38,8 @@ public class UserGrpMstDTO {
 
     private String userCode;
 
+    private Long userId;
+
     private LocalDate activeDate;
 
     private LocalDate InactiveDate;
@@ -128,6 +130,14 @@ public class UserGrpMstDTO {
 
     public void setUserCode(String userCode) {
         this.userCode = userCode;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public LocalDate getAuthorizationDate() {

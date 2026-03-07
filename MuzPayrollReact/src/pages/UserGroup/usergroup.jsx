@@ -67,7 +67,7 @@ function UserGroup() {
     try {
       const response = await getUserGroupsList(entityId, true);
       setUserGroupList(response.data);
-      console.log("user Group", response);
+      // console.log("user Group", response);
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -168,6 +168,7 @@ function UserGroup() {
       }, 800);
     } catch (err) {
       console.error(err);
+      handleApiError(err);
     } finally {
       await ensureMinDuration(startTime, 800);
       // hide loader ONLY at the end

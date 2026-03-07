@@ -13,19 +13,16 @@ import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 //service
 import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
-import { getLocationGroupsList } from "../../services/locationGroup.service.js";
-import {
-  getLocationGrpRightssList,
-  saveLocationGrpRights,
-} from "../../services/locationGrpRights.service.js";
+import { getUserGroupsList } from "../../services/usergroup.service.js";
+import { getUserGrpRightsList, saveUserGrpRights } from "../../services/userGrpRights.service.js";
 
 import { useAuth } from "../../context/AuthProvider.jsx";
-import "./css/LocationGroupRights.css";
+
 // Utils(Helpers)
 import { handleApiError } from "../../utils/errorToastResolver";
 import {
   OPTION_TYPE_MAP,
-  PERMISSION_PRESETS_LOCATION,
+  PERMISSION_PRESETS_USER,
 } from "../../constants/permissionPresets.js";
 
 const MODULES_PER_PAGE = 3;
@@ -40,7 +37,7 @@ export default function LocationGroupRights() {
   const [showFilters, setShowFilters] = useState(true);
   const [isSearchApplied, setIsSearchApplied] = useState(false);
   const [solutions, setSolutions] = useState([]);
-  const [locations, setLocations] = useState([]);
+  const [userGrpRights, setUserGrpRights] = useState([]);
   const [selectedPreset, setSelectedPreset] = useState(null);
 
   // New state for UX improvements
@@ -71,16 +68,16 @@ export default function LocationGroupRights() {
         const originalScreen = originalModules
           .find((m) => m.id === module.id)
           ?.screens.find(
-            (s) => s.egrEntityGroupRightID === screen.egrEntityGroupRightID,
+            (s) => s.ugrUserGroupRightID === screen.ugrUserGroupRightID,
           );
 
         if (
           originalScreen &&
-          (screen.egrView !== originalScreen.egrView ||
-            screen.egrAdd !== originalScreen.egrAdd ||
-            screen.egrEdit !== originalScreen.egrEdit ||
-            screen.egrDelete !== originalScreen.egrDelete ||
-            screen.egrPrint !== originalScreen.egrPrint)
+          (screen.ugrView !== originalScreen.ugrView ||
+            screen.ugrAdd !== originalScreen.ugrAdd ||
+            screen.ugrEdit !== originalScreen.ugrEdit ||
+            screen.ugrDelete !== originalScreen.ugrDelete ||
+            screen.ugrPrint !== originalScreen.ugrPrint)
         ) {
           changed++;
         }
@@ -96,11 +93,12 @@ export default function LocationGroupRights() {
       const solutions = await getSolutionList();
       setSolutions(solutions.data);
 
-      const locationGrp = await getLocationGroupsList(
+      const userGroup = await getUserGroupsList(
         user.userEntityHierarchyId,
         true,
       );
-      setLocations(locationGrp.data);
+      //   console.log("User",user)
+      setUserGrpRights(userGroup.data);
     } catch (error) {
       console.error("Error fetching solutions:", error);
     } finally {
@@ -125,7 +123,7 @@ export default function LocationGroupRights() {
     },
   });
 
-  const locationGrpRights = watch("locations");
+  const locationGrpRights = watch("userGrpRights");
   const businessSolution = watch("businessSolution");
 
   const solutionOptions = useMemo(
@@ -139,12 +137,12 @@ export default function LocationGroupRights() {
 
   const branchOptions = useMemo(() => {
     return [
-      ...locations.map((s) => ({
+      ...userGrpRights.map((s) => ({
         value: s.mstID,
         label: s.name,
       })),
     ];
-  }, [locations]);
+  }, [userGrpRights]);
 
   const groupByModule = (data) => {
     const grouped = data.reduce((acc, item) => {
@@ -177,16 +175,16 @@ export default function LocationGroupRights() {
         return {
           ...module,
           screens: module.screens.map((screen) => {
-            if (screen.egrEntityGroupRightID !== screenId) return screen;
+            if (screen.ugrUserGroupRightID !== screenId) return screen;
 
             const updated = { ...screen };
 
-            if (permission === "egrView" && !value) {
-              updated.egrView = false;
-              updated.egrAdd = false;
-              updated.egrEdit = false;
-              updated.egrDelete = false;
-              updated.egrPrint = false;
+            if (permission === "ugrView" && !value) {
+              updated.ugrView = false;
+              updated.ugrAdd = false;
+              updated.ugrEdit = false;
+              updated.ugrDelete = false;
+              updated.ugrPrint = false;
             } else {
               updated[permission] = value;
             }
@@ -198,7 +196,7 @@ export default function LocationGroupRights() {
     );
     setSelectedPreset(null);
   };
-
+  console.log("user",user)
   // Toggle entire column permission for a module
   const toggleColumnPermission = (moduleId, permission, value) => {
     setModules((prev) =>
@@ -240,14 +238,14 @@ export default function LocationGroupRights() {
   const applyPresetToSelection = () => {
     if (!selectedPreset || !selectedRowIds.size) return;
 
-    const preset = PERMISSION_PRESETS_LOCATION.find((p) => p.id === selectedPreset);
+    const preset = PERMISSION_PRESETS_USER.find((p) => p.id === selectedPreset);
     if (!preset) return;
 
     setModules((prev) =>
       prev.map((module) => ({
         ...module,
         screens: module.screens.map((screen) => {
-          if (selectedRowIds.has(screen.egrEntityGroupRightID)) {
+          if (selectedRowIds.has(screen.ugrUserGroupRightID)) {
             return {
               ...screen,
               ...preset.permissions,
@@ -267,7 +265,7 @@ export default function LocationGroupRights() {
   const applyPresetToAll = () => {
     if (!selectedPreset) return;
 
-    const preset = PERMISSION_PRESETS_LOCATION.find((p) => p.id === selectedPreset);
+    const preset = PERMISSION_PRESETS_USER.find((p) => p.id === selectedPreset);
     if (!preset) return;
 
     setModules((prev) =>
@@ -289,12 +287,13 @@ export default function LocationGroupRights() {
     // show loader
     showRailLoader("Loading permissions...");
     try {
-      const res = await getLocationGrpRightssList(
+      const res = await getUserGrpRightsList(
         businessSolution,
         locationGrpRights,
       );
-      // console.log("DEMO", res.data);
+
       const grouped = groupByModule(res.data);
+        console.log("DEMO", grouped);
       setModules(grouped);
       setOriginalModules(JSON.parse(JSON.stringify(grouped)));
 
@@ -309,7 +308,7 @@ export default function LocationGroupRights() {
       });
 
       setCollapsedModules(collapseState);
-
+      //   console.log("DEMO", collapsedModules);
       setPage(1);
     } catch (err) {
       handleApiError(err);
@@ -321,7 +320,7 @@ export default function LocationGroupRights() {
   };
 
   const handleApplySearch = async () => {
-    const isValid = await trigger(["businessSolution", "locations"]);
+    const isValid = await trigger(["businessSolution", "userGrpRights"]);
     if (!isValid) return;
 
     setIsSearchApplied(true);
@@ -335,7 +334,7 @@ export default function LocationGroupRights() {
     const ids = [];
     modules.forEach((module) => {
       module.screens.forEach((screen) => {
-        ids.push(screen.egrEntityGroupRightID);
+        ids.push(screen.ugrUserGroupRightID);
       });
     });
     return ids;
@@ -361,7 +360,7 @@ export default function LocationGroupRights() {
       const screens = getFilteredScreens(module);
 
       screens.forEach((screen) => {
-        ids.add(screen.egrEntityGroupRightID);
+        ids.add(screen.ugrUserGroupRightID);
       });
     });
 
@@ -378,7 +377,7 @@ export default function LocationGroupRights() {
       const screens = getFilteredScreens(module);
 
       screens.forEach((screen) => {
-        ids.add(screen.egrEntityGroupRightID);
+        ids.add(screen.ugrUserGroupRightID);
       });
     });
 
@@ -398,7 +397,7 @@ export default function LocationGroupRights() {
   const handleClear = () => {
     fetchDropDown();
     setValue("businessSolution", null);
-    setValue("locations", null);
+    setValue("userGrpRights", null);
 
     if (changedScreensCount) {
       toast("You have unsaved changes", {
@@ -427,28 +426,28 @@ export default function LocationGroupRights() {
         const originalScreen = originalModules
           .find((m) => m.id === module.id)
           ?.screens.find(
-            (s) => s.egrEntityGroupRightID === screen.egrEntityGroupRightID,
+            (s) => s.ugrUserGroupRightID === screen.ugrUserGroupRightID,
           );
 
         if (
           originalScreen &&
-          (screen.egrView !== originalScreen.egrView ||
-            screen.egrAdd !== originalScreen.egrAdd ||
-            screen.egrEdit !== originalScreen.egrEdit ||
-            screen.egrDelete !== originalScreen.egrDelete ||
-            screen.egrPrint !== originalScreen.egrPrint)
+          (screen.ugrView !== originalScreen.ugrView ||
+            screen.ugrAdd !== originalScreen.ugrAdd ||
+            screen.ugrEdit !== originalScreen.ugrEdit ||
+            screen.ugrDelete !== originalScreen.ugrDelete ||
+            screen.ugrPrint !== originalScreen.ugrPrint)
         ) {
           changed.push(screen);
         }
       });
     });
 
-    // console.log("Changed payload:", changed);
+    console.log("Changed payload:", changed);
     const startTime = Date.now();
     // show loader
     showRailLoader("Saving permission changes...");
     try {
-      await saveLocationGrpRights(changed);
+      await saveUserGrpRights(changed);
       toast.success(`Saved ${changed.length} changes`);
     } catch (error) {
       handleApiError(error);
@@ -481,8 +480,8 @@ export default function LocationGroupRights() {
 
           <div className="lgrs-header">
             <div>
-              <h2>Location Group Rights</h2>
-              <p>Manage screen-level permissions for selected location group</p>
+              <h2>User Group Rights</h2>
+              <p>Manage screen-level permissions for selected user group</p>
             </div>
             <div className="filter-save">
               <button
@@ -540,7 +539,7 @@ export default function LocationGroupRights() {
 
               <div className="filter-item">
                 <Controller
-                  name="locations"
+                  name="userGrpRights"
                   control={control}
                   rules={{ required: "Location group is required" }}
                   render={({ field }) => (
@@ -548,7 +547,7 @@ export default function LocationGroupRights() {
                       isDisabled={isSearchApplied}
                       classNamePrefix="form-control-select"
                       className={`
-                        ${errors.locations ? "error" : ""}
+                        ${errors.userGrpRights ? "error" : ""}
                         ${isSearchApplied ? "read-only" : ""}
                       `}
                       options={branchOptions}
@@ -562,9 +561,9 @@ export default function LocationGroupRights() {
                   )}
                 />
 
-                {errors.locations && (
+                {errors.userGrpRights && (
                   <span className="error-message">
-                    {errors.locations.message}
+                    {errors.userGrpRights.message}
                   </span>
                 )}
               </div>
@@ -630,24 +629,24 @@ export default function LocationGroupRights() {
               <div className="bulk-assign">
                 <div className="preset-selector">
                   <Select
-                    options={PERMISSION_PRESETS_LOCATION.map((preset) => ({
+                    options={PERMISSION_PRESETS_USER.map((preset) => ({
                       value: preset.id,
                       label: preset.name,
                       description: preset.description,
                     }))}
                     menuPortalTarget={document.body}
                     menuPosition="fixed"
-                    placeholder="Apply permission preset..."
-                    styles={{
+                     styles={{
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                       menu: (base) => ({ ...base, zIndex: 9999 }),
                     }}
+                    placeholder="Apply permission preset..."
                     isSearchable={false}
                     value={
                       selectedPreset
                         ? {
                             value: selectedPreset,
-                            label: PERMISSION_PRESETS_LOCATION.find(
+                            label: PERMISSION_PRESETS_USER.find(
                               (p) => p.id === selectedPreset,
                             )?.name,
                           }
@@ -789,7 +788,7 @@ export default function LocationGroupRights() {
                                     onChange={(e) =>
                                       toggleColumnPermission(
                                         module.id,
-                                        "egrView",
+                                        "ugrView",
                                         e.target.checked,
                                       )
                                     }
@@ -803,7 +802,7 @@ export default function LocationGroupRights() {
                                     onChange={(e) =>
                                       toggleColumnPermission(
                                         module.id,
-                                        "egrAdd",
+                                        "ugrAdd",
                                         e.target.checked,
                                       )
                                     }
@@ -817,7 +816,7 @@ export default function LocationGroupRights() {
                                     onChange={(e) =>
                                       toggleColumnPermission(
                                         module.id,
-                                        "egrEdit",
+                                        "ugrEdit",
                                         e.target.checked,
                                       )
                                     }
@@ -831,7 +830,7 @@ export default function LocationGroupRights() {
                                     onChange={(e) =>
                                       toggleColumnPermission(
                                         module.id,
-                                        "egrDelete",
+                                        "ugrDelete",
                                         e.target.checked,
                                       )
                                     }
@@ -845,7 +844,7 @@ export default function LocationGroupRights() {
                                     onChange={(e) =>
                                       toggleColumnPermission(
                                         module.id,
-                                        "egrPrint",
+                                        "ugrPrint",
                                         e.target.checked,
                                       )
                                     }
@@ -857,15 +856,15 @@ export default function LocationGroupRights() {
 
                             <tbody>
                               {filteredScreens.map((screen) => (
-                                <tr key={screen.egrEntityGroupRightID}>
+                                <tr key={screen.ugrUserGroupRightID}>
                                   <td>
                                     <input
                                       type="checkbox"
                                       checked={selectedRowIds.has(
-                                        screen.egrEntityGroupRightID,
+                                        screen.ugrUserGroupRightID,
                                       )}
                                       onChange={() =>
-                                        toggleSet(screen.egrEntityGroupRightID)
+                                        toggleSet(screen.ugrUserGroupRightID)
                                       }
                                     />
                                   </td>
@@ -881,12 +880,12 @@ export default function LocationGroupRights() {
                                   <td>
                                     <input
                                       type="checkbox"
-                                      checked={screen.egrView}
+                                      checked={screen.ugrView}
                                       onChange={(e) =>
                                         handlePermissionChange(
                                           module.id,
-                                          screen.egrEntityGroupRightID,
-                                          "egrView",
+                                          screen.ugrUserGroupRightID,
+                                          "ugrView",
                                           e.target.checked,
                                         )
                                       }
@@ -896,12 +895,12 @@ export default function LocationGroupRights() {
                                   <td>
                                     <input
                                       type="checkbox"
-                                      checked={screen.egrAdd}
+                                      checked={screen.ugrAdd}
                                       onChange={(e) =>
                                         handlePermissionChange(
                                           module.id,
-                                          screen.egrEntityGroupRightID,
-                                          "egrAdd",
+                                          screen.ugrUserGroupRightID,
+                                          "ugrAdd",
                                           e.target.checked,
                                         )
                                       }
@@ -911,12 +910,12 @@ export default function LocationGroupRights() {
                                   <td>
                                     <input
                                       type="checkbox"
-                                      checked={screen.egrEdit}
+                                      checked={screen.ugrEdit}
                                       onChange={(e) =>
                                         handlePermissionChange(
                                           module.id,
-                                          screen.egrEntityGroupRightID,
-                                          "egrEdit",
+                                          screen.ugrUserGroupRightID,
+                                          "ugrEdit",
                                           e.target.checked,
                                         )
                                       }
@@ -926,12 +925,12 @@ export default function LocationGroupRights() {
                                   <td>
                                     <input
                                       type="checkbox"
-                                      checked={screen.egrDelete}
+                                      checked={screen.ugrDelete}
                                       onChange={(e) =>
                                         handlePermissionChange(
                                           module.id,
-                                          screen.egrEntityGroupRightID,
-                                          "egrDelete",
+                                          screen.ugrUserGroupRightID,
+                                          "ugrDelete",
                                           e.target.checked,
                                         )
                                       }
@@ -941,12 +940,12 @@ export default function LocationGroupRights() {
                                   <td>
                                     <input
                                       type="checkbox"
-                                      checked={screen.egrPrint}
+                                      checked={screen.ugrPrint}
                                       onChange={(e) =>
                                         handlePermissionChange(
                                           module.id,
-                                          screen.egrEntityGroupRightID,
-                                          "egrPrint",
+                                          screen.ugrUserGroupRightID,
+                                          "ugrPrint",
                                           e.target.checked,
                                         )
                                       }

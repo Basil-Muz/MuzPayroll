@@ -6,6 +6,7 @@ import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 // Third-party UI libraries & icons
 import Select from "react-select";
 import DatePicker from "react-datepicker";
+import { useSearchParams } from "react-router-dom";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
 //Constants
@@ -24,11 +25,15 @@ import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
 //service
 import { saveCompany } from "../../services/company.service";
 import { getCompanyAmendList } from "../../services/company.service";
+import { fetchSideBar } from "../../services/menu.service";
 
+import { useLoader } from "../../context/LoaderContext";
 import { useAuth } from "../../context/AuthProvider";
 
 //Utils (Helpers)
 import { formatDate } from "../../utils/dateFormater";
+import { ensureMinDuration } from "../../utils/loaderDelay";
+import { getFloatingActions } from "../../utils/setActionButtons";
 
 //  Components
 import ThemeToggle from "../../components/ThemeToggle/ThemeToggle";
@@ -44,6 +49,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 export default function GenaralCompanyForm() {
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
+  const [backendPermissions, setBackendPermissions] = useState();
   // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
   // const UserData = localStorage.getItem("loginData");
@@ -59,6 +65,11 @@ export default function GenaralCompanyForm() {
   const userCode = user.userCode.split("@", 1)[0];
 
   const { companyId } = useParams();
+
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
+
+  const { showRailLoader, hideLoader } = useLoader();
 
   //Fetch company amend data
   const {
@@ -233,27 +244,22 @@ export default function GenaralCompanyForm() {
     !isVerifiedAmendment &&
     ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
 
-  // console.log("Can save", canSave);
-  // const canSave =
-  //   !isVerifiedAmendment &&
-  //   // Amendment mode: user changed something
-  //   ((isAmendMode && hasUserChanges) ||
-  //     // New entry mode: complete all steps + valid docs
-  //     (!isAmendMode && isLastStep && documentsValid));
+  const setSidebar = async () => {
+    const res = await fetchSideBar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+    );
+    // console.log("Response", res.data);
+    setBackendPermissions(res.data);
+  };
 
-  // useEffect(() => {
-  //   if (!watchedDocuments?.length) {
-  //     console.log("Documents chnaged");
-  //     setSubmitStatus(1);
-  //     return;
-  //   }
-
-  //   const hasEmptyFile = watchedDocuments.some(
-  //     (doc) => !doc?.file || doc.file.length === 0,
-  //   );
-  //   console.log("Documents chnaged", hasEmptyFile);
-  //   setSubmitStatus(hasEmptyFile ? 1 : 0);
-  // }, [watchedDocuments]);
+  useEffect(() => {
+    setSidebar();
+  }, [optionid]);
 
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });
@@ -317,14 +323,6 @@ export default function GenaralCompanyForm() {
   const handleSelectAmendment = (id, index) => {
     // User Selecetion - Assign the amend data to feild
     setSelectedAmendment(amendments[index]);
-
-    // setAmendmentData(amendments[index]);
-    // setValue("shortName", amendments[index].shortName);
-
-    // setValue("company", amendments[index].company, {
-    //   shouldDirty: true,
-    //   shouldValidate: true,
-    // });
   };
 
   const { handleClear } = useFormClear({
@@ -334,6 +332,17 @@ export default function GenaralCompanyForm() {
     reset,
     userCode,
   });
+
+  const handleRefresh = async () => {
+    const startTime = Date.now();
+    showRailLoader("Refreshing...");
+    if (amendLenght > 0) fetchEntityAmendData(companyId);
+
+    await ensureMinDuration(startTime, 1200);
+    hideLoader();
+    // if(amendLenght === 0)
+    // datePickerRef.current?.setOpen(true);
+  };
 
   return (
     <>
@@ -737,40 +746,25 @@ export default function GenaralCompanyForm() {
           </div>
         </div>
         <FloatingActionBar
-          actions={{
-            save: {
-              onClick: handleSubmit(onSubmit),
-              // disabled:true,
-              // disabled: step < steps.length - 1 && submitStatus == 1,
-              disabled: !canSave,
+          actions={getFloatingActions(
+            backendPermissions,
+            {
+              handleSave: handleSubmit(onSubmit),
+              handleClear,
+              handleRefresh,
+              // handleSearch,
+              // handleNew,
+              // handleDelete,
+              // handlePrint,
             },
-            search: {
-              // onClick: handleSearch,
-              disabled: true,
+            {
+              canSave: !canSave, // because disabled: canSave
+              canSearch: true, // true → disabled
+              canClear: false, // false → enabled
+              canRefresh: false, // false → enabled
             },
-            clear: {
-              onClick: handleClear,
-              // disabled:true,
-            },
-            // delete: {
-            //   // onClick: handleDelete,
-            //   // disabled: !hasDeletePermission
-            //   disabled: true,
-            // },
-            print: {
-              // onClick: handlePrint,
-              // disabled: isNewRecord
-              disabled: true,
-            },
-            // new: {
-            // onClick: toggleForm,
-            //to toggle the designation form
-            // },
-            refresh: {
-              // onClick: () => window.location.reload(),
-              // Refresh the page
-            },
-          }}
+            ["new", "save", "clear", "search", "refresh"],
+          )}
         />
       </div>
       <ThemeToggle></ThemeToggle>

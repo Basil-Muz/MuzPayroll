@@ -92,7 +92,7 @@ export const useSaveForm = ({
       //setCanSave(false);     // disable save button
       toast.success(entity + " saved successfully!");
       setStep(0); //Goes to step 1
-      console.log("Has Amend", isFirstAmend);
+      // console.log("Has Amend", isFirstAmend);
       // reset only on success
       if (!isFirstAmend) {
         await refreshAmendments(entityId); // fetch the amendment data

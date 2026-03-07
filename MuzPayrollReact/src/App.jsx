@@ -35,6 +35,7 @@ import LocationList from "./pages/LocationPage/LocationList.jsx";
 import StatusUpdate from "./pages/StatusUpdate/StatusUpdate.jsx";
 
 import UserGroup from "./pages/UserGroup/usergroup.jsx";
+import UserGrpRights from "./pages/UserGrpRights/UserGrpRights.jsx"
 import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
 import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 
@@ -170,6 +171,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <SiteMap />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/usergrouprights"
+            element={
+              <ProtectedRoute>
+                <UserGrpRights />
               </ProtectedRoute>
             }
           />

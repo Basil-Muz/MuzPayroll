@@ -21,3 +21,23 @@ export const fetchMainMenu = (
     }
   });
 };
+
+export const fetchSideBar = (
+  transtype,
+  transsubtype,
+  userId,
+  solutionId,
+  optionid,
+  entityHierarchyId
+) => {
+  return api.get(`/menu/sidebar`, {
+    params: {
+      transtype,
+      transsubtype,
+      userId,
+      solutionId,
+      optionid,
+      entity_hierarchy_id:entityHierarchyId,
+    }
+  });
+};
