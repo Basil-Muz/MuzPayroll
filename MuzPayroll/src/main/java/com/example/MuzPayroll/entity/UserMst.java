@@ -25,10 +25,9 @@ public class UserMst {
     @Column(nullable = false, length = 255)
     private String password;
 
-   @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UsmEntityHierarchyID", nullable = false)
     private EntityHierarchyInfo UsmEntityHierarchyID;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UsmUserTypeID", nullable = false)
@@ -40,8 +39,7 @@ public class UserMst {
     @Column(nullable = false)
     private Boolean UsmChangePasswordOnNextLogin;
 
-
-    @ManyToOne
+   @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UsmDefaultEntityHierarchyID", nullable = false)
     private EntityHierarchyInfo UsmDefaultEntityHierarchyID;
 
@@ -62,18 +60,6 @@ public class UserMst {
 
     @Column(nullable = false)
     private Integer userAttempt = 0;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CompanyID", nullable = false)
-    private CompanyMst companyEntity;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BranchID", nullable = false)
-    private BranchMst branchEntity;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LocationID", nullable = false)
-    private LocationMst locationEntity;
 
     public Long getUserMstID() {
         return userMstID;
@@ -131,30 +117,6 @@ public class UserMst {
         this.userAttempt = userAttempt;
     }
 
-    public CompanyMst getCompanyEntity() {
-        return companyEntity;
-    }
-
-    public void setCompanyEntity(CompanyMst companyEntity) {
-        this.companyEntity = companyEntity;
-    }
-
-    public BranchMst getBranchEntity() {
-        return branchEntity;
-    }
-
-    public void setBranchEntity(BranchMst branchEntity) {
-        this.branchEntity = branchEntity;
-    }
-
-    public LocationMst getLocationEntity() {
-        return locationEntity;
-    }
-
-    public void setLocationEntity(LocationMst locationEntity) {
-        this.locationEntity = locationEntity;
-    }
-
     public EntityHierarchyInfo getUsmEntityHierarchyID() {
         return UsmEntityHierarchyID;
     }
@@ -162,7 +124,6 @@ public class UserMst {
     public void setUsmEntityHierarchyID(EntityHierarchyInfo usmEntityHierarchyID) {
         UsmEntityHierarchyID = usmEntityHierarchyID;
     }
-
 
     public UserTypeMst getUserTypeMst() {
         return userTypeMst;
@@ -211,6 +172,7 @@ public class UserMst {
     public void setUsmTransValidYN(Boolean UsmTransValidYN) {
         this.UsmTransValidYN = UsmTransValidYN;
     }
+
     public EntityHierarchyInfo getUsmDefaultEntityHierarchyID() {
         return UsmDefaultEntityHierarchyID;
     }

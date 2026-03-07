@@ -15,11 +15,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.MuzPayroll.entity.DTO.AmendListDTO;
+import com.example.MuzPayroll.entity.DTO.EntityDataDTO;
 import com.example.MuzPayroll.entity.DTO.EntityMstDTO;
 import com.example.MuzPayroll.entity.DTO.FormListDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.entity.DTO.UserEntityDTO;
+import com.example.MuzPayroll.entity.EntityLog;
 import com.example.MuzPayroll.entity.EntityMst;
+import com.example.MuzPayroll.repository.EntityLogRepository;
 import com.example.MuzPayroll.repository.EntityRepository;
 import com.example.MuzPayroll.service.EntityService;
 
@@ -33,6 +37,9 @@ public class EntityController {
 
     @Autowired
     private EntityRepository entityRepository;
+
+    @Autowired
+    private EntityLogRepository entityLogRepository;
 
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<EntityMstDTO> saveCompany(
@@ -50,12 +57,25 @@ public class EntityController {
         }
     }
 
-    // TO get the amend the List of Logs y using MstID
-    @GetMapping("/gelist")
-    public List<EntityMstDTO> getEntityAmendList(
-            @RequestParam Long Id) {
+    // TO get the amend the List of Logs using MstID
+    @GetMapping("/amenddata")
+    public ResponseEntity<List<AmendListDTO>> getEntityAmendList(
+            @RequestParam Long etmEntityID) {
 
-        return entityService.getAmendList(Id);
+        List<EntityLog> list = entityLogRepository.findAllAmendList(etmEntityID);
+
+        List<AmendListDTO> response = list.stream()
+                .map(entity -> {
+                    AmendListDTO dto = new AmendListDTO();
+                    dto.setMstID(entity.getEntityLogPK().getEtmEntityID());
+                    dto.setAmendNo(entity.getAmendNo());
+                    dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
+                    dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
+                    dto.setRowNo(entity.getEntityLogPK().getRowNo());
+                    return dto;
+                })
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     // TO get the companyMst and the List of Logs y using MstID
@@ -64,6 +84,17 @@ public class EntityController {
 
         EntityMstDTO dto = entityService.getEntityWithLogs(ID);
         return ResponseEntity.ok(dto);
+    }
+
+    // TO get the Mst data and the log data
+    @GetMapping("/editmodefill")
+    public ResponseEntity<List<EntityDataDTO>> editmodeFill(
+            @RequestParam Long etmEntityID,
+            @RequestParam Long mccId,
+            @RequestParam Long amendNo) {
+
+        return ResponseEntity.ok(
+                entityLogRepository.getEntityLogs(etmEntityID, mccId, String.valueOf(amendNo)));
     }
 
     @GetMapping("/fetchCompany")

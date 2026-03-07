@@ -277,9 +277,9 @@ const GeneralInfoForm = function GeneralInfoForm({
               {...register("EtmCode", {
                 required: "Code is required",
                 pattern: {
-                  value: /^[A-Z]{2,5}\d{3}$/,
+                  value: /^[A-Z]{3,11}$/,
                   message:
-                    "Code must be uppercase letters followed by 3 digits (e.g., CMP001)",
+                    "Code must contain only uppercase letters and be between 3 and 11 characters",
                 },
                 onChange: (e) => {
                   const value = e.target.value;

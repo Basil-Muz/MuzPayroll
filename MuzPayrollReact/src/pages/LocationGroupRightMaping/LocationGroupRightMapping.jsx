@@ -45,7 +45,7 @@ const initData = [
 
 const PAGE_SIZE = 8;
 
-export default function LocationGroupRightsMapping() {
+export default function () {
   const [rows, setRows] = useState(initData);
 
   // const [branchFilter, setBranchFilter] = useState("ALL");
@@ -467,7 +467,6 @@ export default function LocationGroupRightsMapping() {
         ${errors.branches ? "error" : ""}
         ${isSearchApplied ? "read-only" : ""}
       `}
-                      /* 🔥 IMPORTANT FIX */
                       value={
                         branchOptions.find(
                           (opt) => opt.value === field.value,
