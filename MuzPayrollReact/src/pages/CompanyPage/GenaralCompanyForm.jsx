@@ -21,11 +21,11 @@ import { useGenerateAmend } from "../../hooks/useGenerateAmend";
 import { useSmoothFormFocus } from "../../hooks/useSmoothFormFocus";
 import { useEntityAmendList } from "../../hooks/useEntityAmendList";
 import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
 
 //service
 import { saveCompany } from "../../services/company.service";
 import { getCompanyAmendList } from "../../services/company.service";
-import { fetchSideBar } from "../../services/menu.service";
 
 import { useLoader } from "../../context/LoaderContext";
 import { useAuth } from "../../context/AuthProvider";
@@ -50,17 +50,10 @@ import "react-datepicker/dist/react-datepicker.css";
 export default function GenaralCompanyForm() {
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
   const [backendPermissions, setBackendPermissions] = useState();
-  // const authDateInputRef = useRef(null);
   const generalInfoRef = useRef(null);
-  // const UserData = localStorage.getItem("loginData");
-  // const userObj = JSON.parse(UserData);
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
-  //Convert the JSON string to objects
-  // const userCode = userObj.userCode.split("@", 1)[0];
 
   const { user } = useAuth();
-
-  //  const userId = user.userMstId;
 
   const userCode = user.userCode.split("@", 1)[0];
 
@@ -133,6 +126,8 @@ export default function GenaralCompanyForm() {
     fieldMap: COMMON_ENTITY_FIELD_MAP,
   });
 
+  const { setSidebar } = useSidebarPermissions();
+
   // From content changes
   const [formFlags] = useState({
     companyForm: true,
@@ -149,7 +144,7 @@ export default function GenaralCompanyForm() {
     control,
     name: "withaffectdate",
   });
-
+  let isUnlocked = !!authDate;
   //Handle the generate new amend
   const { handleGenerateAmendment } = useGenerateAmend({
     setSelectedAmendment,
@@ -157,6 +152,7 @@ export default function GenaralCompanyForm() {
     reset,
     getValues,
     clearErrors,
+    isUnlocked,
   });
 
   const { onSubmit, step, setStep, datePickerRef } = useSaveForm({
@@ -177,7 +173,7 @@ export default function GenaralCompanyForm() {
   });
 
   //workflow of amend date then name logic
-  let isUnlocked = !!authDate;
+
   if (amendments.length > 0) {
     isUnlocked = true;
   } else {
@@ -244,21 +240,16 @@ export default function GenaralCompanyForm() {
     !isVerifiedAmendment &&
     ((isAmendMode && isDirty) || (!isAmendMode && isLastStep));
 
-  const setSidebar = async () => {
-    const res = await fetchSideBar(
+  useEffect(() => {
+    setSidebar(
       "OPTION_RIGHTS",
       "",
       user.userMstId,
       user.solutionId,
       optionid,
       user.userEntityHierarchyId,
+      setBackendPermissions,
     );
-    // console.log("Response", res.data);
-    setBackendPermissions(res.data);
-  };
-
-  useEffect(() => {
-    setSidebar();
   }, [optionid]);
 
   useEffect(() => {
@@ -334,12 +325,12 @@ export default function GenaralCompanyForm() {
   });
 
   const handleRefresh = async () => {
-    const startTime = Date.now();
-    showRailLoader("Refreshing...");
-    if (amendLenght > 0) fetchEntityAmendData(companyId);
+    // const startTime = Date.now();
+    // showRailLoader("Refreshing...");
+    if (amendLenght > 0) await fetchEntityAmendData(companyId);
 
-    await ensureMinDuration(startTime, 1200);
-    hideLoader();
+    // await ensureMinDuration(startTime, 1200);
+    // hideLoader();
     // if(amendLenght === 0)
     // datePickerRef.current?.setOpen(true);
   };

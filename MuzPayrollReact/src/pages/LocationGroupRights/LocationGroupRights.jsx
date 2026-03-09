@@ -33,7 +33,7 @@ const MODULES_PER_PAGE = 3;
 export default function LocationGroupRights() {
   const { showRailLoader, hideLoader } = useLoader();
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
-  const [bulkGroup, setBulkGroup] = useState([]);
+  // const [bulkGroup, setBulkGroup] = useState([]);
   const [modules, setModules] = useState([]);
   const [originalModules, setOriginalModules] = useState([]);
   const [page, setPage] = useState(1);
@@ -56,7 +56,7 @@ export default function LocationGroupRights() {
 
   useEffect(() => {
     fetchDropDown();
-  }, []);
+  },[]);
 
   // Calculate changed screens whenever modules change
   useEffect(() => {
@@ -200,22 +200,22 @@ export default function LocationGroupRights() {
   };
 
   // Toggle entire column permission for a module
-  const toggleColumnPermission = (moduleId, permission, value) => {
-    setModules((prev) =>
-      prev.map((module) => {
-        if (module.id !== moduleId) return module;
+  // const toggleColumnPermission = (moduleId, permission, value) => {
+  //   setModules((prev) =>
+  //     prev.map((module) => {
+  //       if (module.id !== moduleId) return module;
 
-        return {
-          ...module,
-          screens: module.screens.map((screen) => ({
-            ...screen,
-            [permission]: value,
-          })),
-        };
-      }),
-    );
-    setSelectedPreset(null);
-  };
+  //       return {
+  //         ...module,
+  //         screens: module.screens.map((screen) => ({
+  //           ...screen,
+  //           [permission]: value,
+  //         })),
+  //       };
+  //     }),
+  //   );
+  //   setSelectedPreset(null);
+  // };
 
   // Toggle module collapse
   const toggleModule = (id) => {
@@ -240,7 +240,9 @@ export default function LocationGroupRights() {
   const applyPresetToSelection = () => {
     if (!selectedPreset || !selectedRowIds.size) return;
 
-    const preset = PERMISSION_PRESETS_LOCATION.find((p) => p.id === selectedPreset);
+    const preset = PERMISSION_PRESETS_LOCATION.find(
+      (p) => p.id === selectedPreset,
+    );
     if (!preset) return;
 
     setModules((prev) =>
@@ -267,7 +269,9 @@ export default function LocationGroupRights() {
   const applyPresetToAll = () => {
     if (!selectedPreset) return;
 
-    const preset = PERMISSION_PRESETS_LOCATION.find((p) => p.id === selectedPreset);
+    const preset = PERMISSION_PRESETS_LOCATION.find(
+      (p) => p.id === selectedPreset,
+    );
     if (!preset) return;
 
     setModules((prev) =>
@@ -293,14 +297,14 @@ export default function LocationGroupRights() {
         businessSolution,
         locationGrpRights,
       );
-      // console.log("DEMO", res.data);
+      console.log("DEMO", res.data);
       const grouped = groupByModule(res.data);
       setModules(grouped);
       setOriginalModules(JSON.parse(JSON.stringify(grouped)));
 
       // Clear selections when new data loads
       setSelectedRowIds(new Set());
-      setBulkGroup([]);
+      // setBulkGroup([]);
       setSelectedPreset(null);
       setModuleSearch({});
       const collapseState = {};
@@ -351,9 +355,9 @@ export default function LocationGroupRights() {
 
   const selectAllOnPage = () => {
     const ids = new Set(selectedRowIds);
-
+    // console.log("Id",collapsedModules)
     paginatedModules.forEach((module) => {
-      const isCollapsed = collapsedModules[module.id];
+      const isCollapsed = collapsedModules[module.id] === true ;
 
       // skip closed modules
       if (isCollapsed) return;
@@ -369,11 +373,11 @@ export default function LocationGroupRights() {
   };
   const selectAllAcrossPages = () => {
     const ids = new Set(selectedRowIds);
+    // console.log("Not p",selectedRowIds);
+    paginatedModules.forEach((module) => {
+      // const isCollapsed = collapsedModules[module.id] === true;
 
-    modules.forEach((module) => {
-      const isCollapsed = collapsedModules[module.id];
-
-      if (isCollapsed) return;
+      // if (isCollapsed) return;
 
       const screens = getFilteredScreens(module);
 
@@ -387,7 +391,7 @@ export default function LocationGroupRights() {
 
   const clearSelection = () => {
     setSelectedRowIds(new Set());
-    setBulkGroup([]);
+    // setBulkGroup([]);
     setSelectedPreset(null);
   };
 
@@ -412,7 +416,7 @@ export default function LocationGroupRights() {
     setOriginalModules([]);
     setPage(1);
     setSelectedRowIds(new Set());
-    setBulkGroup([]);
+    // setBulkGroup([]);
     setChangedScreensCount(0);
     setSelectedPreset(null);
     setModuleSearch({});
@@ -586,7 +590,7 @@ export default function LocationGroupRights() {
                       setIsSearchApplied(false);
                       setShowFilters(true);
                       setSelectedRowIds(new Set());
-                      setBulkGroup([]);
+                      // setBulkGroup([]);
                       setSelectedPreset(null);
                     }}
                   >
@@ -717,7 +721,7 @@ export default function LocationGroupRights() {
             modules.length ? (
               paginatedModules.map((module) => {
                 const filteredScreens = getFilteredScreens(module);
-                const isCollapsed = collapsedModules[module.id];
+                const isCollapsed = collapsedModules[module.id] === true;
 
                 return (
                   <div

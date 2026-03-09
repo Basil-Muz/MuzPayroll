@@ -7,6 +7,9 @@ import DatePicker from "react-datepicker";
 import { useParams } from "react-router-dom";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
+
+import { useLoader } from "../../context/LoaderContext";
 
 //  Hooks
 import { useSaveForm } from "../../hooks/useSaveForm";
@@ -18,13 +21,16 @@ import { useGenerateAmend } from "../../hooks/useGenerateAmend";
 import { useEntityAmendList } from "../../hooks/useEntityAmendList";
 import { useSmoothFormFocus } from "../../hooks/useSmoothFormFocus";
 import { useSetAmendmentData } from "../../hooks/useSetAmendmentData";
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
 
 //  Services (API calls)
 import { getLocationAmendList } from "../../services/location.service";
 import { saveLocation } from "../../services/location.service";
 //  Utils / helpers
 import { formatDate } from "../../utils/dateFormater";
+import { ensureMinDuration } from "../../utils/loaderDelay";
 import { handleApiError } from "../../utils/errorToastResolver";
+import { getFloatingActions } from "../../utils/setActionButtons";
 
 //  Constants
 import { steps } from "../../constants/FormSteps";
@@ -47,7 +53,7 @@ export default function GenaralLocationForm() {
    * 1. LOCAL STATE & REFS
    * ------------------------------------------------------------------ */
   const [addingNewAmend, setAddingNewAmend] = useState(false);
-
+  const [backendPermissions, setBackendPermissions] = useState();
   const generalInfoRef = useRef(null);
   const dateWrapperRef = useRef(null);
   const cancelledRef = useRef(false);
@@ -60,12 +66,15 @@ export default function GenaralLocationForm() {
   const userCode = user.userCode.split("@", 1)[0];
   const userId = user.userMstId;
   const companyId = user.userEntityHierarchyId;
-console.log("Userfgfdg",user)
+  const branchId = user.branchEntityHierarchyId;
+
+  // console.log("Userfgfdg", user.branchEntityHierarchyId);
   /* ------------------------------------------------------------------
    * 3. ROUTE PARAMS
    * ------------------------------------------------------------------ */
   const { locationId } = useParams();
-
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
   /* ------------------------------------------------------------------
    * 4. DOMAIN / BUSINESS HOOKS
    * ------------------------------------------------------------------ */
@@ -80,10 +89,10 @@ console.log("Userfgfdg",user)
     addingNewAmend,
     setAddingNewAmend,
   });
-
+  const { showRailLoader, hideLoader } = useLoader();
   const { loadCompany, companyList } = useLoadCompany();
   const { loadBranches, branchList } = useLoadBranch();
-
+  const { setSidebar } = useSidebarPermissions();
   /* ------------------------------------------------------------------
    * 5. FORM INITIALIZATION (React Hook Form)
    * ------------------------------------------------------------------ */
@@ -221,7 +230,17 @@ console.log("Userfgfdg",user)
     setValue,
     fieldMap: COMMON_LOCATION_FIELD_MAP,
   });
-
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid, user, setSidebar]);
   /* ------------------------------------------------------------------
    * 11. EVENT HANDLERS
    * ------------------------------------------------------------------ */
@@ -236,19 +255,16 @@ console.log("Userfgfdg",user)
     clearErrors,
     reset,
     userCode,
+    ids: { companyId ,branchId},
   });
 
   /* ------------------------------------------------------------------
    * 12. SIDE EFFECTS
    * ------------------------------------------------------------------ */
-  const load = useCallback(async () => {
-    try {
-      loadBranches(userId, companyId);
-      loadCompany(userId);
-    } catch (err) {
-      if (!cancelledRef.current) handleApiError(err);
-    }
-  }, [userId, loadBranches,loadCompany ,companyId]);
+const load = useCallback(async () => {
+  await loadBranches(userId, companyId);
+  await loadCompany(userId);
+}, [userId, companyId, loadBranches, loadCompany]);
 
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });
@@ -676,39 +692,25 @@ console.log("Userfgfdg",user)
           </div>
         </div>
         <FloatingActionBar
-          actions={{
-            save: {
-              onClick: handleSubmit(onSubmit),
-              // disabled:true,
-              disabled: !canSave,
+          actions={getFloatingActions(
+            backendPermissions,
+            {
+              handleSave: handleSubmit(onSubmit),
+              handleClear,
+              handleRefresh: load,
+              // handleSearch,
+              // handleNew,
+              // handleDelete,
+              // handlePrint,
             },
-            search: {
-              // onClick: handleSearch,
-              disabled: true,
+            {
+              canSave: !canSave, // because disabled: canSave
+              canSearch: true, // true → disabled
+              canClear: false, // false → enabled
+              canRefresh: false, // false → enabled
             },
-            clear: {
-              onClick: handleClear,
-              // disabled:true,
-            },
-            // delete: {
-            //   // onClick: handleDelete,
-            //   // disabled: !hasDeletePermission
-            //   disabled: true,
-            // },
-            print: {
-              // onClick: handlePrint,
-              // disabled: isNewRecord
-              disabled: true,
-            },
-            // new: {
-            // onClick: toggleForm,
-            //to toggle the designation form
-            // },
-            refresh: {
-              onClick: load,
-              // Refresh the page
-            },
-          }}
+            ["new", "save", "clear", "search", "refresh"],
+          )}
         />
       </div>
       <ThemeToggle></ThemeToggle>

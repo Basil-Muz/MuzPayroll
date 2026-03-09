@@ -14,7 +14,10 @@ import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 //service
 import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
 import { getUserGroupsList } from "../../services/usergroup.service.js";
-import { getUserGrpRightsList, saveUserGrpRights } from "../../services/userGrpRights.service.js";
+import {
+  getUserGrpRightsList,
+  saveUserGrpRights,
+} from "../../services/userGrpRights.service.js";
 
 import { useAuth } from "../../context/AuthProvider.jsx";
 
@@ -196,7 +199,8 @@ export default function LocationGroupRights() {
     );
     setSelectedPreset(null);
   };
-  console.log("user",user)
+  // console.log("user",user)
+
   // Toggle entire column permission for a module
   const toggleColumnPermission = (moduleId, permission, value) => {
     setModules((prev) =>
@@ -293,7 +297,7 @@ export default function LocationGroupRights() {
       );
 
       const grouped = groupByModule(res.data);
-        console.log("DEMO", grouped);
+      console.log("DEMO", grouped);
       setModules(grouped);
       setOriginalModules(JSON.parse(JSON.stringify(grouped)));
 
@@ -352,7 +356,7 @@ export default function LocationGroupRights() {
     const ids = new Set(selectedRowIds);
 
     paginatedModules.forEach((module) => {
-      const isCollapsed = collapsedModules[module.id];
+      const isCollapsed = collapsedModules[module.id] === true;
 
       // skip closed modules
       if (isCollapsed) return;
@@ -370,9 +374,9 @@ export default function LocationGroupRights() {
     const ids = new Set(selectedRowIds);
 
     modules.forEach((module) => {
-      const isCollapsed = collapsedModules[module.id];
+      // const isCollapsed = collapsedModules[module.id] === true;
 
-      if (isCollapsed) return;
+      // if (isCollapsed) return;
 
       const screens = getFilteredScreens(module);
 
@@ -636,7 +640,7 @@ export default function LocationGroupRights() {
                     }))}
                     menuPortalTarget={document.body}
                     menuPosition="fixed"
-                     styles={{
+                    styles={{
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                       menu: (base) => ({ ...base, zIndex: 9999 }),
                     }}
@@ -727,6 +731,11 @@ export default function LocationGroupRights() {
                       className={`module-header ${isCollapsed ? "collapsed" : ""}`}
                       onClick={() => toggleModule(module.id)}
                     >
+                      {/* <input
+                        type="checkbox"
+                        // checked={selectedRowIds.has(screen.ugrUserGroupRightID)}
+                        onChange={() => toggleColumnPermission(module.id,screen.ugrUserGroupRightID)}
+                      /> */}
                       <h4 className="module-title">
                         {isCollapsed ? <FaChevronRight /> : <FaChevronDown />}
                         {module.name}

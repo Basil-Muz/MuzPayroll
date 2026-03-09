@@ -188,7 +188,7 @@
 /* tiles */
 .tile-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
   margin-bottom: 18px;
 }
@@ -514,13 +514,6 @@
 }
 
 /* ===================== TILE GRID ===================== */
-
-.tile-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 16px;
-  margin-bottom: 18px;
-}
 
 @media (max-width: 1024px) {
   .tile-row {

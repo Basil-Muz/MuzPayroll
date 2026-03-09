@@ -6,6 +6,8 @@ import { useParams } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { useSearchParams } from "react-router-dom";
+
 import GeneralInfoForm from "./General Info/GeneralInfoForm";
 import AddressForm from "./General Info/AddressForm";
 import ContactForm from "./General Info/ContactForm";
@@ -17,15 +19,18 @@ import ThemeToggle from "../../../components/ThemeToggle/ThemeToggle";
 import ScrollToTopButton from "../../../components/ScrollToTop/ScrollToTopButton";
 
 //Hook (flow control)
+import { useSidebarPermissions } from "../../../hooks/useSidebarPermissions";
 import { useSetAmendmentData } from "../../../hooks/useSetAmendmentData";
 import { useEntityAmendList } from "../../../hooks/useEntityAmendList";
 import { useSmoothFormFocus } from "../../../hooks/useSmoothFormFocus";
-import { useLoadCompany } from "../../../hooks/useLoadCompany";
 import { useGenerateAmend } from "../../../hooks/useGenerateAmend";
 import { useFormStepper } from "../../../hooks/useFormStepper";
+import { useLoadCompany } from "../../../hooks/useLoadCompany";
 import { useSaveForm } from "../../../hooks/useSaveForm";
 
-import { useAuth } from "../../../context/AuthProvider"
+import { useAuth } from "../../../context/AuthProvider";
+import { useLoader } from "../../../context/LoaderContext";
+import { useFormClear } from "../../../hooks/useFormClear";
 
 //service
 import { getBranchAmendList } from "../../../services/branch.service";
@@ -37,24 +42,27 @@ import { COMMON_BRANCH_FIELD_MAP } from "../../../constants/branchFieldMap";
 
 //Utils (Helpers)
 import { formatDate } from "../../../utils/dateFormater";
-import { useFormClear } from "../../../hooks/useFormClear";
+import { ensureMinDuration } from "../../../utils/loaderDelay";
+import { getFloatingActions } from "../../../utils/setActionButtons";
 
 export default function GenaralBranchForm() {
   const [addingNewAmend, setAddingNewAmend] = useState(false); // enables the auth date and hide generate amned button
+  const [backendPermissions, setBackendPermissions] = useState();
   const dateWrapperRef = useRef(null); // to scroll in to controller of date picker
   const generalInfoRef = useRef(null);
   // const UserData = localStorage.getItem("loginData");
   // const userObj = JSON.parse(UserData);
 
   //Convert the JSON string to objects
-  const { user } = useAuth()
+  const { user } = useAuth();
 
-   const userId = user.userMstId;
- const userCode = user.userCode.split("@", 1)[0];
-  // const companyId = userObj.companyId;
+  const userId = user.userMstId;
+  const userCode = user.userCode.split("@", 1)[0];
 
-
-  console.log("Userid",user)
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
+  // console.log("Userid", user);
+  const companyId = user.userEntityHierarchyId;
   //Fetch company amendmends data
   const {
     amendments,
@@ -70,6 +78,8 @@ export default function GenaralBranchForm() {
   });
 
   const { loadCompany, companyList } = useLoadCompany(); //  Fetch the company with company id
+
+  const { showRailLoader, hideLoader } = useLoader();
 
   const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
 
@@ -109,7 +119,7 @@ export default function GenaralBranchForm() {
   });
 
   const { branchId } = useParams(); // perameter from url
-
+  const { setSidebar } = useSidebarPermissions();
   const amendLenght = amendments.length;
 
   //seting amend data with selected amend pill
@@ -118,7 +128,15 @@ export default function GenaralBranchForm() {
     setValue,
     fieldMap: COMMON_BRANCH_FIELD_MAP,
   });
+    const authDate = watch("withaffectdate");
+    let isUnlocked = !!authDate;
+      //workflow of amend date then name logic
 
+  if (amendments.length > 0) {
+    isUnlocked = true;
+  } else {
+    isUnlocked = !!authDate;
+  }
   //  handle generate amendmend
   const { handleGenerateAmendment } = useGenerateAmend({
     setSelectedAmendment,
@@ -126,6 +144,7 @@ export default function GenaralBranchForm() {
     reset,
     getValues,
     clearErrors,
+    isUnlocked,
     // setIsReadOnly,
   });
 
@@ -141,15 +160,7 @@ export default function GenaralBranchForm() {
     saveEntity: saveBranch,
   });
 
-  const authDate = watch("withaffectdate"); //  workflow of amend date then name logic
-
-  //workflow of amend date then name logic
-  let isUnlocked = !!authDate;
-  if (amendments.length > 0) {
-    isUnlocked = true;
-  } else {
-    isUnlocked = !!authDate;
-  }
+ //  workflow of amend date then name logic
 
   // From content changes
   const [formFlags] = useState({
@@ -223,6 +234,18 @@ export default function GenaralBranchForm() {
           amendments[0],
         )
     : null;
+
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
 
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });
@@ -324,7 +347,20 @@ export default function GenaralBranchForm() {
     clearErrors,
     reset,
     userCode,
+    ids: { companyId },
   });
+
+  const handleRefresh = async () => {
+    const startTime = Date.now();
+    showRailLoader("Refreshing...");
+    if (amendLenght > 0) fetchEntityAmendData(branchId);
+
+    await ensureMinDuration(startTime, 1200);
+    hideLoader();
+    // if(amendLenght === 0)
+    // datePickerRef.current?.setOpen(true);
+  };
+
   // const handleClear = () => {
   //   if (selectedAmendment) {
   //     // Restore selected amendment values
@@ -753,39 +789,25 @@ export default function GenaralBranchForm() {
           </div>
         </div>
         <FloatingActionBar
-          actions={{
-            save: {
-              onClick: handleSubmit(onSubmit),
-              // disabled:true,
-              disabled: !canSave,
+          actions={getFloatingActions(
+            backendPermissions,
+            {
+              handleSave: handleSubmit(onSubmit),
+              handleClear,
+              handleRefresh,
+              // handleSearch,
+              // handleNew,
+              // handleDelete,
+              // handlePrint,
             },
-            search: {
-              // onClick: handleSearch,
-              disabled: true,
+            {
+              canSave: !canSave, // because disabled: canSave
+              canSearch: true, // true → disabled
+              canClear: false, // false → enabled
+              canRefresh: false, // false → enabled
             },
-            clear: {
-              onClick: handleClear,
-              // disabled:true,
-            },
-            // delete: {
-            //   // onClick: handleDelete,
-            //   // disabled: !hasDeletePermission
-            //   disabled: true,
-            // },
-            print: {
-              // onClick: handlePrint,
-              // disabled: isNewRecord
-              disabled: true,
-            },
-            // new: {
-            // onClick: toggleForm,
-            //to toggle the designation form
-            // },
-            refresh: {
-              // onClick: () => window.location.reload(),
-              // Refresh the page
-            },
-          }}
+            ["new", "save", "clear", "search", "refresh"],
+          )}
         />
       </div>
       <ThemeToggle></ThemeToggle>
