@@ -585,3 +585,54 @@ background: var(--background) !important
 .custom-time-picker button:hover {
   background-color: var(--brand--hover);
 }
+/* ===== USER FORM LAYOUT ===== */
+
+.user-form-wrapper{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:30px;
+}
+
+/* LEFT SIDE */
+.user-fields{
+  flex:1;
+}
+
+/* RIGHT IMAGE */
+.user-image-section{
+  width:110px;
+  display:flex;
+  justify-content:center;
+}
+
+.user-avatar{
+  width:85px;
+  height:85px;
+  border-radius:50%;
+  border:1px solid #ddd;
+  object-fit:cover;
+}
+
+/* INPUT WIDTH REDUCE */
+.modal-usergroup-form .form-row{
+  display:grid;
+  grid-template-columns:140px 240px;
+  align-items:center;
+  gap:10px;
+}
+
+/* USER CODE ALIGN */
+.code-group{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* PASSWORD HINT */
+.password-hint{
+  font-size:11px;
+  color:#888;
+  margin-top:4px;
+  display:block;
+}

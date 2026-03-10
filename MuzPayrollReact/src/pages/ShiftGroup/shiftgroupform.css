@@ -422,9 +422,9 @@ select#status {
 @media (max-width: 768px) {
 
   /* Modal wrapper */
-  .modal-shift-form {
+  /* .modal-shift-form {
 
-  }
+  } */
 .modal-shift-form .form-row {
     display: flex;
     align-items: center;

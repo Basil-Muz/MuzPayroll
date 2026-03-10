@@ -46,6 +46,7 @@ import Reports from "./pages/Reports/Reports.jsx";
 import LocationGroupRights from "./pages/LocationGroupRights/LocationGroupRights.jsx";
 import SiteMap from "./pages/SiteMap/SiteMap.jsx";
 import Department from "./pages/Department/department.jsx";
+import User from "./pages/User/user.jsx"
 
 function App() {
   return (
@@ -80,6 +81,7 @@ function App() {
           <Route path="/designation" element={<Designation />} />
           <Route path="/department" element={<Department />} />
           <Route path="/branchform" element={<BranchPageForm />} />
+          <Route path="/user" element={<User />} />
           <Route
             path="/companyform"
             element={
