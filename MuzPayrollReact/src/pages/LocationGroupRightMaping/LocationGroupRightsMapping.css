@@ -251,14 +251,13 @@
 ================================ */
  .btn-change {
   background-color: var(--background);
-
   color: var(--text);
-  border-color: var(--border);
+  border: 1px solid var(--brand-border) !important;
 }
 
  .btn-change:hover {
   background-color: var(--option-light);
-  border-color: var(--brand-border);
+  border-color: var(--brand-border-light);
 }
 
 .lgr-filters .btn-change:active {
@@ -424,7 +423,7 @@
 ================================ */
 .lgr-filters {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   /* flex-wrap: wrap; */
   gap: 12px;
 

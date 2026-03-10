@@ -198,13 +198,13 @@ export default function Setting() {
         1,
         rowNumber,
       );
-      console.log("Sub menus", response);
+      // console.log("Sub menus", response);
       const sitemapData = buildSitemapFromSubMenuResponse(
         response.data,
         "System Management",
       );
       setSettingsData(sitemapData);
-      console.log("Generated sitemap", sitemapData);
+      // console.log("Generated sitemap", sitemapData);
     } catch (error) {
       handleApiError(error);
     } finally {

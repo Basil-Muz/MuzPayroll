@@ -1,4 +1,4 @@
-// services/user.service.js
+// services/usergroup.service.js
 import api from "../api/axiosInstance";
 
 // Fetch user Group amendment list

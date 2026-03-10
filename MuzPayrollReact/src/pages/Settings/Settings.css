@@ -183,7 +183,7 @@
 }
 
 /* tiles */
-.tile-row {
+/* .tile-row {
   .sidebar button:focus {
     outline: none;
   }
@@ -191,7 +191,7 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
   margin-bottom: 12px;
-}
+} */
 
 .tile-card {
   display: flex;

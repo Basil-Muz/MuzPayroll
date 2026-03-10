@@ -161,7 +161,7 @@ public class LocationController {
                     AmendListDTO dto = new AmendListDTO();
                     dto.setMstID(log.getLocationLogPK().getLocationMstID());
                     dto.setRowNo(log.getLocationLogPK().getRowNo());
-                    dto.setAmendNo(log.getAmendNo());
+                    // dto.setAmendNo(log.getAmendNo());
                     dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
                     dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
                     return dto;

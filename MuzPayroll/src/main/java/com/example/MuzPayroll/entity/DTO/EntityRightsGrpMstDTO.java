@@ -7,11 +7,11 @@ import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.EntityHierarchyInfo;
 import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.EntityRightsGrpLogPK;
-import com.example.MuzPayroll.entity.UserGrpLogPK;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class EntityRightsGrpMstDTO {
-     @JsonIgnore
+
+    @JsonIgnore
     private Authorization authorization;
 
     private List<EntityRightsGrpLogDTO> entityRightsGrpLogDTOs;
@@ -54,6 +54,8 @@ public class EntityRightsGrpMstDTO {
     private Long entityHierarchyInfoID;
 
     private EntityHierarchyInfo HierarchyInfoID;
+
+    private EntityMst entityMst;
 
     public EntityHierarchyInfo getHierarchyInfoID() {
         return HierarchyInfoID;
@@ -192,11 +194,11 @@ public class EntityRightsGrpMstDTO {
     }
 
     // public EntityMst getEntityMst() {
-    //     return entityMst;
+    // return entityMst;
     // }
 
     // public void setEntityMst(EntityMst entityMst) {
-    //     this.entityMst = entityMst;
+    // this.entityMst = entityMst;
     // }
 
     public List<EntityRightsGrpLogDTO> getEntityRightsGrpLogDTOs() {
@@ -213,6 +215,14 @@ public class EntityRightsGrpMstDTO {
 
     public void setEntityRightsGrpLogPK(EntityRightsGrpLogPK entityRightsGrpLogPK) {
         this.entityRightsGrpLogPK = entityRightsGrpLogPK;
+    }
+
+    public EntityMst getEntityMst() {
+        return entityMst;
+    }
+
+    public void setEntityMst(EntityMst entityMst) {
+        this.entityMst = entityMst;
     }
 
 }

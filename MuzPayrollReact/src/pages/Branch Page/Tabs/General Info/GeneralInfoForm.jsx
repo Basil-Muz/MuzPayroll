@@ -277,9 +277,9 @@ const GeneralInfoForm = function GeneralInfoForm({
               {...register("EtmCode", {
                 required: "Code is required",
                 pattern: {
-                  value: /^[A-Z]{2,5}\d{3}$/,
+                  value: /^[A-Z]{3,11}$/,
                   message:
-                    "Code must be uppercase letters followed by 3 digits (e.g., CMP001)",
+                    "Code must contain only uppercase letters and be between 3 and 11 characters",
                 },
                 onChange: (e) => {
                   const value = e.target.value;
@@ -469,7 +469,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
                             // Validate file type
                             if (!file.type.match("image/(png|jpeg|jpg)")) {
-                              setError("EtmImage", {
+                              setError("entityImage", {
                                 type: "manual",
                                 message:
                                   "Only PNG, JPG and JPEG files are allowed",
@@ -479,7 +479,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
                             // Validate file size (5MB max)
                             if (file.size > 5 * 1024 * 1024) {
-                              setError("EtmImage", {
+                              setError("entityImage", {
                                 type: "manual",
                                 message: "File size must be less than 5MB",
                               });
@@ -622,12 +622,12 @@ const GeneralInfoForm = function GeneralInfoForm({
                       </div>
 
                       {/* Error Message */}
-                      {errors.EtmImage && (
+                      {errors.entityImage && (
                         <div className="error-message">
                           {/* <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg> */}
-                          {errors.EtmImage.message}
+                          {errors.entityImage.message}
                         </div>
                       )}
 

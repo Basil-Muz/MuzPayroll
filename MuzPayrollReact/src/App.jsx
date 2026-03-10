@@ -35,6 +35,7 @@ import LocationList from "./pages/LocationPage/LocationList.jsx";
 import StatusUpdate from "./pages/StatusUpdate/StatusUpdate.jsx";
 
 import UserGroup from "./pages/UserGroup/usergroup.jsx";
+import UserGrpRights from "./pages/UserGrpRights/UserGrpRights.jsx"
 import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
 import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 
@@ -175,6 +176,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/usergrouprights"
+            element={
+              <ProtectedRoute>
+                <UserGrpRights />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/payrollgroup" element={<PayrollGroup />} />
           <Route path="/payrollgroupsearch" element={<PayrollGroupSearch />} />
           <Route path="/payrollgrouplist" element={<PayrollGroupList />} />
@@ -187,7 +196,10 @@ function App() {
             element={<LocationGroupRightsMapping />}
           />
 
-          <Route path="/locationgrouprights" element={<LocationGroupRights />} />
+          <Route
+            path="/locationgrouprights"
+            element={<LocationGroupRights />}
+          />
         </Routes>
       </AuthProvider>
       <Toaster

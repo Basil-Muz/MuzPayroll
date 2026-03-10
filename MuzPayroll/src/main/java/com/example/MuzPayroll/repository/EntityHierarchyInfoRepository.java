@@ -12,52 +12,53 @@ import com.example.MuzPayroll.entity.EntityHierarchyInfo;
 @Repository
 public interface EntityHierarchyInfoRepository extends JpaRepository<EntityHierarchyInfo, Long> {
 
-    @Query(value = """
-            SELECT ehi_branchid
-            FROM entity_hierarchy_info
-            WHERE ehi_locationid = :locationId
-            """, nativeQuery = true)
-    Long findBranchIdByLocationId(@Param("locationId") Long locationId);
-
-    @Query(value = """
-                        SELECT em.etm_name
-                        FROM entity_hierarchy_info eh
-            JOIN entity_mst em
-            ON eh.ehi_entity_hierarchyid = em.etm_entityid
-                        WHERE eh.ehi_entity_hierarchyid = :entityId
+        @Query(value = """
+                        SELECT ehi_branchid
+                        FROM entity_hierarchy_info
+                        WHERE ehi_locationid = :locationId
                         """, nativeQuery = true)
-    String findEntityNameByEntityId(@Param("entityId") Long entityId);
+        Long findBranchIdByLocationId(@Param("locationId") Long locationId);
 
-    @Query(value = """
-            SELECT eh.ehi_business_groupid
-            FROM entity_hierarchy_info eh
-            WHERE eh.ehi_entity_hierarchyid = :entityHierarchyInfoID
-            """, nativeQuery = true)
-    Long findBusinessGroupIdByEntityHierarchyInfoId(
-            @Param("entityHierarchyInfoID") Long entityHierarchyInfoID);
-@Query(value = """
-        SELECT *
-        FROM entity_hierarchy_info eh
-        WHERE eh.ehi_entity_hierarchyid = :hierarchyId
-        """, nativeQuery = true)
-Optional<EntityHierarchyInfo> findByHierarchyId(
-        @Param("hierarchyId") Long hierarchyId);
+        @Query(value = """
+                                    SELECT em.etm_name
+                                    FROM entity_hierarchy_info eh
+                        JOIN entity_mst em
+                        ON eh.ehi_entity_hierarchyid = em.etm_entityid
+                                    WHERE eh.ehi_entity_hierarchyid = :entityId
+                                    """, nativeQuery = true)
+        String findEntityNameByEntityId(@Param("entityId") Long entityId);
 
-    @Query(value = """
-            SELECT eh.ehi_business_groupid
-            FROM entity_hierarchy_info eh
-            WHERE eh.ehi_entity_hierarchyid = :entityHierarchyInfoID
-            """, nativeQuery = true)
-    Optional<Long> findBusinessGroupIdByEntityHierarchyInfoId(
-            @Param("entityHierarchyInfoID") EntityHierarchyInfo entityHierarchyInfoID);
+        @Query(value = """
+                        SELECT eh.ehi_business_groupid
+                        FROM entity_hierarchy_info eh
+                        WHERE eh.ehi_entity_hierarchyid = :entityHierarchyInfoID
+                        """, nativeQuery = true)
+        Long findBusinessGroupIdByEntityHierarchyInfoId(
+                        @Param("entityHierarchyInfoID") Long entityHierarchyInfoID);
 
-    @Query(value = """
-            SELECT *
-            FROM entity_hierarchy_info
-            WHERE ehi_companyid = :companyId
-            ORDER BY ehi_level_no DESC
-            LIMIT 1
-            """, nativeQuery = true)
-    Optional<EntityHierarchyInfo> findLatestHierarchyByCompanyId(
-            @Param("companyId") Long companyId);
+        @Query(value = """
+                        SELECT *
+                        FROM entity_hierarchy_info eh
+                        WHERE eh.ehi_entity_hierarchyid = :hierarchyId
+                        """, nativeQuery = true)
+        EntityHierarchyInfo findByHierarchyId(
+                        @Param("hierarchyId") Long hierarchyId);
+
+        @Query(value = """
+                        SELECT eh.ehi_business_groupid
+                        FROM entity_hierarchy_info eh
+                        WHERE eh.ehi_entity_hierarchyid = :entityHierarchyInfoID
+                        """, nativeQuery = true)
+        Optional<Long> findBusinessGroupIdByEntityHierarchyInfoId(
+                        @Param("entityHierarchyInfoID") EntityHierarchyInfo entityHierarchyInfoID);
+
+        @Query(value = """
+                        SELECT *
+                        FROM entity_hierarchy_info
+                        WHERE ehi_companyid = :companyId
+                        ORDER BY ehi_level_no DESC
+                        LIMIT 1
+                        """, nativeQuery = true)
+        Optional<EntityHierarchyInfo> findLatestHierarchyByCompanyId(
+                        @Param("companyId") Long companyId);
 }

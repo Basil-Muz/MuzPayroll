@@ -218,6 +218,8 @@ body {
 
 /* ===== HEADER ===== */
 .form-header {
+  display: flex;
+    justify-content: space-between;
   padding: 23px 31px 15px;
   border-bottom: 1px solid var(--border);
   /* background: linear-gradient(135deg, var(--background-alt) 0%, #070707ff 100%); */

@@ -24,6 +24,7 @@ import com.example.MuzPayroll.entity.UserGrpMst;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
 import com.example.MuzPayroll.repository.UserGrpLogRepo;
 import com.example.MuzPayroll.repository.UserGrpMstRepo;
+import com.example.MuzPayroll.repository.UserGrpRightsRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
 @Service
@@ -43,6 +44,9 @@ public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, Use
 
     @Autowired
     private UserGrpLogRepo userGrpLogRepo;
+
+    @Autowired
+    private UserGrpRightsRepository userGrpRightsRepository;
 
     // ================= FINAL SAVE WRAPPER =================
     @Transactional
@@ -632,7 +636,8 @@ public class UserGrpMstService extends MuzirisAbstractService<UserGrpMstDTO, Use
             if (entity != null) {
                 // ===== SAVE MAIN FIRST =====
                 savedEntity = userGrpMstRepo.save(entity);
-
+                 
+                userGrpRightsRepository.insertDefaultPermissions(savedEntity.getUgmUserGroupID(),dto.getUserId());
                 // ===== SAVE AUTHORIZATION WITH ID =====
                 // Get the authorization created in entityPopulate
                 Authorization auth = entity.getAuthorization();

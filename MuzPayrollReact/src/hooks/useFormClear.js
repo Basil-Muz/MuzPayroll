@@ -1,13 +1,16 @@
 import { toast } from "react-hot-toast";
 
 export const useFormClear = ({
-    setAmendmentData,
-    selectedAmendment,
-    clearErrors,
-    reset,
-    userCode
-}) =>{
-      const handleClear = () => {
+  setAmendmentData,
+  selectedAmendment,
+  clearErrors,
+  reset,
+  userCode,
+  ids = {}, // optional ids
+}) => {
+  const { companyId, branchId } = ids;
+
+  const handleClear = () => {
     if (selectedAmendment) {
       // Restore selected amendment values
       setAmendmentData(selectedAmendment);
@@ -20,11 +23,13 @@ export const useFormClear = ({
         userCode,
         authorizationStatus: 0,
         withaffectdate: "",
+        companyMst: companyId ? Number(companyId) : null,
+        branchEntity: branchId ? Number(branchId) : null,
         activeDate: new Date().toISOString().split("T")[0],
       });
     }
   };
   return {
-    handleClear
-  }
-}
+    handleClear,
+  };
+};

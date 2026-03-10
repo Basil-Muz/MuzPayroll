@@ -51,6 +51,13 @@ Page<UserGrpMst> searchUserGroup(
     Pageable pageable
 );
 
+@Query(value = """
+    SELECT *
+    FROM user_grp_mst
+    WHERE ugm_user_groupid = :userGroupId 
+    """, nativeQuery = true)
+UserGrpMst findByUserGrpRightsId(Long userGroupId);
+
 
         /**
          * Get the LATEST Location with LO prefix using Pageable

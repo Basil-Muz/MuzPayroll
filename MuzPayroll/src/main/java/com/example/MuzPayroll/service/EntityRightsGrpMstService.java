@@ -13,32 +13,26 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.EntityRightsGrpLog;
-import com.example.MuzPayroll.entity.EntityGrpRights;
 import com.example.MuzPayroll.entity.EntityHierarchyInfo;
-import com.example.MuzPayroll.entity.UserGrpLog;
-import com.example.MuzPayroll.entity.UserGrpMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.EntityRightsGrpLogDTO;
 import com.example.MuzPayroll.entity.DTO.EntityRightsGrpMstDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
-import com.example.MuzPayroll.entity.DTO.UserGrpLogDTO;
-import com.example.MuzPayroll.entity.DTO.UserGrpMstDTO;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
 import com.example.MuzPayroll.repository.EntityHierarchyInfoRepository;
 import com.example.MuzPayroll.repository.EntityRightsGrpLogRepo;
 import com.example.MuzPayroll.repository.EntityRightsGrpMstRepo;
-import com.example.MuzPayroll.repository.LocationRepository;
 import com.example.MuzPayroll.repository.UserRepository;
 
-import jakarta.persistence.Convert;
 import jakarta.persistence.EntityManager;
 
 import com.example.MuzPayroll.entity.EntityRightsGrpLogPK;
 import com.example.MuzPayroll.entity.EntityRightsGrpMst;
+import com.example.MuzPayroll.repository.EntityRepository;
 
 @Service
-public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRightsGrpMstDTO, EntityRightsGrpMst>{
-        @Autowired
+public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRightsGrpMstDTO, EntityRightsGrpMst> {
+    @Autowired
     private EntityRightsGrpMstRepo entityRightsGrpMstRepo;
 
     @Autowired
@@ -56,8 +50,9 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
     @Autowired
     private EntityHierarchyInfoRepository entityHierarchyInfoRepository;
 
+
     @Autowired
-    private EntityManager entityManager;
+    private EntityRepository entityRepository;
 
     @Transactional
     public Response<EntityRightsGrpMstDTO> saveWrapper(EntityRightsGrpMstDTO dto, String mode) {
@@ -65,7 +60,8 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         dtos.add(dto);
         return save(dtos, mode);
     }
-     // =================== 1️⃣ ENTITY VALIDATION ===================
+
+    // =================== 1️⃣ ENTITY VALIDATION ===================
     @Override
     public Response<Boolean> entityValidate(List<EntityRightsGrpMstDTO> dtos, String mode) {
         if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {
@@ -101,7 +97,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                         rowErrors.add("Short name is required");
                     if (dto.getActiveDate() == null)
                         rowErrors.add("Active date is required");
-                    if (dto.getEntityHierarchyInfoID()== null)
+                    if (dto.getEntityHierarchyInfoID() == null)
                         rowErrors.add("Enity ID is required");
 
                     // Add row errors to main error list with row number
@@ -195,72 +191,24 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         return Response.success(true);
     }
 
-    
-
-    private List<EntityRightsGrpLogDTO> convertToLogDTO(List<EntityRightsGrpMstDTO> dtos) {
-      if (dtos == null || dtos.isEmpty())
-            return null;
-
-        List<EntityRightsGrpLogDTO> logDtos = new ArrayList<>();
-
-        for (EntityRightsGrpMstDTO dto : dtos) {
-            if (dto == null) {
-                continue; // Skip null DTOs
-            }
-
-            EntityRightsGrpLogDTO logDto = new EntityRightsGrpLogDTO();
-
-            logDto.setErmEntityRightsGroupID(dto.getErmEntityRightsGroupID());
-            logDto.setErmAuthInfoID(dto.getErmAuthInfoID());
-            logDto.setErmName(dto.getErmName());
-            logDto.setErmCode(dto.getErmCode());
-            logDto.setErmShortName(dto.getErmShortName());
-            logDto.setErmDesc(dto.getErmDesc());
-            logDto.setActiveDate(dto.getActiveDate());
-            logDto.setWithaffectdate(dto.getWithaffectdate());
-            logDto.setAuthorizationDate(dto.getAuthorizationDate());
-            logDto.setAuthorizationStatus(dto.getAuthorizationStatus());
-            logDto.setUserId(dto.getUserId());
-            logDto.setAmendNo(dto.getAmendNo());
-            logDto.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
-            logDto.setEntityHierarchyInfoID(dto.getEntityHierarchyInfoID());
-
-            logDtos.add(logDto);
-        }
-        return logDtos;
-    }
-        // =================== 2️⃣ ENTITY POPULATE ===================
+    // =================== 2️⃣ ENTITY POPULATE ===================
     @Override
     public Response<Boolean> entityPopulate(List<EntityRightsGrpMstDTO> dtos, String mode) {
         List<String> errors = new ArrayList<>();
         EntityRightsGrpMstDTO dto = dtos.get(0);
+
         // System.out.println("dfsgdsgsdfg"+dto.getUserId());
         UserMst user = userRepository.findByUserMstId(dto.getUserId());
         if (user == null)
             errors.add("Invalid user Id");
 
-        if (!errors.isEmpty()) {
-            return Response.error(errors);
-        }
-        // System.out.println("Entityfgvgdfgv"+dto.getEntityHierarchyInfoID());
-        //   System.out.println("Entity  "+dto.getEntityHierarchyInfoID().getInfoID());
-        //Fetching business groupid with entity hierarchy id
-//         Long businessGroupId =
-//         entityHierarchyInfoRepository.findBusinessGroupIdByEntityHierarchyInfoId(
-//                 dto.getEntityHierarchyInfoID()
-//         );
-//         if (businessGroupId == null) {
-//     throw new RuntimeException("Hierarchy not found");
-// }
+        EntityHierarchyInfo ent = entityHierarchyInfoRepository.findByHierarchyId(dto.getEntityHierarchyInfoID());
 
-        // Long businessGroupId = hierarchyInfo.getEhiBusinessGroupID();
-// System.out.println("Entity  "+businessGroupId);
-        // EntityHierarchyInfo businessGroupRef =
-        // entityManager.getReference(EntityHierarchyInfo.class, businessGroupId);
-        // System.out.println("Entityfgvgdfgv"+businessGroupRef);
+        EntityMst entity = entityRepository
+                .findById(ent.getEhiBusinessGroupID())
+                .orElse(null);
 
-    // dto.setEntityHierarchyInfoID(businessGroupId);
-        
+        dto.setEntityMst(entity);
 
         if ("INSERT".equals(mode)) {
 
@@ -318,28 +266,15 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         }
         // <-----
 
+        if (!errors.isEmpty()) {
+            return Response.error(errors);
+        }
+
         return Response.success(true);
     }
-    private List<EntityRightsGrpLogDTO> populateLogEntityfromEntity(EntityRightsGrpMstDTO dto) {
-        List<EntityRightsGrpLogDTO> DtoLogs = new ArrayList<>();
-        EntityRightsGrpLogDTO DtoLog = new EntityRightsGrpLogDTO();
 
-        DtoLog.setErmEntityRightsGroupID(dto.getErmEntityRightsGroupID());
-        DtoLog.setErmName(dto.getErmName());
-        DtoLog.setErmCode(dto.getErmCode());
-        DtoLog.setActiveDate(dto.getActiveDate());
-        DtoLog.setAmendNo(dto.getAmendNo());
-        DtoLog.setErmShortName(dto.getErmShortName());
-        DtoLog.setErmDesc(dto.getErmDesc());
-        DtoLog.setAuthorizationDate(dto.getAuthorizationDate());
-        DtoLog.setAuthorizationStatus(dto.getAuthorizationStatus());
-        DtoLog.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
-        DtoLog.setErmEntityRightsGroupID(dto.getErmEntityRightsGroupID());
-        DtoLogs.add(DtoLog);
-        return DtoLogs;
-
-    }
-     // =================== 3️⃣ BUSINESS VALIDATION ===================
+    
+    // =================== 3️⃣ BUSINESS VALIDATION ===================
     @Override
     public Response<Boolean> businessValidate(List<EntityRightsGrpMstDTO> dtos, String mode) {
         if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {
@@ -365,6 +300,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
     }
 
     // =================== 4️⃣ GENERATE PK ===================
+
     @Override
     public Response<Object> generatePK(List<EntityRightsGrpMstDTO> dtos, String mode) {
         List<String> errors = new ArrayList<>();
@@ -525,7 +461,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         }
     }
 
-     // =================== 5️⃣ GENERATE SERIAL NO ===================
+    // =================== 5️⃣ GENERATE SERIAL NO ===================
     @Override
     public Response<String> generateSerialNo(List<EntityRightsGrpMstDTO> dtos, String mode) {
 
@@ -618,7 +554,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
         // }
     }
 
-     // =================== 6️⃣ converttoEntity ===================
+    // =================== 6️⃣ converttoEntity ===================
     @Override
     public Response<EntityRightsGrpMst> converttoEntity(List<EntityRightsGrpMstDTO> dtos) {
 
@@ -638,79 +574,6 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
 
     }
 
-    // =================== DTO → ENTITY ===================
-    @Override
-    protected EntityRightsGrpMst dtoToEntity(List<EntityRightsGrpMstDTO> dtos) {
-        if (dtos == null || dtos.isEmpty()) {
-            return null;
-        }
-
-        // Take the first DTO from the list
-        EntityRightsGrpMstDTO dto = dtos.get(0);
-
-        EntityRightsGrpMst entity = new EntityRightsGrpMst();
-
-        // Set ALL fields from the first DTO
-        entity.setErmEntityGroupID(dto.getErmEntityRightsGroupID());
-         if (dto.getEntityHierarchyInfoID() != null) {
-        // System.out.println("dfgdfg"+dto.getEntityHierarchyInfoID());
-            Long hierarchy =
-                entityHierarchyInfoRepository
-                .findBusinessGroupIdByEntityHierarchyInfoId(dto.getEntityHierarchyInfoID());
-                
-
-            entity.setEntityHierarchyInfoID(hierarchy);
-        }
-        entity.setErmCode(dto.getErmCode());
-        entity.setErmDesc(dto.getErmDesc());
-        entity.setErmName(dto.getErmName());
-        entity.setErmShortName(dto.getErmShortName());
-        entity.setWithaffectdate(dto.getWithaffectdate());
-        entity.setActiveDate(dto.getActiveDate());
-        entity.setErmActiveYN(dto.getErmActiveYN());
-        entity.setInactiveDate(dto.getInactiveDate());
-
-        // Set authorization if available
-        if (dto.getAuthorization() != null) {
-            entity.setAuthorization(dto.getAuthorization());
-        }
-
-        return entity;
-    }
-
-    // =================== ENTITY → DTO ===================
-    @Override
-    public EntityRightsGrpMstDTO entityToDto(EntityRightsGrpMst entity) {
-        EntityRightsGrpMstDTO dto = new EntityRightsGrpMstDTO();
-
-        dto.setErmEntityRightsGroupID(entity.getErmEntityGroupID());
-        dto.setWithaffectdate(entity.getWithaffectdate());
-        dto.setAuthorization(entity.getAuthorization());
-        dto.setActiveDate(entity.getActiveDate());
-        dto.setInactiveDate(entity.getInactiveDate());         
-        dto.setEntityHierarchyInfoID(entity.getEntityHierarchyInfoID());
-        // dto.setEntityMstID(entity.getEntityMst().getEtmEntityID());
-        dto.setErmCode(entity.getErmCode());
-        dto.setErmDesc(entity.getErmDesc());
-        dto.setErmName(entity.getErmName());
-        dto.setErmShortName(entity.getErmShortName());
-        dto.setErmActiveYN(entity.getErmActiveYN());
-
-        // ===== AUTHORIZATION MAPPING =====
-        if (entity.getAuthorization() != null) {
-
-            dto.setErmAuthInfoID(entity.getAuthorization().getAuthId());
-            dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
-            dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
-
-            if (entity.getAuthorization().getUserMst() != null) {
-                dto.setUserId(entity.getAuthorization().getUserMst().getUserMstID());
-            }
-        }
-
-        return dto;
-    }
-
     // =================== 8️⃣ SAVE ENTITY IN SERVICE ===================
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -726,7 +589,11 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                 // ===== SAVE AUTHORIZATION WITH ID =====
                 // Get the authorization created in entityPopulate
                 Authorization auth = entity.getAuthorization();
-                entityRightsGrpMstRepo.insertDefaultPermissions(savedEntity.getErmEntityGroupID(),dto.getUserId());//user code is in string 
+                entityRightsGrpMstRepo.insertDefaultPermissions(savedEntity.getErmEntityGroupID(), dto.getUserId());// user
+                                                                                                                    // code
+                                                                                                                    // is
+                                                                                                                    // in
+                                                                                                                    // string
                 // Set the ID
                 auth.setMstId(savedEntity.getErmEntityGroupID());
 
@@ -820,6 +687,39 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
 
     // =================== 9️⃣ UTILITY METHODS ===================
 
+     private List<EntityRightsGrpLogDTO> convertToLogDTO(List<EntityRightsGrpMstDTO> dtos) {
+        if (dtos == null || dtos.isEmpty())
+            return null;
+
+        List<EntityRightsGrpLogDTO> logDtos = new ArrayList<>();
+
+        for (EntityRightsGrpMstDTO dto : dtos) {
+            if (dto == null) {
+                continue; // Skip null DTOs
+            }
+
+            EntityRightsGrpLogDTO logDto = new EntityRightsGrpLogDTO();
+
+            logDto.setErmEntityRightsGroupID(dto.getErmEntityRightsGroupID());
+            logDto.setErmAuthInfoID(dto.getErmAuthInfoID());
+            logDto.setErmName(dto.getErmName());
+            logDto.setErmCode(dto.getErmCode());
+            logDto.setErmShortName(dto.getErmShortName());
+            logDto.setErmDesc(dto.getErmDesc());
+            logDto.setActiveDate(dto.getActiveDate());
+            logDto.setWithaffectdate(dto.getWithaffectdate());
+            logDto.setAuthorizationDate(dto.getAuthorizationDate());
+            logDto.setAuthorizationStatus(dto.getAuthorizationStatus());
+            logDto.setUserId(dto.getUserId());
+            logDto.setAmendNo(dto.getAmendNo());
+            logDto.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
+            logDto.setEntityHierarchyInfoID(dto.getEntityHierarchyInfoID());
+
+            logDtos.add(logDto);
+        }
+        return logDtos;
+    }
+    
     private boolean isEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
@@ -831,9 +731,102 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                 isEmpty(entityMst.getEtmName()) ||
                 isEmpty(entityMst.getEtmCode());
     }
-   
+
+      // =================== DTO → ENTITY ===================
+    @Override
+    protected EntityRightsGrpMst dtoToEntity(List<EntityRightsGrpMstDTO> dtos) {
+        if (dtos == null || dtos.isEmpty()) {
+            return null;
+        }
+
+        // Take the first DTO from the list
+        EntityRightsGrpMstDTO dto = dtos.get(0);
+
+        EntityRightsGrpMst entity = new EntityRightsGrpMst();
+
+        // Set ALL fields from the first DTO
+        entity.setErmEntityGroupID(dto.getErmEntityRightsGroupID());
+
+        // if (dto.getEntityHierarchyInfoID() != null) {
+        // // System.out.println("dfgdfg"+dto.getEntityHierarchyInfoID());
+        // Long hierarchy = entityHierarchyInfoRepository
+        // .findBusinessGroupIdByEntityHierarchyInfoId(dto.getEntityHierarchyInfoID());
+
+        // entity.setEntityHierarchyInfoID(hierarchy);
+        // }
+
+        entity.setEntityMst(dto.getEntityMst());
+        entity.setErmCode(dto.getErmCode());
+        entity.setErmDesc(dto.getErmDesc());
+        entity.setErmName(dto.getErmName());
+        entity.setErmShortName(dto.getErmShortName());
+        entity.setWithaffectdate(dto.getWithaffectdate());
+        entity.setActiveDate(dto.getActiveDate());
+        entity.setErmActiveYN(dto.getErmActiveYN());
+        entity.setInactiveDate(dto.getInactiveDate());
+
+        // Set authorization if available
+        if (dto.getAuthorization() != null) {
+            entity.setAuthorization(dto.getAuthorization());
+        }
+
+        return entity;
+    }
+
+    // =================== ENTITY → DTO ===================
+    @Override
+    public EntityRightsGrpMstDTO entityToDto(EntityRightsGrpMst entity) {
+        EntityRightsGrpMstDTO dto = new EntityRightsGrpMstDTO();
+
+        dto.setErmEntityRightsGroupID(entity.getErmEntityGroupID());
+        dto.setWithaffectdate(entity.getWithaffectdate());
+        dto.setAuthorization(entity.getAuthorization());
+        dto.setActiveDate(entity.getActiveDate());
+        dto.setInactiveDate(entity.getInactiveDate());
+        // dto.setEntityMstID(entity.getEntityMst().getEtmEntityID());
+        dto.setErmCode(entity.getErmCode());
+        dto.setErmDesc(entity.getErmDesc());
+        dto.setErmName(entity.getErmName());
+        dto.setErmShortName(entity.getErmShortName());
+        dto.setErmActiveYN(entity.getErmActiveYN());
+
+        // ===== AUTHORIZATION MAPPING =====
+        if (entity.getAuthorization() != null) {
+
+            dto.setErmAuthInfoID(entity.getAuthorization().getAuthId());
+            dto.setAuthorizationStatus(entity.getAuthorization().getAuthorizationStatus());
+            dto.setAuthorizationDate(entity.getAuthorization().getAuthorizationDate());
+
+            if (entity.getAuthorization().getUserMst() != null) {
+                dto.setUserId(entity.getAuthorization().getUserMst().getUserMstID());
+            }
+        }
+
+        return dto;
+    }
+
+    private List<EntityRightsGrpLogDTO> populateLogEntityfromEntity(EntityRightsGrpMstDTO dto) {
+        List<EntityRightsGrpLogDTO> DtoLogs = new ArrayList<>();
+        EntityRightsGrpLogDTO DtoLog = new EntityRightsGrpLogDTO();
+
+        DtoLog.setErmEntityRightsGroupID(dto.getErmEntityRightsGroupID());
+        DtoLog.setErmName(dto.getErmName());
+        DtoLog.setErmCode(dto.getErmCode());
+        DtoLog.setActiveDate(dto.getActiveDate());
+        DtoLog.setAmendNo(dto.getAmendNo());
+        DtoLog.setErmShortName(dto.getErmShortName());
+        DtoLog.setErmDesc(dto.getErmDesc());
+        DtoLog.setAuthorizationDate(dto.getAuthorizationDate());
+        DtoLog.setAuthorizationStatus(dto.getAuthorizationStatus());
+        DtoLog.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
+        DtoLog.setErmEntityRightsGroupID(dto.getErmEntityRightsGroupID());
+        DtoLogs.add(DtoLog);
+        return DtoLogs;
+
+    }
+
     private void populateLogEntityPKfromEntity(Long logPk, Long logRowNo, EntityRightsGrpMstDTO entity) {
-       for (EntityRightsGrpLogDTO entityLog : entity.getEntityRightsGrpLogDTOs()) {
+        for (EntityRightsGrpLogDTO entityLog : entity.getEntityRightsGrpLogDTOs()) {
             EntityRightsGrpLogPK LogPK = new EntityRightsGrpLogPK();
             LogPK.setErmEntityRightsGroupID(logPk);
             LogPK.setRowNo(logRowNo);
@@ -842,7 +835,6 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
             logRowNo++;
         }
     }
-
 
     // To set the Log list in the entity to retrun to ui
     @Transactional(readOnly = true)
@@ -925,67 +917,67 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
 
         // Fetch ALL logs related to this MST
         // List<UserGrpLog> Logs = userGrpLogRepo
-        //         .findByUserGrpLogPK_UgmUserGroupIDOrderByUserGrpLogPK_RowNoDesc(
-        //                 ugmUserGroupID);
+        // .findByUserGrpLogPK_UgmUserGroupIDOrderByUserGrpLogPK_RowNoDesc(
+        // ugmUserGroupID);
 
         // Optional<UserGrpLog> selectedLog = Logs.stream()
-        //         .filter(log -> log.getAuthorization() != null)
-        //         .max(Comparator.comparing(UserGrpLog::getAmendNo))
-        //         .flatMap(latestLog -> {
+        // .filter(log -> log.getAuthorization() != null)
+        // .max(Comparator.comparing(UserGrpLog::getAmendNo))
+        // .flatMap(latestLog -> {
 
-        //             // Case 1: latest is TRUE → return it
-        //             if (Boolean.TRUE.equals(
-        //                     latestLog.getAuthorization().getAuthorizationStatus())) {
-        //                 return Optional.of(latestLog);
-        //             }
+        // // Case 1: latest is TRUE → return it
+        // if (Boolean.TRUE.equals(
+        // latestLog.getAuthorization().getAuthorizationStatus())) {
+        // return Optional.of(latestLog);
+        // }
 
-        //             // Case 2: latest is FALSE → find latest TRUE
-        //             return Logs.stream()
-        //                     .filter(log -> log.getAuthorization() != null)
-        //                     .filter(log -> Boolean.TRUE.equals(
-        //                             log.getAuthorization().getAuthorizationStatus()))
-        //                     .max(Comparator.comparing(UserGrpLog::getAmendNo));
-        //         });
+        // // Case 2: latest is FALSE → find latest TRUE
+        // return Logs.stream()
+        // .filter(log -> log.getAuthorization() != null)
+        // .filter(log -> Boolean.TRUE.equals(
+        // log.getAuthorization().getAuthorizationStatus()))
+        // .max(Comparator.comparing(UserGrpLog::getAmendNo));
+        // });
 
         // // Case 3: no TRUE exists → fallback to latest FALSE
         // if (!selectedLog.isPresent()) {
-        //     selectedLog = Logs.stream()
-        //             .filter(log -> log.getAuthorization() != null)
-        //             .filter(log -> Boolean.FALSE.equals(
-        //                     log.getAuthorization().getAuthorizationStatus()))
-        //             .max(Comparator.comparing(UserGrpLog::getAmendNo));
+        // selectedLog = Logs.stream()
+        // .filter(log -> log.getAuthorization() != null)
+        // .filter(log -> Boolean.FALSE.equals(
+        // log.getAuthorization().getAuthorizationStatus()))
+        // .max(Comparator.comparing(UserGrpLog::getAmendNo));
         // }
 
         // // Apply mapping
         // selectedLog.ifPresent(log -> {
 
-        //     dto.setAmendNo(log.getAmendNo());
-        //     dto.setUgmAuthInfoID(log.getAuthorization().getAuthId());
-        //     dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
-        //     dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
+        // dto.setAmendNo(log.getAmendNo());
+        // dto.setUgmAuthInfoID(log.getAuthorization().getAuthId());
+        // dto.setAuthorizationDate(log.getAuthorization().getAuthorizationDate());
+        // dto.setAuthorizationStatus(log.getAuthorization().getAuthorizationStatus());
 
-        //     if (log.getAuthorization().getUserMst() != null) {
-        //         dto.setUserCode(
-        //                 log.getAuthorization().getUserMst().getUserCode());
-        //     }
+        // if (log.getAuthorization().getUserMst() != null) {
+        // dto.setUserCode(
+        // log.getAuthorization().getUserMst().getUserCode());
+        // }
         // });
 
         // // Convert ALL logs → DTO list
         // List<UserGrpLogDTO> logDtos = Logs.stream()
-        //         .map(userGrpLogService::entityToDto)
-        //         .toList();
+        // .map(userGrpLogService::entityToDto)
+        // .toList();
 
         // // Attach list to MST DTO
         // dto.setUserGrpLogDTOs(logDtos);
 
         Authorization auth = authorizationRepository
-        .findTopByMstIdOrderByAuthIdDesc(ermEntityGroupID)
-        .orElse(null);
+                .findTopByMstIdOrderByAuthIdDesc(ermEntityGroupID)
+                .orElse(null);
 
-        // entity.setAuthorization(auth);  
+        // entity.setAuthorization(auth);
 
         // System.out.println("Authrization "+ entity.getAuthorization());
-          dto.setAuthorizationStatus(auth.getAuthorizationStatus());
+        dto.setAuthorizationStatus(auth.getAuthorizationStatus());
         return dto;
     }
 }

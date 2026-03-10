@@ -26,7 +26,7 @@ export const useLoadCompany = () => {
 
       setCompanyList(companyList);
 
-      console.log("Company List:", companyList);
+      // console.log("Company List:", companyList);
       // setCompanyList([company]);
       // setInitialCompanyId(company.companyMstID); // store it
     } catch (error) {

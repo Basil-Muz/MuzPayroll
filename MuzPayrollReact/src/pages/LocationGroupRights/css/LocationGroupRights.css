@@ -639,8 +639,15 @@
 .link.danger:hover {
   color: var(--danger-dark);
 }
+.react-select__menu-portal {
+  z-index: 9999 !important;
+}
 .react-select__menu {
-  z-index: 999;
+  z-index: 9999 !important;
+}
+.react-select__menu {
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 /* ======================================================
    PAGINATION
