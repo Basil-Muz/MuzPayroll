@@ -47,6 +47,7 @@ import Reports from "./pages/Reports/Reports.jsx";
 import LocationGroupRights from "./pages/LocationGroupRights/LocationGroupRights.jsx";
 import SiteMap from "./pages/SiteMap/SiteMap.jsx";
 import Department from "./pages/Department/department.jsx";
+import UserSettings from "./pages/UserSettings/UserSettings.jsx";
 
 function App() {
   return (
@@ -179,6 +180,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserGrpRights />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/usersettings"
+            element={
+              <ProtectedRoute>
+                <UserSettings />
               </ProtectedRoute>
             }
           />

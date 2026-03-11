@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.EntityHierarchyInfo;
-import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.EntityRightsGrpLogPK;
 
 import jakarta.persistence.Column;

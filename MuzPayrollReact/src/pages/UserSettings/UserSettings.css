@@ -1,0 +1,50 @@
+.us-filter-item .ms .ms-control {
+  min-width: 200px; /* Stable minimum width */
+  width: 100%; /* Allows table cell to control max width */
+  /* width: clamp(212px, 100%, 260px); */
+  min-height: 32px;
+  padding: 11px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 4px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  transition: all 0.3s ease;
+}
+.lgr-layout.us th.group-fixed {
+  width: 260px;
+}
+.us-filter-item .bulk-bar {
+  gap:6px;
+}
+.us-filter-item .ms-control.open {
+  outline: none !important;
+  border-color: var(--brand-border);
+  box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1);
+}
+
+.us-filter-item .ms-option {
+  padding: 7px 9px;
+  display: flex;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.us-filter-item .ms-placeholder {
+  font-size: 14px;
+  font-family: Arial, sans-serif !important;
+  color: var(--text-light);
+}
+
+.us-filter-item .ms-control.disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+.us-filter-item .ms-chip {
+  font-size: 13px;
+}
