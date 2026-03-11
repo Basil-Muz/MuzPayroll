@@ -8,7 +8,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
-import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 
 @Component

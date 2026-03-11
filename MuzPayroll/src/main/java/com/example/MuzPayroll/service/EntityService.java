@@ -1549,7 +1549,6 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
         public List<UserEntityDTO> getCompany(Long userMstID, Long mccId) {
 
-                System.out.println("Userid" + userMstID);
                 UserMst user = userRepository.findByUserMstID(userMstID)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 

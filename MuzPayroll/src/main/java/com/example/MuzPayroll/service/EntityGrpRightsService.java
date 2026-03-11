@@ -2,25 +2,18 @@ package com.example.MuzPayroll.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.hibernate.type.descriptor.java.LocalDateJavaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.EntityGrpRights;
-import com.example.MuzPayroll.entity.EntityHierarchyInfo;
 import com.example.MuzPayroll.entity.EntityRightsGrpMst;
 import com.example.MuzPayroll.entity.OptionMst;
 import com.example.MuzPayroll.entity.SolutionMst;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.EntityGrpRightsDTO;
-import com.example.MuzPayroll.entity.DTO.EntityLogDTO;
-import com.example.MuzPayroll.entity.DTO.EntityRightsGrpLogDTO;
-import com.example.MuzPayroll.entity.DTO.EntityRightsGrpMstDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.EntityGrpRightsRepository;
 import com.example.MuzPayroll.repository.EntityRightsGrpMstRepo;

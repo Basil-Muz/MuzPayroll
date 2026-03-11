@@ -23,7 +23,7 @@ public class EntityGrpRightsLink {
 
     @ManyToOne
     @JoinColumn(name = "EglEntityHierarchyID", nullable = false)
-    private EntityHierarchyInfo entityHierarchyInfo;
+    private EntityMst entityMst;
 
     @ManyToOne
     @JoinColumn(name = "EglEntityGroupRightsID", nullable = false)
@@ -42,14 +42,6 @@ public class EntityGrpRightsLink {
 
     public void setSolutionMst(SolutionMst solutionMst) {
         this.solutionMst = solutionMst;
-    }
-
-    public EntityHierarchyInfo getEntityHierarchyInfo() {
-        return entityHierarchyInfo;
-    }
-
-    public void setEntityHierarchyInfo(EntityHierarchyInfo entityHierarchyInfo) {
-        this.entityHierarchyInfo = entityHierarchyInfo;
     }
 
     public UserMst getUserMst() {
@@ -82,6 +74,14 @@ public class EntityGrpRightsLink {
 
     public void setEntityGrpRightsLinkID(Long EntityGrpRightsLinkID) {
         this.EntityGrpRightsLinkID = EntityGrpRightsLinkID;
+    }
+
+    public EntityMst getEntityMst() {
+        return entityMst;
+    }
+
+    public void setEntityMst(EntityMst entityMst) {
+        this.entityMst = entityMst;
     }
 
 }

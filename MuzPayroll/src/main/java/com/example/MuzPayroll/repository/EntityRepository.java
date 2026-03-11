@@ -9,10 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.example.MuzPayroll.entity.EntityLog;
 import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.DTO.EntityDataDTO;
-import com.example.MuzPayroll.entity.DTO.EntityMstDTO;
 
 @Repository
 public interface EntityRepository extends JpaRepository<EntityMst, Long> {
