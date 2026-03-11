@@ -48,6 +48,7 @@ import LocationGroupRights from "./pages/LocationGroupRights/LocationGroupRights
 import SiteMap from "./pages/SiteMap/SiteMap.jsx";
 import Department from "./pages/Department/department.jsx";
 import User from "./pages/User/user.jsx"
+import ResetPassword from "./pages/Reset Password/resetPassword.jsx";
 
 function App() {
   return (
@@ -83,6 +84,7 @@ function App() {
           <Route path="/department" element={<Department />} />
           <Route path="/branchform" element={<BranchPageForm />} />
           <Route path="/user" element={<User />} />
+          <Route path="/resetpassword" element={<ResetPassword />} />
           <Route
             path="/companyform"
             element={

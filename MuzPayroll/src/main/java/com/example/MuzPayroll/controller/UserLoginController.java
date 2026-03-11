@@ -7,11 +7,15 @@ import com.example.MuzPayroll.entity.DTO.ForgotPasswordVerifyRequestDTO;
 import com.example.MuzPayroll.entity.DTO.LoginRequestDTO;
 import com.example.MuzPayroll.entity.DTO.LoginResponseDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
+import com.example.MuzPayroll.entity.DTO.UserDTO;
 import com.example.MuzPayroll.service.ChangePasswordService;
 import com.example.MuzPayroll.service.ForgotChangePasswordService;
 import com.example.MuzPayroll.service.ForgotPasswordOtpService;
 import com.example.MuzPayroll.service.ForgotPasswordVerifyOtpService;
+import com.example.MuzPayroll.service.UserCrudService;
 import com.example.MuzPayroll.service.UserMstService;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +40,9 @@ public class UserLoginController {
     @Autowired
     private ForgotPasswordVerifyOtpService VerifyOtpService;
 
+    @Autowired
+    private UserCrudService userCrudService;
+
     @PostMapping("/login")
     public ResponseEntity<Response<LoginResponseDTO>> login(
             @RequestBody LoginRequestDTO request) {
@@ -50,16 +57,17 @@ public class UserLoginController {
     // // ================= USER CONTEXT =================
     // @GetMapping("/user-context")
     // public ResponseEntity<Response<LoginResponseDTO>> getUserContext(
-    //         @RequestParam Long companyId,
-    //         @RequestParam Long branchId,
-    //         @RequestParam Long locationId,
-    //         @RequestParam String userCode) {
+    // @RequestParam Long companyId,
+    // @RequestParam Long branchId,
+    // @RequestParam Long locationId,
+    // @RequestParam String userCode) {
 
-    //     Response<LoginResponseDTO> response = service.getUserContext(companyId, branchId, locationId, userCode);
+    // Response<LoginResponseDTO> response = service.getUserContext(companyId,
+    // branchId, locationId, userCode);
 
-    //     return ResponseEntity
-    //             .status(response.getStatusCode())
-    //             .body(response);
+    // return ResponseEntity
+    // .status(response.getStatusCode())
+    // .body(response);
     // }
 
     @PostMapping("/change-password")
@@ -116,6 +124,14 @@ public class UserLoginController {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/user/save")
+    public Response<UserDTO> saveUser(
+            @RequestBody List<UserDTO> users,
+            @RequestParam String mode) {
+
+        return userCrudService.save(users, mode);
     }
 
 }

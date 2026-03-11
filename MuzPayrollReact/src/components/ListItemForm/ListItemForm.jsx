@@ -14,6 +14,7 @@ import { IoNotificationsSharp } from "react-icons/io5";
 import TimePicker from "react-time-picker";
 import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
+// import { Controller } from "react-hook-form";
 
 // Context / Custom Hooks
 import { useAuth } from "../../context/AuthProvider";
@@ -143,9 +144,8 @@ function ListItemForm({
 
                     <input
                       type="text"
-                      className={`form-control ${
-                        errors[ENTITY_FIELD_MAP.code] ? "error" : ""
-                      } ${isVarified ? "read-only" : ""}`}
+                      className={`form-control ${errors[ENTITY_FIELD_MAP.code] ? "error" : ""
+                        } ${isVarified ? "read-only" : ""}`}
                       placeholder="Enter Group Code"
                       disabled={isVarified}
                       {...register(ENTITY_FIELD_MAP.code, {
@@ -180,9 +180,8 @@ function ListItemForm({
 
                     <input
                       type="text"
-                      className={`form-control ${
-                        errors[ENTITY_FIELD_MAP.name] ? "error" : ""
-                      } ${isVarified ? "read-only" : ""}`}
+                      className={`form-control ${errors[ENTITY_FIELD_MAP.name] ? "error" : ""
+                        } ${isVarified ? "read-only" : ""}`}
                       placeholder="Enter Group Name"
                       disabled={isVarified}
                       {...register(ENTITY_FIELD_MAP.name, {
@@ -218,9 +217,8 @@ function ListItemForm({
 
                     <input
                       type="text"
-                      className={`form-control ${
-                        errors[ENTITY_FIELD_MAP.shortName] ? "error" : ""
-                      } ${isVarified ? "read-only" : ""}`}
+                      className={`form-control ${errors[ENTITY_FIELD_MAP.shortName] ? "error" : ""
+                        } ${isVarified ? "read-only" : ""}`}
                       placeholder="Enter Short Name"
                       disabled={isVarified}
                       {...register(ENTITY_FIELD_MAP.shortName, {
@@ -276,6 +274,7 @@ function ListItemForm({
                       }
                       dateFormat="dd/MM/yyyy"
                       className="form-control"
+                      minDate={new Date()}
                     />
 
                   )}
@@ -308,6 +307,7 @@ function ListItemForm({
                     return (
 
                       <Select
+                        classNamePrefix="form-control-select"
                         options={options}
                         isSearchable={false}
                         value={options.find(

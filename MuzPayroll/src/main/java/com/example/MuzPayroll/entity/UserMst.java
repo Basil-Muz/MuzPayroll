@@ -26,7 +26,7 @@ public class UserMst {
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UsmEntityHierarchyID", nullable = false)
+    @JoinColumn(name = "UsmEntityHierarchyID", nullable = true)
     private EntityHierarchyInfo UsmEntityHierarchyID;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,7 +40,7 @@ public class UserMst {
     private Boolean UsmChangePasswordOnNextLogin;
 
    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UsmDefaultEntityHierarchyID", nullable = false)
+    @JoinColumn(name = "UsmDefaultEntityHierarchyID", nullable = true)
     private EntityHierarchyInfo UsmDefaultEntityHierarchyID;
 
     @Column(nullable = false)

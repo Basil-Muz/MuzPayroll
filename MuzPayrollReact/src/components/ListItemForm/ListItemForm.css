@@ -16,6 +16,7 @@
   overflow: auto;
   z-index: 1000;
 }
+
 /* Form Title */
 .modal-header .form-title {
   font-size: 16px;
@@ -215,9 +216,11 @@
   /* border-radius: 4px;*/
   outline: none;
 }
-.modal-usergroup-form .form-control-select__control{
-background: var(--background) !important
+
+.modal-usergroup-form .form-control-select__control {
+  background: var(--background) !important
 }
+
 .modal-usergroup-form .form-buttons {
   display: flex;
   justify-content: flex-end;
@@ -362,6 +365,7 @@ background: var(--background) !important
   opacity: var(--disabled-opacity);
   box-shadow: none;
 }
+
 .shift-type-container {
   display: flex;
   gap: 12px;
@@ -397,6 +401,7 @@ background: var(--background) !important
 }
 
 @media (min-width: 1726px) {
+
   /* large screens */
   .modal-content {
     left: 50% !important;
@@ -545,7 +550,7 @@ background: var(--background) !important
   .modal-usergroup-form textarea {
     min-height: 60px;
   }
-  
+
 }
 
 @keyframes slideUpMobile {
@@ -557,6 +562,7 @@ background: var(--background) !important
     transform: translateY(0);
   }
 }
+
 /* Wrapper */
 .custom-time-picker {
   width: 100%;
@@ -564,7 +570,7 @@ background: var(--background) !important
 
 /* Input box */
 .custom-time-picker .react-time-picker__wrapper {
-  border:1.5px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   padding: 6px 10px;
   background: white;
@@ -585,54 +591,4 @@ background: var(--background) !important
 .custom-time-picker button:hover {
   background-color: var(--brand--hover);
 }
-/* ===== USER FORM LAYOUT ===== */
 
-.user-form-wrapper{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:30px;
-}
-
-/* LEFT SIDE */
-.user-fields{
-  flex:1;
-}
-
-/* RIGHT IMAGE */
-.user-image-section{
-  width:110px;
-  display:flex;
-  justify-content:center;
-}
-
-.user-avatar{
-  width:85px;
-  height:85px;
-  border-radius:50%;
-  border:1px solid #ddd;
-  object-fit:cover;
-}
-
-/* INPUT WIDTH REDUCE */
-.modal-usergroup-form .form-row{
-  display:grid;
-  grid-template-columns:140px 240px;
-  align-items:center;
-  gap:10px;
-}
-
-/* USER CODE ALIGN */
-.code-group{
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-/* PASSWORD HINT */
-.password-hint{
-  font-size:11px;
-  color:#888;
-  margin-top:4px;
-  display:block;
-}
