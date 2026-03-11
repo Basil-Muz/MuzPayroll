@@ -1,58 +1,68 @@
 package com.example.MuzPayroll.entity.DTO;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public class EntityGrpRightsLinkDTO {
 
-    private Long entityHierarchyId;
+    private Long entityGrpRightsLinkID;
 
-    public Long getEntityHierarchyId() {
-        return entityHierarchyId;
+    private Long eglSolutionID;
+
+    private Long eglEntityHierarchyID;
+
+    private List<Long> eglEntityGroupRightsIDs;
+
+    private Long LastModUserId;
+
+    private LocalDate EglLastModDate;
+
+    public LocalDate getEglLastModDate() {
+        return EglLastModDate;
     }
 
-    public void setEntityHierarchyId(Long entityHierarchyId) {
-        this.entityHierarchyId = entityHierarchyId;
+    public void setEglLastModDate(LocalDate EglLastModDate) {
+        this.EglLastModDate = EglLastModDate;
     }
 
-    private String branchName;
-
-    public String getBranchName() {
-        return branchName;
+    public Long getLastModUserId() {
+        return LastModUserId;
     }
 
-    public void setBranchName(String branchName) {
-        this.branchName = branchName;
+    public void setLastModUserId(Long LastModUserId) {
+        this.LastModUserId = LastModUserId;
     }
 
-    private String locationName;
-
-    public String getLocationName() {
-        return locationName;
+    public Long getEglEntityHierarchyID() {
+        return eglEntityHierarchyID;
     }
 
-    public void setLocationName(String locationName) {
-        this.locationName = locationName;
+    public void setEglEntityHierarchyID(Long eglEntityHierarchyID) {
+        this.eglEntityHierarchyID = eglEntityHierarchyID;
     }
 
-    private String groupName;
-
-    public String getGroupName() {
-        return groupName;
+    public Long getEglSolutionID() {
+        return eglSolutionID;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setEglSolutionID(Long eglSolutionID) {
+        this.eglSolutionID = eglSolutionID;
     }
 
-    public EntityGrpRightsLinkDTO() {
+    public Long getEntityGrpRightsLinkID() {
+        return entityGrpRightsLinkID;
     }
 
-    public EntityGrpRightsLinkDTO(Long entityHierarchyId,
-            String branchName,
-            String locationName,
-            String groupName) {
-        this.entityHierarchyId = entityHierarchyId;
-        this.branchName = branchName;
-        this.locationName = locationName;
-        this.groupName = groupName;
+    public void setEntityGrpRightsLinkID(Long entityGrpRightsLinkID) {
+        this.entityGrpRightsLinkID = entityGrpRightsLinkID;
+    }
+
+    public List<Long> getEglEntityGroupRightsIDs() {
+        return eglEntityGroupRightsIDs;
+    }
+
+    public void setEglEntityGroupRightsIDs(List<Long> eglEntityGroupRightsIDs) {
+        this.eglEntityGroupRightsIDs = eglEntityGroupRightsIDs;
     }
 
 }

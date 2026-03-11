@@ -1,7 +1,6 @@
 package com.example.MuzPayroll.entity;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -14,8 +13,6 @@ import jakarta.persistence.Transient;
 
 @Entity
 public class EntityRightsGrpMst {
-    @Transient
-    private List<EntityRightsGrpLog> entityRightsGrpLogs;
 
     @Transient
     // @JsonIgnore

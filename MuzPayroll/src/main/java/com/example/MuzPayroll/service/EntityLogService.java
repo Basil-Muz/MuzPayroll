@@ -13,7 +13,6 @@ import com.example.MuzPayroll.entity.AddressInfoLog;
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.EntityLog;
 import com.example.MuzPayroll.entity.UserMst;
-import com.example.MuzPayroll.entity.DTO.EntityDataDTO;
 import com.example.MuzPayroll.entity.DTO.EntityLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.repository.AddressInfoLogRepository;
