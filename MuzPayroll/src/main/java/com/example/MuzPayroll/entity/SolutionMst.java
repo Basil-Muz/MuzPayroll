@@ -9,7 +9,7 @@ public class SolutionMst {
 
     @Id
     @Column(name = "SomSolutionID", unique = true, nullable = false)
-    private Long SomSolutionID;
+    private Long somSolutionID;
 
     @Column(nullable = false)
     private String SomSolutionCode;
@@ -45,10 +45,10 @@ public class SolutionMst {
     }
 
     public Long getSomSolutionID() {
-        return SomSolutionID;
+        return somSolutionID;
     }
 
-    public void setSomSolutionID(Long SomSolutionID) {
-        this.SomSolutionID = SomSolutionID;
+    public void setSomSolutionID(Long somSolutionID) {
+        this.somSolutionID = somSolutionID;
     }
 }

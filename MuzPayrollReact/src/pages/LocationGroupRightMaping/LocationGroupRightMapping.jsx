@@ -5,6 +5,7 @@ import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { useLoader } from "../../context/LoaderContext.jsx";
 import { ensureMinDuration } from "../../utils/loaderDelay";
+import { getFloatingActions } from "../../utils/setActionButtons";
 
 // Components
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
@@ -12,94 +13,183 @@ import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import { useAuth } from "../../context/AuthProvider";
 
-//service
-import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
-import { getBranchList } from "../../services/LocationGroupRightsMapping.service.js";
-// Utils(Helpers)
-import { handleApiError } from "../../utils/errorToastResolver";
+// Services
+import {
+  getSolutionList,
+  getBranchList,
+  getLocationGrpList,
+  getInitDataList,
+  saveLocationGroupMappings,
+} from "../../services/LocationGroupRightsMapping.service.js";
 
-// Styles
+import { handleApiError } from "../../utils/errorToastResolver";
+import { useSearchParams } from "react-router-dom";
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
+
 import "./LocationGroupRightsMapping.css";
 
 /* =========================================
    Main Page
 ========================================= */
 
-const initData = [
-  // {
-  //   id: 1,
-  //   businessSolution: { id: 1, name: "Employee portal" },
-  //   branch: {
-  //     id: 1,
-  //     name: "Norms Management Pvt Ltd",
-  //   },
-  //   location: {
-  //     id: "1002",
-  //     name: "ALAPPUZHA",
-  //   },
-  //   group: [{ id: 1027, name: "WAYANAD" }],
-  //   // _original: [],
-  //   _dirty: false,
-  // },
-];
-
 const PAGE_SIZE = 8;
 
 export default function () {
-  const [rows, setRows] = useState(initData);
+  const [rows, setRows] = useState([]);
+  const [solutions, setSolutions] = useState([]);
+  const [branches, setBranches] = useState([]);
+  const [groups, setGroups] = useState([]);
 
-  // const [branchFilter, setBranchFilter] = useState("ALL");
-
-  // const [locationQuery, setLocationQuery] = useState("");
-  const { showRailLoader, hideLoader } = useLoader();
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
   const [saveSelection, setSaveSelection] = useState(new Set());
-  const [originalMap, setOriginalMap] = useState(new Map()); // Capture the first state before edit
+  const [originalMap, setOriginalMap] = useState(new Map());
 
   const [bulkGroup, setBulkGroup] = useState([]);
 
-  const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  const [showFilters, setShowFilters] = useState(true); // Toggle the filter component
-  const [isSearchApplied, setIsSearchApplied] = useState(false); //  Load the table data
+  const [showFilters, setShowFilters] = useState(true);
+  const [isSearchApplied, setIsSearchApplied] = useState(false);
 
-  const [solutions, setSolutions] = useState([]);
-  const [branches, setBranches] = useState([]);
-
+  const { showRailLoader, hideLoader } = useLoader();
   const { user } = useAuth();
 
   const userId = user.userMstId;
   const companyId = user.userEntityHierarchyId;
 
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
+  const [backendPermissions, setBackendPermissions] = useState();
+
+  const { setSidebar } = useSidebarPermissions();
+
   useEffect(() => {
-    fetchDropDown();
+    loadInitialDropdowns();
   }, []);
 
-  const fetchDropDown = async () => {
+  const loadInitialDropdowns = async () => {
     const startTime = Date.now();
-    showRailLoader("Fetching details…");
-    try {
-      const solutions = await getSolutionList();
-      setSolutions(solutions.data);
+    showRailLoader("Fetching details...");
 
-      const branchs = await getBranchList(userId, companyId);
-      setBranches(branchs.data);
-    } catch (error) {
-      console.error("Error fetching solutions or Branchs:", error);
+    try {
+      const solutionRes = await getSolutionList();
+      setSolutions(solutionRes.data);
+
+      const branchRes = await getBranchList(userId, companyId);
+      setBranches(branchRes.data);
+
+      const groupRes = await getLocationGrpList(companyId);
+      setGroups(groupRes.data);
+    } catch (err) {
+      console.error(err);
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
     }
+  };
+
+  const solutionOptions = useMemo(
+    () =>
+      solutions.map((s) => ({
+        value: s.somSolutionID,
+        label: s.somSolutionName,
+      })),
+    [solutions],
+  );
+
+  const branchOptions = useMemo(() => {
+    return [
+      { value: "ALL", label: "All branches" },
+      ...branches.map((b) => ({
+        value: b.entityHierarchyId,
+        label: b.entityName,
+      })),
+    ];
+  }, [branches]);
+
+  const groupOptions = useMemo(
+    () =>
+      groups.map((g) => ({
+        id: g.mstID,
+        name: g.name,
+      })),
+    [groups],
+  );
+
+  const getBranchIds = () => {
+    if (branchFilter === "ALL") {
+      return branches.map((b) => b.entityHierarchyId);
+    }
+    return branchFilter ? [Number(branchFilter)] : [];
+  };
+
+  const fetchLocationGroupMappings = async () => {
+    const startTime = Date.now();
+    showRailLoader("Loading mappings...");
 
     try {
-      const branchs = await getBranchList(userId, companyId);
-      console.log("Branches fetched:", branchs);
-      setBranches(branchs.data);
+      const branchIds = getBranchIds();
+      console.log("Branch IDs sent to API:", branchIds);
+
+      const res = await getInitDataList(businessSolution, branchIds);
+
+      const transformedRows = res.data.map((item, index) => {
+        const selectedGroups =
+          item.groupId
+            ?.map((gid) => {
+              const g = groups.find((grp) => grp.mstID === gid);
+              return g
+                ? {
+                    id: g.mstID,
+                    name: g.name,
+                  }
+                : null;
+            })
+            .filter(Boolean) || [];
+
+        return {
+          id: `${item.entityHierarchyId}-${index}`,
+
+          linkId: item.linkId, // IMPORTANT
+
+          branch: {
+            id: item.branchId,
+            name: item.branchName,
+          },
+
+          location: {
+            id: item.entityHierarchyId,
+            name: item.locationName,
+          },
+
+          group: selectedGroups,
+
+          _dirty: false,
+        };
+      });
+      setRows(transformedRows);
+      setTotalCount(transformedRows.length);
     } catch (err) {
-      console.error("Branch fetch failed:", err);
+      handleApiError(err);
+    } finally {
+      await ensureMinDuration(startTime, 800);
+      hideLoader();
     }
   };
+
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
+
   const {
     register,
     // handleSubmit,
@@ -130,25 +220,6 @@ export default function () {
   //   return rows.slice(start, start + PAGE_SIZE);
   // }, [rows, page]);
 
-  const solutionOptions = useMemo(
-    () =>
-      solutions.map((s) => ({
-        value: s.somSolutionID,
-        label: s.somSolutionName,
-      })),
-    [solutions],
-  );
-
-  const branchOptions = useMemo(() => {
-    return [
-      { value: "ALL", label: "All branches" },
-      ...branches.map((s) => ({
-        value: s.entityHierarchyId,
-        label: s.entityName,
-      })),
-    ];
-  }, [branches]);
-  console.log("branches listaedfwef", branchOptions);
   // const filteredRows = useMemo(() => {
   //   if (!isSearchApplied) return [];
   //   trigger();
@@ -207,12 +278,18 @@ export default function () {
 
     setIsSearchApplied(true);
     setShowFilters(false);
-    setPage(1); // always reset page
+    setPage(1);
 
-    await fetchFilteredRows();
+    await fetchLocationGroupMappings();
   };
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
+
+  useEffect(() => {
+    if (isSearchApplied) {
+      fetchLocationGroupMappings();
+    }
+  }, [page]);
 
   const pageRows = useMemo(() => rows, [rows]);
 
@@ -292,10 +369,12 @@ export default function () {
   //   });
   // };
   const handleRefresh = () => {
-    fetchDropDown();
+    loadInitialDropdowns();
+
+    // fetchLocationGroupMappings();
   };
   const handleClear = () => {
-    fetchDropDown();
+    loadInitialDropdowns();
     setValue("businessSolution", null);
     setValue("branches", null);
     // Warn but DO NOT block
@@ -336,43 +415,42 @@ export default function () {
   const handleSave = async () => {
     if (!saveSelection.size) return;
 
-    // collect dirty rows
     const dirtyRows = rows.filter((r) => saveSelection.has(r.id));
 
-    // build payload
-    const payload = dirtyRows.map((r) => ({
-      branchId: r.branch.id,
-      locationId: r.location.id,
-      groupIds: r.group.map((g) => g.id),
-    }));
-
     try {
-      console.log("Saving payload:", payload);
+      for (const r of dirtyRows) {
+        const payload = new FormData();
 
-      // API call
-      // await saveLocationGroupMapping(payload);
+        payload.append("entityGrpRightsLinkID", r.linkId || "");
+        payload.append("eglSolutionID", businessSolution);
+        payload.append("eglEntityHierarchyID", r.location.id);
 
-      // Commit state on success
+        r.group.forEach((g) => {
+          payload.append("eglEntityGroupRightsIDs", g.id);
+        });
+
+        payload.append("LastModUserId", userId);
+        payload.append(
+          "EglLastModDate",
+          new Date().toISOString().split("T")[0],
+        );
+
+        await saveLocationGroupMappings(payload);
+      }
+
+      toast.success("Mappings saved successfully");
+
       setRows((prev) =>
         prev.map((row) =>
-          saveSelection.has(row.id)
-            ? {
-                ...row,
-                _dirty: false,
-              }
-            : row,
+          saveSelection.has(row.id) ? { ...row, _dirty: false } : row,
         ),
       );
 
-      // cleanup control state
       setSaveSelection(new Set());
       setSelectedRowIds(new Set());
       setBulkGroup([]);
-      setOriginalMap(new Map());
     } catch (err) {
       handleApiError(err);
-      console.error("Save failed", err);
-      // TODO: show toast / banner
     }
   };
 
@@ -560,7 +638,7 @@ export default function () {
 
               <div className="bulk-assign">
                 <LocationGroupMultiSelect
-                  options={GROUPS}
+                  options={groupOptions}
                   value={bulkGroup}
                   onChange={setBulkGroup}
                   placeholder="Assign location groups"
@@ -612,7 +690,7 @@ export default function () {
                         </td>
                         <td>
                           <LocationGroupMultiSelect
-                            options={GROUPS}
+                            options={groupOptions}
                             value={r.group}
                             onChange={(value) => {
                               setSelectedRowIds((p) => new Set(p).add(r.id));
@@ -724,7 +802,7 @@ export default function () {
         </div>
 
         <aside className="lgr-actions">
-          <FloatingActionBar
+          {/* <FloatingActionBar
             actions={{
               save: {
                 onClick: handleSave,
@@ -757,6 +835,28 @@ export default function () {
                 onClick: handleRefresh,
               },
             }}
+          /> */}
+
+          <FloatingActionBar
+            actions={getFloatingActions(
+              backendPermissions,
+              {
+                handleSave,
+                handleClear,
+                handleRefresh,
+                // handleSearch,
+                // handleNew,
+                // handleDelete,
+                // handlePrint,
+              },
+              {
+                canSave: !saveSelection.size, // because disabled: canSave
+                canSearch: true, // true → disabled
+                canClear: false, // false → enabled
+                canRefresh: false, // false → enabled
+              },
+              ["print", "save", "clear", "search", "refresh"],
+            )}
           />
         </aside>
       </div>

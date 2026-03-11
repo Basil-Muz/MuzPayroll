@@ -4,13 +4,12 @@ import java.time.LocalDate;
 
 import com.example.MuzPayroll.entity.Authorization;
 import com.example.MuzPayroll.entity.EntityHierarchyInfo;
-import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.EntityRightsGrpLogPK;
 
 import jakarta.persistence.Column;
 
 public class EntityRightsGrpLogDTO {
-   private EntityRightsGrpLogPK entityRightsGrpLogPK;
+    private EntityRightsGrpLogPK entityRightsGrpLogPK;
 
     private Long ErmEntityRightsGroupID;
 
@@ -36,9 +35,9 @@ public class EntityRightsGrpLogDTO {
 
     private Boolean authorizationStatus;
 
-    private Long entityHierarchyInfoID; 
+    private Long entityHierarchyInfoID;
 
-    private EntityHierarchyInfo HierarchyInfoID; 
+    private EntityHierarchyInfo HierarchyInfoID;
 
     public EntityHierarchyInfo getHierarchyInfoID() {
         return HierarchyInfoID;
@@ -47,7 +46,6 @@ public class EntityRightsGrpLogDTO {
     public void setHierarchyInfoID(EntityHierarchyInfo hierarchyInfoID) {
         HierarchyInfoID = hierarchyInfoID;
     }
-
 
     @Column(name = "ActiveDate", nullable = false)
     private LocalDate activeDate;
@@ -167,17 +165,16 @@ public class EntityRightsGrpLogDTO {
     }
 
     // public EntityMst getEntityMst() {
-    //     return entityMst;
+    // return entityMst;
     // }
 
     // public void setEntityMst(EntityMst entityMst) {
-    //     this.entityMst = entityMst;
+    // this.entityMst = entityMst;
     // }
 
-      public Long getEntityHierarchyInfoID() {
+    public Long getEntityHierarchyInfoID() {
         return entityHierarchyInfoID;
     }
-
 
     public void setEntityHierarchyInfoID(Long entityHierarchyInfoID) {
         this.entityHierarchyInfoID = entityHierarchyInfoID;
