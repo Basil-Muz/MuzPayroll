@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+
+  backend:
+    build: ./backend
+    container_name: springboot-api
+    ports:
+      - "8080:8080"
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: react-ui
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always

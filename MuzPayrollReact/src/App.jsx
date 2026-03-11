@@ -49,6 +49,7 @@ import SiteMap from "./pages/SiteMap/SiteMap.jsx";
 import Department from "./pages/Department/department.jsx";
 import User from "./pages/User/user.jsx"
 import ResetPassword from "./pages/Reset Password/resetPassword.jsx";
+import UserSettings from "./pages/UserSettings/UserSettings.jsx";
 
 function App() {
   return (
@@ -183,6 +184,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserGrpRights />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/usersettings"
+            element={
+              <ProtectedRoute>
+                <UserSettings />
               </ProtectedRoute>
             }
           />
