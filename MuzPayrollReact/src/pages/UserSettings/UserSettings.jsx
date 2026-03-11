@@ -638,7 +638,7 @@ export default function UserSettings() {
                   <th>User Group</th>
                   <th className="group-fixed">User Groups</th>
                   <th>Location</th>
-                  <th className="group-fixed">Location Groups</th>
+                  <th className="group-fixed">Locations</th>
                   {/* <th className="assign-fixed">Assign</th> */}
                   <th>Save</th>
                 </tr>
@@ -803,14 +803,14 @@ export default function UserSettings() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="no-table-data">
+                      <td colSpan={8} className="no-table-data">
                         No mapping details found for selected criteria
                       </td>
                     </tr>
                   )
                 ) : (
                   <tr>
-                    <td colSpan={6} className="no-table-data">
+                    <td colSpan={8} className="no-table-data">
                       Select filters and click <strong>Apply</strong> to view
                       mappings
                     </td>

@@ -16,6 +16,7 @@ import com.example.MuzPayroll.entity.UserAndUserGroupLink;
 import com.example.MuzPayroll.entity.UserGrpMst;
 import com.example.MuzPayroll.entity.DTO.EntityDTO;
 import com.example.MuzPayroll.entity.DTO.EntityGrpRightsDTO;
+import com.example.MuzPayroll.entity.DTO.EntityGrpRightsLinkDTO;
 import com.example.MuzPayroll.entity.DTO.EntityRightsGrpMstDTO;
 import com.example.MuzPayroll.entity.DTO.GroupDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
@@ -184,16 +185,9 @@ public class UserSettingsService extends MuzirisAbstractService<UserSettingsResp
     @Override
     protected UserAndUserGroupLink saveEntity(UserAndUserGroupLink entity, List<UserSettingsResponseDTO> dtos,
             String mode) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'saveEntity'");
-    }
-
-    @Override
-    public Response<UserAndUserGroupLink> converttoEntity(List<UserSettingsResponseDTO> dtos) {
-        UserAndUserGroupLink group = new UserAndUserGroupLink();
-        List<UserAndUserGroupLink> links = new ArrayList<>();
-        for (UserSettingsResponseDTO dto : dtos) {
-            if (dto.getGroups() != null && !dto.getGroups().isEmpty()) {
+                List<UserAndEntityLink> userAndEntityLinkList =  new ArrayList<>();
+                for (UserSettingsResponseDTO dto : dtos) {
+                if (dto.getGroups() != null && !dto.getGroups().isEmpty()) {
 
                 for (GroupDTO groupDTO : dto.getGroups()) {
 
@@ -203,12 +197,27 @@ public class UserSettingsService extends MuzirisAbstractService<UserSettingsResp
                         userGrp.setUserMst(
                                 userRepository.findByUserMstId(dto.getId()));
                     }
-                    UserGrpMst group = userAndUserGroupLinkRepositoty.findByUserGrpRightsId(groupDTO.getId());
 
-                    links.add(userGrp);
+                    // UserGrpMst group = userAndUserGroupLinkRepositoty.findByUserGrpRightsId(groupDTO.getId());
+
+                    // userGrp.setUserGrpMst(group);
                 }
             }
         }
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'saveEntity'");
+    }
+
+    @Override
+    public Response<UserAndUserGroupLink> converttoEntity(List<UserSettingsResponseDTO> dtos) {
+        UserAndUserGroupLink group = new UserAndUserGroupLink();
+      
+                // UserSettingsResponseDTO dto = dtos.get(0);
+                //     if (dto.getId() != null) {
+                //         group.setUserMst(
+                //                 userRepository.findByUserMstId(dto.getId()));
+                //     }
+                    
 
         return Response.success(group);
     }
