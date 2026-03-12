@@ -28,37 +28,15 @@ import { handleApiError } from "../../utils/errorToastResolver";
 import { extractIds } from "../../utils/idFrommultiSelect.js";
 import { getFloatingActions } from "../../utils/setActionButtons";
 
-import "./UserSettings.css";
-/* =========================================
-   Main Page
-========================================= */
-const GROUPS = [
-  // { id: 1027, name: "WAYANAD" },
-  { id: 1026, name: "KANNUR" },
-];
-// const [] = [
-//   {
-//     id: 1,
-//     businessSolution: { id: 1, name: "Employee portal" },
-//     branch: {
-//       id: 1,
-//       name: "Norms Management Pvt Ltd",
-//     },
-//     location: {
-//       id: "1002",
-//       name: "ALAPPUZHA",
-//     },
-//     group: [{ id: 1027, name: "WAYANAD" }],
-//     // _original: [],
-//     _dirty: false,
-//   },
-// ];
-
+import "./CompanyAllocation.css"
 const PAGE_SIZE = 8;
 
 export default function UserSettings() {
   const [rows, setRows] = useState([]);
 
+  // const [branchFilter, setBranchFilter] = useState("ALL");
+
+  // const [locationQuery, setLocationQuery] = useState("");
   const { showRailLoader, hideLoader } = useLoader();
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
   const [saveSelection, setSaveSelection] = useState(new Set());
@@ -70,6 +48,9 @@ export default function UserSettings() {
   const [locations, setLocations] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
+
+  const [activeUser, setActiveUser] = useState(null);
+  const [showConfigModal, setShowConfigModal] = useState(false);
 
   const [backendPermissions, setBackendPermissions] = useState();
 
@@ -86,6 +67,9 @@ export default function UserSettings() {
 
   const { setSidebar } = useSidebarPermissions();
 
+  // const userId = user.userMstId;
+  // const companyId = user.userEntityHierarchyId;
+
   useEffect(() => {
     fetchDropDown();
   }, []);
@@ -100,6 +84,7 @@ export default function UserSettings() {
       setBackendPermissions,
     );
   }, [optionid]);
+
   // console.log("User", user);
   const fetchDropDown = async () => {
     const startTime = Date.now();
@@ -128,7 +113,6 @@ export default function UserSettings() {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
     }
-
   };
   const {
     register,
@@ -151,6 +135,16 @@ export default function UserSettings() {
       activeStatusYN: 1,
     },
   });
+
+  const openConfigModal = (row) => {
+    setActiveUser(row);
+    setShowConfigModal(true);
+  };
+
+  const closeConfigModal = () => {
+    setActiveUser(null);
+    setShowConfigModal(false);
+  };
 
   const userTypeOptions = useMemo(
     () =>
@@ -192,9 +186,6 @@ export default function UserSettings() {
     const startTime = Date.now();
     showRailLoader("Loading required data...");
     try {
-      // const userTypes = getValues("UserCode");
-      // const userTypes = extractIds(bulkGroup);
-
       const payload = buildFilterPayload();
       console.log("payload", payload);
 
@@ -202,7 +193,6 @@ export default function UserSettings() {
       const res = await getUserSettingsList(payload);
       // console.log("Response", res.data);
       // setRows(res.data);
-
       // MOCK (simulate backend pagination)
       const start = (page - 1) * PAGE_SIZE;
       const pagedData = res.data.slice(start, start + PAGE_SIZE);
@@ -361,11 +351,6 @@ export default function UserSettings() {
     setIsSearchApplied(false);
     setShowFilters(true);
 
-    // Clear search inputs
-    // setBusinessSolution("");
-    // setBranchFilter("");
-    // setLocationQuery("");
-
     //  RESET SELECT BOX IN TABLE DATA
     setRows(
       rows.map((r) => ({
@@ -456,7 +441,7 @@ export default function UserSettings() {
           <Header backendError={[]} />
           <div className="lgr-header">
             <div>
-              <h2>User Settings</h2>
+              <h2>Company Allocation</h2>
               <p>Manage user group and location assignments for users</p>
             </div>
             <div className="filter-save">
@@ -659,7 +644,7 @@ export default function UserSettings() {
                   <th>Location</th>
                   <th className="group-fixed">Locations</th>
                   {/* <th className="assign-fixed">Assign</th> */}
-                  <th>Save</th>
+                  <th>Action</th>
                 </tr>
               </thead>
 
@@ -810,12 +795,12 @@ export default function UserSettings() {
                       )} */}
                         </td>
                         <td>
-                          <input
-                            type="checkbox"
-                            disabled={!r._dirty}
-                            checked={saveSelection.has(r.id)}
-                            readOnly
-                          />
+                          <button
+                            className="btn btn-config"
+                            onClick={() => openConfigModal(r)}
+                          >
+                            Configure
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -837,7 +822,87 @@ export default function UserSettings() {
               </tbody>
             </table>
           </div>
+          {showConfigModal && activeUser && (
+            <div className="modal-overlay">
+              <div className="config-modal">
+                <div className="modal-header">
+                  <h3>
+                    Configure Settings – {activeUser.name} ({activeUser.code})
+                  </h3>
+                  <button className="close-btn" onClick={closeConfigModal}>
+                    ✕
+                  </button>
+                </div>
 
+                <div className="modal-body">
+                  {/* User Groups */}
+                  <div className="modal-field">
+                    <label>User Groups</label>
+                    <LocationGroupMultiSelect
+                      options={branchOptions}
+                      value={activeUser.groups}
+                      onChange={(value) => {
+                        setActiveUser((prev) => ({
+                          ...prev,
+                          groups: value,
+                        }));
+                      }}
+                      placeholder="Select user groups"
+                    />
+                  </div>
+
+                  {/* Locations */}
+                  <div className="modal-field">
+                    <label>Locations</label>
+                    <LocationGroupMultiSelect
+                      options={LocationOptions}
+                      value={activeUser.entity}
+                      onChange={(value) => {
+                        setActiveUser((prev) => ({
+                          ...prev,
+                          entity: value,
+                        }));
+                      }}
+                      placeholder="Select locations"
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-footer">
+                  <button className="btn btn-cancel" onClick={closeConfigModal}>
+                    Cancel
+                  </button>
+
+                  <button
+                    className="btn btn-save"
+                    onClick={() => {
+                      setRows((prev) =>
+                        prev.map((row) =>
+                          row.id === activeUser.id
+                            ? {
+                                ...row,
+                                groups: activeUser.groups,
+                                entity: activeUser.entity,
+                                _dirty: true,
+                              }
+                            : row,
+                        ),
+                      );
+
+                      setSaveSelection((prev) =>
+                        new Set(prev).add(activeUser.id),
+                      );
+
+                      toast.success("Configuration updated");
+                      closeConfigModal();
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Pagination */}
           <div className="pager">
             <button

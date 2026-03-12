@@ -48,6 +48,7 @@ import LocationGroupRights from "./pages/LocationGroupRights/LocationGroupRights
 import SiteMap from "./pages/SiteMap/SiteMap.jsx";
 import Department from "./pages/Department/department.jsx";
 import UserSettings from "./pages/UserSettings/UserSettings.jsx";
+import CompanyAllocation from "./pages/CompanyAllocation/CompanyAllocation.jsx";
 
 function App() {
   return (
@@ -188,6 +189,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserSettings />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/companyallocation"
+            element={
+              <ProtectedRoute>
+                <CompanyAllocation />
               </ProtectedRoute>
             }
           />
