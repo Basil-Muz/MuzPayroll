@@ -194,7 +194,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="/usersettings"
             element={
               <ProtectedRoute>
@@ -214,10 +214,7 @@ function App() {
             element={<LocationGroupRightsMapping />}
           />
 
-          <Route
-            path="/licenseagreement"
-            element={<LicenseAgreement />}
-          />
+          <Route path="/licenseagreement" element={<LicenseAgreement />} />
 
           <Route
             path="/locationgrouprights"
