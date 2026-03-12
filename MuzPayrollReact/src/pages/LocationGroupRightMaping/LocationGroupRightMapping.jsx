@@ -130,7 +130,6 @@ export default function () {
 
     try {
       const branchIds = getBranchIds();
-      console.log("Branch IDs sent to API:", branchIds);
 
       const res = await getInitDataList(businessSolution, branchIds);
 
@@ -151,7 +150,6 @@ export default function () {
         return {
           id: `${item.entityHierarchyId}-${index}`,
 
-          linkId: item.linkId, // IMPORTANT
 
           branch: {
             id: item.branchId,
@@ -368,11 +366,15 @@ export default function () {
   //     return n;
   //   });
   // };
-  const handleRefresh = () => {
-    loadInitialDropdowns();
 
-    // fetchLocationGroupMappings();
+  const handleRefresh = () => {
+    if (isSearchApplied == true) {
+      fetchLocationGroupMappings();
+    } else {
+      loadInitialDropdowns();
+    }
   };
+
   const handleClear = () => {
     loadInitialDropdowns();
     setValue("businessSolution", null);

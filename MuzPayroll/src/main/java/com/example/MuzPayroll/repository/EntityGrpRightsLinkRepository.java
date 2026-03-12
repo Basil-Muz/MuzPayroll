@@ -14,7 +14,6 @@ public interface EntityGrpRightsLinkRepository extends JpaRepository<EntityGrpRi
 
     @Query(value = """
             SELECT
-                er.entity_grp_rights_linkid AS linkId,
                 e.etm_entityid AS branchId,
                 e.etm_name AS branchName,
                 eh.ehi_entity_hierarchyid AS locationId,
