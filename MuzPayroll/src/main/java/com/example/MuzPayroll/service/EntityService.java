@@ -959,7 +959,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
 
                                 // =====================
                                 // COMPANY
-                                // =====================
+                                // ================UserAndUserGroupLink=====
                                 savedEntity = entityRepository.save(entity);
 
                                 // BG hierarchy
