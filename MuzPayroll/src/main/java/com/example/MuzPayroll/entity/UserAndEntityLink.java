@@ -20,7 +20,15 @@ public class UserAndEntityLink {
 
     @ManyToOne
     @JoinColumn(name = "UelEntityHierarchyID", nullable = true)
-    private EntityHierarchyInfo entityHierarchyInfo;
+    private EntityMst entityMst;
+
+    public EntityMst getEntityMst() {
+        return entityMst;
+    }
+
+    public void setEntityMst(EntityMst entityMst) {
+        this.entityMst = entityMst;
+    }
 
     public UserMst getUserMst() {
         return userMst;
@@ -28,14 +36,6 @@ public class UserAndEntityLink {
 
     public void setUserMst(UserMst userMst) {
         this.userMst = userMst;
-    }
-
-    public EntityHierarchyInfo getEntityHierarchyInfo() {
-        return entityHierarchyInfo;
-    }
-
-    public void setEntityHierarchyInfo(EntityHierarchyInfo entityHierarchyInfo) {
-        this.entityHierarchyInfo = entityHierarchyInfo;
     }
 
     public Long getUserAndEntityLinkID() {
