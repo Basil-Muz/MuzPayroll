@@ -49,7 +49,7 @@ import SiteMap from "./pages/SiteMap/SiteMap.jsx";
 import Department from "./pages/Department/department.jsx";
 import UserSettings from "./pages/UserSettings/UserSettings.jsx";
 import CompanyAllocation from "./pages/CompanyAllocation/CompanyAllocation.jsx";
-
+import LicenseAgreement from './pages/License Agreement/LicenseAgreement.jsx';
 function App() {
   return (
     <>
