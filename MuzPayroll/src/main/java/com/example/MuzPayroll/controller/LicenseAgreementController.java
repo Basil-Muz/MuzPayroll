@@ -12,31 +12,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.MuzPayroll.entity.LicenseAgreement;
 import com.example.MuzPayroll.entity.DTO.EntityGrpLinkDTO;
 import com.example.MuzPayroll.entity.DTO.EntityGrpRightsLinkDTO;
+import com.example.MuzPayroll.entity.DTO.LicenseAgreementDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
-import com.example.MuzPayroll.service.EntityGrpRightsLinkService;
+import com.example.MuzPayroll.repository.LicenseAgreementRepository;
+import com.example.MuzPayroll.service.LicenseAgreementService;
 
-@RestController
-@RequestMapping("/entity-rights")
 @CrossOrigin(origins = "*")
-public class EntityGrpRightsLinkController {
+@RestController
+@RequestMapping("/licenseagreement")
+public class LicenseAgreementController {
+
     @Autowired
-    EntityGrpRightsLinkService entityGrpRightsLinkService;
+    private LicenseAgreementRepository licenseAgreementRepository;
+
+    @Autowired
+    private LicenseAgreementService licenseAgreementService;
 
     @PostMapping("/save")
-    public Response<EntityGrpRightsLinkDTO> save(@ModelAttribute EntityGrpRightsLinkDTO dto) {
-        return entityGrpRightsLinkService.saveWrapper(dto, "INSERT");
+    public Response<LicenseAgreementDTO> save(@ModelAttribute LicenseAgreementDTO dto) {
+        return licenseAgreementService.saveWrapper(dto, "INSERT");
     }
 
-    @GetMapping("/linkData")
-    public ResponseEntity<List<EntityGrpLinkDTO>> getEntityRights(
-            @RequestParam Long solutionId,
-            @RequestParam List<Long> branchIds) {
+    @GetMapping("/getdata")
+    public ResponseEntity<List<LicenseAgreementDTO>> getLicenseAgreementS(
+            @RequestParam Long companyId) {
 
-        List<EntityGrpLinkDTO> result = entityGrpRightsLinkService.getData(solutionId, branchIds);
+        List<LicenseAgreementDTO> result = licenseAgreementService.getData(companyId);
 
         return ResponseEntity.ok(result);
     }
-
 }

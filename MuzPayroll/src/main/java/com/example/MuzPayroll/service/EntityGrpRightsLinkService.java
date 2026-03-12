@@ -218,7 +218,7 @@ public class EntityGrpRightsLinkService extends MuzirisAbstractService<EntityGrp
                 entity.setEntityMst(entityMst);
 
                 SolutionMst solutionMst = solutionRepository.findById(dto.getEglSolutionID())
-                                .orElseThrow(() -> new RuntimeException("Invalid Entity ID"));
+                                .orElseThrow(() -> new RuntimeException("Invalid Solution ID"));
                 entity.setSolutionMst(solutionMst);
 
                 // EntityRightsGrpMst entityRightsGrpMst = entityRightsGrpMstRepository
@@ -318,18 +318,16 @@ public class EntityGrpRightsLinkService extends MuzirisAbstractService<EntityGrp
 
                 for (Object[] r : rows) {
 
-                        Long linkId = r[0] != null ? ((Number) r[0]).longValue() : null;
-                        Long branchId = r[1] != null ? ((Number) r[1]).longValue() : null;
-                        String branchName = (String) r[2];
-                        Long locationId = r[3] != null ? ((Number) r[3]).longValue() : null;
-                        String locationName = (String) r[4];
-                        Long groupId = r[5] != null ? ((Number) r[5]).longValue() : null;
+                        Long branchId = r[0] != null ? ((Number) r[0]).longValue() : null;
+                        String branchName = (String) r[1];
+                        Long locationId = r[2] != null ? ((Number) r[2]).longValue() : null;
+                        String locationName = (String) r[3];
+                        Long groupId = r[4] != null ? ((Number) r[4]).longValue() : null;
 
                         EntityGrpLinkDTO dto = map.get(locationId);
 
                         if (dto == null) {
                                 dto = new EntityGrpLinkDTO();
-                                dto.setLinkId(linkId);
                                 dto.setBranchId(branchId);
                                 dto.setBranchName(branchName);
                                 dto.setEntityHierarchyId(locationId);
