@@ -89,9 +89,10 @@ export default function GenaralLocationForm() {
     addingNewAmend,
     setAddingNewAmend,
   });
-  const { showRailLoader, hideLoader } = useLoader();
+
   const { loadCompany, companyList } = useLoadCompany();
   const { loadBranches, branchList } = useLoadBranch();
+
   const { setSidebar } = useSidebarPermissions();
   /* ------------------------------------------------------------------
    * 5. FORM INITIALIZATION (React Hook Form)
@@ -240,7 +241,7 @@ export default function GenaralLocationForm() {
       user.userEntityHierarchyId,
       setBackendPermissions,
     );
-  }, [optionid, user, setSidebar]);
+  }, [optionid]);
   /* ------------------------------------------------------------------
    * 11. EVENT HANDLERS
    * ------------------------------------------------------------------ */

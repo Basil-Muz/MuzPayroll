@@ -56,17 +56,6 @@ public class EntityRightsGrpLog {
         return ErmCode;
     }
 
-    @Column(name = "ehi_business_groupid")
-    private Long entityHierarchyInfoID; 
-
-    public Long getEntityHierarchyInfoID() {
-        return entityHierarchyInfoID;
-    }
-
-    public void setEntityHierarchyInfoID(Long entityHierarchyInfoID) {
-        this.entityHierarchyInfoID = entityHierarchyInfoID;
-    }
-
     public void setErmCode(String ErmCode) {
         this.ErmCode = ErmCode;
     }
