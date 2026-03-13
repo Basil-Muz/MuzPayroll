@@ -10,6 +10,7 @@ import { useSearchParams } from "react-router-dom";
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
+import CompanyAllocationModal from "../../components/CompanyModel/CompanyAllocationModal.jsx";
 import { useAuth } from "../../context/AuthProvider";
 
 import { useSidebarPermissions } from "../../hooks/useSidebarPermissions.js";
@@ -28,9 +29,31 @@ import { handleApiError } from "../../utils/errorToastResolver";
 import { extractIds } from "../../utils/idFrommultiSelect.js";
 import { getFloatingActions } from "../../utils/setActionButtons";
 
-import "./CompanyAllocation.css"
+import "./CompanyAllocation.css";
 const PAGE_SIZE = 8;
-
+const companies = [
+  {
+    companyId: 101,
+    companyName: "4C GEMS AGENCY",
+    groups: [{ id: 1, name: "Admin" }],
+    locations: [{ id: 11, name: "Kochi" }],
+    enabled: true,
+  },
+  {
+    companyId: 102,
+    companyName: "A1 EQUIPMENTS",
+    groups: [],
+    locations: [],
+    enabled: false,
+  },
+  {
+    companyId: 103,
+    companyName: "AADHYA CONSTRUCTIONS",
+    groups: [{ id: 2, name: "Manager" }],
+    locations: [{ id: 12, name: "Trivandrum" }],
+    enabled: true,
+  },
+];
 export default function UserSettings() {
   const [rows, setRows] = useState([]);
 
@@ -49,9 +72,9 @@ export default function UserSettings() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
 
-  const [activeUser, setActiveUser] = useState(null);
-  const [showConfigModal, setShowConfigModal] = useState(false);
-
+  const [showModal, setShowModal] = useState(false);
+  const [modalUser, setModalUser] = useState(null);
+  const [companyRows, setCompanyRows] = useState([companies]);
   const [backendPermissions, setBackendPermissions] = useState();
 
   const [showFilters, setShowFilters] = useState(true); // Toggle the filter component
@@ -136,15 +159,15 @@ export default function UserSettings() {
     },
   });
 
-  const openConfigModal = (row) => {
-    setActiveUser(row);
-    setShowConfigModal(true);
-  };
+  // const openConfigModal = (row) => {
+  //   setActiveUser(row);
+  //   setShowConfigModal(true);
+  // };
 
-  const closeConfigModal = () => {
-    setActiveUser(null);
-    setShowConfigModal(false);
-  };
+  // const closeConfigModal = () => {
+  //   setActiveUser(null);
+  //   setShowConfigModal(false);
+  // };
 
   const userTypeOptions = useMemo(
     () =>
@@ -187,7 +210,7 @@ export default function UserSettings() {
     showRailLoader("Loading required data...");
     try {
       const payload = buildFilterPayload();
-      console.log("payload", payload);
+      // console.log("payload", payload);
 
       // Replace with real API
       const res = await getUserSettingsList(payload);
@@ -243,7 +266,7 @@ export default function UserSettings() {
   };
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
-  console.log("UDHINBF", setSelectedRowIds);
+
   const pageRows = useMemo(() => rows, [rows]);
 
   // useEffect(() => {
@@ -394,7 +417,7 @@ export default function UserSettings() {
     const startTime = Date.now();
     showRailLoader("Saving selected records...");
     try {
-      console.log("Saving payload:", payload);
+      // console.log("Saving payload:", payload);
 
       // API call
       await saveUserSettings(payload, "INSERT");
@@ -442,16 +465,19 @@ export default function UserSettings() {
           <div className="lgr-header">
             <div>
               <h2>Company Allocation</h2>
-              <p>Manage user group and location assignments for users</p>
+              <p>
+                Assign user groups and locations for the selected user's
+                companies
+              </p>
             </div>
             <div className="filter-save">
-              <button
+              {/* <button
                 className={`filter-toggle ${showFilters ? "active" : ""}`}
                 onClick={() => setShowFilters((s) => !s)}
               >
                 <FaFilter />
                 <span>Filters</span>
-              </button>
+              </button> */}
 
               <div
                 className={`save-indicator ${saveSelection.size ? "active" : ""}`}
@@ -470,179 +496,15 @@ export default function UserSettings() {
             </div>
           </div>
 
-          {showFilters && (
-            <div className="lgr-filters">
-              <div className="us-filter-item">
-                <LocationGroupMultiSelect
-                  options={userTypeOptions}
-                  value={selectedUserTypes}
-                  onChange={(val) => {
-                    setSelectedUserTypes(val);
-                    if (val.length > 0) {
-                      clearErrors("userType");
-                    }
-                  }}
-                  placeholder="Select User Types"
-                  disabled={isSearchApplied}
-                />
-                {errors.userType && (
-                  <span className="error-message">
-                    {errors.userType.message}
-                  </span>
-                )}
-              </div>
-              <div className="us-filter-item">
-                <input
-                  type="text"
-                  // ref={nameInputRef}
-                  className={`form-control ${errors.UserCode ? "error" : ""} ${isSearchApplied ? "read-only" : ""}`}
-                  placeholder="Enter User Code"
-                  disabled={isSearchApplied}
-                  {...register("UserCode", {
-                    // required: `User code is required`,
-                    pattern: {
-                      value: /^[a-zA-Z0-9\s.-]+$/,
-                      message:
-                        "Only letters, numbers, spaces, dots, and hyphens are allowed",
-                    },
-                  })}
-                />
-                {errors.UserCode && (
-                  <span className="error-message">
-                    {errors.UserCode.message}
-                  </span>
-                )}
-              </div>
-              <div className="us-filter-item">
-                <LocationGroupMultiSelect
-                  options={branchOptions}
-                  value={bulkGroup}
-                  onChange={setBulkGroup}
-                  placeholder="Select User Groups"
-                  disabled={isSearchApplied}
-                />
-              </div>
-              <div className="us-filter-item">
-                <LocationGroupMultiSelect
-                  options={LocationOptions}
-                  value={selectedLocation}
-                  onChange={setSelectedLocation}
-                  placeholder="Select Location Groups"
-                  disabled={isSearchApplied}
-                />
-              </div>
-
-              {/* <div>
-                <input
-                  type="search"
-                  disabled={isSearchApplied}
-                  className={`form-control input${errors.location ? "error" : ""} ${isSearchApplied ? "read-only" : ""}`}
-                  placeholder="Search by location"
-                  {...register("location")}
-                />
-              </div> */}
-
-              <div className="search-actions">
-                {!isSearchApplied ? (
-                  <button className="btn btn-apply" onClick={handleApplySearch}>
-                    Apply
-                  </button>
-                ) : (
-                  <button
-                    className="btn btn-change"
-                    onClick={() => {
-                      if (saveSelection.size) {
-                        alert("You have unsaved changes");
-                        return;
-                      }
-                      setIsSearchApplied(false);
-
-                      setSelectedRowIds(new Set());
-                      setBulkGroup([]);
-                    }}
-                  >
-                    Change Search
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Bulk Panel */}
-          {/* {selectedRowIds.size === 0 && (
-            <div className="bulk-hint" role="status" aria-live="polite">
-              Select one or more rows to enable bulk actions
-            </div>
-          )} */}
-
-          {/* ===== Bulk Context Bar ===== */}
-          {selectedRowIds.size > 0 && (
-            <div
-              className="bulk-bar"
-              role="region"
-              aria-label="Bulk assignment controls"
-              aria-live="polite"
-            >
-              <div className="bulk-info">
-                <strong>{selectedRowIds.size}</strong>
-                <span>locations selected for bulk assignment</span>
-              </div>
-
-              <div
-                className="bulk-actions"
-                role="group"
-                aria-label="Bulk selection actions"
-              >
-                <button className="link" onClick={selectAllOnPage}>
-                  Select all on page
-                </button>
-
-                <button className="link" onClick={selectAllAcrossPages}>
-                  Select all across pages
-                </button>
-
-                <button className="link danger" onClick={clearSelection}>
-                  Clear selection
-                </button>
-              </div>
-
-              <div className="bulk-assign">
-                <LocationGroupMultiSelect
-                  options={branchOptions}
-                  value={bulkGroup}
-                  onChange={setBulkGroup}
-                  placeholder="Assign User Groups"
-                />
-                <LocationGroupMultiSelect
-                  options={LocationOptions}
-                  value={location}
-                  onChange={setLocation}
-                  placeholder="Assign Location"
-                />
-                <button
-                  className="btn btn-apply"
-                  disabled={!bulkGroup?.length && !location?.length}
-                  onClick={applyBulk}
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Table */}
 
           <div className="card">
             <table className="grid">
               <thead>
                 <tr>
-                  <th>Set</th>
                   <th>User Code</th>
                   <th>User Name</th>
-                  <th>User Group</th>
-                  <th className="group-fixed">User Groups</th>
-                  <th>Location</th>
-                  <th className="group-fixed">Locations</th>
+                  <th className="group-fixed">Companys</th>
                   {/* <th className="assign-fixed">Assign</th> */}
                   <th>Action</th>
                 </tr>
@@ -653,13 +515,6 @@ export default function UserSettings() {
                   pageRows.length ? (
                     pageRows.map((r) => (
                       <tr key={r.id} className={r._dirty ? "dirty" : ""}>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={selectedRowIds.has(r.id)}
-                            onChange={() => toggleSet(r.id)}
-                          />
-                        </td>
                         <td>{r.code}</td>
                         <td>{r.name}</td>
                         <td className="muted">
@@ -797,7 +652,11 @@ export default function UserSettings() {
                         <td>
                           <button
                             className="btn btn-config"
-                            onClick={() => openConfigModal(r)}
+                            onClick={() => {
+                              setModalUser(r);
+                              setCompanyRows(r.companies || []);
+                              setShowModal(true);
+                            }}
                           >
                             Configure
                           </button>
@@ -822,86 +681,25 @@ export default function UserSettings() {
               </tbody>
             </table>
           </div>
-          {showConfigModal && activeUser && (
-            <div className="modal-overlay">
-              <div className="config-modal">
-                <div className="modal-header">
-                  <h3>
-                    Configure Settings – {activeUser.name} ({activeUser.code})
-                  </h3>
-                  <button className="close-btn" onClick={closeConfigModal}>
-                    ✕
-                  </button>
-                </div>
+          {showModal && (
+            <CompanyAllocationModal
+              user={modalUser}
+              companies={companyRows}
+              groupOptions={branchOptions}
+              locationOptions={LocationOptions}
+              onClose={() => setShowModal(false)}
+              onSave={(rows) => {
+                setRows((prev) =>
+                  prev.map((r) =>
+                    r.id === modalUser.id ? { ...r, companies: rows } : r,
+                  ),
+                );
 
-                <div className="modal-body">
-                  {/* User Groups */}
-                  <div className="modal-field">
-                    <label>User Groups</label>
-                    <LocationGroupMultiSelect
-                      options={branchOptions}
-                      value={activeUser.groups}
-                      onChange={(value) => {
-                        setActiveUser((prev) => ({
-                          ...prev,
-                          groups: value,
-                        }));
-                      }}
-                      placeholder="Select user groups"
-                    />
-                  </div>
+                toast.success("Company allocations updated");
 
-                  {/* Locations */}
-                  <div className="modal-field">
-                    <label>Locations</label>
-                    <LocationGroupMultiSelect
-                      options={LocationOptions}
-                      value={activeUser.entity}
-                      onChange={(value) => {
-                        setActiveUser((prev) => ({
-                          ...prev,
-                          entity: value,
-                        }));
-                      }}
-                      placeholder="Select locations"
-                    />
-                  </div>
-                </div>
-
-                <div className="modal-footer">
-                  <button className="btn btn-cancel" onClick={closeConfigModal}>
-                    Cancel
-                  </button>
-
-                  <button
-                    className="btn btn-save"
-                    onClick={() => {
-                      setRows((prev) =>
-                        prev.map((row) =>
-                          row.id === activeUser.id
-                            ? {
-                                ...row,
-                                groups: activeUser.groups,
-                                entity: activeUser.entity,
-                                _dirty: true,
-                              }
-                            : row,
-                        ),
-                      );
-
-                      setSaveSelection((prev) =>
-                        new Set(prev).add(activeUser.id),
-                      );
-
-                      toast.success("Configuration updated");
-                      closeConfigModal();
-                    }}
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
+                setShowModal(false);
+              }}
+            />
           )}
           {/* Pagination */}
           <div className="pager">

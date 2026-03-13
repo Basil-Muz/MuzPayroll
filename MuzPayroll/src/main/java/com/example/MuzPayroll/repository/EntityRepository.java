@@ -446,4 +446,22 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
     // @Param("etmEntityID") Long etmEntityID,
     // @Param("mccId") Long mccId);
 
+
+    @Query("""
+            SELECT a
+            FROM EntityMst a
+            WHERE a.etmEntityId = :etmEntityId
+            """)
+    EntityMst findByEtmEntityID(
+            @Param("etmEntityId") Long etmEntityId);
+
+    @Query("""
+            SELECT a.etmEntityId
+            FROM EntityMst a
+            WHERE a.etmEntityId = :etmEntityId
+            """)
+    Long findIdByEtmEntityID(
+            @Param("etmEntityId") Long etmEntityId);
+
+
 }

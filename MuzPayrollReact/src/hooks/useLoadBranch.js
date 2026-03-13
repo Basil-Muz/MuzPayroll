@@ -18,13 +18,13 @@ export const useLoadBranch = () => {
         value: branch.entityHierarchyId,
         label: branch.entityName,
       }));
-      console.log("conso",branches)
+      // console.log("conso",branches)
       setBranchList(branches);
     } catch (error) {
       handleApiError(error);
     }
     finally{
-          await ensureMinDuration(startTime, 1200);
+          await ensureMinDuration(startTime, 800);
       hideLoader();
     }
   }, []);

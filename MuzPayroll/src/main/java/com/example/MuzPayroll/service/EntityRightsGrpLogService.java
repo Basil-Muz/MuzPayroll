@@ -9,36 +9,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.MuzPayroll.entity.Authorization;
-import com.example.MuzPayroll.entity.EntityHierarchyInfo;
+import com.example.MuzPayroll.entity.EntityMst;
 import com.example.MuzPayroll.entity.EntityRightsGrpLog;
-import com.example.MuzPayroll.entity.UserGrpLog;
 import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.DTO.EntityRightsGrpLogDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
-import com.example.MuzPayroll.entity.DTO.UserGrpLogDTO;
 import com.example.MuzPayroll.repository.AuthorizationRepository;
 import com.example.MuzPayroll.repository.EntityHierarchyInfoRepository;
+import com.example.MuzPayroll.repository.EntityRepository;
 import com.example.MuzPayroll.repository.EntityRightsGrpLogRepo;
 import com.example.MuzPayroll.repository.UserRepository;
 
 @Service
-public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRightsGrpLogDTO, EntityRightsGrpLog>{
+public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRightsGrpLogDTO, EntityRightsGrpLog> {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EntityRepository entityRepository;
 
     @Autowired
     private EntityRightsGrpLogRepo entityRightsGrpLogRepo;
 
     @Autowired
     private AuthorizationRepository authorizationRepository;
-   
+
     @Autowired
-    private EntityHierarchyInfoRepository entityHierarchyInfoRepository;
+    private EntityHierarchyInfoRepository entityRepositoryfindByEtmEntityID;
 
     @Override
     public Response<Boolean> entityValidate(List<EntityRightsGrpLogDTO> dtos, String mode) {
-           // =================== 1️⃣ ENTITY VALIDATION ===================
+        // =================== 1️⃣ ENTITY VALIDATION ===================
         if ("INSERT".equals(mode) || "UPDATE".equals(mode)) {
 
             if (dtos == null)
@@ -86,7 +88,6 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         return Response.success(true);
     }
 
-
     // =================== 4️⃣ GENERATE PK ===================
     @Override
     public Response<Object> generatePK(List<EntityRightsGrpLogDTO> dtos, String mode) {
@@ -95,7 +96,7 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         return Response.success(true);
     }
 
-     // =================== 5️⃣ GENERATE SERIAL NO ===================
+    // =================== 5️⃣ GENERATE SERIAL NO ===================
     @Override
     public Response<String> generateSerialNo(List<EntityRightsGrpLogDTO> dtos, String mode) {
         List<String> errors = new ArrayList<>();
@@ -146,7 +147,7 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         dto.setAmendNo(String.valueOf(generatedAmendNo));
         return Response.success(dto.getAmendNo());
     }
-     // =================== 6️⃣ converttoEntity ===================
+    // =================== 6️⃣ converttoEntity ===================
 
     @Override
     public Response<EntityRightsGrpLog> converttoEntity(List<EntityRightsGrpLogDTO> dto) {
@@ -166,16 +167,14 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         // Set ALL fields
 
         log.setEntityRightsGrpLogPK(dto.getEntityRightsGrpLogPK());
-       
+
         if (dto.getEntityHierarchyInfoID() != null) {
-            Long hierarchy =
-                entityHierarchyInfoRepository.findBusinessGroupIdByEntityHierarchyInfoId(
-                        dto.getEntityHierarchyInfoID()
-                );
-                if(hierarchy == null){
-                    new RuntimeException("Hierarchy not found");
-                }
-            log.setEntityHierarchyInfoID(hierarchy);
+            EntityMst hierarchy = entityRepository.findByEtmEntityID(
+                    dto.getEntityHierarchyInfoID());
+            if (hierarchy == null) {
+                new RuntimeException("Hierarchy not found");
+            }
+            log.setEntityMst(hierarchy);
         }
         log.setErmCode(dto.getErmCode());
         log.setErmDesc(dto.getErmDesc());
@@ -196,11 +195,15 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         EntityRightsGrpLogDTO dto = new EntityRightsGrpLogDTO();
 
         dto.setEntityRightsGrpLogPK(entity.getEntityRightsGrpLogPK());
-       
+        if (dto.getEntityHierarchyInfoID() != null) {
+                Long hierarchy = entityRepository.findIdByEtmEntityID(
+                        entity.getEntityMst().getEtmEntityId());
+                if (hierarchy == null) {
+                    new RuntimeException("Business group id not found");
+                }
 
-            dto.setEntityHierarchyInfoID(
-                entity.getEntityHierarchyInfoID()
-            );
+                dto.setEntityHierarchyInfoID(hierarchy);
+            }
         dto.setErmCode(entity.getErmCode());
         dto.setErmDesc(entity.getErmDesc());
         dto.setErmName(entity.getErmName());
@@ -233,17 +236,16 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
         if ("INSERT".equalsIgnoreCase(mode) || "UPDATE".equalsIgnoreCase(mode)) {
 
             log.setErmName(dto.getErmName());
-            
+
             if (dto.getEntityHierarchyInfoID() != null) {
-            Long hierarchy =
-                entityHierarchyInfoRepository.findBusinessGroupIdByEntityHierarchyInfoId(
+                EntityMst hierarchy = entityRepository.findByEtmEntityID(
                         dto.getEntityHierarchyInfoID());
-                if(hierarchy == null){
-                     new RuntimeException("Business group id not found");
+                if (hierarchy == null) {
+                    new RuntimeException("Business group id not found");
                 }
 
-            log.setEntityHierarchyInfoID(hierarchy);
-        }
+                log.setEntityMst(hierarchy);
+            }
             log.setActiveDate(dto.getActiveDate());
             log.setWithaffectdate(dto.getWithaffectdate());
             log.setAmendNo(dto.getAmendNo());
@@ -278,4 +280,3 @@ public class EntityRightsGrpLogService extends MuzirisAbstractService<EntityRigh
     }
 
 }
-    
