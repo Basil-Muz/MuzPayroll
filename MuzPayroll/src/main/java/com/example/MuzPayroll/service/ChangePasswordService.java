@@ -152,4 +152,37 @@ public class ChangePasswordService
         dto.setMessage("Password changed successfully");
         return dto;
     }
+
+   public Response<Boolean> resetPassword(ChangePasswordRequest request) {
+
+    try {
+        UserMst user = userRepo.findByUserCode(request.getUserCode());
+
+        if (user == null) {
+            return Response.error("User not found");
+        }
+
+        if (request.getNewPassword() == null || request.getNewPassword().isBlank()) {
+            return Response.error("New password is required");
+        }
+
+        if (request.getConfirmPassword() == null || request.getConfirmPassword().isBlank()) {
+            return Response.error("Confirm password is required");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return Response.error("Passwords do not match");
+        }
+
+        user.setPassword(request.getNewPassword());
+        user.setUsmChangePasswordOnNextLogin(false);
+
+        userRepo.save(user);
+
+        return Response.success(true);
+
+    } catch (Exception e) {
+        return Response.error(e.getMessage());
+    }
+}
 }

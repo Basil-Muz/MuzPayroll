@@ -1,5 +1,8 @@
 package com.example.MuzPayroll.entity.DTO;
 
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class UserDTO {
     private Long userMstId;
     private String userCode;
@@ -9,7 +12,10 @@ public class UserDTO {
     private String mobileNo;
     private Long userTypeId;
     private Long authorizationStatus;
-    private Boolean activeDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate activeDate;
+    private Boolean activeYN;
     private Boolean changePasswordNextLogin;
     private Long entityHierarchyId;
     private Long defaultEntityHierarchyId;
@@ -86,12 +92,12 @@ public class UserDTO {
         this.authorizationStatus = authorizationStatus;
     }
 
-    public Boolean getActiveDate() {
-        return activeDate;
+    public Boolean getActiveYN() {
+        return activeYN;
     }
 
-    public void setActiveDate(Boolean activeDate) {
-        this.activeDate = activeDate;
+    public void setActiveYN(Boolean activeYN) {
+        this.activeYN = activeYN;
     }
 
     public Long getEntityHierarchyId() {
@@ -108,5 +114,13 @@ public class UserDTO {
 
     public void setDefaultEntityHierarchyId(Long defaultEntityHierarchyId) {
         this.defaultEntityHierarchyId = defaultEntityHierarchyId;
+    }
+
+    public LocalDate getActiveDate() {
+        return activeDate;
+    }
+
+    public void setActiveDate(LocalDate activeDate) {
+        this.activeDate = activeDate;
     }
 }

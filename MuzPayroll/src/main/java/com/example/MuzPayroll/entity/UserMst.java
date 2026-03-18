@@ -39,7 +39,7 @@ public class UserMst {
     @Column(nullable = false)
     private Boolean UsmChangePasswordOnNextLogin;
 
-   @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UsmDefaultEntityHierarchyID", nullable = true)
     private EntityHierarchyInfo UsmDefaultEntityHierarchyID;
 
@@ -60,6 +60,9 @@ public class UserMst {
 
     @Column(nullable = false)
     private Integer userAttempt = 0;
+
+    @Column(name = "UsmActiveDate")
+    private LocalDate UsmActiveDate;
 
     public Long getUserMstID() {
         return userMstID;
@@ -179,5 +182,13 @@ public class UserMst {
 
     public void setUsmDefaultEntityHierarchyID(EntityHierarchyInfo usmDefaultEntityHierarchyID) {
         UsmDefaultEntityHierarchyID = usmDefaultEntityHierarchyID;
+    }
+
+    public LocalDate getUsmActiveDate() {
+        return UsmActiveDate;
+    }
+
+    public void setUsmActiveDate(LocalDate usmActiveDate) {
+        UsmActiveDate = usmActiveDate;
     }
 }

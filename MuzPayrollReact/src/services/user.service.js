@@ -18,9 +18,9 @@ export const getUserById = (userId) => {
 };
 
 // Fetch user amendment list
-export const getUserAmendById = (userId) => {
-  return api.get(`/user/getamendlist/${userId}`);
-};
+// export const getUserAmendById = (userId) => {
+//   return api.get(`/user/getamendlist/${userId}`);
+// };
 
 // Save user
 export const saveUser = (formData, mode) => {

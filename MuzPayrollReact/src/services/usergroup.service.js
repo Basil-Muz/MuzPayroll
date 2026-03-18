@@ -1,4 +1,4 @@
-// services/usergroup.service.js
+// services/user.service.js
 import api from "../api/axiosInstance";
 
 // Fetch user Group amendment list
@@ -19,8 +19,13 @@ export const getUserGroupAmendById = (userGroupId) => {
   return api.get(`/userGrp/getamendlist/${userGroupId}`);
 };
 
-export const saveUserGroup = (formData, mode) => {
-  return api.post("/userGrp/save", formData, { params: { mode: mode } });
+export const saveUserGroup = async (formData, mode) => {
+  return api.post("/userGrp/save", formData, {
+    params: { mode },
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
 };
 
 export const searchUserGroup = (search) => {

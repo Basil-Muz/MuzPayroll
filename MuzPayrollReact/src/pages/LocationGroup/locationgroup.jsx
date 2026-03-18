@@ -55,6 +55,29 @@ function LocationGroup() {
 
   const entityId = user.userEntityHierarchyId;
 
+  const userId = user?.userId; // from useAuth
+  const saveLocationGroupWrapper = async (formData, mode) => {
+    // Convert FormData to a new FormData to ensure we can append
+    const newFormData = new FormData();
+
+    // Copy all existing fields
+    for (let pair of formData.entries()) {
+      newFormData.append(pair[0], pair[1]);
+    }
+
+    // Append required fields for backend
+    if (!newFormData.get("userId") && user?.userId) {
+      newFormData.append("userId", user.userId);
+    }
+
+    if (!newFormData.get("authorizationDate")) {
+      const today = new Date().toISOString().split("T")[0];
+      newFormData.append("authorizationDate", today);
+    }
+
+    // Call original API
+    return await saveLocationGroup(newFormData, mode);
+  };
   const getAllLocationGroups = async (loadFirst) => {
     const startTime = Date.now();
     if (loadFirst === true)
@@ -76,7 +99,7 @@ function LocationGroup() {
 
   useEffect(() => {
     getAllLocationGroups(true);
-  }, [showForm]);
+  }, []);
 
   const handleNew = () => {
     setSelectedItem(null);
@@ -84,10 +107,28 @@ function LocationGroup() {
   };
 
   const handleDataToForm = (item) => {
-    setSelectedItem(item);
+    console.log("Clicked Item:", item);
+
+    const today = new Date().toISOString().split("T")[0];
+
+    if (typeof item === "number") {
+      // If only ID is provided, create full object with required fields
+      setSelectedItem({
+        id: item,
+        userId: user?.userId,
+        authorizationDate: today,
+      });
+    } else {
+      setSelectedItem({
+        ...item,
+        id: item.mstID,
+        userId: user?.userId,
+        authorizationDate: item.authorizationDate || today,
+      });
+    }
+
     toggleForm();
   };
-
   // const handleSave = () => {
   //   console.log("Save clicked");
   //   // API call / form submit logic
@@ -321,18 +362,97 @@ function LocationGroup() {
             entity="Location Group"
             data={selectedItem}
             toggleForm={toggleForm}
-            saveEntity={saveLocationGroup}
+            saveEntity={saveLocationGroupWrapper}
             fetchEntityById={getLocationGroupById}
             ENTITY_FIELD_MAP={LOCATION_GROUP_FIELD_MAP}
           >
             {({ register, errors, isVarified }) => (
               <div className="full-content">
+                {/* Group Code */}
+                <div className="form-row">
+                  <label className="group-form-label required">
+                    Group Code
+                  </label>
+
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      errors[LOCATION_GROUP_FIELD_MAP.code] ? "error" : ""
+                    } ${isVarified ? "read-only" : ""}`}
+                    placeholder="Enter Group Code"
+                    disabled={isVarified}
+                    {...register(LOCATION_GROUP_FIELD_MAP.code, {
+                      required: "Group Code is required",
+                    })}
+                  />
+
+                  {errors[LOCATION_GROUP_FIELD_MAP.code] && (
+                    <span className="error-message">
+                      {errors[LOCATION_GROUP_FIELD_MAP.code].message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Group Name */}
+                <div className="form-row">
+                  <label className="group-form-label required">
+                    Group Name
+                  </label>
+
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      errors[LOCATION_GROUP_FIELD_MAP.name] ? "error" : ""
+                    } ${isVarified ? "read-only" : ""}`}
+                    placeholder="Enter Group Name"
+                    disabled={isVarified}
+                    {...register(LOCATION_GROUP_FIELD_MAP.name, {
+                      required: "Group Name is required",
+                    })}
+                  />
+
+                  {errors[LOCATION_GROUP_FIELD_MAP.name] && (
+                    <span className="error-message">
+                      {errors[LOCATION_GROUP_FIELD_MAP.name].message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Short Name */}
+                <div className="form-row">
+                  <label className="group-form-label required">
+                    Short Name
+                  </label>
+
+                  <input
+                    type="text"
+                    className={`form-control ${
+                      errors[LOCATION_GROUP_FIELD_MAP.shortName] ? "error" : ""
+                    } ${isVarified ? "read-only" : ""}`}
+                    placeholder="Enter Short Name"
+                    disabled={isVarified}
+                    {...register(LOCATION_GROUP_FIELD_MAP.shortName, {
+                      required: "Short Name is required",
+                    })}
+                  />
+
+                  {errors[LOCATION_GROUP_FIELD_MAP.shortName] && (
+                    <span className="error-message">
+                      {errors[LOCATION_GROUP_FIELD_MAP.shortName].message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Description */}
                 <div className="form-row">
                   <label className="group-form-label">Description</label>
 
                   <textarea
-                    className={`form-control ${errors[LOCATION_GROUP_FIELD_MAP.description] ? "error" : ""
-                      } ${isVarified ? "read-only" : ""}`}
+                    className={`form-control ${
+                      errors[LOCATION_GROUP_FIELD_MAP.description]
+                        ? "error"
+                        : ""
+                    } ${isVarified ? "read-only" : ""}`}
                     placeholder="Enter Description"
                     disabled={isVarified}
                     {...register(LOCATION_GROUP_FIELD_MAP.description)}

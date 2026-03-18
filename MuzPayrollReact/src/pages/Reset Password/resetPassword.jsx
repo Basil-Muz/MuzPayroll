@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbPasswordUser } from "react-icons/tb";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import Select from "react-select";
+
 import "../LoginPage/loginpage.css";
 
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
-import { resetPassword } from "../../services/resetpassword.service"
+import {
+  resetPassword,
+  getUsersDropdown,
+} from "../../services/resetpassword.service";
 
 function ResetPasswordSimple() {
-
   const navigate = useNavigate();
 
   const [userCode, setUserCode] = useState("");
@@ -16,8 +20,28 @@ function ResetPasswordSimple() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Fetch users
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await getUsersDropdown();
+        setUsers(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch users", err);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  // Convert to react-select format
+  const userOptions = users.map((u) => ({
+    value: u.userCode,
+    label: `${u.userCode} - ${u.username}`,
+  }));
 
   const clearForm = () => {
     setUserCode("");
@@ -43,21 +67,13 @@ function ResetPasswordSimple() {
       return;
     }
 
-    const payload = {
-      userCode,
-      newPassword,
-      confirmPassword
-    };
-
     try {
-
+      const payload = { userCode, newPassword, confirmPassword };
       const response = await resetPassword(payload);
 
       setSuccess(response.data?.message || "Password reset successfully");
-
       clearForm();
 
-      // get solutionId from loginData
       const loginData = JSON.parse(localStorage.getItem("loginData"));
       const solutionId = loginData?.solutionId;
 
@@ -72,49 +88,50 @@ function ResetPasswordSimple() {
           navigate("/payroll", { replace: true });
         }
       }, 2000);
-
     } catch (err) {
       setError(
         err.response?.data?.errors?.[0] ||
-        err.response?.data?.message ||
-        "Failed to reset password"
+          err.response?.data?.message ||
+          "Failed to reset password"
       );
     }
   };
 
   return (
     <div className="login-container">
-
       <FloatingActionBar
         actions={{
           save: { onClick: handleSubmit },
           clear: { onClick: clearForm },
           delete: { disabled: true },
           print: { disabled: true },
-          new: { onClick: clearForm }
+          new: { onClick: clearForm },
         }}
       />
 
       <form className="login-box" onSubmit={handleSubmit}>
-
         <div className="logo-section">
           <h2>Reset Password</h2>
         </div>
 
+        {/* User Dropdown */}
         <div className="form-group1">
           <label>User Code</label>
-          <div className="input-wrapper">
-            <TbPasswordUser className="input-inside-icon" />
-            <input
-              type="text"
-              value={userCode}
-              onChange={(e) => setUserCode(e.target.value)}
-              placeholder="Enter User Code"
-              autoFocus
-            />
-          </div>
+          <Select
+            classNamePrefix="form-control-select"
+            options={userOptions}
+            isSearchable={false}
+            value={
+              userOptions.find((opt) => opt.value === userCode) || null
+            }
+            onChange={(option) =>
+              setUserCode(option ? option.value : "")
+            }
+            placeholder="-- Select User --"
+          />
         </div>
 
+        {/* New Password */}
         <div className="form-group1">
           <label>New Password</label>
           <div className="input-wrapper">
@@ -134,6 +151,7 @@ function ResetPasswordSimple() {
           </div>
         </div>
 
+        {/* Confirm Password */}
         <div className="form-group1">
           <label>Confirm Password</label>
           <div className="input-wrapper">
@@ -153,7 +171,6 @@ function ResetPasswordSimple() {
         <button type="submit" className="login-btn">
           RESET
         </button>
-
       </form>
     </div>
   );

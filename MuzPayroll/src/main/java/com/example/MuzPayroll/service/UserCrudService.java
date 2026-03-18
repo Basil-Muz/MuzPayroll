@@ -11,6 +11,7 @@ import com.example.MuzPayroll.entity.UserMst;
 import com.example.MuzPayroll.entity.UserTypeMst;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.entity.DTO.UserDTO;
+import com.example.MuzPayroll.entity.DTO.UserDropDownRestPasswordDTO;
 import com.example.MuzPayroll.repository.UserRepository;
 
 @Service
@@ -65,6 +66,9 @@ public class UserCrudService extends MuzirisAbstractService<UserDTO, UserMst> {
         if (dto.getAuthorizationStatus() == null) {
             errors.add("Authorization status is required");
         }
+        if (dto.getActiveYN() == null) {
+            errors.add("Active status is required");
+        }
         if (dto.getActiveDate() == null) {
             errors.add("Active date is required");
         }
@@ -103,8 +107,16 @@ public class UserCrudService extends MuzirisAbstractService<UserDTO, UserMst> {
 
     @Override
     public Response<UserMst> converttoEntity(List<UserDTO> dtos) {
+
         UserDTO dto = dtos.get(0);
-        UserMst user = new UserMst();
+
+        UserMst user;
+
+        if (dto.getUserMstId() != null) {
+            user = userRepo.findById(dto.getUserMstId()).orElse(new UserMst());
+        } else {
+            user = new UserMst();
+        }
 
         user.setUserMstID(dto.getUserMstId());
         user.setUserCode(dto.getUserCode());
@@ -114,15 +126,21 @@ public class UserCrudService extends MuzirisAbstractService<UserDTO, UserMst> {
         user.setPassword(dto.getPassword());
 
         user.setUserAttempt(0);
-        user.setUsmActiveYN(dto.getActiveDate());
+
+        user.setUsmActiveYN(dto.getActiveYN());
+        user.setUsmActiveDate(dto.getActiveDate());
+
         user.setUsmTransValidYN(true);
+
         user.setUsmAuthInfoID(dto.getAuthorizationStatus());
 
         user.setUsmPasswordLastChangedDate(LocalDate.now());
 
         user.setUsmChangePasswordOnNextLogin(dto.getChangePasswordNextLogin());
 
-        // TEMPORARY: Set relational fields to null
+        // If entity has active date column
+        // user.setUsmActiveDate(dto.getActiveDate());
+
         user.setUsmEntityHierarchyID(null);
         user.setUsmDefaultEntityHierarchyID(null);
 
@@ -139,16 +157,61 @@ public class UserCrudService extends MuzirisAbstractService<UserDTO, UserMst> {
         return userRepo.save(entity);
     }
 
-    @Override
     public UserDTO entityToDto(UserMst entity) {
+
         UserDTO dto = new UserDTO();
+
         dto.setUserMstId(entity.getUserMstID());
         dto.setUserCode(entity.getUserCode());
         dto.setUserName(entity.getUserName());
         dto.setEmail(entity.getEmail());
         dto.setMobileNo(entity.getPhoneNumber());
+        dto.setPassword(entity.getPassword());
+
+        if (entity.getUserTypeMst() != null) {
+            dto.setUserTypeId(entity.getUserTypeMst().getUgmUserGroupID());
+        }
+
         dto.setChangePasswordNextLogin(entity.getUsmChangePasswordOnNextLogin());
+
+        dto.setActiveYN(entity.getUsmActiveYN());
+
+        dto.setAuthorizationStatus(entity.getUsmAuthInfoID());
+
+        // if entity has active date
+        dto.setActiveDate(entity.getUsmActiveDate());
+
         return dto;
+    }
+
+    public List<UserDTO> getUserList(Long companyId, Boolean activeStatusYN) {
+        List<UserMst> users = userRepo.findAllUsers();
+        List<UserDTO> result = new ArrayList<>();
+        for (UserMst user : users) {
+            result.add(entityToDto(user));
+        }
+        return result;
+    }
+
+    public UserDTO getUserById(Long userId) {
+        UserMst user = userRepo.findByUserMstId(userId);
+        if (user == null) {
+            return null;
+        }
+        return entityToDto(user);
+    }
+
+    public List<UserDTO> searchUsers(String search) {
+        List<UserMst> users = userRepo.searchUsers(search);
+        List<UserDTO> result = new ArrayList<>();
+        for (UserMst user : users) {
+            result.add(entityToDto(user));
+        }
+        return result;
+    }
+
+    public List<UserDropDownRestPasswordDTO> getUserDropdown() {
+        return userRepo.getUserDropdown();
     }
 
 }

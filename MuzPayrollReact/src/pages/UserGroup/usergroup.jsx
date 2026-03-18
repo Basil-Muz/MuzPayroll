@@ -45,7 +45,7 @@ function UserGroup() {
   const [boxView, setBoxView] = useState(true);
   const [listView, setListView] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  // const [showForm, setShowForm] = useState(false);
   const [groupByStatus, setGroupByStatus] = useState(false);
   const [activeUserGroups, setActiveUserGroups] = useState([]);
   const [inactiveUserGroups, setInactiveUserGroups] = useState([]);
@@ -55,6 +55,7 @@ function UserGroup() {
   // const [flag, setFlag] = useState(false); // new state for flag from child
 
   const { user } = useAuth();
+  console.log("current user:", user);
 
   const entityId = user?.userEntityHierarchyId;
 
@@ -121,26 +122,84 @@ function UserGroup() {
       }
     }, 400);
 
+    // Cleanup to cancel any previous timeout to avoid multiple calls
     return () => clearTimeout(handler);
-  }, [searchData]);
+  }, [searchData, searchdata]);
 
   useEffect(() => {
     getAllUserGroups(true);
-  }, [showForm]);
+  }, []);
 
-  const toggleForm = () => {
-    setShowForm((prev) => !prev);
-  };
+  // const toggleForm = () => {
+  //   setShowForm((prev) => !prev);
+  // };
   const handleNew = () => {
-    setSelectedItem(null);
-    setShowForm(true);
+    setSelectedItem({});
   };
+  // const formData = useMemo(() => {
+  //   if (!selectedItem) return null;
+  //   return { ...selectedItem, id: selectedItem.mstID };
+  // }, [selectedItem]);
 
-  const handleDataToForm = (item) => {
-    setSelectedItem(item);
-    toggleForm();
+  const handleSaveUserGroup = async (formData) => {
+    const currentUser =
+      user || JSON.parse(localStorage.getItem("user") || "{}");
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const sendData = new FormData();
+
+    sendData.append("ugmCode", formData.get("ugmCode"));
+    sendData.append("ugmName", formData.get("ugmName"));
+    sendData.append("ugmShortName", formData.get("ugmShortName"));
+    sendData.append("ugmDesc", formData.get("ugmDesc"));
+    sendData.append("userId", currentUser.userMstId);
+    sendData.append("userCode", currentUser.userCode);
+    sendData.append("entityId", currentUser.userEntityHierarchyId);
+    sendData.append("entityMst", currentUser.userEntityHierarchyId);
+
+    sendData.append("activeDate", today);
+    sendData.append("withaffectdate", today);
+    sendData.append("authorizationDate", today);
+    sendData.append("authorizationStatus", false);
+    sendData.append("UgmActiveYN", true);
+
+    // IMPORTANT FIX
+    const id = formData.get("id");
+    if (id) {
+      sendData.append("id", id); //  REQUIRED FOR UPDATE
+    }
+
+    const finalMode = id ? "UPDATE" : "INSERT";
+
+    console.log("ID VALUE:", id);
+
+    try {
+      const res = await saveUserGroup(sendData, finalMode);
+
+      if (res?.data?.success) {
+        const saved = res.data.data;
+
+        if (finalMode === "INSERT") {
+          setUserGroupList((prev) => [...prev, saved]);
+        } else {
+          setUserGroupList((prev) =>
+            prev.map((item) => (item.mstID === saved.mstID ? saved : item))
+          );
+        }
+        await getAllUserGroups(false);
+
+        setSelectedItem(null);
+       
+        toast.success(
+          finalMode === "INSERT" ? "User Group added" : "User Group updated",
+        );
+         return res;
+      }
+    } catch (err) {
+      handleApiError(err);
+    }
   };
-
   /* ================= GROUPING ================= */
   const handleGroupSubmit = async (checked) => {
     setGroupByStatus(checked);
@@ -240,7 +299,6 @@ function UserGroup() {
                   item={item}
                   status="active"
                   handleDataToForm={handleDataToForm}
-
                 />
               ))}
             </div>
@@ -286,7 +344,7 @@ function UserGroup() {
         <FloatingActionBar
           actions={{
             save: {
-              // onClick: handleSave,
+              // onClick: () => handleSaveUserGroup(selectedItem, "ADD"),
               disabled: true,
               // disabled: isViewMode || isSubmitted
             },
@@ -317,33 +375,121 @@ function UserGroup() {
           }}
         />
 
-        {showForm && (
+        {selectedItem && (
           <ListItemForm
             entity="User Group"
             data={selectedItem}
-            toggleForm={toggleForm}
-            saveEntity={saveUserGroup}
+            toggleForm={() => {
+              setSelectedItem(null);
+            }}
+            saveEntity={(data) => handleSaveUserGroup(data)}
             fetchEntityById={getUserGroupById}
             ENTITY_FIELD_MAP={USER_GROUP_FIELD_MAP}
           >
             {({ register, errors, isVarified }) => (
-              <div className="full-content">
-                <div className="form-row">
-                  <label className="group-form-label">Description</label>
+              <div className="main-model-content">
+                {/* HIDDEN ID */}
+                <input type="hidden" {...register("id")} />
 
-                  <textarea
-                    className={`form-control ${errors[USER_GROUP_FIELD_MAP.description] ? "error" : ""
+                {/* Group Code */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="form-label required">Group Code</label>
+
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors[USER_GROUP_FIELD_MAP.code] ? "error" : ""
                       } ${isVarified ? "read-only" : ""}`}
-                    placeholder="Enter Description"
-                    disabled={isVarified}
-                    {...register(USER_GROUP_FIELD_MAP.description)}
-                  />
+                      placeholder="Enter Group Code"
+                      disabled={isVarified}
+                      {...register(USER_GROUP_FIELD_MAP.code, {
+                        required: "Group Code is required",
+                      })}
+                    />
 
-                  {errors[USER_GROUP_FIELD_MAP.description] && (
-                    <span className="error-message">
-                      {errors[USER_GROUP_FIELD_MAP.description].message}
-                    </span>
-                  )}
+                    {errors[USER_GROUP_FIELD_MAP.code] && (
+                      <span className="error-message">
+                        {errors[USER_GROUP_FIELD_MAP.code].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Group Name */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label required">
+                      Group Name
+                    </label>
+
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors[USER_GROUP_FIELD_MAP.name] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter Group Name"
+                      disabled={isVarified}
+                      {...register(USER_GROUP_FIELD_MAP.name, {
+                        required: "Group Name is required",
+                      })}
+                    />
+
+                    {errors[USER_GROUP_FIELD_MAP.name] && (
+                      <span className="error-message">
+                        {errors[USER_GROUP_FIELD_MAP.name].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Short Name */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label required">
+                      Short Name
+                    </label>
+
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors[USER_GROUP_FIELD_MAP.shortName] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter Short Name"
+                      disabled={isVarified}
+                      {...register(USER_GROUP_FIELD_MAP.shortName, {
+                        required: "Short Name is required",
+                      })}
+                    />
+
+                    {errors[USER_GROUP_FIELD_MAP.shortName] && (
+                      <span className="error-message">
+                        {errors[USER_GROUP_FIELD_MAP.shortName].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Description</label>
+
+                    <textarea
+                      className={`form-control ${
+                        errors[USER_GROUP_FIELD_MAP.description] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter Description"
+                      disabled={isVarified}
+                      {...register(USER_GROUP_FIELD_MAP.description)}
+                    />
+
+                    {errors[USER_GROUP_FIELD_MAP.description] && (
+                      <span className="error-message">
+                        {errors[USER_GROUP_FIELD_MAP.description].message}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

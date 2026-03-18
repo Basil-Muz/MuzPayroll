@@ -9,6 +9,7 @@ public class ChangePasswordRequest {
     private String newPassword;
     private UserMst userEntity;
     private String message;
+    private String confirmPassword;
 
     public UserMst getUserEntity() {
         return userEntity;
@@ -48,6 +49,14 @@ public class ChangePasswordRequest {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 
 }

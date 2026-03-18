@@ -85,7 +85,7 @@ export const ContextSwitcher = React.memo(
     const selectedLocation = watch("location");
 
     // console.log("sdfsd", selectedLocation.value);
-    const userId = user.userMstId;
+    const userId = user?.userMstId;
     useEffect(() => {
       if (isOpen && initialData && !hasResetRef.current) {
         reset(initialData);
@@ -147,13 +147,13 @@ export const ContextSwitcher = React.memo(
         setValue("branch", selectedBranchOption || null);
         setValue("location", null);
       },
-      [setValue, apiCache, user.branchEntityHierarchyId, userId],
+      [setValue, apiCache, user?.branchEntityHierarchyId, userId],
     );
     // Fetch companies on open
     useEffect(() => {
       if (!isOpen) return;
 
-      const cacheKey = `companies_${user.companyId}`;
+      const cacheKey = `companies_${user?.companyId}`;
       const cached = apiCache.get(cacheKey);
 
       if (cached) {
@@ -190,7 +190,7 @@ export const ContextSwitcher = React.memo(
 
       fetchCompanies();
       // fetchBranches(user.companyId);
-    }, [isOpen, user.companyId]);
+    }, [isOpen, user?.companyId]);
 
     useEffect(() => {
       if (selectedCompany?.value) {

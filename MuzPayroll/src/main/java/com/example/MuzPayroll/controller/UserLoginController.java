@@ -8,6 +8,7 @@ import com.example.MuzPayroll.entity.DTO.LoginRequestDTO;
 import com.example.MuzPayroll.entity.DTO.LoginResponseDTO;
 import com.example.MuzPayroll.entity.DTO.Response;
 import com.example.MuzPayroll.entity.DTO.UserDTO;
+import com.example.MuzPayroll.entity.DTO.UserDropDownRestPasswordDTO;
 import com.example.MuzPayroll.service.ChangePasswordService;
 import com.example.MuzPayroll.service.ForgotChangePasswordService;
 import com.example.MuzPayroll.service.ForgotPasswordOtpService;
@@ -15,6 +16,7 @@ import com.example.MuzPayroll.service.ForgotPasswordVerifyOtpService;
 import com.example.MuzPayroll.service.UserCrudService;
 import com.example.MuzPayroll.service.UserMstService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,12 +128,50 @@ public class UserLoginController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/user/userlist")
+    public List<UserDTO> getUserList(
+            @RequestParam Long companyId,
+            @RequestParam Boolean activeStatusYN) {
+
+        return userCrudService.getUserList(companyId, activeStatusYN);
+
+    }
+
+    @GetMapping("/user/{userId}")
+    public UserDTO getUserById(@PathVariable Long userId) {
+        return userCrudService.getUserById(userId);
+    }
+
+    @GetMapping("/user/users")
+    public List<UserDTO> searchUsers(@RequestParam String search) {
+        return userCrudService.searchUsers(search);
+    }
+
     @PostMapping("/user/save")
     public Response<UserDTO> saveUser(
-            @RequestBody List<UserDTO> users,
+            @ModelAttribute UserDTO user,
             @RequestParam String mode) {
 
-        return userCrudService.save(users, mode);
+        List<UserDTO> list = new ArrayList<>();
+        list.add(user);
+
+        return userCrudService.save(list, mode);
+    }
+
+    @PostMapping("/resetpassword")
+    public ResponseEntity<Response<Boolean>> resetPassword(
+            @RequestBody ChangePasswordRequest request) {
+
+        Response<Boolean> response = changeservice.resetPassword(request);
+
+        return ResponseEntity
+                .status(response.getStatusCode())
+                .body(response);
+    }
+
+    @GetMapping("/users/dropdown")
+    public List<UserDropDownRestPasswordDTO> getUserDropdown() {
+        return userCrudService.getUserDropdown();
     }
 
 }
