@@ -413,4 +413,13 @@ public class EntityLogDTO {
         this.addressInfoID = addressInfoID;
     }
 
+    private String esiRegion;
+
+    public String getEsiRegion() {
+        return esiRegion;
+    }
+
+    public void setEsiRegion(String esiRegion) {
+        this.esiRegion = esiRegion;
+    }
 }

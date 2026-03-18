@@ -150,7 +150,6 @@ export default function () {
         return {
           id: `${item.entityHierarchyId}-${index}`,
 
-
           branch: {
             id: item.branchId,
             name: item.branchName,

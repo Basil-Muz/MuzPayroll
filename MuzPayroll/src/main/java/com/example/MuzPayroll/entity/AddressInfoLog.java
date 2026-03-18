@@ -208,4 +208,13 @@ public class AddressInfoLog {
         this.addressInfoLogPK = addressInfoLogPK;
     }
 
+    private String esiRegion;
+
+    public String getEsiRegion() {
+        return esiRegion;
+    }
+
+    public void setEsiRegion(String esiRegion) {
+        this.esiRegion = esiRegion;
+    }
 }

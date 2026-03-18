@@ -2,17 +2,17 @@ package com.example.MuzPayroll.entity.DTO;
 
 public class MenuDTO {
 
-    private Integer productId;
-    private Integer menuRowNo;
+    private Long productId;
+    private Long menuRowNo;
     private Boolean optionYn;
-    private Integer optionId;
+    private Long optionId;
     private String url;
     private String displayName;
     private String description;
     private String optionType;
-    private Integer parentMenuRowNo;
-    private Integer levelNo;
-    private Integer solutionId;
+    private Long parentMenuRowNo;
+    private Long levelNo;
+    private Long solutionId;
     private Boolean Add;
     private Boolean Edit;
     private Boolean View;
@@ -22,19 +22,19 @@ public class MenuDTO {
 
     // getters + setters
 
-    public Integer getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(Integer productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 
-    public Integer getMenuRowNo() {
+    public Long getMenuRowNo() {
         return menuRowNo;
     }
 
-    public void setMenuRowNo(Integer menuRowNo) {
+    public void setMenuRowNo(Long menuRowNo) {
         this.menuRowNo = menuRowNo;
     }
 
@@ -46,11 +46,11 @@ public class MenuDTO {
         this.optionYn = optionYn;
     }
 
-    public Integer getOptionId() {
+    public Long getOptionId() {
         return optionId;
     }
 
-    public void setOptionId(Integer optionId) {
+    public void setOptionId(Long optionId) {
         this.optionId = optionId;
     }
 
@@ -86,27 +86,27 @@ public class MenuDTO {
         this.optionType = optionType;
     }
 
-    public Integer getParentMenuRowNo() {
+    public Long getParentMenuRowNo() {
         return parentMenuRowNo;
     }
 
-    public void setParentMenuRowNo(Integer parentMenuRowNo) {
+    public void setParentMenuRowNo(Long parentMenuRowNo) {
         this.parentMenuRowNo = parentMenuRowNo;
     }
 
-    public Integer getLevelNo() {
+    public Long getLevelNo() {
         return levelNo;
     }
 
-    public void setLevelNo(Integer levelNo) {
+    public void setLevelNo(Long levelNo) {
         this.levelNo = levelNo;
     }
 
-    public Integer getSolutionId() {
+    public Long getSolutionId() {
         return solutionId;
     }
 
-    public void setSolutionId(Integer solutionId) {
+    public void setSolutionId(Long solutionId) {
         this.solutionId = solutionId;
     }
 

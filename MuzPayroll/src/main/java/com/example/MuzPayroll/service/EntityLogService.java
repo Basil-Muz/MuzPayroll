@@ -84,6 +84,7 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
             infoLog.setEmployerEmail(dto.getEmployerEmail());
             infoLog.setWithaffectdate(dto.getWithaffectdate());
             infoLog.setAmendNo(dto.getAmendNo());
+            infoLog.setEsiRegion(dto.getEsiRegion());
 
             dto.setAddressInfoLog(infoLog);
 
@@ -217,6 +218,7 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
         Log.setAmendNo(dto.getAmendNo());
         Log.setAuthorization(dto.getAuthorization());
         Log.setAddressInfoLog(dto.getAddressInfoLogID());
+
         // Log.setAddressInfoLog(dto.getLogRowNo());
 
         AddressInfoLog addressinfoLog = new AddressInfoLog();
@@ -239,6 +241,7 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
         addressinfoLog.setWithaffectdate(dto.getWithaffectdate());
         addressinfoLog.setAmendNo(dto.getAmendNo());
         addressinfoLog.setAddressInfoLogPK(dto.getAddressInfoLogPK());
+        addressinfoLog.setEsiRegion(dto.getEsiRegion());
 
         if (dto.getAddressInfoLog() != null) {
             Log.setAddressInfoLog(dto.getAddressInfoLog());
@@ -297,7 +300,7 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
             dto.setEmployerNumber(entity.getAddressInfoLog().getEmployerNumber());
             dto.setEmployerEmail(entity.getAddressInfoLog().getEmployerEmail());
             dto.setWithaffectdate(entity.getAddressInfoLog().getWithaffectdate());
-
+            dto.setEsiRegion(entity.getAddressInfoLog().getEsiRegion());
         }
 
         return dto;
@@ -336,6 +339,7 @@ public class EntityLogService extends MuzirisAbstractService<EntityLogDTO, Entit
             addressinfoLog.setEmployerNumber(dto.getEmployerNumber());
             addressinfoLog.setEmployerEmail(dto.getEmployerEmail());
             addressinfoLog.setAmendNo(dto.getAmendNo());
+            addressinfoLog.setEsiRegion(dto.getEsiRegion());
 
             AddressInfoLog savedAddress = addressInfoLogRepository.save(addressinfoLog);
 

@@ -230,4 +230,14 @@ public class AddressInfoMst {
         this.amendNo = amendNo;
     }
 
+    private String esiRegion;
+
+    public String getEsiRegion() {
+        return esiRegion;
+    }
+
+    public void setEsiRegion(String esiRegion) {
+        this.esiRegion = esiRegion;
+    }
+
 }
