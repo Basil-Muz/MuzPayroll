@@ -331,6 +331,7 @@ export default function LicenseAgreement() {
                   <Select
                     options={companyOptions}
                     classNamePrefix="form-control-select"
+                    isDisabled={isSearchApplied}
                     value={
                       companyOptions.find((opt) => opt.value === field.value) ||
                       null
@@ -345,9 +346,29 @@ export default function LicenseAgreement() {
               )}
             </div>
 
-            <button className="btn btn-apply" onClick={handleApplySearch}>
-              Apply
-            </button>
+            <div className="search-actions">
+              {!isSearchApplied ? (
+                <button className="btn btn-apply" onClick={handleApplySearch}>
+                  Apply
+                </button>
+              ) : (
+                <button
+                  className="btn btn-change"
+                  onClick={() => {
+                    if (saveSelection.size) {
+                      alert("You have unsaved changes");
+                      return;
+                    }
+                    setIsSearchApplied(false);
+
+                    setSelectedRowIds(new Set());
+                    setBulkGroup([]);
+                  }}
+                >
+                  Change Search
+                </button>
+              )}
+            </div>
           </div>
         )}
 

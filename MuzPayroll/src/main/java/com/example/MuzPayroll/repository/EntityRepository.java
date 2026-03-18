@@ -60,14 +60,14 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
             @Param("mccId") Long mccId);
 
     @Query(value = """
-            SELECT
-                uel.uel_entity_hierarchyid,
+             SELECT
+                um.usm_entity_hierarchyid,
                 em.etm_name,
                 mcc.mcc_name
-            FROM user_and_entity_link uel
+            FROM user_mst um
 
             JOIN entity_mst em
-                ON uel.uel_entity_hierarchyid = em.etm_entityid
+                ON um.usm_entity_hierarchyid = em.etm_entityid
 
             JOIN muz_control_codes mcc
                 ON mcc.mccid = em.etm_entity_type_mccid
@@ -100,9 +100,8 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
                 WHERE sub_auth.rn = 1
                   AND sub_auth.authorization_status = TRUE
             ) a ON a.mst_id = em.etm_entityid
-
             WHERE mcc.mccid = :mccId
-            AND uel.uel_userid = :userId
+            AND um.user_mstid = :userId
             """, nativeQuery = true)
     List<Object[]> getUserCompany(
             @Param("userId") Long userId,
@@ -110,24 +109,51 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
 
     @Query(value = """
              SELECT
-                uel.uel_entity_hierarchyid,
+                em.etm_entityid,
                 em.etm_name,
                 mcc.mcc_name
-            FROM user_and_entity_link uel
-            JOIN entity_mst em
-                ON uel.uel_entity_hierarchyid = em.etm_entityid
+            FROM entity_mst em
+
+            JOIN entity_hierarchy_info ehi
+			    ON em.etm_entityid = ehi.ehi_entity_hierarchyid
+				
+			JOIN user_mst um
+                ON ehi.ehi_companyid = um.usm_entity_hierarchyid
+
             JOIN muz_control_codes mcc
                 ON mcc.mccid = em.etm_entity_type_mccid
-            JOIN entity_hierarchy_info
-                ON entity_hierarchy_info.ehi_entity_hierarchyid = em.etm_entityid
-                 JOIN entity_log l
-                 ON em.etm_entityid = l.etm_entityid
-            JOIN authorization_tbl a
-                 ON a.mst_id = l.etm_entityid
+
+            -- Latest entity_log per entity
+            JOIN (
+                SELECT *
+                FROM (
+                    SELECT l.*,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY l.etm_entityid
+                               ORDER BY l.amend_no DESC
+                           ) AS rn
+                    FROM entity_log l
+                ) sub_log
+                WHERE sub_log.rn = 1
+            ) l ON em.etm_entityid = l.etm_entityid
+
+            -- Latest authorization per entity
+            JOIN (
+                SELECT *
+                FROM (
+                    SELECT a.*,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY a.mst_id
+                               ORDER BY a.auth_id DESC
+                           ) AS rn
+                    FROM authorization_tbl a
+                ) sub_auth
+                WHERE sub_auth.rn = 1
+                  AND sub_auth.authorization_status = TRUE
+            ) a ON a.mst_id = em.etm_entityid
             WHERE mcc.mccid = :mccId
-            AND uel.uel_userid = :userId
-            AND entity_hierarchy_info.ehi_companyid = :companyId
-            AND a.authorization_status = TRUE
+            AND um.user_mstid = :userId
+            AND ehi.ehi_companyid = :companyId
             """, nativeQuery = true)
     List<Object[]> getUserBranch(
             @Param("userId") Long userId,
@@ -187,24 +213,51 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
 
     @Query(value = """
             SELECT
-                uel.uel_entity_hierarchyid,
+                uml.uel_entity_hierarchyid,
                 em.etm_name,
                 mcc.mcc_name
-            FROM user_and_entity_link uel
+            FROM user_and_entity_link uml
+
             JOIN entity_mst em
-                ON uel.uel_entity_hierarchyid = em.etm_entityid
+                ON uml.uel_entity_hierarchyid = em.etm_entityid
+
             JOIN muz_control_codes mcc
                 ON mcc.mccid = em.etm_entity_type_mccid
-            JOIN entity_hierarchy_info
-                ON entity_hierarchy_info.ehi_entity_hierarchyid = em.etm_entityid
-                 JOIN entity_log l
-                 ON em.etm_entityid = l.etm_entityid
-            JOIN authorization_tbl a
-                 ON a.mst_id = l.etm_entityid
+            
+            JOIN entity_hierarchy_info ehi
+			    ON ehi.ehi_entity_hierarchyid = uml.uel_entity_hierarchyid
+
+            -- Latest entity_log per entity
+            JOIN (
+                SELECT *
+                FROM (
+                    SELECT l.*,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY l.etm_entityid
+                               ORDER BY l.amend_no DESC
+                           ) AS rn
+                    FROM entity_log l
+                ) sub_log
+                WHERE sub_log.rn = 1
+            ) l ON em.etm_entityid = l.etm_entityid
+
+            -- Latest authorization per entity
+            JOIN (
+                SELECT *
+                FROM (
+                    SELECT a.*,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY a.mst_id
+                               ORDER BY a.auth_id DESC
+                           ) AS rn
+                    FROM authorization_tbl a
+                ) sub_auth
+                WHERE sub_auth.rn = 1
+                  AND sub_auth.authorization_status = TRUE
+            ) a ON a.mst_id = em.etm_entityid
             WHERE mcc.mccid = :mccId
-            AND uel.uel_userid = :userId
-            AND entity_hierarchy_info.ehi_branchid =:branchId
-            AND a.authorization_status = TRUE
+            AND uml.uel_userid = :userId
+            AND ehi.ehi_branchid = :branchId
             """, nativeQuery = true)
     List<Object[]> getUserLocation(
             @Param("userId") Long userId,
@@ -311,14 +364,41 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
     @Query(value = """
             SELECT em.*
             FROM entity_mst em
+
             JOIN entity_hierarchy_info uel
-            ON uel.ehi_entity_hierarchyid = em.etm_entityid
+                ON em.etm_entityid = uel.ehi_entity_hierarchyid
+
             JOIN muz_control_codes mcc
                 ON mcc.mccid = em.etm_entity_type_mccid
-            JOIN entity_log l
-                ON em.etm_entityid = l.etm_entityid
-            JOIN authorization_tbl a
-                ON a.mst_id = l.etm_entityid
+
+            -- Get latest log row per entity
+            JOIN (
+                SELECT *
+                FROM (
+                    SELECT l.*,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY l.etm_entityid
+                               ORDER BY l.amend_no DESC
+                           ) AS rn
+                    FROM entity_log l
+                ) sub
+                WHERE sub.rn = 1
+            ) l ON em.etm_entityid = l.etm_entityid
+
+            -- Get latest authorization per entity
+            JOIN (
+                SELECT *
+                FROM (
+                    SELECT a.*,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY a.mst_id
+                               ORDER BY a.auth_id DESC
+                           ) AS rn
+                    FROM authorization_tbl a
+                ) suba
+                WHERE suba.rn = 1
+            ) a ON a.mst_id = em.etm_entityid
+
             WHERE mcc.mccid = 14
             AND uel.ehi_companyid = :companyId
             AND (:activeStatusYN IS NULL OR em.etm_activeyn = :activeStatusYN)
@@ -329,19 +409,46 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
 
     @Query(value = """
             SELECT em.*
-                    FROM entity_mst em
-                    JOIN entity_hierarchy_info uel
-                    ON uel.ehi_entity_hierarchyid = em.etm_entityid
-                    JOIN muz_control_codes mcc
-                        ON mcc.mccid = em.etm_entity_type_mccid
-                    JOIN entity_log l
-                        ON em.etm_entityid = l.etm_entityid
-                    JOIN authorization_tbl a
-                        ON a.mst_id = l.etm_entityid
-                    WHERE mcc.mccid = 15
-                    AND (:activeStatusYN IS NULL OR em.etm_activeyn = :activeStatusYN)
-                    AND uel.ehi_companyid = :companyId
-                    AND (:branchId IS NULL OR uel.ehi_branchid = :branchId)
+            FROM entity_mst em
+
+            JOIN entity_hierarchy_info uel
+                ON em.etm_entityid = uel.ehi_entity_hierarchyid
+
+            JOIN muz_control_codes mcc
+                ON mcc.mccid = em.etm_entity_type_mccid
+
+            -- Get latest log row per entity
+            JOIN (
+                SELECT *
+                FROM (
+                    SELECT l.*,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY l.etm_entityid
+                               ORDER BY l.amend_no DESC
+                           ) AS rn
+                    FROM entity_log l
+                ) sub
+                WHERE sub.rn = 1
+            ) l ON em.etm_entityid = l.etm_entityid
+
+            -- Get latest authorization per entity
+            JOIN (
+                SELECT *
+                FROM (
+                    SELECT a.*,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY a.mst_id
+                               ORDER BY a.auth_id DESC
+                           ) AS rn
+                    FROM authorization_tbl a
+                ) suba
+                WHERE suba.rn = 1
+            ) a ON a.mst_id = em.etm_entityid
+
+            WHERE mcc.mccid = 15
+            AND (:activeStatusYN IS NULL OR em.etm_activeyn = :activeStatusYN)
+            AND uel.ehi_companyid = :companyId
+            AND (:branchId IS NULL OR uel.ehi_branchid = :branchId)
             """, nativeQuery = true)
     List<EntityMst> findLocationByStatus(
             @Param("activeStatusYN") Boolean activeStatusYN,
@@ -446,7 +553,6 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
     // @Param("etmEntityID") Long etmEntityID,
     // @Param("mccId") Long mccId);
 
-
     @Query("""
             SELECT a
             FROM EntityMst a
@@ -462,6 +568,5 @@ public interface EntityRepository extends JpaRepository<EntityMst, Long> {
             """)
     Long findIdByEtmEntityID(
             @Param("etmEntityId") Long etmEntityId);
-
 
 }

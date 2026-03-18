@@ -26,11 +26,11 @@ public class MenuController {
     public List<MenuDTO> getMenu(
             @RequestParam String transtype,
             @RequestParam String transsubtype,
-            @RequestParam Integer userId,
-            @RequestParam Integer solutionId,
-            @RequestParam Integer entityHierarchyId,
-            @RequestParam Integer productid,
-            @RequestParam(required = false) Integer menu_row_no) {
+            @RequestParam Long userId,
+            @RequestParam Long solutionId,
+            @RequestParam Long entityHierarchyId,
+            @RequestParam Long productid,
+            @RequestParam(required = false) Long menu_row_no) {
 
         return menuService.getMenu(transtype, transsubtype, userId, solutionId, entityHierarchyId, productid,
                 menu_row_no);

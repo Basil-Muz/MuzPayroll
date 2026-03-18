@@ -224,6 +224,14 @@ function App() {
               path="/locationgrouprights"
               element={<LocationGroupRights />}
             />
+            <Route
+              path="/statusupdate"
+              element={
+                <ProtectedRoute>
+                  <StatusUpdate />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
             <Route path="*" element={<NotFoundPage />} /> {/* always last! */}
           </Routes>

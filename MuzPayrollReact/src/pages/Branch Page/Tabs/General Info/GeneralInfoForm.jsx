@@ -56,7 +56,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
     // if (branchList?.length > 0) {
     //   // The branchId is string but in branchList it is integer
-    //   setValue("branchEntity", branchList[0].value, {
+    //   setValue("branchMst", branchList[0].value, {
     //     shouldDirty: false,
     //     shouldTouch: false,
     //     shouldValidate: false,
@@ -74,7 +74,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
   useEffect(() => {
     if (branchList?.length > 0) {
-      setValue("branchEntity", branchList[0].value, {
+      setValue("branchMst", branchList[0].value, {
         shouldDirty: false,
         shouldTouch: false,
         shouldValidate: false,
@@ -257,7 +257,7 @@ const GeneralInfoForm = function GeneralInfoForm({
             <div className="branch-form-group">
               <label className="form-label required">Branch</label>
               <Controller
-                name="branchEntity"
+                name="branchMst"
                 control={control}
                 rules={{ required: "Please select a branch" }}
                 render={({ field }) => {
@@ -271,16 +271,16 @@ const GeneralInfoForm = function GeneralInfoForm({
                       isSearchable
                       isDisabled={isReadOnly}
                       classNamePrefix="form-control-select"
-                      className={`${errors.branchEntity ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                      className={`${errors.branchMst ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                       value={selectedOption || null} // important
                       onChange={(option) => field.onChange(option.value)} // store full object
                     />
                   );
                 }}
               />
-              {errors.branchEntity && (
+              {errors.branchMst && (
                 <span className="error-message">
-                  {errors.branchEntity.message}
+                  {errors.branchMst.message}
                 </span>
               )}
             </div>

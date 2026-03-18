@@ -334,6 +334,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         infoMst.setEmployerEmail(dto.getEmployerEmail());
                         infoMst.setWithaffectdate(dto.getWithaffectdate());
                         infoMst.setAmendNo(dto.getAmendNo());
+                        infoMst.setEsiRegion(dto.getEsiRegion());
 
                         dto.setAddressInfoMst(infoMst);
 
@@ -417,6 +418,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         infoMst.setEmployerEmail(dto.getEmployerEmail());
                         infoMst.setWithaffectdate(dto.getWithaffectdate());
                         infoMst.setAmendNo(dto.getAmendNo());
+                        infoMst.setEsiRegion(dto.getEsiRegion());
 
                         dto.setAddressInfoMst(infoMst);
 
@@ -1226,6 +1228,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                 DtoLog.setAuthId(dto.getAuthId());
                 DtoLog.setMuzControlCodes(dto.getMuzControlCodes());
                 DtoLog.setInactiveDate(dto.getInactiveDate());
+                DtoLog.setEsiRegion(dto.getEsiRegion());
 
                 DtoLogs.add(DtoLog);
                 return DtoLogs;
@@ -1280,6 +1283,7 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
                         logDto.setEtmPrefix(dto.getEtmPrefix());
                         logDto.setMuzControlCodes(dto.getMuzControlCodes());
                         logDto.setInactiveDate(dto.getInactiveDate());
+                        logDto.setEsiRegion(dto.getEsiRegion());
                         logDtos.add(logDto);
                 }
                 return logDtos;
@@ -1289,10 +1293,10 @@ public class EntityService extends MuzirisAbstractService<EntityMstDTO, EntityMs
         private Response<String> validateAndProcessImage(EntityMstDTO dto) {
                 MultipartFile file = dto.getEtmImage();
 
-                // If no new image uploaded and no existing image path, image is required
-                if ((file == null || file.isEmpty()) && isEmpty(dto.getImagePath())) {
-                        return Response.error("Entity image is required");
-                }
+                // // If no new image uploaded and no existing image path, image is required
+                // if ((file == null || file.isEmpty()) && isEmpty(dto.getImagePath())) {
+                // return Response.error("Entity image is required");
+                // }
 
                 // If new image is uploaded, validate and process it
                 if (file != null && !file.isEmpty()) {
