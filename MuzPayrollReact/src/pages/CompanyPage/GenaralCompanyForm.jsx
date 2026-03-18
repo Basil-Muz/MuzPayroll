@@ -27,12 +27,10 @@ import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
 import { saveCompany } from "../../services/company.service";
 import { getCompanyAmendList } from "../../services/company.service";
 
-import { useLoader } from "../../context/LoaderContext";
 import { useAuth } from "../../context/AuthProvider";
 
 //Utils (Helpers)
 import { formatDate } from "../../utils/dateFormater";
-import { ensureMinDuration } from "../../utils/loaderDelay";
 import { getFloatingActions } from "../../utils/setActionButtons";
 
 //  Components
@@ -61,8 +59,6 @@ export default function GenaralCompanyForm() {
 
   const [searchParams] = useSearchParams();
   const optionid = searchParams.get("opid");
-
-  const { showRailLoader, hideLoader } = useLoader();
 
   //Fetch company amend data
   const {
@@ -144,7 +140,11 @@ export default function GenaralCompanyForm() {
     control,
     name: "withaffectdate",
   });
-  let isUnlocked = !!authDate;
+
+  //workflow of amend date then name logic
+  const [isUnlocked, setIsUnlocked] = useState(
+    amendments.length > 0 ? true : !!authDate,
+  );
   //Handle the generate new amend
   const { handleGenerateAmendment } = useGenerateAmend({
     setSelectedAmendment,
@@ -152,7 +152,7 @@ export default function GenaralCompanyForm() {
     reset,
     getValues,
     clearErrors,
-    isUnlocked,
+    setIsUnlocked,
   });
 
   const { onSubmit, step, setStep, datePickerRef } = useSaveForm({
@@ -171,14 +171,6 @@ export default function GenaralCompanyForm() {
     trigger,
     setStep,
   });
-
-  //workflow of amend date then name logic
-
-  if (amendments.length > 0) {
-    isUnlocked = true;
-  } else {
-    isUnlocked = !!authDate;
-  }
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -526,7 +518,7 @@ export default function GenaralCompanyForm() {
                             }
                             onChange={(date) => {
                               field.onChange(date ? formatDate(date) : null);
-
+                              setIsUnlocked(true);
                               setTimeout(() => {
                                 smoothFocus(); //  Focus to name after selecting the date
                               }, 0);

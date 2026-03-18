@@ -27,7 +27,10 @@
   --text: #f7f1f9;
   --text-muted: #b094b8;
 }
-
+/* #root > *{
+  
+transition: all 0.3s ease;
+} */
 a {
   font-weight: 500;
   color: #646cff;

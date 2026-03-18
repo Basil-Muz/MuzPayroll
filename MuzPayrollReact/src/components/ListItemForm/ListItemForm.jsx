@@ -98,7 +98,7 @@ function ListItemForm({
     if (!flag) {
       codeInputRef.current?.focus();
     }
-    console.log("User dfhgdfgh",user)
+    // console.log("User dfhgdfgh",user)
   }, [flag]);
 
   useEffect(() => {
@@ -150,30 +150,34 @@ function ListItemForm({
     Object.keys(values).forEach((key) => {
       formData.append(key, values[key]);
     });
-    for (const pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
+    // for (const pair of formData.entries()) {
+    //   console.log(pair[0], pair[1]);
+    // }
     const startTime = Date.now();
     // show loader
     showRailLoader("Saving " + entity + "…");
     try {
+      let res;
       if (!data)
         //  For fresh insert
-        await saveEntity(formData, "INSERT");
-      else await saveEntity(formData, "UPDATE"); //for edit
+        res = await saveEntity(formData, "INSERT");
+      else res = await saveEntity(formData, "UPDATE"); //for edit
+      console.log("Response",res)
+    
+      if(res.data.success === false)
+        throw res;
 
-      toast.success(entity + " saved successfully");
-
+        toast.success(entity + " saved successfully");
+        toggleForm();
       // console.log("Save response",response);
     } catch (error) {
-      console.error("Error updating " + entity + ":", error);
+      console.error("Error updating ", error);
       handleApiError(error, {
         entity: entity,
       });
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
-      toggleForm();
     }
   };
 

@@ -44,7 +44,7 @@
 }
 
 .us-filter-item .ms-control.disabled {
-  background: #f9fafb;
+  background: var(--bg);
   color: #9ca3af;
   cursor: not-allowed;
 }

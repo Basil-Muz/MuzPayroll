@@ -9,8 +9,6 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
 
-import { useLoader } from "../../context/LoaderContext";
-
 //  Hooks
 import { useSaveForm } from "../../hooks/useSaveForm";
 import { useFormClear } from "../../hooks/useFormClear";
@@ -28,8 +26,6 @@ import { getLocationAmendList } from "../../services/location.service";
 import { saveLocation } from "../../services/location.service";
 //  Utils / helpers
 import { formatDate } from "../../utils/dateFormater";
-import { ensureMinDuration } from "../../utils/loaderDelay";
-import { handleApiError } from "../../utils/errorToastResolver";
 import { getFloatingActions } from "../../utils/setActionButtons";
 
 //  Constants
@@ -52,6 +48,7 @@ export default function GenaralLocationForm() {
   /* ------------------------------------------------------------------
    * 1. LOCAL STATE & REFS
    * ------------------------------------------------------------------ */
+
   const [addingNewAmend, setAddingNewAmend] = useState(false);
   const [backendPermissions, setBackendPermissions] = useState();
   const generalInfoRef = useRef(null);
@@ -121,17 +118,18 @@ export default function GenaralLocationForm() {
     },
   });
 
-  /* ------------------------------------------------------------------
-   * 6. DERIVED FORM STATE
-   * ------------------------------------------------------------------ */
-  const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
-
   const authDate = useWatch({
     control,
     name: "withaffectdate",
   });
+  const [isUnlocked, setIsUnlocked] = useState(
+    amendments.length > 0 ? true : !!authDate,
+  );
 
-  const isUnlocked = amendments.length > 0 ? true : !!authDate;
+  /* ------------------------------------------------------------------
+   * 6. DERIVED FORM STATE
+   * ------------------------------------------------------------------ */
+  const inputMode = amendments.length > 0 ? "UPDATE" : "INSERT";
 
   const isAmendMode = amendments.length > 0;
   const isVerifiedAmendment =
@@ -154,6 +152,7 @@ export default function GenaralLocationForm() {
     reset,
     getValues,
     clearErrors,
+    setIsUnlocked,
   });
 
   const { onSubmit, step, setStep, datePickerRef } = useSaveForm({
@@ -231,6 +230,9 @@ export default function GenaralLocationForm() {
     setValue,
     fieldMap: COMMON_LOCATION_FIELD_MAP,
   });
+
+
+
   useEffect(() => {
     setSidebar(
       "OPTION_RIGHTS",
@@ -256,16 +258,16 @@ export default function GenaralLocationForm() {
     clearErrors,
     reset,
     userCode,
-    ids: { companyId ,branchId},
+    ids: { companyId, branchId },
   });
 
   /* ------------------------------------------------------------------
    * 12. SIDE EFFECTS
    * ------------------------------------------------------------------ */
-const load = useCallback(async () => {
-  await loadBranches(userId, companyId);
-  await loadCompany(userId);
-}, [userId, companyId, loadBranches, loadCompany]);
+  const load = useCallback(async () => {
+    await loadBranches(userId, companyId);
+    await loadCompany(userId);
+  }, [userId, companyId, loadBranches, loadCompany]);
 
   useEffect(() => {
     setValue("mode", inputMode, { shouldDirty: false });
@@ -503,7 +505,7 @@ const load = useCallback(async () => {
                             }
                             onChange={(date) => {
                               field.onChange(date ? formatDate(date) : null);
-
+                              setIsUnlocked(true);
                               setTimeout(() => {
                                 smoothFocus("name"); //  Focus to name after selecting the date
                               }, 0);

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRef } from "react";
 import Select from "react-select";
 import { Controller } from "react-hook-form";
@@ -11,7 +11,6 @@ import { useAuth } from "../../../../context/AuthProvider";
 
 const VITE_API_BASE_URL = "http://localhost:8087";
 import { formatLocalDate } from "../../../../utils/dateFormater";
-import { handleApiError } from "../../../../utils/errorToastResolver";
 const GeneralInfoForm = function GeneralInfoForm({
   register,
   errors,
@@ -34,7 +33,6 @@ const GeneralInfoForm = function GeneralInfoForm({
   // const [generatedCode, setGeneratedCode] = useState("");
   const [rawImage, setRawImage] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
-  const [branches, setBranches] = useState([]);
   const fileInputRef = useRef(null);
   const nameInputRef = useRef(null);
   const isLocked = !isUnlocked;
@@ -73,7 +71,7 @@ const GeneralInfoForm = function GeneralInfoForm({
 
     loadBranches(userId, company);
   }, [company, userId]);
-  
+
   useEffect(() => {
     if (branchList?.length > 0) {
       setValue("branchEntity", branchList[0].value, {

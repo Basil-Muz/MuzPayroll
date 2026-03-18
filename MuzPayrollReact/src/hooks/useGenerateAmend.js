@@ -6,7 +6,7 @@ export const useGenerateAmend = ({
   reset,
   getValues,
   clearErrors,
-  isUnlocked,
+  setIsUnlocked,
   // setIsReadOnly,
 }) => {
   //Prepare form for generating new amendments
@@ -31,7 +31,7 @@ export const useGenerateAmend = ({
     });
 
     clearErrors();
-    isUnlocked = false;
-  }, [setSelectedAmendment, setAddingNewAmend, reset, getValues, clearErrors, isUnlocked]);
+    setIsUnlocked(false);
+  }, [setSelectedAmendment, setAddingNewAmend, reset, getValues, clearErrors, setIsUnlocked]);
   return { handleGenerateAmendment };
 };

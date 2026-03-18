@@ -3,11 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 // import { toast } from "react-hot-toast";
 import axios from "axios";
-import { Controller } from "react-hook-form";
-import Select from "react-select";
 import { useForm } from "react-hook-form";
-import { FaUser } from "react-icons/fa";
-
 import "./Header.css";
 import { IoMdSettings } from "react-icons/io";
 import { IoNotificationsSharp } from "react-icons/io5";
@@ -18,14 +14,10 @@ import { HiOutlineSwitchHorizontal } from "react-icons/hi";
 
 // Import the icons at the top
 import {
-  IoAlertCircle,
-  IoCheckmarkCircle,
-  IoInformationCircle,
-  IoTimeOutline,
+  IoTimeOutline,  
 } from "react-icons/io5";
 import { BsBell, BsExclamationTriangle, BsInbox } from "react-icons/bs";
 import { MdError, MdWarning, MdInfo, MdCheckCircle } from "react-icons/md";
-import { FaRegBell, FaRegCheckCircle } from "react-icons/fa";
 
 // Context / hooks
 
@@ -36,8 +28,9 @@ import { handleApiError } from "../../utils/errorToastResolver";
 
 //component
 import { ContextSwitcher } from "./ContextSwitcher";
+import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
-const BLOCKED_PATHS = ["/masters", "/home", "/settings"];
+const BLOCKED_PATHS = ["/masters/540", "/home", "/settings/750"];
 const CONTEXT_SWITCHER = ["/home"];
 
 const HOVER_DELAY = 200; // Delay before closing on mouse leave
@@ -78,7 +71,7 @@ const Header = ({ backendError = [] }) => {
   const [notOpen, setNotOpen] = useState(false);
   const [dashOpen, setDashOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [loadingLocation, setLoadingLocation] = useState(false);
+  // const [loadingLocation, setLoadingLocation] = useState(false);
 
   const [isContextOpen, setIsContextOpen] = useState(false);
   // const [contextBranch, setContextBranch] = useState(null);
@@ -256,7 +249,6 @@ const Header = ({ backendError = [] }) => {
   const fetchLocationsByBranch = useCallback(
     async (branchId) => {
       try {
-        setLoadingLocation(true);
         const res = await axios.get(
           `http://localhost:8087/location/locationlist/${branchId}`,
         );
@@ -271,7 +263,7 @@ const Header = ({ backendError = [] }) => {
         handleApiError(err);
         setLocationList([]);
       } finally {
-        setLoadingLocation(false);
+        // setLoadingLocation(false);
       }
     },
     [setLocationList],
@@ -785,8 +777,13 @@ const Header = ({ backendError = [] }) => {
                     {/* <FaUser /> */}
                   </div>
                   <div className="profile-info">
-                    <h4>{user?.userName || "User"}</h4>
+                    <div>
+                       <h4>{user?.userName || "User"}</h4>
                     <p>{user?.role || "Admin"}</p>
+                    </div>
+                   <div>
+                    <ThemeToggle/>
+                   </div>
                   </div>
                 </div>
 

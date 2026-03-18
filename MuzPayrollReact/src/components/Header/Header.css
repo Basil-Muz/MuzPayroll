@@ -10,7 +10,7 @@
   right: 0;
   min-height: 66px;
   padding: 0 24px;
-  background: var(--background);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -395,6 +395,7 @@
   max-width: 400px;
   width: max-content;
   backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
   -webkit-backdrop-filter: blur(10px);
 }
 
