@@ -302,9 +302,9 @@ function LoggedPage() {
         1,
         null,
       );
-      // console.log("Main Menu", response);
+      console.log("Main Menu", response.data);
       const organizedMenu = organizeMenuFromBackend(response.data);
-      // console.log("Organized menu", organizedMenu);
+      console.log("Organized menu", organizedMenu);
       updateMenus(organizedMenu);
     } catch (error) {
       // console.log("Error" + error);

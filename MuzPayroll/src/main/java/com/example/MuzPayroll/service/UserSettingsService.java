@@ -240,9 +240,16 @@ public class UserSettingsService extends MuzirisAbstractService<UserSettingsResp
             }
 
         }
+        if (!userAndEntityLinkList.isEmpty()) {
+            userAndEntityLinkRepository.saveAll(userAndEntityLinkList);
+        }
+        if (userAndUserGroupLinkList.isEmpty()) {
+            UserAndUserGroupLink userSavednone = new UserAndUserGroupLink();
+            return userSavednone;
+        }
 
-        userAndEntityLinkRepository.saveAll(userAndEntityLinkList);
         List<UserAndUserGroupLink> saved = userAndUserGroupLinkRepositoty.saveAll(userAndUserGroupLinkList);
+
         return saved.get(0);
 
     }
