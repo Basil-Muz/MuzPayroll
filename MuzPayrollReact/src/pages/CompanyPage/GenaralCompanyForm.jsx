@@ -750,7 +750,6 @@ export default function GenaralCompanyForm() {
           )}
         />
       </div>
-      <ThemeToggle></ThemeToggle>
       <ScrollToTopButton />
     </>
   );

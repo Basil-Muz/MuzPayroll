@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-// import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import "./Header.css";
@@ -9,18 +8,12 @@ import { IoMdSettings } from "react-icons/io";
 import { IoNotificationsSharp } from "react-icons/io5";
 import { BiSolidCollection } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
-import { ImUser } from "react-icons/im";
 import { HiOutlineSwitchHorizontal } from "react-icons/hi";
-
-// Import the icons at the top
-import {
-  IoTimeOutline,  
-} from "react-icons/io5";
+import { IoTimeOutline } from "react-icons/io5";
 import { BsBell, BsExclamationTriangle, BsInbox } from "react-icons/bs";
 import { MdError, MdWarning, MdInfo, MdCheckCircle } from "react-icons/md";
 
 // Context / hooks
-
 import { useAuth } from "../../context/AuthProvider";
 
 // Utils
@@ -32,7 +25,6 @@ import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
 const BLOCKED_PATHS = ["/masters/540", "/home", "/settings/750"];
 const CONTEXT_SWITCHER = ["/home"];
-
 const HOVER_DELAY = 200; // Delay before closing on mouse leave
 
 // Update your initial notifications to include type
@@ -67,44 +59,23 @@ const INITIAL_NOTIFICATIONS = [
   },
 ];
 
-const Header = ({ backendError = [] }) => {
+const Header = memo(({ backendError = [] }) => {
   const [notOpen, setNotOpen] = useState(false);
   const [dashOpen, setDashOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  // const [loadingLocation, setLoadingLocation] = useState(false);
-
-  const [isContextOpen, setIsContextOpen] = useState(false);
-  // const [contextBranch, setContextBranch] = useState(null);
-  // const [contextLocation, setContextLocation] = useState(null);
+  const [isContextOpen, setIsContextOpen] = useState(false); // Added missing state
 
   const [companyList, setCompanyList] = useState([]);
   const [notifications, setNotifications] = useState([]);
-
   const [branchList, setBranchList] = useState([]);
   const [locationList, setLocationList] = useState([]);
   const [dashNotifications, setDashNotifications] = useState(
     INITIAL_NOTIFICATIONS,
   );
-  // const hasHydratedRef = useRef(false);
 
   const location = useLocation();
-
-  //Import functions from context
   const { user, logout, updateUser } = useAuth();
-  // const { showRailLoader, hideLoader } = useLoader();
   const navigate = useNavigate();
-
-  const handleLogOut = () => {
-    const currentSolution = user?.solutionId;
-
-    logout();
-
-    if (currentSolution === 1) {
-      navigate("/payroll", { replace: true });
-    } else if (currentSolution === 2) {
-      navigate("/payrollemp", { replace: true });
-    }
-  };
 
   const { setValue } = useForm({
     defaultValues: {
@@ -119,78 +90,68 @@ const Header = ({ backendError = [] }) => {
   const dashTimerRef = useRef(null);
   const profileTimerRef = useRef(null);
 
-  // Parse login data safely
-  // const getLoginData = () => {
-  //   try {
-  //     const data = localStorage.getItem("loginData");
-  //     return data ? JSON.parse(data) : {};
-  //   } catch (error) {
-  //     console.error("Error parsing login data:", error);
-  //     return {};
-  //   }
-  // };
-
-  // const loginData = getLoginData();
-  const companyId = user?.companyId
+  const companyId = user?.companyId;
   const currentPath = location.pathname;
 
-  const shouldRenderDashboard = !BLOCKED_PATHS.includes(currentPath);
-  const shouldRenderProfile = BLOCKED_PATHS.includes(currentPath);
-  const shouldRenderHome = !CONTEXT_SWITCHER.includes(currentPath);
-  const toggleContext = useCallback(() => {
-    setIsContextOpen(true);
-    // console.log("context", isContextOpen);
-  }, []);
-  /* ================= API ================= */
-  const fetchContextData = useCallback(
-    async (branchId, userCode) => {
-      //User code for user base access
-      if (!companyId) return;
-      const entityId = 4;
-      const userId = 3;
-      try {
-        const [companyRes, branchRes] = await Promise.all([
-          axios.get("http://localhost:8087/entity/fetchCompany", {
-            params: {
-              userId: userId,
-              // companyId: entityId, // make sure this matches your variable
-            },
-          }),
-          axios.get("http://localhost:8087/entity/fetchBranch", {
-            params: {
-              userId: userId,
-              companyId: entityId, // make sure this matches your variable
-            },
-          }),
-        ]);
-        // console.log("Branch response", branchRes.data);
-
-        const companyData = Array.isArray(companyRes.data)
-          ? companyRes.data
-          : [companyRes.data]; //if the API returns one company
-
-        setCompanyList(
-          companyData.map((company) => ({
-            value: company.entityHierarchyId,
-            label: company.entityName,
-          })),
-        );
-
-        setBranchList(
-          branchRes.data.map((branch) => ({
-            value: branch.entityHierarchyId,
-            label: branch.entityName,
-          })),
-        );
-      } catch (err) {
-        handleApiError(err, { entity: "company" });
-        console.log("company error", err);
-      }
-    },
-    [companyId],
+  const shouldRenderDashboard = useMemo(
+    () => !BLOCKED_PATHS.includes(currentPath),
+    [currentPath],
+  );
+  const shouldRenderProfile = useMemo(
+    () => BLOCKED_PATHS.includes(currentPath),
+    [currentPath],
+  );
+  const shouldRenderHome = useMemo(
+    () => !CONTEXT_SWITCHER.includes(currentPath),
+    [currentPath],
   );
 
-  // Helper function to get notification icon based on type
+  const toggleContext = useCallback(() => {
+    setIsContextOpen(true);
+  }, []);
+
+  const fetchContextData = useCallback(async () => {
+    if (!companyId) return;
+    const entityId = 4;
+    const userId = 3;
+    try {
+      const [companyRes, branchRes] = await Promise.all([
+        axios.get("http://localhost:8087/entity/fetchCompany", {
+          params: {
+            userId: userId,
+          },
+        }),
+        axios.get("http://localhost:8087/entity/fetchBranch", {
+          params: {
+            userId: userId,
+            companyId: entityId,
+          },
+        }),
+      ]);
+
+      const companyData = Array.isArray(companyRes.data)
+        ? companyRes.data
+        : [companyRes.data];
+
+      setCompanyList(
+        companyData.map((company) => ({
+          value: company.entityHierarchyId,
+          label: company.entityName,
+        })),
+      );
+
+      setBranchList(
+        branchRes.data.map((branch) => ({
+          value: branch.entityHierarchyId,
+          label: branch.entityName,
+        })),
+      );
+    } catch (err) {
+      handleApiError(err, { entity: "company" });
+    }
+  }, [companyId]);
+
+  // Helper functions (unchanged, but kept concise)
   const getNotificationIcon = (type) => {
     switch (type) {
       case "error":
@@ -205,7 +166,6 @@ const Header = ({ backendError = [] }) => {
     }
   };
 
-  // Helper function to get notification title
   const getNotificationTitle = (type) => {
     switch (type) {
       case "error":
@@ -221,177 +181,104 @@ const Header = ({ backendError = [] }) => {
     }
   };
 
-  // const fetchBranchesByCompanyList = useCallback(
-  //   async (companyId) => {
-  //     const startTime = Date.now();
-  //     // console.log("companys :");
-  //     // show loader
-  //     showRailLoader("Retrieving available branches…");
-  //     try {
-  //       const res = await fetchBranchesByCompany(companyId);
-  //       console.log("companys :", res);
-  //       setBranchList(
-  //         res.data.map((branch) => ({
-  //           value: branch.branchMstID,
-  //           label: branch.branch,
-  //         })),
-  //       );
-  //     } catch (error) {
-  //       handleApiError(error);
-  //     } finally {
-  //       await ensureMinDuration(startTime, 1200);
-  //       hideLoader();
-  //     }
-  //   },
-  //   [setBranchList],
-  // );
+  const fetchLocationsByBranch = useCallback(async (branchId) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8087/location/locationlist/${branchId}`,
+      );
 
-  const fetchLocationsByBranch = useCallback(
-    async (branchId) => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8087/location/locationlist/${branchId}`,
-        );
-
-        setLocationList(
-          res.data.map((loc) => ({
-            value: loc.mstID,
-            label: loc.name,
-          })),
-        );
-      } catch (err) {
-        handleApiError(err);
-        setLocationList([]);
-      } finally {
-        // setLoadingLocation(false);
-      }
-    },
-    [setLocationList],
-  );
-
-  // useEffect(() => {
-  //   const data = getLoginData();
-  //   setContextBranch(data.branchId || null);
-  //   setContextLocation(data.locationId || null);
-  // }, []);
-
-  // Clean up timers on unmount
-  useEffect(() => {
-    return () => {
-      clearTimeout(notifTimerRef.current);
-      clearTimeout(dashTimerRef.current);
-      clearTimeout(profileTimerRef.current);
-    };
+      setLocationList(
+        res.data.map((loc) => ({
+          value: loc.mstID,
+          label: loc.name,
+        })),
+      );
+    } catch (err) {
+      handleApiError(err);
+      setLocationList([]);
+    }
   }, []);
 
+  // Combined useEffect for form value setting
   useEffect(() => {
-    if (!user || companyList.length === 0) return;
+    if (!user) return;
 
-    // if (companyList.length === 0) return;
-
-    const companyOption = companyList.find(
-      (c) => c.value === Number(user.userEntityHierarchyId),
-    );
-
-    if (companyOption) {
-      setValue("company", companyOption, {
-        shouldDirty: false,
-        shouldTouch: false,
-      });
-    }
-  }, [companyList, user, setValue]);
-
-  const contextInitialData = {
-    company: user?.userEntityHierarchyId
-      ? {
-        value: user.userEntityHierarchyId,
-        label: user?.companyName,
+    if (companyList.length > 0) {
+      const companyOption = companyList.find(
+        (c) => c.value === Number(user.userEntityHierarchyId),
+      );
+      if (companyOption) {
+        setValue("company", companyOption, {
+          shouldDirty: false,
+          shouldTouch: false,
+        });
       }
-      : null,
-
-    branch: user?.branchId
-      ? {
-        value: user.branchId,
-        label: user?.branchName,
-      }
-      : null,
-
-    location: user?.locationId
-      ? {
-        value: user.locationId,
-        label: user?.locationName,
-      }
-      : null,
-  };
-  // console.log("sdfsdfgs", user);
-  useEffect(() => {
-    if (branchList.length === 0) return;
-
-    const branchOption = branchList.find(
-      (b) => b.value === Number(user?.branchId),
-    ); //stored ID is in string
-    // console.log("Brqanch steed", branchOption);
-    if (branchOption) {
-      setValue("branch", branchOption, {
-        //set in object not number or string
-        shouldDirty: false,
-        shouldTouch: false,
-      });
     }
-    fetchLocationsByBranch(Number(user?.branchId));
-  }, [branchList]);
 
-  useEffect(() => {
-    if (locationList.length === 0) return;
-
-    const locationOption = locationList.find(
-      (l) => l.value === Number(user?.locationId), //stored ID is in string
-    );
-    // console.log("location steed", locationList);
-    if (locationOption) {
-      setValue("location", locationOption, {
-        shouldDirty: false,
-        shouldTouch: false,
-      });
+    if (branchList.length > 0) {
+      const branchOption = branchList.find(
+        (b) => b.value === Number(user.branchId),
+      );
+      if (branchOption) {
+        setValue("branch", branchOption, {
+          shouldDirty: false,
+          shouldTouch: false,
+        });
+      }
+      fetchLocationsByBranch(Number(user.branchId));
     }
-  }, [locationList, setValue]);
+
+    if (locationList.length > 0) {
+      const locationOption = locationList.find(
+        (l) => l.value === Number(user.locationId),
+      );
+      if (locationOption) {
+        setValue("location", locationOption, {
+          shouldDirty: false,
+          shouldTouch: false,
+        });
+      }
+    }
+  }, [
+    companyList,
+    branchList,
+    locationList,
+    user,
+    setValue,
+    fetchLocationsByBranch,
+  ]);
 
   useEffect(() => {
     if (!companyId || !user?.branchId) return;
+    fetchContextData();
+  }, [companyId, user?.branchId, fetchContextData]);
 
-    fetchContextData(user?.branchId, user?.userCode);
-  }, [
-    companyId,
-    user?.branchId,
-    user?.userCode,
-    user?.locationId,
-    fetchContextData,
-  ]);
+  // Memoized contextInitialData
+  const contextInitialData = useMemo(
+    () => ({
+      company: user?.userEntityHierarchyId
+        ? {
+            value: user.userEntityHierarchyId,
+            label: user.companyName,
+          }
+        : null,
+      branch: user?.branchId
+        ? {
+            value: user.branchId,
+            label: user.branchName,
+          }
+        : null,
+      location: user?.locationId
+        ? {
+            value: user.locationId,
+            label: user.locationName,
+          }
+        : null,
+    }),
+    [user],
+  );
 
-  //Listen to trigger on user changes
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   // const data = getLoginData();
-  //   // console.log("Login data", data);
-  //   // setContextBranch(user.branchId);
-  //   // console.log("Branch context", contextBranch);
-  //   setValue("branch", user.branchId, {
-  //     shouldDirty: false,
-  //     shouldTouch: false,
-  //   });
-
-  //   // setContextLocation(user.locationId);
-  //   // console.log("Location context", contextLocation);
-  //   setValue("location", user.locationId, {
-  //     shouldDirty: false,
-  //     shouldTouch: false,
-  //   });
-
-  //   // console.log("User data changed", user);
-  // }, [user?.branchId, setValue, user]);
-
-  // Notification functions
+  // Notification functions (optimized with useCallback)
   const removeNotification = useCallback((id) => {
     setNotifications((prev) =>
       prev.filter((notification) => notification.id !== id),
@@ -501,6 +388,18 @@ const Header = ({ backendError = [] }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeAllDropdowns]);
+
+  const handleLogOut = () => {
+    const currentSolution = user?.solutionId;
+
+    logout();
+
+    if (currentSolution === 1) {
+      navigate("/payroll", { replace: true });
+    } else if (currentSolution === 2) {
+      navigate("/payrollemp", { replace: true });
+    }
+  };
 
   // Replace the existing JSX return statement with this enhanced version
   return (
@@ -760,7 +659,6 @@ const Header = ({ backendError = [] }) => {
             >
               <div className="user-avatar">
                 {user?.userName?.charAt(0) || "U"}
-                {/* <FaUser /> */}
               </div>
             </button>
 
@@ -774,16 +672,15 @@ const Header = ({ backendError = [] }) => {
                 <div className="profile-header">
                   <div className="profile-avatar">
                     {user?.userName?.charAt(0) || "U"}
-                    {/* <FaUser /> */}
                   </div>
                   <div className="profile-info">
                     <div>
-                       <h4>{user?.userName || "User"}</h4>
-                    <p>{user?.role || "Admin"}</p>
+                      <h4>{user?.userName || "User"}</h4>
+                      <p>{user?.role || "Admin"}</p>
                     </div>
-                   <div>
-                    <ThemeToggle/>
-                   </div>
+                    <div>
+                      <ThemeToggle />
+                    </div>
                   </div>
                 </div>
 
@@ -845,5 +742,5 @@ const Header = ({ backendError = [] }) => {
       />
     </>
   );
-};
+});
 export default Header;

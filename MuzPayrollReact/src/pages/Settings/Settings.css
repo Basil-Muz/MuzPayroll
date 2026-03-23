@@ -133,6 +133,7 @@
 .content {
   padding: 20px 40px;
   width: 92%;
+  min-height: 81vh;
 }
 
 .page-title {

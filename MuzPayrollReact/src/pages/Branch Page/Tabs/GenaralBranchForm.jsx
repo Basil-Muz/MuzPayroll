@@ -806,7 +806,6 @@ export default function GenaralBranchForm() {
           )}
         />
       </div>
-      <ThemeToggle></ThemeToggle>
       <ScrollToTopButton />
     </>
   );

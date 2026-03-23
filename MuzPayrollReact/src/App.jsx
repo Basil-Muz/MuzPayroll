@@ -1,7 +1,7 @@
 import "./App.css";
 // import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import { useSystemThemeSync } from "./hooks/useSystemThemeSync.js";
 import { Toaster, toast } from "react-hot-toast";
 import "./ToastStyles.css";
 
@@ -53,6 +53,7 @@ import UserSettings from "./pages/UserSettings/UserSettings.jsx";
 import CompanyAllocation from "./pages/CompanyAllocation/CompanyAllocation.jsx";
 import LicenseAgreement from "./pages/License Agreement/LicenseAgreement.jsx";
 function App() {
+  useSystemThemeSync();
   return (
     <>
       <AuthProvider>

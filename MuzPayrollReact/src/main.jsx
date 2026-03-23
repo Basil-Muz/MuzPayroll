@@ -6,10 +6,17 @@ import "./index.css";
 import App from "./App.jsx";
 import { LoaderProvider } from "./context/LoaderContext";
 
-// ✅ Runs FIRST before any page renders
-const savedTheme = localStorage.getItem("theme"); // check saved preference
+// Runs FIRST before any page renders
+const savedTheme = localStorage.getItem("theme");
+const userPreference = localStorage.getItem("theme-manual");
+
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-const theme = savedTheme || (prefersDark ? "dark" : "light");
+
+const theme =
+  userPreference === "true"
+    ? savedTheme
+    : savedTheme || (prefersDark ? "dark" : "light");
+
 document.documentElement.setAttribute("data-theme", theme);
 
 createRoot(document.getElementById("root")).render(
