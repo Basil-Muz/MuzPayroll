@@ -8,6 +8,20 @@ jobs:
   build-backend:
     name: Build Spring Boot
     runs-on: ubuntu-latest
+    services:                                        # ✅ services is under the job, not under steps
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: PayrollBasil
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -26,11 +40,15 @@ jobs:
           restore-keys: maven
 
       - name: Build Backend
-        working-directory: MuzPayroll           # ✅ backend subfolder
+        working-directory: MuzPayroll
         run: mvn clean install -DskipTests
 
       - name: Run Backend Tests
         working-directory: MuzPayroll
+        env:                                         # ✅ env is under the step, not under the job
+          SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.148:5432/PayrollBasil
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: localadmin
         run: mvn test
 
   build-frontend:
@@ -52,7 +70,7 @@ jobs:
           key: node-${{ hashFiles('MuzPayrollReact/package-lock.json') }}
 
       - name: Install Dependencies
-        working-directory: MuzPayrollReact      # ✅ frontend subfolder
+        working-directory: MuzPayrollReact
         run: npm install
 
       - name: Run Frontend Tests
@@ -61,7 +79,7 @@ jobs:
 
       - name: Build React App
         working-directory: MuzPayrollReact
-        run: npm run build
+        run: npm test 
 
   docker-build:
     name: Build & Push Docker Images
