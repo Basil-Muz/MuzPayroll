@@ -42,3 +42,6 @@ import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
               ["new", "save", "clear", "search", "refresh"],
             )}
           />
+
+          DOCKER_USERNAME : alanpj28
+          DOCKER_PASSWORD : ;9zG_R-!*^PFAZ8
