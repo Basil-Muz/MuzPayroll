@@ -3,12 +3,11 @@ on:
   push:
     branches:
       - master
-
 jobs:
   build-backend:
     name: Build Spring Boot
     runs-on: ubuntu-latest
-    services:                                        # ✅ services is under the job, not under steps
+    services:
       postgres:
         image: postgres:15
         env:
@@ -25,62 +24,51 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
-
       - name: Cache Maven Dependencies
         uses: actions/cache@v3
         with:
           path: ~/.m2
           key: maven-${{ hashFiles('MuzPayroll/pom.xml') }}
           restore-keys: maven
-
       - name: Build Backend
         working-directory: MuzPayroll
         run: mvn clean install -DskipTests
-
       - name: Run Backend Tests
         working-directory: MuzPayroll
-        env:                                         # ✅ env is under the step, not under the job
-          SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.148:5432/PayrollBasil
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/PayrollBasil  # ✅ CI postgres service
           SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: localadmin
+          SPRING_DATASOURCE_PASSWORD: postgres                                  # ✅ matches service password
         run: mvn test
-
   build-frontend:
     name: Build React
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - name: Cache Node Modules
         uses: actions/cache@v3
         with:
           path: MuzPayrollReact/node_modules
           key: node-${{ hashFiles('MuzPayrollReact/package-lock.json') }}
-
       - name: Install Dependencies
         working-directory: MuzPayrollReact
         run: npm install
-
       - name: Run Frontend Tests
         working-directory: MuzPayrollReact
-        run: npm test -- --watchAll=false
-
+        run: npm test
       - name: Build React App
         working-directory: MuzPayrollReact
-        run: npm test 
-
+        run: npm run build
   docker-build:
     name: Build & Push Docker Images
     needs: [build-backend, build-frontend]
@@ -88,25 +76,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Build Backend Image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/springboot-backend:latest ./MuzPayroll
-
       - name: Push Backend Image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/springboot-backend:latest
-
       - name: Build Frontend Image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/react-frontend:latest ./MuzPayrollReact
-
       - name: Push Frontend Image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/react-frontend:latest
-
   deploy:
     name: Deploy to Server
     needs: docker-build
