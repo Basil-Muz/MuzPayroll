@@ -40,10 +40,10 @@ public class MenuController {
     public List<MenuDTO> getSideBar(
             @RequestParam String transtype,
             @RequestParam String transsubtype,
-            @RequestParam Integer userId,
-            @RequestParam Integer solutionId,
-            @RequestParam Integer optionid,
-            @RequestParam Integer entity_hierarchy_id) {
+            @RequestParam Long userId,
+            @RequestParam Long solutionId,
+            @RequestParam Long optionid,
+            @RequestParam Long entity_hierarchy_id) {
 
         return menuService.getSideBar(transtype, transsubtype, userId, solutionId, optionid, entity_hierarchy_id);
     }

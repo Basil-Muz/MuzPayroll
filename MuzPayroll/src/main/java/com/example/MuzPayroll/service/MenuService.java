@@ -18,8 +18,8 @@ public interface MenuService {
     List<MenuDTO> getSideBar(
             String transtype,
             String transsubtype,
-            Integer userId,
-            Integer solutionId,
-            Integer optionid,
-            Integer entity_hierarchy_id);
+            Long userId,
+            Long solutionId,
+            Long optionid,
+            Long entity_hierarchy_id);
 }
