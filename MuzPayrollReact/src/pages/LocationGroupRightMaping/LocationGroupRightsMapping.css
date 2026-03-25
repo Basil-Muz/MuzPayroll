@@ -57,23 +57,12 @@
 }
 
 .btn-apply-outline {
-  background: white;
+  background: var(--bg);
   border: 1px solid var(--brand);
-  color: var(--brand);
+  color: var(--text);
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-}
-
-.btn-apply-outline:hover {
-  background: #fcf0ff;
-}
-
-.btn-apply-outline:disabled {
-  border-color: #ccc;
-  color: #999;
-  cursor: not-allowed;
-  background: white;
 }
 
 .lgr-actions .floating-action-bar {

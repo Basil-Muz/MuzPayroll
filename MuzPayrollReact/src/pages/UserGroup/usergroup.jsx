@@ -2,11 +2,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 
 // Third-party libraries
-import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
+import { BsGrid3X3GapFill } from "react-icons/bs";
 import { IoIosSearch } from "react-icons/io";
 
 import { toast } from "react-hot-toast";
+
 // Styles
 import "./usergroup.css";
 
@@ -15,6 +17,8 @@ import Search from "../../components/search/Search";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
+
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
 
 // Local components
 import ListItemForm from "../../components/ListItemForm/ListItemForm";
@@ -27,6 +31,7 @@ import { useLoader } from "../../context/LoaderContext";
 // Utils
 import { ensureMinDuration } from "../../utils/loaderDelay";
 import { handleApiError } from "../../utils/errorToastResolver";
+import { getFloatingActions } from "../../utils/setActionButtons";
 
 // Services
 import {
@@ -51,13 +56,27 @@ function UserGroup() {
   const [inactiveUserGroups, setInactiveUserGroups] = useState([]);
   const [searchData, setSearchdata] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
-  // const [loading, setLoading] = useState(true);
-  // const [flag, setFlag] = useState(false); // new state for flag from child
+  const [backendPermissions, setBackendPermissions] = useState();
 
   const { user } = useAuth();
-
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
   const entityId = user?.userEntityHierarchyId;
 
+  const { setSidebar } = useSidebarPermissions();
+
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
+  // console.log("Backed menu",backendPermissions)
   const getAllUserGroups = async (loadFirst) => {
     const startTime = Date.now();
     if (loadFirst === true) {
@@ -84,20 +103,6 @@ function UserGroup() {
     toast.success("User groups have been updated.");
   };
 
-  // const handleDelete = () => {
-  //   console.log("Delete clicked");
-  // };
-
-  // const handlePrint = () => {
-  //   console.log("Print clicked");
-  // };
-
-  //   const handleFlagChange = (newFlag) => {
-  //     setFlag(newFlag); // update parent state
-  //     setTimeout(() => {
-  //       setFlag(false); // reset flag after 2 seconds
-  //     }, 1000);
-  //   };
   const handleSearchChange = (e) => {
     setSearchdata(e.target.value);
   };
@@ -328,7 +333,9 @@ function UserGroup() {
                   item={item}
                   status="active"
                   handleDataToForm={handleDataToForm}
-                />
+                >
+                  <div>{item.description}</div>
+                </ListCard>
               ))}
             </div>
           ) : (
@@ -345,7 +352,10 @@ function UserGroup() {
                     item={item}
                     status="active"
                     handleDataToForm={handleDataToForm}
-                  />
+                  >
+                    {" "}
+                    <div>{item.description}</div>
+                  </ListCard>
                 ))}
               </div>
             ) : (
@@ -361,7 +371,10 @@ function UserGroup() {
                     item={item}
                     status="inactive"
                     handleDataToForm={handleDataToForm}
-                  />
+                  >
+                    {" "}
+                    <div>{item.description}</div>
+                  </ListCard>
                 ))}
               </div>
             ) : (
@@ -370,7 +383,7 @@ function UserGroup() {
           </>
         )}
 
-        <FloatingActionBar
+        {/* <FloatingActionBar
           actions={{
             save: {
               // onClick: () => handleSaveUserGroup(selectedItem, "ADD"),
@@ -402,9 +415,32 @@ function UserGroup() {
             //   onClick: () => window.location.reload(),  // Refresh the page
             // },
           }}
+        /> */}
+        <FloatingActionBar
+          actions={getFloatingActions(
+            backendPermissions,
+            {
+              // handleSave,
+              handleClear,
+              // handleRefresh,
+              // handleSearch,
+              handleNew: handleNew,
+              // handleDelete,
+              // handlePrint,
+            },
+            {
+              canNew:false, //  add is disable by backed
+              canSave: true, // because disabled: canSave
+              // canSearch: true, // true → disabled
+              canClear: false, // false → enabled
+              // canRefresh: false, // false → enabled
+              canDelete: true,
+              
+            },
+            ["new", "save", "clear", "print", "delete"],
+          )}
         />
-
-        {selectedItem && (
+        {showForm && (
           <ListItemForm
             entity="User Group"
             data={selectedItem}
@@ -419,6 +455,7 @@ function UserGroup() {
               <div className="main-model-content">
                 {/* HIDDEN ID */}
                 <input type="hidden" {...register("id")} />
+
 
                 {/* Group Code */}
                 <div className="full-content">
@@ -436,6 +473,16 @@ function UserGroup() {
                         required: "Group Code is required",
                       })}
                     />
+
+                  <textarea
+                    className={`form-control ${
+                      errors[USER_GROUP_FIELD_MAP.description] ? "error" : ""
+                    } ${isVarified ? "read-only" : ""}`}
+                    placeholder="Enter Description"
+                    disabled={isVarified}
+                    {...register(USER_GROUP_FIELD_MAP.description)}
+                  />
+
 
                     {errors[USER_GROUP_FIELD_MAP.code] && (
                       <span className="error-message">

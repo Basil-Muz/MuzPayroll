@@ -7,6 +7,7 @@
   /*margin: 0 auto;   */ /* center it horizontally */
   background-color: var(--bg);
   font-family: "Roboto", Arial, sans-serif;
+  transition: all 0.3s ease;
 }
 
 /* sidebar */
@@ -132,6 +133,7 @@
 .content {
   padding: 20px 40px;
   width: 92%;
+  min-height: 81vh;
 }
 
 .page-title {
@@ -250,7 +252,7 @@
   justify-content: space-between;
   align-items: center;
 }
-.settigs-app-shell .main-cancel {
+/* .settigs-app-shell .main-cancel {
   padding: 7px;
   display: flex;
   width: 46px;
@@ -266,4 +268,4 @@
 }
 .main-cancel:hover {
   background-color: #c40101ff;
-}
+} */

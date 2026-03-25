@@ -143,7 +143,7 @@
   /* justify-content: center;
     align-items: center; */
 
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--glass-bg);
   /* clearer, modern */
   backdrop-filter: blur(10px);
   /* stronger blur = premium */
@@ -160,7 +160,7 @@
   /* Hidden by default */
   justify-content: center;
   /* align-items: center; */
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   /* justify-content: center;
     align-items: center; */
 

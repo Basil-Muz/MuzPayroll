@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { FaFilter, FaChevronDown, FaChevronRight } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { toast } from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { useLoader } from "../../context/LoaderContext.jsx";
@@ -10,7 +11,9 @@ import { ensureMinDuration } from "../../utils/loaderDelay";
 // Components
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
 import Header from "../../components/Header/Header";
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
+
 //service
 import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
 import { getLocationGroupsList } from "../../services/locationGroup.service.js";
@@ -20,9 +23,13 @@ import {
 } from "../../services/locationGrpRights.service.js";
 
 import { useAuth } from "../../context/AuthProvider.jsx";
+
 import "./css/LocationGroupRights.css";
+
 // Utils(Helpers)
+import { getFloatingActions } from "../../utils/setActionButtons";
 import { handleApiError } from "../../utils/errorToastResolver";
+
 import {
   OPTION_TYPE_MAP,
   PERMISSION_PRESETS_LOCATION,
@@ -32,6 +39,7 @@ const MODULES_PER_PAGE = 3;
 
 export default function LocationGroupRights() {
   const { showRailLoader, hideLoader } = useLoader();
+  const [backendPermissions, setBackendPermissions] = useState();
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
   // const [bulkGroup, setBulkGroup] = useState([]);
   const [modules, setModules] = useState([]);
@@ -48,15 +56,30 @@ export default function LocationGroupRights() {
   const [collapsedModules, setCollapsedModules] = useState({});
 
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
   // console.log("User",user)
   // const companyId = 4;
 
   // Track changed screens count
   const [changedScreensCount, setChangedScreensCount] = useState(0);
+  const { setSidebar } = useSidebarPermissions();
 
   useEffect(() => {
     fetchDropDown();
-  },[]);
+  }, []);
+
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
 
   // Calculate changed screens whenever modules change
   useEffect(() => {
@@ -303,7 +326,7 @@ export default function LocationGroupRights() {
       setOriginalModules(JSON.parse(JSON.stringify(grouped)));
 
       // Clear selections when new data loads
-      setSelectedRowIds(new Set());
+      // setSelectedRowIds(new Set());
       // setBulkGroup([]);
       setSelectedPreset(null);
       setModuleSearch({});
@@ -315,6 +338,8 @@ export default function LocationGroupRights() {
       setCollapsedModules(collapseState);
 
       setPage(1);
+      if (res.data.length > 0)
+        setSelectedRowIds(new Set([res.data[0].egrEntityGroupRightID]));
     } catch (err) {
       handleApiError(err);
     } finally {
@@ -357,7 +382,7 @@ export default function LocationGroupRights() {
     const ids = new Set(selectedRowIds);
     // console.log("Id",collapsedModules)
     paginatedModules.forEach((module) => {
-      const isCollapsed = collapsedModules[module.id] === true ;
+      const isCollapsed = collapsedModules[module.id] === true;
 
       // skip closed modules
       if (isCollapsed) return;
@@ -454,6 +479,7 @@ export default function LocationGroupRights() {
     try {
       await saveLocationGrpRights(changed);
       toast.success(`Saved ${changed.length} changes`);
+      setChangedScreensCount(0);
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -985,28 +1011,25 @@ export default function LocationGroupRights() {
 
         <aside className="lgrs-actions">
           <FloatingActionBar
-            actions={{
-              save: {
-                onClick: handleSave,
-                disabled: !changedScreensCount,
+            actions={getFloatingActions(
+              backendPermissions,
+              {
+                handleSave,
+                handleClear: handleRefresh,
+                handleRefresh,
+                // handleSearch,
+                handleNew: handleClear,
+                // handleDelete,
+                // handlePrint,
               },
-              // search: {
-              //   disabled: true,
-              // },
-              clear: {
-                onClick: handleRefresh,
+              {
+                canSave: !changedScreensCount, // because disabled: canSave
+                canSearch: true, // true → disabled
+                canClear: false, // false → enabled
+                canRefresh: false, // false → enabled
               },
-
-              delete: {
-                disabled: true,
-              },
-              refresh: {
-                onClick: handleRefresh,
-              },
-              new: {
-                onClick: handleClear,
-              },
-            }}
+              ["new", "save", "clear", "delete", "refresh"],
+            )}
           />
         </aside>
       </div>

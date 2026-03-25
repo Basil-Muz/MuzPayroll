@@ -56,12 +56,41 @@ function ListItemForm({
 
   // Load full entity data if editing
   useEffect(() => {
+<<<<<<< HEAD
     if (!data?.id) {
       setMode("INSERT");
       reset({
         activeDate: new Date(),
         authorizationStatus: 0,
         activeYN: true,
+=======
+    if (!flag) {
+      codeInputRef.current?.focus();
+    }
+    // console.log("User dfhgdfgh",user)
+  }, [flag]);
+
+  useEffect(() => {
+    setFocus("Code");
+  }, []);
+
+  const fetchFormDataById = async (data) => {
+    const startTime = Date.now();
+    // show loader
+    showRailLoader("Fetching available " + entity + "..");
+    try {
+
+      // console.log("Selected data",data)
+
+      const response = await fetchEntityById(data);
+      // console.log("Data by id", response);
+      setSeconderyFormData(response.data);
+      if (response.data.authorizationStatus === true) setIsVarified(true);
+    } catch (error) {
+      console.error("Error fetching " + entity, error);
+      handleApiError(error, {
+        entity: entity,
+>>>>>>> e5795faaed64d7f66fcd26102dac01b044173521
       });
       return;
     }
@@ -120,9 +149,16 @@ function ListItemForm({
         formData.append(key, value);
       }
     });
+<<<<<<< HEAD
+=======
+    // for (const pair of formData.entries()) {
+    //   console.log(pair[0], pair[1]);
+    // }
+>>>>>>> e5795faaed64d7f66fcd26102dac01b044173521
     const startTime = Date.now();
     showRailLoader("Saving " + entity + "...");
     try {
+<<<<<<< HEAD
       const res = await saveEntity(formData, mode);
 
       if (res.data.success) {
@@ -133,6 +169,26 @@ function ListItemForm({
       }
     } catch (error) {
       handleApiError(error, { entity });
+=======
+      let res;
+      if (!data)
+        //  For fresh insert
+        res = await saveEntity(formData, "INSERT");
+      else res = await saveEntity(formData, "UPDATE"); //for edit
+      console.log("Response",res)
+    
+      if(res.data.success === false)
+        throw res;
+
+        toast.success(entity + " saved successfully");
+        toggleForm();
+      // console.log("Save response",response);
+    } catch (error) {
+      console.error("Error updating ", error);
+      handleApiError(error, {
+        entity: entity,
+      });
+>>>>>>> e5795faaed64d7f66fcd26102dac01b044173521
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();

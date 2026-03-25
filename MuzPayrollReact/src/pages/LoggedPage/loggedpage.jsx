@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import Sidebar from "../../components/SideBar/Sidebar";
-import muzLogo from "../../assets/muzlogo_transparent.png";
+import muzLogo from "/muz-logo.png";
 
 import { useLoader } from "../../context/LoaderContext";
 import { useAuth } from "../../context/AuthProvider";
@@ -311,6 +311,22 @@ function LoggedPage() {
         okEnabled: false, // ✅ only after success
         changeEnabled: true,
       });
+<<<<<<< HEAD
+=======
+      const response = await fetchMainMenu(
+        "MAIN_MENU",
+        "LIST",
+        user.userMstId,
+        user.solutionId,
+        selectedLocationId,
+        1,
+        null,
+      );
+      console.log("Main Menu", response.data);
+      const organizedMenu = organizeMenuFromBackend(response.data);
+      console.log("Organized menu", organizedMenu);
+      updateMenus(organizedMenu);
+>>>>>>> e5795faaed64d7f66fcd26102dac01b044173521
     } catch (error) {
       console.log("API FAILED", error);
 
@@ -359,11 +375,15 @@ function LoggedPage() {
                   options={companyOptions}
                   onChange={(opt) => {
                     const newId = opt?.value || "";
+<<<<<<< HEAD
 
                     // ✅ ADD THIS CHECK
                     if (newId === selectedCompanyId) return;
 
                     setUserChangedCompany(true);
+=======
+                    setUserChangedCompany(true); //  mark manual change
+>>>>>>> e5795faaed64d7f66fcd26102dac01b044173521
                     setSelectedCompanyId(newId);
 
                     setSelectedBranchId("");

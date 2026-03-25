@@ -3,14 +3,19 @@ import { FaFilter, FaChevronDown, FaChevronRight } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import Select from "react-select";
+import { useSearchParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
+
 import { useLoader } from "../../context/LoaderContext.jsx";
+
+import { getFloatingActions } from "../../utils/setActionButtons";
 import { ensureMinDuration } from "../../utils/loaderDelay";
 
 // Components
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
 import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
 //service
 import { getSolutionList } from "../../services/LocationGroupRightsMapping.service.js";
 import { getUserGroupsList } from "../../services/usergroup.service.js";
@@ -33,7 +38,7 @@ const MODULES_PER_PAGE = 3;
 export default function LocationGroupRights() {
   const { showRailLoader, hideLoader } = useLoader();
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
-  const [bulkGroup, setBulkGroup] = useState([]);
+  // const [bulkGroup, setBulkGroup] = useState([]);
   const [modules, setModules] = useState([]);
   const [originalModules, setOriginalModules] = useState([]);
   const [page, setPage] = useState(1);
@@ -42,12 +47,16 @@ export default function LocationGroupRights() {
   const [solutions, setSolutions] = useState([]);
   const [userGrpRights, setUserGrpRights] = useState([]);
   const [selectedPreset, setSelectedPreset] = useState(null);
-
+  const [backendPermissions, setBackendPermissions] = useState();
   // New state for UX improvements
   const [moduleSearch, setModuleSearch] = useState({});
   const [collapsedModules, setCollapsedModules] = useState({});
 
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
+
+  const { setSidebar } = useSidebarPermissions();
   // console.log("User",user)
   // const companyId = 4;
 
@@ -57,6 +66,18 @@ export default function LocationGroupRights() {
   useEffect(() => {
     fetchDropDown();
   }, []);
+
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
 
   // Calculate changed screens whenever modules change
   useEffect(() => {
@@ -202,22 +223,22 @@ export default function LocationGroupRights() {
   // console.log("user",user)
 
   // Toggle entire column permission for a module
-  const toggleColumnPermission = (moduleId, permission, value) => {
-    setModules((prev) =>
-      prev.map((module) => {
-        if (module.id !== moduleId) return module;
+  // const toggleColumnPermission = (moduleId, permission, value) => {
+  //   setModules((prev) =>
+  //     prev.map((module) => {
+  //       if (module.id !== moduleId) return module;
 
-        return {
-          ...module,
-          screens: module.screens.map((screen) => ({
-            ...screen,
-            [permission]: value,
-          })),
-        };
-      }),
-    );
-    setSelectedPreset(null);
-  };
+  //       return {
+  //         ...module,
+  //         screens: module.screens.map((screen) => ({
+  //           ...screen,
+  //           [permission]: value,
+  //         })),
+  //       };
+  //     }),
+  //   );
+  //   setSelectedPreset(null);
+  // };
 
   // Toggle module collapse
   const toggleModule = (id) => {
@@ -303,7 +324,7 @@ export default function LocationGroupRights() {
 
       // Clear selections when new data loads
       setSelectedRowIds(new Set());
-      setBulkGroup([]);
+      // setBulkGroup([]);
       setSelectedPreset(null);
       setModuleSearch({});
       const collapseState = {};
@@ -314,6 +335,7 @@ export default function LocationGroupRights() {
       setCollapsedModules(collapseState);
       //   console.log("DEMO", collapsedModules);
       setPage(1);
+      if (res.data.length > 0) setSelectedRowIds(new Set([res.data[0].id]));
     } catch (err) {
       handleApiError(err);
     } finally {
@@ -390,7 +412,7 @@ export default function LocationGroupRights() {
 
   const clearSelection = () => {
     setSelectedRowIds(new Set());
-    setBulkGroup([]);
+    // setBulkGroup([]);
     setSelectedPreset(null);
   };
 
@@ -415,7 +437,7 @@ export default function LocationGroupRights() {
     setOriginalModules([]);
     setPage(1);
     setSelectedRowIds(new Set());
-    setBulkGroup([]);
+    // setBulkGroup([]);
     setChangedScreensCount(0);
     setSelectedPreset(null);
     setModuleSearch({});
@@ -453,6 +475,7 @@ export default function LocationGroupRights() {
     try {
       await saveUserGrpRights(changed);
       toast.success(`Saved ${changed.length} changes`);
+      setChangedScreensCount(0);
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -589,7 +612,7 @@ export default function LocationGroupRights() {
                       setIsSearchApplied(false);
                       setShowFilters(true);
                       setSelectedRowIds(new Set());
-                      setBulkGroup([]);
+                      // setBulkGroup([]);
                       setSelectedPreset(null);
                     }}
                   >
@@ -989,28 +1012,25 @@ export default function LocationGroupRights() {
 
         <aside className="lgrs-actions">
           <FloatingActionBar
-            actions={{
-              save: {
-                onClick: handleSave,
-                disabled: !changedScreensCount,
+            actions={getFloatingActions(
+              backendPermissions,
+              {
+                handleSave,
+                handleClear: handleRefresh,
+                handleRefresh,
+                // handleSearch,
+                handleNew: handleClear,
+                // handleDelete,
+                // handlePrint,
               },
-              // search: {
-              //   disabled: true,
-              // },
-              clear: {
-                onClick: handleRefresh,
+              {
+                canSave: !changedScreensCount, // because disabled: canSave
+                canSearch: true, // true → disabled
+                canClear: false, // false → enabled
+                canRefresh: false, // false → enabled
               },
-
-              delete: {
-                disabled: true,
-              },
-              refresh: {
-                onClick: handleRefresh,
-              },
-              new: {
-                onClick: handleClear,
-              },
-            }}
+              ["new", "save", "clear", "search", "refresh"],
+            )}
           />
         </aside>
       </div>

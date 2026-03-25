@@ -60,8 +60,11 @@ public class UserSettingsService extends MuzirisAbstractService<UserSettingsResp
         userTypeId = (userTypeId == null || userTypeId.isEmpty()) ? null : userTypeId;
         userGrpId = (userGrpId == null || userGrpId.isEmpty()) ? null : userGrpId;
         locationId = (locationId == null || locationId.isEmpty()) ? null : locationId;
-        
-        List<Object[]> rows = userTypeMstRepository.findList(companyId, userCode, userTypeId, userGrpId, locationId);
+        boolean filterUserGroup = userGrpId != null && !userGrpId.isEmpty();
+        boolean filterLocation = locationId != null && !locationId.isEmpty();
+        List<Object[]> rows = userTypeMstRepository.findList(companyId, userCode, userTypeId, userGrpId, locationId,
+                filterUserGroup,
+                filterLocation);
         return rows.stream().map(r -> {
 
             UserSettingsResponseDTO dto = new UserSettingsResponseDTO();
@@ -237,9 +240,16 @@ public class UserSettingsService extends MuzirisAbstractService<UserSettingsResp
             }
 
         }
+        if (!userAndEntityLinkList.isEmpty()) {
+            userAndEntityLinkRepository.saveAll(userAndEntityLinkList);
+        }
+        if (userAndUserGroupLinkList.isEmpty()) {
+            UserAndUserGroupLink userSavednone = new UserAndUserGroupLink();
+            return userSavednone;
+        }
 
-        userAndEntityLinkRepository.saveAll(userAndEntityLinkList);
         List<UserAndUserGroupLink> saved = userAndUserGroupLinkRepositoty.saveAll(userAndUserGroupLinkList);
+
         return saved.get(0);
 
     }

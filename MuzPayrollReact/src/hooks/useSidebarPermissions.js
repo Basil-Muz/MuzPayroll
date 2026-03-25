@@ -19,7 +19,6 @@ export const useSidebarPermissions = () => {
         optionid,
         entityHierarchyId
       );
-
       setBackendPermissions(res.data);
     } catch (error) {
       console.error("Error fetching sidebar permissions:", error);
