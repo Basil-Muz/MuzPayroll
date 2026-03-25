@@ -15,7 +15,6 @@ import com.example.MuzPayroll.entity.MuzControlCodes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
-
 import jakarta.persistence.Transient;
 
 public class EntityMstDTO {
@@ -528,6 +527,16 @@ public class EntityMstDTO {
 
     public void setEhiSubLedgerID(Long ehiSubLedgerID) {
         EhiSubLedgerID = ehiSubLedgerID;
+    }
+
+    private String esiRegion;
+
+    public String getEsiRegion() {
+        return esiRegion;
+    }
+
+    public void setEsiRegion(String esiRegion) {
+        this.esiRegion = esiRegion;
     }
 
 }

@@ -52,4 +52,6 @@ public interface UserRepository extends JpaRepository<UserMst, Long> {
         @Query("SELECT new com.example.MuzPayroll.entity.DTO.UserDropDownRestPasswordDTO(u.userCode, u.userName) FROM UserMst u WHERE u.UsmActiveYN = true")
         List<UserDropDownRestPasswordDTO> getUserDropdown();
 
+        @Query(value = "SELECT MAX(user_mstid) FROM user_mst WHERE user_mstid BETWEEN 1000 AND 9999", nativeQuery = true)
+        Long findMaxFourDigitUserMstId();
 }

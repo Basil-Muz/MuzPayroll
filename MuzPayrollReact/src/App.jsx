@@ -35,7 +35,7 @@ import LocationList from "./pages/LocationPage/LocationList.jsx";
 import StatusUpdate from "./pages/StatusUpdate/StatusUpdate.jsx";
 
 import UserGroup from "./pages/UserGroup/usergroup.jsx";
-import UserGrpRights from "./pages/UserGrpRights/UserGrpRights.jsx"
+import UserGrpRights from "./pages/UserGrpRights/UserGrpRights.jsx";
 import LocationGroup from "./pages/LocationGroup/locationgroup.jsx";
 import ShiftGroup from "./pages/ShiftGroup/shiftgroup.jsx";
 
@@ -50,7 +50,8 @@ import Department from "./pages/Department/department.jsx";
 import User from "./pages/User/user.jsx"
 import ResetPassword from "./pages/Reset Password/resetPassword.jsx";
 import UserSettings from "./pages/UserSettings/UserSettings.jsx";
-
+import CompanyAllocation from "./pages/CompanyAllocation/CompanyAllocation.jsx";
+import LicenseAgreement from './pages/License Agreement/LicenseAgreement.jsx';
 function App() {
   return (
     <>
@@ -61,15 +62,26 @@ function App() {
           <Route path="/" element={<Navigate to="/payroll" replace />} />
           <Route path="/payroll" element={<LoginPage />} />
           <Route path="/payrollemp" element={<LoginPage />} />
-          <Route path="/home" element={<ProtectedRoute><LoggedPage /></ProtectedRoute>} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <LoggedPage />
+              </ProtectedRoute>
+            }
+          />
           {/* <Route path="/company" element={<Companyform />} />
           <Route path="/generalform" element={<GeneralForm />} /> */}
           <Route path="/documentsinfo" element={<DocumentsInfo />} />
           <Route path="/masters/:rowNumber" element={<MasterPage />} />
-          <Route path="/changepassword" element={
-            <ProtectedRoute>
-              <ChangePassword />
-            </ProtectedRoute>} />
+          <Route
+            path="/changepassword"
+            element={
+            
+                <ChangePassword />
+              
+            }
+          />
 
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/settings/:rowNumber" element={<Settings />} />
@@ -187,11 +199,19 @@ function App() {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="/usersettings"
             element={
               <ProtectedRoute>
                 <UserSettings />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/companyallocation"
+            element={
+              <ProtectedRoute>
+                <CompanyAllocation />
               </ProtectedRoute>
             }
           />
@@ -206,6 +226,8 @@ function App() {
             path="/locationrightsmapping"
             element={<LocationGroupRightsMapping />}
           />
+
+          <Route path="/licenseagreement" element={<LicenseAgreement />} />
 
           <Route
             path="/locationgrouprights"

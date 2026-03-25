@@ -49,33 +49,97 @@ function LocationGroup() {
   const [groupByStatus, setGroupByStatus] = useState(false);
   const [activeLocations, setActiveLocations] = useState([]);
   const [inactiveLocations, setInactiveLocations] = useState([]);
-  // const [[], set[]] = useState([]);
+
   const { showRailLoader, hideLoader } = useLoader();
   const { user } = useAuth();
 
   const entityId = user.userEntityHierarchyId;
 
-  const userId = user?.userId; // from useAuth
-  const saveLocationGroupWrapper = async (formData, mode) => {
-    // Convert FormData to a new FormData to ensure we can append
+  const userId = user?.userId;
+
+  const saveLocationGroupWrapper = async (dataObj, mode) => {
     const newFormData = new FormData();
+    const today = new Date().toISOString().split("T")[0];
 
-    // Copy all existing fields
-    for (let pair of formData.entries()) {
-      newFormData.append(pair[0], pair[1]);
+    const getValue = (obj, key) => {
+      if (obj instanceof FormData) return obj.get(key);
+      return obj[key];
+    };
+
+    // ===== GET USER =====
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const finalUserId =
+      storedUser?.userId ||
+      storedUser?.userMstId ||
+      user?.userId ||
+      user?.userMstId;
+
+    if (!finalUserId) {
+      console.error("User ID missing!", { user, storedUser });
+      toast.error("User not found. Please login again.");
+      return;
     }
 
-    // Append required fields for backend
-    if (!newFormData.get("userId") && user?.userId) {
-      newFormData.append("userId", user.userId);
+    const id = dataObj instanceof FormData ? dataObj.get("id") : dataObj?.id;
+
+    // ===== MAIN FIELDS =====
+    newFormData.append("ermCode", getValue(dataObj, "ermCode"));
+    newFormData.append("ermName", getValue(dataObj, "ermName"));
+    newFormData.append("ermShortName", getValue(dataObj, "ermShortName"));
+    newFormData.append("ermDesc", getValue(dataObj, "ermDesc"));
+    newFormData.append(
+      "ermEntityRightsGroupID",
+      getValue(dataObj, "ermEntityRightsGroupID"),
+    );
+
+    newFormData.append("ermActiveYN", true);
+    newFormData.append("authorizationStatus", false);
+
+    newFormData.append("userId", finalUserId);
+
+    newFormData.append(
+      "entityHierarchyInfoID",
+      storedUser?.userEntityHierarchyId || user?.userEntityHierarchyId,
+    );
+
+    newFormData.append("activeDate", today);
+    newFormData.append("withaffectdate", today);
+    newFormData.append("authorizationDate", today);
+
+    // ===== CHILD DTO =====
+    newFormData.append("entityRightsGrpLogDTOs[0].userId", finalUserId);
+    newFormData.append("entityRightsGrpLogDTOs[0].activeDate", today);
+    newFormData.append("entityRightsGrpLogDTOs[0].authorizationDate", today);
+    newFormData.append("entityRightsGrpLogDTOs[0].authorizationStatus", false);
+
+    // ===== UPDATE CASE =====
+    if (id) {
+      newFormData.append("ermEntityRightsGroupID", id);
+
+      // 🔥 VERY IMPORTANT: pass log ID if exists
+      const logId =
+        dataObj?.entityRightsGrpLogDTOs?.[0]?.entityRightsGrpLogID ||
+        dataObj?.entityRightsGrpLogDTOs?.[0]?.id;
+
+      if (logId) {
+        newFormData.append(
+          "entityRightsGrpLogDTOs[0].entityRightsGrpLogID",
+          logId,
+        );
+      }
     }
 
-    if (!newFormData.get("authorizationDate")) {
-      const today = new Date().toISOString().split("T")[0];
-      newFormData.append("authorizationDate", today);
+    // ===== DEBUG =====
+    console.log("AUTH USER:", user);
+    console.log("STORED USER:", storedUser);
+    console.log("FINAL USER ID:", finalUserId);
+
+    console.log("FINAL PAYLOAD:");
+    for (let pair of newFormData.entries()) {
+      console.log(pair[0], pair[1]);
     }
 
-    // Call original API
     return await saveLocationGroup(newFormData, mode);
   };
   const getAllLocationGroups = async (loadFirst) => {
@@ -106,28 +170,48 @@ function LocationGroup() {
     setShowForm(true);
   };
 
-  const handleDataToForm = (item) => {
+  const handleDataToForm = async (item) => {
     console.log("Clicked Item:", item);
 
     const today = new Date().toISOString().split("T")[0];
 
+    let fullData = {};
+
     if (typeof item === "number") {
-      // If only ID is provided, create full object with required fields
-      setSelectedItem({
-        id: item,
-        userId: user?.userId,
-        authorizationDate: today,
-      });
+      try {
+        const res = await getLocationGroupById(item);
+        fullData = res.data;
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load data");
+        return;
+      }
     } else {
-      setSelectedItem({
-        ...item,
-        id: item.mstID,
-        userId: user?.userId,
-        authorizationDate: item.authorizationDate || today,
-      });
+      fullData = item;
     }
 
-    toggleForm();
+    setSelectedItem({
+      ...fullData,
+
+      id: fullData.ermEntityRightsGroupID || fullData.id || item,
+
+      userId: user?.userMstId || user?.userId,
+      entityRightsGrpLogDTOs: fullData.entityRightsGrpLogDTOs || [],
+
+      [LOCATION_GROUP_FIELD_MAP.code]: fullData.ermCode || fullData.code,
+
+      [LOCATION_GROUP_FIELD_MAP.name]: fullData.ermName || fullData.name,
+
+      [LOCATION_GROUP_FIELD_MAP.shortName]:
+        fullData.ermShortName || fullData.shortName,
+
+      [LOCATION_GROUP_FIELD_MAP.description]:
+        fullData.ermDesc || fullData.description,
+
+      authorizationDate: fullData.authorizationDate || today,
+    });
+
+    setShowForm(true);
   };
   // const handleSave = () => {
   //   console.log("Save clicked");
@@ -362,107 +446,119 @@ function LocationGroup() {
             entity="Location Group"
             data={selectedItem}
             toggleForm={toggleForm}
-            saveEntity={saveLocationGroupWrapper}
+            saveEntity={async (formData, mode) => {
+              const res = await saveLocationGroupWrapper(formData, mode);
+
+              if (res?.data?.success) {
+                await getAllLocationGroups(false);
+              }
+
+              return res;
+            }}
             fetchEntityById={getLocationGroupById}
             ENTITY_FIELD_MAP={LOCATION_GROUP_FIELD_MAP}
           >
             {({ register, errors, isVarified }) => (
-              <div className="full-content">
+              <div className="main-model-content">
                 {/* Group Code */}
-                <div className="form-row">
-                  <label className="group-form-label required">
-                    Group Code
-                  </label>
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="form-label required">Group Code</label>
 
-                  <input
-                    type="text"
-                    className={`form-control ${
-                      errors[LOCATION_GROUP_FIELD_MAP.code] ? "error" : ""
-                    } ${isVarified ? "read-only" : ""}`}
-                    placeholder="Enter Group Code"
-                    disabled={isVarified}
-                    {...register(LOCATION_GROUP_FIELD_MAP.code, {
-                      required: "Group Code is required",
-                    })}
-                  />
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors[LOCATION_GROUP_FIELD_MAP.code] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter Group Code"
+                      disabled={isVarified}
+                      {...register(LOCATION_GROUP_FIELD_MAP.code, {
+                        required: "Group Code is required",
+                      })}
+                    />
 
-                  {errors[LOCATION_GROUP_FIELD_MAP.code] && (
-                    <span className="error-message">
-                      {errors[LOCATION_GROUP_FIELD_MAP.code].message}
-                    </span>
-                  )}
+                    {errors[LOCATION_GROUP_FIELD_MAP.code] && (
+                      <span className="error-message">
+                        {errors[LOCATION_GROUP_FIELD_MAP.code].message}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Group Name */}
-                <div className="form-row">
-                  <label className="group-form-label required">
-                    Group Name
-                  </label>
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="form-label required">Group Name</label>
 
-                  <input
-                    type="text"
-                    className={`form-control ${
-                      errors[LOCATION_GROUP_FIELD_MAP.name] ? "error" : ""
-                    } ${isVarified ? "read-only" : ""}`}
-                    placeholder="Enter Group Name"
-                    disabled={isVarified}
-                    {...register(LOCATION_GROUP_FIELD_MAP.name, {
-                      required: "Group Name is required",
-                    })}
-                  />
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors[LOCATION_GROUP_FIELD_MAP.name] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter Group Name"
+                      disabled={isVarified}
+                      {...register(LOCATION_GROUP_FIELD_MAP.name, {
+                        required: "Group Name is required",
+                      })}
+                    />
 
-                  {errors[LOCATION_GROUP_FIELD_MAP.name] && (
-                    <span className="error-message">
-                      {errors[LOCATION_GROUP_FIELD_MAP.name].message}
-                    </span>
-                  )}
+                    {errors[LOCATION_GROUP_FIELD_MAP.name] && (
+                      <span className="error-message">
+                        {errors[LOCATION_GROUP_FIELD_MAP.name].message}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Short Name */}
-                <div className="form-row">
-                  <label className="group-form-label required">
-                    Short Name
-                  </label>
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="form-label required">Short Name</label>
 
-                  <input
-                    type="text"
-                    className={`form-control ${
-                      errors[LOCATION_GROUP_FIELD_MAP.shortName] ? "error" : ""
-                    } ${isVarified ? "read-only" : ""}`}
-                    placeholder="Enter Short Name"
-                    disabled={isVarified}
-                    {...register(LOCATION_GROUP_FIELD_MAP.shortName, {
-                      required: "Short Name is required",
-                    })}
-                  />
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        errors[LOCATION_GROUP_FIELD_MAP.shortName]
+                          ? "error"
+                          : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter Short Name"
+                      disabled={isVarified}
+                      {...register(LOCATION_GROUP_FIELD_MAP.shortName, {
+                        required: "Short Name is required",
+                      })}
+                    />
 
-                  {errors[LOCATION_GROUP_FIELD_MAP.shortName] && (
-                    <span className="error-message">
-                      {errors[LOCATION_GROUP_FIELD_MAP.shortName].message}
-                    </span>
-                  )}
+                    {errors[LOCATION_GROUP_FIELD_MAP.shortName] && (
+                      <span className="error-message">
+                        {errors[LOCATION_GROUP_FIELD_MAP.shortName].message}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Description */}
-                <div className="form-row">
-                  <label className="group-form-label">Description</label>
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Description</label>
 
-                  <textarea
-                    className={`form-control ${
-                      errors[LOCATION_GROUP_FIELD_MAP.description]
-                        ? "error"
-                        : ""
-                    } ${isVarified ? "read-only" : ""}`}
-                    placeholder="Enter Description"
-                    disabled={isVarified}
-                    {...register(LOCATION_GROUP_FIELD_MAP.description)}
-                  />
+                    <textarea
+                      className={`form-control ${
+                        errors[LOCATION_GROUP_FIELD_MAP.description]
+                          ? "error"
+                          : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter Description"
+                      disabled={isVarified}
+                      {...register(LOCATION_GROUP_FIELD_MAP.description)}
+                    />
 
-                  {errors[LOCATION_GROUP_FIELD_MAP.description] && (
-                    <span className="error-message">
-                      {errors[LOCATION_GROUP_FIELD_MAP.description].message}
-                    </span>
-                  )}
+                    {errors[LOCATION_GROUP_FIELD_MAP.description] && (
+                      <span className="error-message">
+                        {errors[LOCATION_GROUP_FIELD_MAP.description].message}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

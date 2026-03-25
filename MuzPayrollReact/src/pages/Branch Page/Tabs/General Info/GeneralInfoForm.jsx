@@ -1,16 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRef } from "react";
 import Select from "react-select";
 import { Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ImageCropModal from "./ImageCropModal";
+
+import { useLoadBranch } from "../../../../hooks/useLoadBranch";
+import { useAuth } from "../../../../context/AuthProvider";
+
 const VITE_API_BASE_URL = "http://localhost:8087";
 import { formatLocalDate } from "../../../../utils/dateFormater";
+import { handleApiError } from "../../../../utils/errorToastResolver";
 const GeneralInfoForm = function GeneralInfoForm({
   register,
   errors,
-  // watch,
+  watch,
   setValue,
   clearErrors,
   control,
@@ -20,7 +25,7 @@ const GeneralInfoForm = function GeneralInfoForm({
   isUnlocked,
   setFocus,
   companys,
-  branchList,
+  // branchList,
   // disabled = {false},
   // requiredMap = {},
 }) {
@@ -29,33 +34,55 @@ const GeneralInfoForm = function GeneralInfoForm({
   // const [generatedCode, setGeneratedCode] = useState("");
   const [rawImage, setRawImage] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
+  const [branches, setBranches] = useState([]);
   const fileInputRef = useRef(null);
   const nameInputRef = useRef(null);
   const isLocked = !isUnlocked;
   // const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
 
   // const fieldName = "EtmName";
+  const { user } = useAuth();
 
-  const UserData = localStorage.getItem("loginData");
-  const userObj = JSON.parse(UserData);
+  const userId = user.userMstId;
+  // const companyId = user.userEntityHierarchyId;
+  // const branchId = user.branchEntityHierarchyId;
 
-  const branchId = userObj.branchId;
+  const { loadBranches, branchList } = useLoadBranch();
+
+  const company = watch("companyMst");
 
   useEffect(() => {
     if (companys?.length > 0) {
       setValue("companyMst", companys[0].value);
     }
 
+    // if (branchList?.length > 0) {
+    //   // The branchId is string but in branchList it is integer
+    //   setValue("branchMst", branchList[0].value, {
+    //     shouldDirty: false,
+    //     shouldTouch: false,
+    //     shouldValidate: false,
+    //   });
+    // }
+
+    // console.log("General info branch :", branchList);
+  }, [companys]);
+
+  useEffect(() => {
+    if (!company) return;
+
+    loadBranches(userId, company);
+  }, [company, userId]);
+
+  useEffect(() => {
     if (branchList?.length > 0) {
-      // The branchId is string but in branchList it is integer
-      setValue("branchEntity", branchList[0].value, {
+      setValue("branchMst", branchList[0].value, {
         shouldDirty: false,
         shouldTouch: false,
         shouldValidate: false,
       });
     }
-    // console.log("General info branch :", branchList);
-  }, [companys, setValue, branchList, branchId]);
+  }, [branchList, setValue]);
 
   useEffect(() => {
     const scrollAndFocus = (element) => {
@@ -232,7 +259,7 @@ const GeneralInfoForm = function GeneralInfoForm({
             <div className="branch-form-group">
               <label className="form-label required">Branch</label>
               <Controller
-                name="branchEntity"
+                name="branchMst"
                 control={control}
                 rules={{ required: "Please select a branch" }}
                 render={({ field }) => {
@@ -246,16 +273,16 @@ const GeneralInfoForm = function GeneralInfoForm({
                       isSearchable
                       isDisabled={isReadOnly}
                       classNamePrefix="form-control-select"
-                      className={`${errors.branchEntity ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
+                      className={`${errors.branchMst ? "error" : ""} ${isReadOnly ? "read-only" : ""}`}
                       value={selectedOption || null} // important
                       onChange={(option) => field.onChange(option.value)} // store full object
                     />
                   );
                 }}
               />
-              {errors.branchEntity && (
+              {errors.branchMst && (
                 <span className="error-message">
-                  {errors.branchEntity.message}
+                  {errors.branchMst.message}
                 </span>
               )}
             </div>

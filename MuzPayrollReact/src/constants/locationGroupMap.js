@@ -5,7 +5,7 @@ export const LOCATION_GROUP_FIELD_MAP = {
   description: "ermDesc",
   activeDate: "activeDate",
   authorizationStatus: "authorizationStatus",
-  ermEntityRightsGroupID:"ermEntityRightsGroupID",
-  activeYN:"ermActiveYN",
-  entityMst:"entityHierarchyInfoID"
+  ermEntityRightsGroupID: "ermEntityRightsGroupID",
+  activeYN: "ermActiveYN",
+  entityHierarchyInfoID: "entityHierarchyInfoID", 
 };

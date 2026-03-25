@@ -8,20 +8,16 @@ public class EntityGrpLinkDTO {
     }
 
     public EntityGrpLinkDTO(Long entityHierarchyId,
-            Long linkId,
             Long branchId,
             String branchName,
             String locationName,
             List<Long> groupId) {
-        this.linkId = linkId;
         this.branchId = branchId;
         this.entityHierarchyId = entityHierarchyId;
         this.branchName = branchName;
         this.locationName = locationName;
         this.groupId = groupId;
     }
-
-    private Long linkId;
 
     private Long branchId;
 
@@ -71,14 +67,6 @@ public class EntityGrpLinkDTO {
 
     public void setBranchId(Long branchId) {
         this.branchId = branchId;
-    }
-
-    public Long getLinkId() {
-        return linkId;
-    }
-
-    public void setLinkId(Long linkId) {
-        this.linkId = linkId;
     }
 
 }

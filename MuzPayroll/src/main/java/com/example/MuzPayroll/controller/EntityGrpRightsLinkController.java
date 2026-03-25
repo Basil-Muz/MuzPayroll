@@ -25,7 +25,7 @@ public class EntityGrpRightsLinkController {
     EntityGrpRightsLinkService entityGrpRightsLinkService;
 
     @PostMapping("/save")
-    public Response<EntityGrpRightsLinkDTO> saveLocation(@ModelAttribute EntityGrpRightsLinkDTO dto) {
+    public Response<EntityGrpRightsLinkDTO> save(@ModelAttribute EntityGrpRightsLinkDTO dto) {
         return entityGrpRightsLinkService.saveWrapper(dto, "INSERT");
     }
 

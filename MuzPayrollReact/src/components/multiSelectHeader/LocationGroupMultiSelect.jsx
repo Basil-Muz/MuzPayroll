@@ -91,7 +91,7 @@ export function LocationGroupMultiSelect({
   return (
     <div className="ms" ref={triggerRef}>
       <div
-        className={`ms-control ${open ? "open" : ""}`}
+        className={`ms-control ${open ? "open" : ""} ${disabled? "disabled":""}`}
         onClick={() => {
           if (!disabled) setOpen((o) => !o);
         }}

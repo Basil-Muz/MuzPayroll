@@ -55,7 +55,6 @@ function UserGroup() {
   // const [flag, setFlag] = useState(false); // new state for flag from child
 
   const { user } = useAuth();
-  console.log("current user:", user);
 
   const entityId = user?.userEntityHierarchyId;
 
@@ -167,12 +166,10 @@ function UserGroup() {
     // IMPORTANT FIX
     const id = formData.get("id");
     if (id) {
-      sendData.append("id", id); //  REQUIRED FOR UPDATE
+      sendData.append("ugmUserGroupID", id); //  REQUIRED FOR UPDATE
     }
 
     const finalMode = id ? "UPDATE" : "INSERT";
-
-    console.log("ID VALUE:", id);
 
     try {
       const res = await saveUserGroup(sendData, finalMode);
@@ -184,20 +181,52 @@ function UserGroup() {
           setUserGroupList((prev) => [...prev, saved]);
         } else {
           setUserGroupList((prev) =>
-            prev.map((item) => (item.mstID === saved.mstID ? saved : item))
+            prev.map((item) => (item.mstID === saved.mstID ? saved : item)),
           );
         }
         await getAllUserGroups(false);
 
         setSelectedItem(null);
-       
+
         toast.success(
           finalMode === "INSERT" ? "User Group added" : "User Group updated",
         );
-         return res;
+        return res;
       }
     } catch (err) {
       handleApiError(err);
+    }
+  };
+
+  const handleDataToForm = async (item) => {
+    console.log("Clicked Item:", item);
+
+    let fullData = {};
+
+    try {
+      if (typeof item === "number") {
+        const res = await getUserGroupById(item);
+        fullData = res.data;
+      } else {
+        fullData = item;
+      }
+
+      // MAP DATA HERE
+      setSelectedItem({
+        id: fullData.ugmUserGroupID,
+
+        // IMPORTANT: ADD THIS LINE
+        code: fullData.ugmCode, // <-- THIS prevents API recall
+
+        [USER_GROUP_FIELD_MAP.code]: fullData.ugmCode,
+        [USER_GROUP_FIELD_MAP.name]: fullData.ugmName,
+        [USER_GROUP_FIELD_MAP.shortName]: fullData.ugmShortName,
+        [USER_GROUP_FIELD_MAP.description]: fullData.ugmDesc,
+        [USER_GROUP_FIELD_MAP.activeDate]: fullData.activeDate,
+      })
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load data");
     }
   };
   /* ================= GROUPING ================= */

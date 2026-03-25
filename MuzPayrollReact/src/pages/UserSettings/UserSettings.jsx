@@ -1,10 +1,10 @@
 import { useMemo, useState, useEffect } from "react";
 import { FaFilter } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
-import Select from "react-select";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useLoader } from "../../context/LoaderContext.jsx";
 import { ensureMinDuration } from "../../utils/loaderDelay";
+import { useSearchParams } from "react-router-dom";
 
 // Components
 import { LocationGroupMultiSelect } from "../../components/multiSelectHeader/LocationGroupMultiSelect";
@@ -12,14 +12,22 @@ import Header from "../../components/Header/Header";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
 import { useAuth } from "../../context/AuthProvider";
 
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions.js";
+
 //service
 import { getUserTypesList } from "../../services/usertype.service.js";
 import { getUserGroupsList } from "../../services/usergroup.service.js";
 import { fetchLocaion } from "../../services/location.service.js";
-import { getUserSettingsList } from "../../services/userSettings.service.js";
+import {
+  getUserSettingsList,
+  saveUserSettings,
+} from "../../services/userSettings.service.js";
+
 // Utils(Helpers)
 import { handleApiError } from "../../utils/errorToastResolver";
 import { extractIds } from "../../utils/idFrommultiSelect.js";
+import { getFloatingActions } from "../../utils/setActionButtons";
+
 import "./UserSettings.css";
 /* =========================================
    Main Page
@@ -51,9 +59,6 @@ const PAGE_SIZE = 8;
 export default function UserSettings() {
   const [rows, setRows] = useState([]);
 
-  // const [branchFilter, setBranchFilter] = useState("ALL");
-
-  // const [locationQuery, setLocationQuery] = useState("");
   const { showRailLoader, hideLoader } = useLoader();
   const [selectedRowIds, setSelectedRowIds] = useState(new Set());
   const [saveSelection, setSaveSelection] = useState(new Set());
@@ -66,6 +71,8 @@ export default function UserSettings() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
 
+  const [backendPermissions, setBackendPermissions] = useState();
+
   const [showFilters, setShowFilters] = useState(true); // Toggle the filter component
   const [isSearchApplied, setIsSearchApplied] = useState(false); //  Load the table data
 
@@ -74,16 +81,29 @@ export default function UserSettings() {
 
   const { user } = useAuth();
 
-  // const userId = user.userMstId;
-  // const companyId = user.userEntityHierarchyId;
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
+
+  const { setSidebar } = useSidebarPermissions();
 
   useEffect(() => {
     fetchDropDown();
   }, []);
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
   // console.log("User", user);
   const fetchDropDown = async () => {
     const startTime = Date.now();
-    showRailLoader("Fetching details…");
+    showRailLoader("Loading required data...");
     try {
       const userTypes = await getUserTypesList();
       // console.log("Usertypes", userTypes.data);
@@ -109,20 +129,13 @@ export default function UserSettings() {
       hideLoader();
     }
 
-    // try {
-    //   // const branchs = await getBranchList(userId, companyId);
-    //   // // console.log("userGrp fetched:", branchs);
-    //   // setUserGrp(branchs.data);
-    // } catch (err) {
-    //   console.error("Branch fetch failed:", err);
-    // }
   };
   const {
     register,
     // handleSubmit,
-    trigger,
-    // setError,
-    // clearErrors,
+    // trigger,
+    setError,
+    clearErrors,
     setValue,
     // reset,
     // setFocus,
@@ -138,25 +151,6 @@ export default function UserSettings() {
       activeStatusYN: 1,
     },
   });
-  // const branchFilter = watch("userGrp");
-  // const locationQuery = watch("location");
-  // const businessSolution = watch("businessSolution");
-  // const totalPages = Math.ceil(rows.length / PAGE_SIZE);
-  // const pageRows = useMemo(() => {
-  //   const start = (page - 1) * PAGE_SIZE;
-  //   return rows.slice(start, start + PAGE_SIZE);
-  // }, [rows, page]);
-
-  //   const userTGrpOptions = useMemo(
-  //   () =>
-  //     userGrp.map((s) => ({
-  //       id: s.ugmUserGroupID,
-  //       name: s.utmName,
-  //     })),
-  //   [userGrp],
-  // );
-
-  // console.log("Suer grp",userTGrpOptions);
 
   const userTypeOptions = useMemo(
     () =>
@@ -182,29 +176,9 @@ export default function UserSettings() {
       ...locations.map((s) => ({
         id: s.entityHierarchyId,
         name: s.entityName,
-      })), 
+      })),
     ];
   }, [locations]);
-
-  // console.log("userGrp listaedfwef", branchOptions);
-  // const filteredRows = useMemo(() => {
-  //   if (!isSearchApplied) return [];
-  //   trigger();
-  //   // console.log("Branch: ", branchFilter);
-  //   return rows.filter((r) => {
-  //     const branchMatch =
-  //       branchFilter === "ALL" || r.branch.id === Number(branchFilter);
-
-  //     const businessMatch =
-  //       !businessSolution || r.businessSolution.id === Number(businessSolution);
-
-  //     const locationMatch =
-  //       !locationQuery ||
-  //       r.location.name.toLowerCase().includes(locationQuery.toLowerCase());
-
-  //     return branchMatch && businessMatch && locationMatch;
-  //   });
-  // }, [rows, branchFilter, businessSolution, locationQuery, isSearchApplied]);
 
   const buildFilterPayload = () => ({
     companyId: user.userEntityHierarchyId,
@@ -215,17 +189,20 @@ export default function UserSettings() {
   });
 
   const fetchFilteredRows = async () => {
+    const startTime = Date.now();
+    showRailLoader("Loading required data...");
     try {
       // const userTypes = getValues("UserCode");
       // const userTypes = extractIds(bulkGroup);
 
       const payload = buildFilterPayload();
-      // console.log("payload",payload);
+      console.log("payload", payload);
 
       // Replace with real API
       const res = await getUserSettingsList(payload);
-      console.log("Response", res.data);
+      // console.log("Response", res.data);
       // setRows(res.data);
+
       // MOCK (simulate backend pagination)
       const start = (page - 1) * PAGE_SIZE;
       const pagedData = res.data.slice(start, start + PAGE_SIZE);
@@ -244,15 +221,29 @@ export default function UserSettings() {
         },
       };
       setTotalCount(customRes.data.totalCount);
-    } catch (err) {
-      console.log("ERROR", err);
-      handleApiError(err);
+      // setShowFilters(true);
+      // console.log("UDHINBF",res.data[0].id)
+      if (res.data.length > 0) setSelectedRowIds(new Set([res.data[0].id]));
+      else setShowFilters(true);
+    } catch (error) {
+      handleApiError(error);
+      console.error("Error fetching userTypes or Location:", error);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
   };
 
   const handleApplySearch = async () => {
-    const isValid = await trigger();
-    if (!isValid) return;
+    if (selectedUserTypes.length === 0) {
+      // toast.error("User type is requred");
+
+      setError("userType", {
+        type: "manual",
+        message: "User type is required",
+      });
+      return;
+    }
     // console.log("Usertype",selectedUserTypes)
     setIsSearchApplied(true);
     setShowFilters(false);
@@ -262,7 +253,7 @@ export default function UserSettings() {
   };
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
-
+  console.log("UDHINBF", setSelectedRowIds);
   const pageRows = useMemo(() => rows, [rows]);
 
   // useEffect(() => {
@@ -292,43 +283,50 @@ export default function UserSettings() {
   const clearSelection = () => {
     setSelectedRowIds(new Set());
     setBulkGroup([]);
+
+    // setError("userType", {
+    //   type: "manual",
+    //   message: "",
+    // });
+    setSelectedUserTypes([]);
+    setSelectedLocation([]);
   };
 
   const applyBulk = () => {
-  if (!bulkGroup.length || !selectedRowIds.size || !location.length) return;
+    if (!bulkGroup.length || !selectedRowIds.size || !location.length) return;
 
-  setRows(prev =>
-    prev.map(row => {
-      if (!selectedRowIds.has(row.id)) return row;
+    setRows((prev) =>
+      prev.map((row) => {
+        if (!selectedRowIds.has(row.id)) return row;
 
-      if (!originalMap.has(row.id)) {
-        setOriginalMap(m => {
-          const next = new Map(m);
-          next.set(row.id, {
-            groups: row.groups,
-            entity: row.entity
+        if (!originalMap.has(row.id)) {
+          setOriginalMap((m) => {
+            const next = new Map(m);
+            next.set(row.id, {
+              groups: row.groups,
+              entity: row.entity,
+            });
+            return next;
           });
-          return next;
-        });
-      }
+        }
 
-      return {
-        ...row,
-        groups: bulkGroup,
-        entity: location,
-        _dirty: true
-      };
-    })
-  );
+        return {
+          ...row,
+          groups: bulkGroup,
+          entity: location,
+          _dirty: true,
+        };
+      }),
+    );
 
-  setSaveSelection(prev => {
-    const next = new Set(prev);
-    selectedRowIds.forEach(id => next.add(id));
-    return next;
-  });
+    setSaveSelection((prev) => {
+      const next = new Set(prev);
+      selectedRowIds.forEach((id) => next.add(id));
+      return next;
+    });
 
-  toast.success("User settings updated for selected rows.");
-};
+    toast.success("User settings updated for selected rows.");
+  };
 
   // const undoRow = (id) => {
   //   setRows((prev) =>
@@ -343,15 +341,18 @@ export default function UserSettings() {
   //   });
   // };
   const handleRefresh = () => {
-    fetchDropDown();
+    if (!isSearchApplied) fetchDropDown();
+    else fetchFilteredRows();
   };
   const handleClear = () => {
     fetchDropDown();
     setValue("businessSolution", null);
     setValue("userGrp", null);
+    setValue("UserCode", null);
+    clearErrors("userType");
     // Warn but DO NOT block
     if (saveSelection.size) {
-      toast("You have unsaved changes", {
+      toast("Unsaved changes will be cleared.", {
         icon: "⚠️",
       });
     }
@@ -380,7 +381,8 @@ export default function UserSettings() {
     setSelectedRowIds(new Set());
     setSaveSelection(new Set());
     setBulkGroup([]);
-
+    setSelectedUserTypes([]);
+    setSelectedLocation([]);
     // Optional: clear undo snapshots
     setOriginalMap(new Map());
   };
@@ -390,19 +392,27 @@ export default function UserSettings() {
 
     // collect dirty rows
     const dirtyRows = rows.filter((r) => saveSelection.has(r.id));
-    console.log("Dirty row",dirtyRows)
+    // console.log("Dirty row", dirtyRows);
     // build payload
     const payload = dirtyRows.map((r) => ({
-      userId: r.id,
-      groupIds: r.groups.map((g) => g.id),
-      entityIds: r.entity.map((e) => e.id),
-    }));
+      id: r.id,
+      groups: r.groups.map((g) => ({
+        id: g.id,
+        name: g.name,
+      })),
 
+      entity: r.entity.map((e) => ({
+        id: e.id,
+        name: e.name,
+      })),
+    }));
+    const startTime = Date.now();
+    showRailLoader("Saving selected records...");
     try {
       console.log("Saving payload:", payload);
 
       // API call
-      await saveUserSettings(payload);
+      await saveUserSettings(payload, "INSERT");
 
       // Commit state on success
       setRows((prev) =>
@@ -420,11 +430,15 @@ export default function UserSettings() {
       setSaveSelection(new Set());
       setSelectedRowIds(new Set());
       setBulkGroup([]);
+      setSelectedUserTypes([]);
+      setSelectedLocation([]);
       setOriginalMap(new Map());
-    } catch (err) {
-      handleApiError(err);
-      console.error("Save failed", err);
-      // TODO: show toast / banner
+    } catch (error) {
+      handleApiError(error);
+      console.error("Error saving user settings:", error);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
     }
   };
 
@@ -477,13 +491,18 @@ export default function UserSettings() {
                 <LocationGroupMultiSelect
                   options={userTypeOptions}
                   value={selectedUserTypes}
-                  onChange={setSelectedUserTypes}
+                  onChange={(val) => {
+                    setSelectedUserTypes(val);
+                    if (val.length > 0) {
+                      clearErrors("userType");
+                    }
+                  }}
                   placeholder="Select User Types"
                   disabled={isSearchApplied}
                 />
-                {errors.businessSolution && (
+                {errors.userType && (
                   <span className="error-message">
-                    {errors.businessSolution.message}
+                    {errors.userType.message}
                   </span>
                 )}
               </div>
@@ -617,7 +636,7 @@ export default function UserSettings() {
                 />
                 <button
                   className="btn btn-apply"
-                  disabled={!bulkGroup.length || !location.length}
+                  disabled={!bulkGroup?.length && !location?.length}
                   onClick={applyBulk}
                 >
                   Apply
@@ -675,12 +694,11 @@ export default function UserSettings() {
                                 prev.map((row) => {
                                   if (row.id !== r.id) return row;
 
-                                  
-                                    setOriginalMap((m) => {
-                                      const next = new Map(m);
-                                      next.set(r.id, row.groups);
-                                      return next;
-                                    });
+                                  setOriginalMap((m) => {
+                                    const next = new Map(m);
+                                    next.set(r.id, row.groups);
+                                    return next;
+                                  });
                                   return {
                                     ...row,
                                     groups: value,
@@ -844,38 +862,25 @@ export default function UserSettings() {
 
         <aside className="lgr-actions">
           <FloatingActionBar
-            actions={{
-              save: {
-                onClick: handleSave,
-                disabled: !saveSelection.size,
-                // disabled: isViewMode || isSubmitted
+            actions={getFloatingActions(
+              backendPermissions,
+              {
+                handleSave: handleSave,
+                handleClear,
+                handleRefresh,
+                // handleSearch,
+                // handleNew,
+                // handleDelete,
+                // handlePrint,
               },
-              search: {
-                //onClick: handleSearch,
-                disabled: true,
+              {
+                canSave: !saveSelection.size, // because disabled: canSave
+                canSearch: true, // true → disabled
+                canClear: false, // false → enabled
+                canRefresh: false, // false → enabled
               },
-              clear: {
-                onClick: handleClear,
-                // disabled:true,
-              },
-              delete: {
-                //onClick: handleDelete,
-                // disabled: !hasDeletePermission
-                disabled: true,
-              },
-
-              // print: {
-              //   onClick: handlePrint,
-              //   // disabled: isNewRecord
-              //   disabled: true,
-              // },
-              // new: {
-              //    onClick: toggleForm, //to toggle the designation form
-              // },
-              refresh: {
-                onClick: handleRefresh,
-              },
-            }}
+              ["print", "save", "clear", "search", "refresh"],
+            )}
           />
         </aside>
       </div>

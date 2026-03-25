@@ -50,7 +50,6 @@ function LoggedPage() {
   const [finYear, setFinYear] = useState(currentFinYear);
   const finYearOptions = getFinYearOptions(currentFinYear);
 
-
   const [selectedCompanyId, setSelectedCompanyId] = useState(
     user?.userEntityHierarchyId || "",
   );
@@ -109,15 +108,13 @@ function LoggedPage() {
           companies.find(
             (c) =>
               String(c.entityHierarchyId) ===
-              String(user?.userEntityHierarchyId)
+              String(user?.userEntityHierarchyId),
           ) || companies[0];
 
         const companyId = String(defaultCompany.entityHierarchyId);
 
         setSelectedCompanyId(companyId);
         setValue("companyId", companyId);
-
-       
       } catch (error) {
         toast.error("Failed to load companies");
         setCompanyList([]);
@@ -155,14 +152,13 @@ function LoggedPage() {
           branches.find(
             (b) =>
               String(b.entityHierarchyId) ===
-              String(user?.branchEntityHierarchyId)
+              String(user?.branchEntityHierarchyId),
           ) || branches[0];
 
         const branchId = String(defaultBranch.entityHierarchyId);
 
         setSelectedBranchId(branchId);
         setValue("branchId", branchId);
-
       } catch (error) {
         toast.error("Failed to load branches");
         setBranchList([]);
@@ -190,7 +186,7 @@ function LoggedPage() {
         const data = await fetchLocation(
           user.userMstId,
           selectedCompanyId,
-          selectedBranchId
+          selectedBranchId,
         );
 
         const locations = Array.isArray(data) ? data : [];
@@ -211,14 +207,13 @@ function LoggedPage() {
           locations.find(
             (l) =>
               String(l.entityHierarchyId) ===
-              String(user?.defaultEntityHierarchyId)
+              String(user?.defaultEntityHierarchyId),
           ) || locations[0];
 
         const locationId = String(defaultLocation.entityHierarchyId);
 
         setSelectedLocationId(locationId);
         setValue("locationId", locationId);
-
       } catch (error) {
         toast.error("Failed to load locations");
         setLocationList([]);
@@ -230,12 +225,7 @@ function LoggedPage() {
     };
 
     loadLocations();
-  }, [
-    user?.userMstId,
-    selectedCompanyId,
-    selectedBranchId,
-
-  ]);
+  }, [user?.userMstId, selectedCompanyId, selectedBranchId]);
 
   // ================= Select options =================
   const companyOptions = companyList.map((c) => ({
@@ -288,7 +278,25 @@ function LoggedPage() {
       const selectedLocation = locationList.find(
         (l) => String(l.entityHierarchyId) === selectedLocationId,
       );
-      // console.log("Comapny",selectedCompany);
+
+      console.log("Calling Menu API");
+
+      const response = await fetchMainMenu(
+        "MAIN_MENU",
+        "LIST",
+        user.userMstId,
+        user.solutionId,
+        selectedLocationId,
+        1,
+        null,
+      );
+
+      console.log("API SUCCESS", response);
+
+      const organizedMenu = organizeMenuFromBackend(response.data);
+      updateMenus(organizedMenu);
+
+      // ONLY HERE disable OK
       updateUser({
         ...user,
         userEntityHierarchyId: selectedCompanyId,
@@ -300,27 +308,14 @@ function LoggedPage() {
         finYear,
         sidebarOpen: true,
         fieldsLocked: true,
-        okEnabled: false,
+        okEnabled: false, // ✅ only after success
         changeEnabled: true,
       });
-      const response = await fetchMainMenu(
-        "MAIN_MENU",
-        "LIST",
-        user.userMstId,
-        user.solutionId,
-        selectedLocationId,
-        1,
-        null,
-      );
-      // console.log("Main Menu", response);
-      const organizedMenu = organizeMenuFromBackend(response.data);
-      // console.log("Organized menu", organizedMenu);
-      updateMenus(organizedMenu);
     } catch (error) {
-      // console.log("Error" + error);
-      handleApiError(error, {
-        entity: "menu",
-      });
+      console.log("API FAILED", error);
+
+   
+      handleApiError(error, { entity: "menu" });
     } finally {
       await ensureMinDuration(startTime, 1200);
       hideLoader();
@@ -364,8 +359,13 @@ function LoggedPage() {
                   options={companyOptions}
                   onChange={(opt) => {
                     const newId = opt?.value || "";
-                    setUserChangedCompany(true);   //  mark manual change
+
+                    // ✅ ADD THIS CHECK
+                    if (newId === selectedCompanyId) return;
+
+                    setUserChangedCompany(true);
                     setSelectedCompanyId(newId);
+
                     setSelectedBranchId("");
                     setSelectedLocationId("");
                     setBranchList([]);
@@ -414,7 +414,7 @@ function LoggedPage() {
                       options={branchOptions}
                       onChange={(opt) => {
                         const newId = opt?.value || "";
-                        setUserChangedBranch(true);   // mark manual change
+                        setUserChangedBranch(true); // mark manual change
                         field.onChange(newId);
                         setSelectedBranchId(newId);
                         setSelectedLocationId("");

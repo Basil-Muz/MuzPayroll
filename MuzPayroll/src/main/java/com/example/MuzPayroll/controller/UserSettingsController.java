@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +36,7 @@ public class UserSettingsController {
     }
 
     @PostMapping("/save")
-    public Response<UserSettingsResponseDTO> saveEntityRightsGrp(@ModelAttribute UserSettingsResponseDTO dto,
+    public Response<UserSettingsResponseDTO> saveEntityRightsGrp(@RequestBody List<UserSettingsResponseDTO> dto,
             @RequestParam String mode) {
         return userSettingsService.saveWrapper(dto, mode);
     }

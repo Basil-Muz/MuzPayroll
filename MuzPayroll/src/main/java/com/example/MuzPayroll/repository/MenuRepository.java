@@ -18,22 +18,22 @@ public class MenuRepository {
     public List<MenuDTO> getMenu(
             String transtype,
             String transsubtype,
-            Integer userid,
-            Integer solutionid,
-            Integer entityid,
-            Integer productid,
-            Integer menu_row_no) {
+            Long userid,
+            Long solutionid,
+            Long entityid,
+            Long productid,
+            Long menu_row_no) {
 
         Query query = entityManager.createNativeQuery(
-                "SELECT * FROM menufunction(:transtype,:transsubtype,:userid,:solutionid,:entityid,:productid,:menu_row_no)");
+                "SELECT * FROM menufunction(:transtype,:transsubtype,:userid,:solutionid,:entityid,:menu_row_no,:productid)");
 
         query.setParameter("transtype", transtype);
         query.setParameter("transsubtype", transsubtype);
         query.setParameter("userid", userid);
         query.setParameter("solutionid", solutionid);
         query.setParameter("entityid", entityid);
-        query.setParameter("productid", productid);
         query.setParameter("menu_row_no", menu_row_no);
+        query.setParameter("productid", productid);
 
         List<Object[]> rows = query.getResultList();
 
@@ -41,16 +41,16 @@ public class MenuRepository {
 
             MenuDTO dto = new MenuDTO();
 
-            dto.setProductId((Integer) row[0]);
-            dto.setMenuRowNo((Integer) row[1]);
+            dto.setProductId((Long) row[0]);
+            dto.setMenuRowNo((Long) row[1]);
             dto.setOptionYn((Boolean) row[2]);
-            dto.setOptionId((Integer) row[3]);
+            dto.setOptionId((Long) row[3]);
             dto.setUrl((String) row[4]);
             dto.setDisplayName((String) row[5]);
             dto.setDescription((String) row[6]);
             dto.setOptionType((String) row[7]);
-            dto.setParentMenuRowNo((Integer) row[8]);
-            dto.setLevelNo((Integer) row[9]);
+            dto.setParentMenuRowNo((Long) row[8]);
+            dto.setLevelNo((Long) row[9]);
 
             return dto;
 
@@ -81,8 +81,8 @@ public class MenuRepository {
 
             MenuDTO dto = new MenuDTO();
 
-            dto.setSolutionId((Integer) row[0]);
-            dto.setOptionId((Integer) row[1]);
+            dto.setSolutionId((Long) row[0]);
+            dto.setOptionId((Long) row[1]);
             dto.setAdd((Boolean) row[2]);
             dto.setEdit((Boolean) row[3]);
             dto.setView((Boolean) row[4]);

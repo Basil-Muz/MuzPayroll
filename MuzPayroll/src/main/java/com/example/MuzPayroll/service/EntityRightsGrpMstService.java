@@ -138,7 +138,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
 
                     // Collect ALL errors
                     if (dto.getErmEntityRightsGroupID() == null)
-                        rowErrors.add(("User user Id is required"));
+                        rowErrors.add(("User Id is required"));
                     if (isEmpty(dto.getErmName()))
                         rowErrors.add("Group Name is required");
                     if (isEmpty(dto.getErmDesc()))

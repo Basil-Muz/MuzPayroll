@@ -90,12 +90,39 @@ public class UserCrudService extends MuzirisAbstractService<UserDTO, UserMst> {
 
     @Override
     public Response<Object> generatePK(List<UserDTO> dtos, String mode) {
-        UserDTO dto = dtos.get(0);
-        if (dto.getUserMstId() == null) {
-            Long id = System.currentTimeMillis();
-            dto.setUserMstId(id);
-
+        if (dtos == null || dtos.isEmpty()) {
+            return Response.error("No user data provided");
         }
+
+        UserDTO dto = dtos.get(0);
+
+        // Only generate if ID is null
+        if (dto.getUserMstId() == null) {
+            try {
+                // Find the maximum existing 4-digit user ID from DB
+                Long maxId = userRepo.findMaxFourDigitUserMstId(); // implement this in your repository
+
+                Long generatedId;
+
+                if (maxId == null || maxId < 1000) {
+                    // No existing users or invalid max → start at 1000
+                    generatedId = 1000L;
+                } else if (maxId >= 9999) {
+                    // Max limit reached
+                    return Response.error("Cannot generate User ID. Maximum limit 9999 reached");
+                } else {
+                    // Increment the max ID
+                    generatedId = maxId + 1;
+                }
+
+                dto.setUserMstId(generatedId);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return Response.error("Error generating User ID: " + e.getMessage());
+            }
+        }
+
         return Response.success(dto.getUserMstId());
     }
 

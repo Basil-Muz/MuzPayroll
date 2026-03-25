@@ -20,3 +20,7 @@ export const getUserSettingsList = (
     },
   });
 };
+
+export const saveUserSettings = (formData, mode) => {
+  return api.post("/userSettings/save", formData,   {params: {mode}});
+};

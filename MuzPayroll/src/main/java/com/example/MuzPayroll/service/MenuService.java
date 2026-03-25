@@ -9,11 +9,11 @@ public interface MenuService {
     List<MenuDTO> getMenu(
             String transtype,
             String transsubtype,
-            Integer userId,
-            Integer solutionId,
-            Integer entityHierarchyId,
-            Integer menu_row_no,
-            Integer productid);
+            Long userId,
+            Long solutionId,
+            Long entityHierarchyId,
+            Long menu_row_no,
+            Long productid);
 
     List<MenuDTO> getSideBar(
             String transtype,

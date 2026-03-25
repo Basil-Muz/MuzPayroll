@@ -58,8 +58,24 @@ public interface UserTypeMstRepository extends JpaRepository<UserTypeMst, Long> 
                 ON em.etm_entityid = l.uel_entity_hierarchyid
 
             WHERE
-                u.usm_entity_hierarchyid = 100064
-            AND u.usm_user_typeid IN (100012,100013)
+                    u.usm_entity_hierarchyid = :companyId
+            AND u.usm_user_typeid IN (:userTypeIds)
+
+            AND (
+                    :userCode IS NULL
+                    OR :userCode = ''
+                    OR u.user_code ILIKE CONCAT('%', :userCode, '%')
+                )
+
+            AND (
+                    COALESCE(:userGrpIds) IS NULL
+                    OR ug.uug_user_groupid IN (:userGrpIds)
+                )
+
+            AND (
+                    COALESCE(:locationIds) IS NULL
+                    OR l.uel_entity_hierarchyid IN (:locationIds)
+                )
 
             GROUP BY
                 u.user_mstid,
