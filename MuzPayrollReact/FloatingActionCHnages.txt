@@ -1,0 +1,44 @@
+import { useSearchParams } from "react-router-dom";
+import { getFloatingActions } from "../../utils/setActionButtons";
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
+
+  const [backendPermissions, setBackendPermissions] = useState();
+
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
+
+  const { setSidebar } = useSidebarPermissions();
+
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
+
+<FloatingActionBar
+            actions={getFloatingActions(
+              backendPermissions,
+              {
+                handleSave,
+                handleClear:handleRefresh,
+                handleRefresh,
+                // handleSearch,
+                handleNew:handleClear,
+                // handleDelete,
+                // handlePrint,
+              },
+              {
+                canSave: !changedScreensCount, // because disabled: canSave
+                canSearch: true, // true → disabled
+                canClear: false, // false → enabled
+                canRefresh: false, // false → enabled
+              },
+              ["new", "save", "clear", "search", "refresh"],
+            )}
+          />

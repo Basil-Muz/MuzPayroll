@@ -1,12 +1,14 @@
 import "./App.css";
 // import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import { useSystemThemeSync } from "./hooks/useSystemThemeSync.js";
 import { Toaster, toast } from "react-hot-toast";
 import "./ToastStyles.css";
 
 import "./common-form.css";
-
+import ErrorBoundary from "./components/Error/ErrorBoundary";
+import NotFoundPage from "./components/Error/NotFoundPage.jsx";
+import UnauthorizedPage from "./components/Error/UnauthorizedPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.jsx";
 
 import DocumentsInfo from "./pages/company/DocumentsInfo";
@@ -51,189 +53,192 @@ import User from "./pages/User/user.jsx"
 import ResetPassword from "./pages/Reset Password/resetPassword.jsx";
 import UserSettings from "./pages/UserSettings/UserSettings.jsx";
 import CompanyAllocation from "./pages/CompanyAllocation/CompanyAllocation.jsx";
-import LicenseAgreement from './pages/License Agreement/LicenseAgreement.jsx';
+import LicenseAgreement from "./pages/License Agreement/LicenseAgreement.jsx";
 function App() {
+  useSystemThemeSync();
   return (
     <>
       <AuthProvider>
         <LoaderRenderer />
-
-        <Routes>
-          <Route path="/" element={<Navigate to="/payroll" replace />} />
-          <Route path="/payroll" element={<LoginPage />} />
-          <Route path="/payrollemp" element={<LoginPage />} />
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <LoggedPage />
-              </ProtectedRoute>
-            }
-          />
-          {/* <Route path="/company" element={<Companyform />} />
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Navigate to="/payroll" replace />} />
+            <Route path="/payroll" element={<LoginPage />} />
+            <Route path="/payrollemp" element={<LoginPage />} />
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <LoggedPage />
+                </ProtectedRoute>
+              }
+            />
+            {/* <Route path="/company" element={<Companyform />} />
           <Route path="/generalform" element={<GeneralForm />} /> */}
-          <Route path="/documentsinfo" element={<DocumentsInfo />} />
-          <Route path="/masters/:rowNumber" element={<MasterPage />} />
-          <Route
-            path="/changepassword"
-            element={
-            
-                <ChangePassword />
-              
-            }
-          />
-
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/settings/:rowNumber" element={<Settings />} />
-
-          {/* <Route path="/branch" element={<BranchForm />} /> */}
-          {/* <Route path="/generalform" element={<BranchGeneralForm />} />
+            <Route path="/documentsinfo" element={<DocumentsInfo />} />
+            <Route path="/masters/:rowNumber" element={<MasterPage />} />
+            <Route
+              path="/changepassword"
+              element={
+             
+                  <ChangePassword />
+               
+              }
+            />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/settings/:rowNumber" element={<Settings />} />
+            {/* <Route path="/branch" element={<BranchForm />} /> */}
+            {/* <Route path="/generalform" element={<BranchGeneralForm />} />
           <Route path="/documentsinfo" element={<BranchDocumentsInfo />} /> */}
-
-          {/* <Route path="/location" element={<LocationForm />} /> */}
-          {/* <Route path="/generalform" element={<LocationGeneralForm />} />
+            {/* <Route path="/location" element={<LocationForm />} /> */}
+            {/* <Route path="/generalform" element={<LocationGeneralForm />} />
           <Route path="/documentsinfo" element={<LocationDocumentsInfo />} /> */}
-          <Route path="/designation" element={<Designation />} />
-          <Route path="/department" element={<Department />} />
-          <Route path="/branchform" element={<BranchPageForm />} />
-          <Route path="/user" element={<User />} />
-          <Route path="/resetpassword" element={<ResetPassword />} />
-          <Route
-            path="/companyform"
-            element={
-              <ProtectedRoute>
-                <CompanyPageForm />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/locationform" element={<LocationPageForm />} />
-
-          <Route
-            path="/companylist"
-            element={
-              <ProtectedRoute>
-                <CompanyList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/company/:companyId"
-            element={
-              <ProtectedRoute>
-                <CompanyPageForm />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/branchlist"
-            element={
-              <ProtectedRoute>
-                <BranchList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/branch/:branchId"
-            element={
-              <ProtectedRoute>
-                <BranchPageForm />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/locationlist"
-            element={
-              <ProtectedRoute>
-                <LocationList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/location/:locationId"
-            element={
-              <ProtectedRoute>
-                <LocationPageForm />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/statusupdate"
-            element={
-              <ProtectedRoute>
-                <StatusUpdate />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/letters/:rowNumber"
-            element={
-              <ProtectedRoute>
-                <Letters />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports/:rowNumber"
-            element={
-              <ProtectedRoute>
-                <Reports />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/sitemap"
-            element={
-              <ProtectedRoute>
-                <SiteMap />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/usergrouprights"
-            element={
-              <ProtectedRoute>
-                <UserGrpRights />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/usersettings"
-            element={
-              <ProtectedRoute>
-                <UserSettings />
-              </ProtectedRoute>
-            }
-          />
-           <Route
-            path="/companyallocation"
-            element={
-              <ProtectedRoute>
-                <CompanyAllocation />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/payrollgroup" element={<PayrollGroup />} />
-          <Route path="/payrollgroupsearch" element={<PayrollGroupSearch />} />
-          <Route path="/payrollgrouplist" element={<PayrollGroupList />} />
-          <Route path="/usergroup" element={<UserGroup />} />
-          <Route path="/locationgroup" element={<LocationGroup />} />
-          <Route path="/shiftgroup" element={<ShiftGroup />} />
-
-          <Route
-            path="/locationrightsmapping"
-            element={<LocationGroupRightsMapping />}
-          />
-
-          <Route path="/licenseagreement" element={<LicenseAgreement />} />
-
-          <Route
-            path="/locationgrouprights"
-            element={<LocationGroupRights />}
-          />
-        </Routes>
+            <Route path="/designation" element={<Designation />} />
+            <Route path="/department" element={<Department />} />
+            <Route path="/branchform" element={<BranchPageForm />} />
+            <Route
+              path="/companyform"
+              element={
+                <ProtectedRoute>
+                  <CompanyPageForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/locationform" element={<LocationPageForm />} />
+            <Route
+              path="/companylist"
+              element={
+                <ProtectedRoute>
+                  <CompanyList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/company/:companyId"
+              element={
+                <ProtectedRoute>
+                  <CompanyPageForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/branchlist"
+              element={
+                <ProtectedRoute>
+                  <BranchList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/branch/:branchId"
+              element={
+                <ProtectedRoute>
+                  <BranchPageForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/locationlist"
+              element={
+                <ProtectedRoute>
+                  <LocationList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/location/:locationId"
+              element={
+                <ProtectedRoute>
+                  <LocationPageForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/statusupdate"
+              element={
+                <ProtectedRoute>
+                  <StatusUpdate />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/letters/:rowNumber"
+              element={
+                <ProtectedRoute>
+                  <Letters />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports/:rowNumber"
+              element={
+                <ProtectedRoute>
+                  <Reports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sitemap"
+              element={
+                <ProtectedRoute>
+                  <SiteMap />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/usergrouprights"
+              element={
+                <ProtectedRoute>
+                  <UserGrpRights />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/usersettings"
+              element={
+                <ProtectedRoute>
+                  <UserSettings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/companyallocation"
+              element={
+                <ProtectedRoute>
+                  <CompanyAllocation />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/payrollgroup" element={<PayrollGroup />} />
+            <Route
+              path="/payrollgroupsearch"
+              element={<PayrollGroupSearch />}
+            />
+            <Route path="/payrollgrouplist" element={<PayrollGroupList />} />
+            <Route path="/usergroup" element={<UserGroup />} />
+            <Route path="/locationgroup" element={<LocationGroup />} />
+            <Route path="/shiftgroup" element={<ShiftGroup />} />
+            <Route
+              path="/locationrightsmapping"
+              element={<LocationGroupRightsMapping />}
+            />
+            <Route path="/licenseagreement" element={<LicenseAgreement />} />
+            <Route
+              path="/locationgrouprights"
+              element={<LocationGroupRights />}
+            />
+            <Route
+              path="/statusupdate"
+              element={
+                <ProtectedRoute>
+                  <StatusUpdate />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            <Route path="*" element={<NotFoundPage />} /> {/* always last! */}
+          </Routes>
+        </ErrorBoundary>
       </AuthProvider>
       <Toaster
         position="top-right"

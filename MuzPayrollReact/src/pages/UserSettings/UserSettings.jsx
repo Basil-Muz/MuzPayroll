@@ -196,7 +196,7 @@ export default function UserSettings() {
       // const userTypes = extractIds(bulkGroup);
 
       const payload = buildFilterPayload();
-      console.log("payload", payload);
+      // console.log("payload", payload);
 
       // Replace with real API
       const res = await getUserSettingsList(payload);
@@ -253,7 +253,7 @@ export default function UserSettings() {
   };
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
-  console.log("UDHINBF", setSelectedRowIds);
+  // console.log("UDHINBF", setSelectedRowIds);
   const pageRows = useMemo(() => rows, [rows]);
 
   // useEffect(() => {

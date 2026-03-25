@@ -7,31 +7,30 @@ export const handleApiError = (
     // operation, // fetch | save | update | delete (optional)
   } = {},
 ) => {
+
   const defaultMessage = "Something went wrong";
 
   /* ----------------------------------
-     1️⃣ Network / Axios-level errors
+     Network / Axios-level errors
   ---------------------------------- */
   if (error?.code === "ERR_NETWORK") {
     toast.error("Unable to connect to server. Please check your network.");
     return;
   }
 
-  if (!error?.response) {
-    toast.error(error?.message || defaultMessage);
-    return;
-  }
+  // if (!error?.response) {
+  //   toast.error(error?.message || defaultMessage);
+  //   return;
+  // }
 
   /* ----------------------------------
-     2️⃣ Backend response extraction
+     Backend response extraction
   ---------------------------------- */
-  const responseData = error.response.data || {};
-  console.log("Error in toast",error)
+  const responseData = error.data || {};
+  // console.log("Error in toast", error);
   const status =
-    error.response.status ||
-    responseData.statusCode ||
-    error.status;
-
+    error.status || error.statusCode || error.status;
+  console.log("Status",status)
   const backendErrors = responseData.errors;
   const message =
     (Array.isArray(backendErrors) && backendErrors[0]) ||
@@ -56,9 +55,7 @@ export const handleApiError = (
       break;
 
     case 404:
-      toast.error(
-        message || `${entity ? entity + " " : ""}not found.`,
-      );
+      toast.error(message || `${entity ? entity + " " : ""}not found.`);
       break;
 
     case 409:

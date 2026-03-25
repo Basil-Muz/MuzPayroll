@@ -20,9 +20,7 @@
   height: calc(100vh - 70px);
   background: var(--bg);
   border-right: 1px solid var(--border);
-  transition:
-    width 250ms ease,
-    transform 300ms ease;
+  transition: all 0.3s ease;
   z-index: 10;
   overflow: visible;
 }
@@ -131,14 +129,12 @@
   z-index: 100;
   width: 56px;
   height: 56px;
-  /* padding-left: 9px; */
   outline: none;
   border: solid 1px var(--brand-border);
   border-radius: 50%;
   cursor: pointer;
-  background: #fcf0fdff;
+  background: var(--bg);
   backdrop-filter: blur(12px);
-  /* box-shadow: 0 4px 12px rgba(0,0,0,0.12); */
   transition: all 0.25s ease;
 }
 

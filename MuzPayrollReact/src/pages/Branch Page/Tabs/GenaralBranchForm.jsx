@@ -129,14 +129,10 @@ export default function GenaralBranchForm() {
     fieldMap: COMMON_BRANCH_FIELD_MAP,
   });
     const authDate = watch("withaffectdate");
-    let isUnlocked = !!authDate;
+  const [isUnlocked, setIsUnlocked] = useState(
+    amendments.length > 0 ? true : !!authDate,
+  );
       //workflow of amend date then name logic
-
-  if (amendments.length > 0) {
-    isUnlocked = true;
-  } else {
-    isUnlocked = !!authDate;
-  }
   //  handle generate amendmend
   const { handleGenerateAmendment } = useGenerateAmend({
     setSelectedAmendment,
@@ -144,7 +140,7 @@ export default function GenaralBranchForm() {
     reset,
     getValues,
     clearErrors,
-    isUnlocked,
+    setIsUnlocked,
     // setIsReadOnly,
   });
 
@@ -579,7 +575,7 @@ export default function GenaralBranchForm() {
                             }
                             onChange={(date) => {
                               field.onChange(date ? formatDate(date) : null);
-
+                              setIsUnlocked(true);
                               setTimeout(() => {
                                 smoothFocus(); //  Focus to name after selecting the date
                               }, 0);
@@ -810,7 +806,6 @@ export default function GenaralBranchForm() {
           )}
         />
       </div>
-      <ThemeToggle></ThemeToggle>
       <ScrollToTopButton />
     </>
   );

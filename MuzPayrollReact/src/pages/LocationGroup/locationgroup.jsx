@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import { BsGrid3X3GapFill } from "react-icons/bs";
 import { FaListUl, FaRegObjectGroup } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
-
+import { useSearchParams } from "react-router-dom";
 /* ================= CONTEXT / HOOKS ================= */
 import { useAuth } from "../../context/AuthProvider";
 import { useLoader } from "../../context/LoaderContext";
@@ -20,6 +20,7 @@ import {
 } from "../../services/locationGroup.service";
 
 /* ================= UTILS ================= */
+import { getFloatingActions } from "../../utils/setActionButtons";
 import { handleApiError } from "../../utils/errorToastResolver";
 import { ensureMinDuration } from "../../utils/loaderDelay";
 
@@ -33,6 +34,8 @@ import { ListCard } from "../../components/List Card/ListCard";
 import Header from "../../components/Header/Header";
 import ListItemForm from "../../components/ListItemForm/ListItemForm";
 import FloatingActionBar from "../../components/demo_buttons/FloatingActionBar";
+
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
 
 /* ================= STYLES ================= */
 import "./locationgroup.css";
@@ -50,8 +53,16 @@ function LocationGroup() {
   const [activeLocations, setActiveLocations] = useState([]);
   const [inactiveLocations, setInactiveLocations] = useState([]);
 
+  const [backendPermissions, setBackendPermissions] = useState();
+
+  // const [[], set[]] = useState([]);
+
   const { showRailLoader, hideLoader } = useLoader();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
+
+  const { setSidebar } = useSidebarPermissions();
 
   const entityId = user.userEntityHierarchyId;
 
@@ -160,10 +171,9 @@ function LocationGroup() {
       }
     }
   };
-
-  useEffect(() => {
-    getAllLocationGroups(true);
-  }, []);
+  // useEffect(() => {
+  //   getAllLocationGroups(true);
+  // }, []);
 
   const handleNew = () => {
     setSelectedItem(null);
@@ -245,18 +255,6 @@ function LocationGroup() {
     }
   }, [searchData, entityId]);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (searchData.trim() !== "") {
-        fetchSearchData();
-      } else {
-        getAllLocationGroups(false);
-      }
-    }, 400);
-
-    return () => clearTimeout(handler);
-  }, [searchData]);
-
   const toggleForm = () => {
     setShowForm((prev) => !prev);
     if (showForm) {
@@ -298,7 +296,33 @@ function LocationGroup() {
       hideLoader();
     }
   };
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchData.trim() !== "") {
+        fetchSearchData();
+      } else {
+        getAllLocationGroups(false);
+      }
+    }, 400);
 
+    return () => clearTimeout(handler);
+  }, [searchData]);
+
+  useEffect(() => {
+    getAllLocationGroups(true);
+  }, [showForm]);
+  
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
   // const containerStyle = { display: "flex" };
 
   return (
@@ -415,7 +439,7 @@ function LocationGroup() {
           </>
         )}
 
-        <FloatingActionBar
+        {/* <FloatingActionBar
           actions={{
             save: {
               // onClick: handleSave,
@@ -439,6 +463,29 @@ function LocationGroup() {
               onClick: handleNew, //to toggle the locationgroup form
             },
           }}
+        /> */}
+        <FloatingActionBar
+          actions={getFloatingActions(
+            backendPermissions,
+            {
+              // handleSave,
+              handleClear,
+              // handleRefresh,
+              // handleSearch,
+              handleNew: handleNew,
+              // handleDelete,
+              // handlePrint,
+            },
+            {
+              canNew: false, //  add is disable by backed
+              canSave: true, // because disabled: canSave
+              // canSearch: true, // true → disabled
+              canClear: false, // false → enabled
+              // canRefresh: false, // false → enabled
+              canDelete: true,
+            },
+            ["new", "save", "clear", "print", "delete"],
+          )}
         />
 
         {showForm && (

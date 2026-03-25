@@ -74,6 +74,7 @@ const LocationList = () => {
         user.userEntityHierarchyId,
         user.branchEntityHierarchyId,
       );
+      console.log("ALL Locations",res)
       setTimeout(() => {
         setAllLocation(res);
         setActiveLocation([]);

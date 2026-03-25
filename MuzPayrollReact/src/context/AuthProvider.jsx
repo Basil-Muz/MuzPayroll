@@ -1,5 +1,5 @@
 // import { useEffect } from "react";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { getLoginData, setLoginData, setMenuData, getMenuData } from "../utils/loginstorageUtils";
 
 const AuthContext = createContext(null);
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
   };
 
 const updateMenus = (updates) => {
-  setMenus((prev) => {
+  setMenus(() => {
     const next = [...updates]; // or merge logic if needed
     setMenuData(next);
     setIsMenuLoaded(true);

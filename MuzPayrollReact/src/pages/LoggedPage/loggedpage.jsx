@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import Sidebar from "../../components/SideBar/Sidebar";
-import muzLogo from "../../assets/muzlogo_transparent.png";
+import muzLogo from "/muz-logo.png";
 
 import { useLoader } from "../../context/LoaderContext";
 import { useAuth } from "../../context/AuthProvider";
@@ -279,7 +279,7 @@ function LoggedPage() {
         (l) => String(l.entityHierarchyId) === selectedLocationId,
       );
 
-      console.log("Calling Menu API");
+      // console.log("Calling Menu API");
 
       const response = await fetchMainMenu(
         "MAIN_MENU",
