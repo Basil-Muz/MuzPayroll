@@ -24,8 +24,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<MenuDTO> getSideBar(String transtype, String transsubtype, Integer userId, Integer solutionId,
-            Integer optionid, Integer entity_hierarchy_id) {
+    public List<MenuDTO> getSideBar(String transtype, String transsubtype, Long userId, Long solutionId,
+            Long optionid, Long entity_hierarchy_id) {
         return menuRepository.getSideBar(transtype, transsubtype, userId, solutionId,
                 optionid, entity_hierarchy_id);
     }

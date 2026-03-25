@@ -60,10 +60,10 @@ public class MenuRepository {
     public List<MenuDTO> getSideBar(
             String transtype,
             String transsubtype,
-            Integer userid,
-            Integer solutionid,
-            Integer optionid,
-            Integer entity_hierarchy_id) {
+            Long userid,
+            Long solutionid,
+            Long optionid,
+            Long entity_hierarchy_id) {
 
         Query query = entityManager.createNativeQuery(
                 "SELECT * FROM OptionRightsProc(:transtype,:transsubtype,:userid,:solutionid,:optionid,:entity_hierarchy_id)");
