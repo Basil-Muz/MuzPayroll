@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class EntityRightsGrpMstDTO {
 
-    @JsonIgnore
     private Authorization authorization;
 
     private List<EntityRightsGrpLogDTO> entityRightsGrpLogDTOs;

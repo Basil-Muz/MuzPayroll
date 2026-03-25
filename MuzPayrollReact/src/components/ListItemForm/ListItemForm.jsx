@@ -28,8 +28,6 @@ function ListItemForm({
   fetchEntityById,
   ENTITY_FIELD_MAP,
   children,
-  
-  
 }) {
   const { showRailLoader, hideLoader } = useLoader();
 
@@ -101,17 +99,19 @@ function ListItemForm({
   // Submit handler
   const onSubmit = async (values) => {
     console.log("formData on save:", values);
+    console.log("AUTH VALUE:", values.authorizationStatus);
+    console.log("TYPE:", typeof values.authorizationStatus);
     const formData = new FormData();
     Object.keys(values).forEach((key) => {
       const value = values[key];
 
-      //skip null / undefined
       if (value === null || value === undefined) return;
-
-      // skip string "null"
       if (value === "null") return;
 
-      if (key === "activeDate") {
+    
+      if (key === "authorizationStatus") {
+        formData.append(key, Number(value)); // always 0 / 1
+      } else if (key === "activeDate") {
         const formattedDate = new Date(value).toISOString().split("T")[0];
         formData.append(key, formattedDate);
       } else if (typeof value === "boolean") {
@@ -120,6 +120,7 @@ function ListItemForm({
         formData.append(key, value);
       }
     });
+
     const startTime = Date.now();
     showRailLoader("Saving " + entity + "...");
     try {

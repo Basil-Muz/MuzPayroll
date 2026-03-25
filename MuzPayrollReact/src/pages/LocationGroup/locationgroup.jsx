@@ -64,7 +64,7 @@ function LocationGroup() {
 
   const { setSidebar } = useSidebarPermissions();
 
-  const entityId = user.userEntityHierarchyId;
+  const entityId = user?.userEntityHierarchyId;
 
   const userId = user?.userId;
 
@@ -105,7 +105,10 @@ function LocationGroup() {
     );
 
     newFormData.append("ermActiveYN", true);
-    newFormData.append("authorizationStatus", false);
+    newFormData.append(
+      "authorizationStatus",
+      getValue(dataObj, "authorizationStatus"),
+    );
 
     newFormData.append("userId", finalUserId);
 
@@ -114,42 +117,43 @@ function LocationGroup() {
       storedUser?.userEntityHierarchyId || user?.userEntityHierarchyId,
     );
 
-    newFormData.append("activeDate", today);
+   
+    newFormData.append("activeDate", getValue(dataObj, "activeDate"));
     newFormData.append("withaffectdate", today);
     newFormData.append("authorizationDate", today);
 
     // ===== CHILD DTO =====
-    newFormData.append("entityRightsGrpLogDTOs[0].userId", finalUserId);
-    newFormData.append("entityRightsGrpLogDTOs[0].activeDate", today);
-    newFormData.append("entityRightsGrpLogDTOs[0].authorizationDate", today);
-    newFormData.append("entityRightsGrpLogDTOs[0].authorizationStatus", false);
+    // newFormData.append("entityRightsGrpLogDTOs[0].userId", finalUserId);
+    // newFormData.append("entityRightsGrpLogDTOs[0].activeDate", today);
+    // newFormData.append("entityRightsGrpLogDTOs[0].authorizationDate", today);
+    // newFormData.append("entityRightsGrpLogDTOs[0].authorizationStatus", false);
 
     // ===== UPDATE CASE =====
-    if (id) {
-      newFormData.append("ermEntityRightsGroupID", id);
+    // if (id) {
+    //   newFormData.append("ermEntityRightsGroupID", id);
 
-      // 🔥 VERY IMPORTANT: pass log ID if exists
-      const logId =
-        dataObj?.entityRightsGrpLogDTOs?.[0]?.entityRightsGrpLogID ||
-        dataObj?.entityRightsGrpLogDTOs?.[0]?.id;
+    //   // 🔥 VERY IMPORTANT: pass log ID if exists
+    //   const logId =
+    //     dataObj?.entityRightsGrpLogDTOs?.[0]?.entityRightsGrpLogID ||
+    //     dataObj?.entityRightsGrpLogDTOs?.[0]?.id;
 
-      if (logId) {
-        newFormData.append(
-          "entityRightsGrpLogDTOs[0].entityRightsGrpLogID",
-          logId,
-        );
-      }
-    }
+    //   if (logId) {
+    //     newFormData.append(
+    //       "entityRightsGrpLogDTOs[0].entityRightsGrpLogID",
+    //       logId,
+    //     );
+    //   }
+    // }
 
     // ===== DEBUG =====
-    console.log("AUTH USER:", user);
-    console.log("STORED USER:", storedUser);
-    console.log("FINAL USER ID:", finalUserId);
+    // console.log("AUTH USER:", user);
+    // console.log("STORED USER:", storedUser);
+    // console.log("FINAL USER ID:", finalUserId);
 
-    console.log("FINAL PAYLOAD:");
-    for (let pair of newFormData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
+    // console.log("FINAL PAYLOAD:");
+    // for (let pair of newFormData.entries()) {
+    //   console.log(pair[0], pair[1]);
+    // }
 
     return await saveLocationGroup(newFormData, mode);
   };
@@ -201,24 +205,7 @@ function LocationGroup() {
     }
 
     setSelectedItem({
-      ...fullData,
-
       id: fullData.ermEntityRightsGroupID || fullData.id || item,
-
-      userId: user?.userMstId || user?.userId,
-      entityRightsGrpLogDTOs: fullData.entityRightsGrpLogDTOs || [],
-
-      [LOCATION_GROUP_FIELD_MAP.code]: fullData.ermCode || fullData.code,
-
-      [LOCATION_GROUP_FIELD_MAP.name]: fullData.ermName || fullData.name,
-
-      [LOCATION_GROUP_FIELD_MAP.shortName]:
-        fullData.ermShortName || fullData.shortName,
-
-      [LOCATION_GROUP_FIELD_MAP.description]:
-        fullData.ermDesc || fullData.description,
-
-      authorizationDate: fullData.authorizationDate || today,
     });
 
     setShowForm(true);
@@ -311,7 +298,7 @@ function LocationGroup() {
   useEffect(() => {
     getAllLocationGroups(true);
   }, [showForm]);
-  
+
   useEffect(() => {
     setSidebar(
       "OPTION_RIGHTS",
