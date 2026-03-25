@@ -28,6 +28,7 @@ Long findMaxRowNo(@Param("grpId") Long grpId);
     FROM EntityRightsGrpLog l
     WHERE l.entityRightsGrpLogPK.ermEntityRightsGroupID = :grpId
     ORDER BY l.entityRightsGrpLogPK.rowNo DESC
+    LIMIT 1
 """)
 Optional<Long> findLatestAmendNoByEntityRightsGroupID(
         @Param("grpId") Long grpId
