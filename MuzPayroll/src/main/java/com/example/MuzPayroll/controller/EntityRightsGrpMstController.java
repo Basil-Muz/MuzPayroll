@@ -47,6 +47,12 @@ public class EntityRightsGrpMstController {
     @PostMapping("/save")
     public Response<EntityRightsGrpMstDTO> saveEntityRightsGrp(@ModelAttribute EntityRightsGrpMstDTO dto,
             @RequestParam String mode) {
+
+        //ADD LOGS HERE
+        System.out.println("AUTH STATUS: " + dto.getAuthorizationStatus());
+        System.out.println("USER ID: " + dto.getUserId());
+        System.out.println("ENTITY ID: " + dto.getEntityHierarchyInfoID());
+
         return entityRightsGrpMstService.saveWrapper(dto, mode);
     }
 

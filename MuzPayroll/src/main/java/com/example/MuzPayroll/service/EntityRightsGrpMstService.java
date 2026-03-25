@@ -231,6 +231,7 @@ public class EntityRightsGrpMstService extends MuzirisAbstractService<EntityRigh
                     .orElseThrow(
                             () -> new IllegalStateException("AuthId not found for mstId [entityPopulate]" + mstId));
 
+                            System.out.println("authId"+authId);
             Optional<Boolean> status = authorizationRepository.findStatusByAuthId(authId);
 
             // ===== CREATE AUTHORIZATION =====
