@@ -1,4 +1,5 @@
 import { fetchSideBar } from "../services/menu.service";
+import { handleApiError } from "../utils/errorToastResolver";
 
 export const useSidebarPermissions = () => {
   const setSidebar = async (
@@ -8,7 +9,7 @@ export const useSidebarPermissions = () => {
     solutionid,
     optionid,
     entityHierarchyId,
-    setBackendPermissions
+    setBackendPermissions,
   ) => {
     try {
       const res = await fetchSideBar(
@@ -17,10 +18,11 @@ export const useSidebarPermissions = () => {
         userid,
         solutionid,
         optionid,
-        entityHierarchyId
+        entityHierarchyId,
       );
-      setBackendPermissions(res.data);
+      setBackendPermissions(res.data[0]);
     } catch (error) {
+      handleApiError(error, { entity: "Action bar" });
       console.error("Error fetching sidebar permissions:", error);
     }
   };

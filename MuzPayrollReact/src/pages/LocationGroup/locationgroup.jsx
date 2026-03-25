@@ -66,7 +66,7 @@ function LocationGroup() {
 
   const entityId = user.userEntityHierarchyId;
 
-  const userId = user?.userId;
+  // const userId = user?.userId;
 
   const saveLocationGroupWrapper = async (dataObj, mode) => {
     const newFormData = new FormData();
@@ -323,6 +323,7 @@ function LocationGroup() {
       setBackendPermissions,
     );
   }, [optionid]);
+  console.log("")
   // const containerStyle = { display: "flex" };
 
   return (

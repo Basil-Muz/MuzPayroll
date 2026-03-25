@@ -306,23 +306,6 @@ const GeneralInfoForm = function GeneralInfoForm({
                   message:
                     "Code must contain only uppercase letters and be between 3 and 11 characters",
                 },
-                onChange: (e) => {
-                  const value = e.target.value;
-
-                  if (value.length < 3) return;
-
-                  const short = value
-                    .trim()
-                    .split(/\s+/)
-                    .map((w) => w[0])
-                    .join("")
-                    .toUpperCase();
-                  setValue("EtmShortName", short, {
-                    shouldDirty: true,
-                    shouldValidate: false,
-                  });
-                  clearErrors("EtmShortName");
-                },
               })}
             />
             {errors.EtmCode && (

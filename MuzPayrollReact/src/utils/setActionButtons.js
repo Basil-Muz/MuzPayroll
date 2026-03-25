@@ -2,18 +2,17 @@ export const getFloatingActions = (
   permissions,
   handlers,
   uiState = {},
-  requiredButtons = []
+  requiredButtons = [],
 ) => {
-
   const {
     canSave = true,
     canSearch = true,
-	canClear =true,
-    canRefresh = true
+    canClear = true,
+    canRefresh = true,
+    canNew
   } = uiState;
 
   const allActions = {
-
     save: {
       onClick: handlers.handleSave,
       disabled: canSave,
@@ -35,28 +34,28 @@ export const getFloatingActions = (
     },
 
     new: {
- 	onClick: handlers?.handleNew,
-      disabled: !permissions?.add,
+      onClick: handlers?.handleNew,
+      disabled: !permissions?.add || canNew,
     },
 
     delete: {
- 	onClick: handlers?.handleDelete,
+      onClick: handlers?.handleDelete,
       disabled: !permissions?.delete,
     },
 
     print: {
- 	onClick: handlers?.handlePrint,
+      onClick: handlers?.handlePrint,
       disabled: !permissions?.print,
-    }
+    },
   };
 
   const actions = {};
 
-  requiredButtons.forEach(btn => {
+  requiredButtons.forEach((btn) => {
     if (allActions[btn]) {
       actions[btn] = allActions[btn];
     }
   });
-
+  // console.log("Actions2",permissions)
   return actions;
 };

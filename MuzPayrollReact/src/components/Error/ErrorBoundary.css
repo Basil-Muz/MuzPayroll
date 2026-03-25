@@ -109,7 +109,11 @@
   text-transform: uppercase;
   margin-bottom: 16px;
 }
-
+button.btn.btn-outline {
+    border: 1px solid var(--brand);
+    background: transparent;
+    color:var(--text);
+}
 .badge-404 {
   background: var(--primary-light);
   color: var(--brand-dark);
