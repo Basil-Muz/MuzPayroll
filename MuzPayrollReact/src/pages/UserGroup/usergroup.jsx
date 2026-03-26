@@ -150,6 +150,7 @@ function UserGroup() {
       user || JSON.parse(localStorage.getItem("user") || "{}");
 
     const today = new Date().toISOString().split("T")[0];
+    const authValue = formData.get("authorizationStatus");
 
     const sendData = new FormData();
 
@@ -162,10 +163,16 @@ function UserGroup() {
     sendData.append("entityId", currentUser.userEntityHierarchyId);
     sendData.append("entityMst", currentUser.userEntityHierarchyId);
 
-    sendData.append("activeDate", today);
+    // sendData.append("activeDate", today);
+    sendData.append("activeDate", formData.get("activeDate"));
     sendData.append("withaffectdate", today);
     sendData.append("authorizationDate", today);
-    sendData.append("authorizationStatus", false);
+    // sendData.append("authorizationStatus", false);
+
+    sendData.append(
+      "authorizationStatus",
+      authValue === "1" || authValue === 1 ? 1 : 0,
+    );
     sendData.append("UgmActiveYN", true);
 
     // IMPORTANT FIX
@@ -228,7 +235,12 @@ function UserGroup() {
         [USER_GROUP_FIELD_MAP.shortName]: fullData.ugmShortName,
         [USER_GROUP_FIELD_MAP.description]: fullData.ugmDesc,
         [USER_GROUP_FIELD_MAP.activeDate]: fullData.activeDate,
-      })
+        authorizationStatus:
+          fullData.authorizationStatus === true ||
+          fullData.authorizationStatus === 1
+            ? 1
+            : 0,
+      });
     } catch (err) {
       console.error(err);
       toast.error("Failed to load data");
@@ -427,13 +439,12 @@ function UserGroup() {
               // handlePrint,
             },
             {
-              canNew:false, //  add is disable by backed
+              canNew: false, //  add is disable by backed
               canSave: true, // because disabled: canSave
               // canSearch: true, // true → disabled
               canClear: false, // false → enabled
               // canRefresh: false, // false → enabled
               canDelete: true,
-              
             },
             ["new", "save", "clear", "print", "delete"],
           )}

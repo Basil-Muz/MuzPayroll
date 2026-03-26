@@ -78,13 +78,23 @@ function ListItemForm({
 
         reset({
           ...entityData,
+
+          authorizationStatus:
+            entityData.authorizationStatus === true ||
+            entityData.authorizationStatus === 1
+              ? 1
+              : 0,
+
           activeDate: entityData.activeDate
             ? new Date(entityData.activeDate)
             : null,
         });
 
         setMode("UPDATE");
-        setIsVarified(entityData.authorizationStatus === 1);
+        setIsVarified(
+          entityData.authorizationStatus === true ||
+            entityData.authorizationStatus === 1,
+        );
       } catch (error) {
         handleApiError(error, { entity });
       } finally {
@@ -108,7 +118,6 @@ function ListItemForm({
       if (value === null || value === undefined) return;
       if (value === "null") return;
 
-    
       if (key === "authorizationStatus") {
         formData.append(key, Number(value)); // always 0 / 1
       } else if (key === "activeDate") {

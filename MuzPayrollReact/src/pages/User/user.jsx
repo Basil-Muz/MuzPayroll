@@ -226,18 +226,18 @@ const User = () => {
             fetchEntityById={getUserById}
             ENTITY_FIELD_MAP={USER_FIELD_MAP}
           >
-            {({ register, control }) => (
+            {({ register, control, isVarified }) => (
               <>
                 {/* User Code */}
                 <div className="form-row">
                   <label>User Code</label>
-                  <input className="form-control" {...register("userCode")} />
+                  <input className="form-control" disabled={isVarified} {...register("userCode")} />
                 </div>
 
                 {/* User Name */}
                 <div className="form-row">
                   <label>User Name</label>
-                  <input className="form-control" {...register("userName")} />
+                  <input className="form-control"  disabled={isVarified} {...register("userName")} />
                 </div>
 
                 {/* User Type */}
@@ -251,6 +251,7 @@ const User = () => {
                         classNamePrefix="form-control-select"
                         options={userTypes}
                         isSearchable={false}
+                        disabled={isVarified}
                         value={
                           userTypes.find((opt) => opt.value === field.value) ||
                           null
@@ -264,13 +265,13 @@ const User = () => {
                 {/* Mobile */}
                 <div className="form-row">
                   <label>Mobile No</label>
-                  <input className="form-control" {...register("mobileNo")} />
+                  <input className="form-control" disabled={isVarified} {...register("mobileNo")} />
                 </div>
 
                 {/* Email */}
                 <div className="form-row">
                   <label>Email</label>
-                  <input className="form-control" {...register("email")} />
+                  <input className="form-control" disabled={isVarified}  {...register("email")} />
                 </div>
 
                 {/* Password */}
@@ -279,6 +280,7 @@ const User = () => {
                   <input
                     type="password"
                     className="form-control"
+                   disabled={isVarified}
                     {...register("password")}
                   />
                 </div>
@@ -288,12 +290,13 @@ const User = () => {
                   <label>Change password on next login</label>
                   <input
                     type="checkbox"
+                   disabled={isVarified}
                     {...register("changePasswordNextLogin")}
                   />
                 </div>
                 <div className="form-row">
                   <label>Active</label>
-                  <input type="checkbox" {...register("activeYN")} />
+                  <input type="checkbox"  disabled={isVarified} {...register("activeYN")} />
                 </div>
               </>
             )}
