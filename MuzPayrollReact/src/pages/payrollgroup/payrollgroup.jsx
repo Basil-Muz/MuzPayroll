@@ -14,7 +14,12 @@ import ListItemForm from "../../components/ListItemForm/ListItemForm";
 import { ListCard } from "../../components/List Card/ListCard";
 
 // Services
-import { getPayrollGroupsList, getPayrollGroupById, savePayrollGroup, searchPayrollGroup, } from "../../services/payrollgroup.service";
+import {
+  getPayrollGroupsList,
+  getPayrollGroupById,
+  savePayrollGroup,
+  searchPayrollGroup,
+} from "../../services/payrollgroup.service";
 import { PAYROLL_GROUP_FIELD_MAP } from "../../constants/payrollGroupMap";
 import { useAuth } from "../../context/AuthProvider";
 
@@ -184,15 +189,11 @@ function PayrollGroup() {
                   handleDataToForm={handleDataToForm}
                 >
                   <div>{item.description}</div>
-
                 </ListCard>
-
               ))}
             </div>
           ) : (
-            <div className="no-data-found">
-              No payroll groups available
-            </div>
+            <div className="no-data-found">No payroll groups available</div>
           ))}
 
         {/* ================= GROUPED VIEW ================= */}
@@ -209,14 +210,11 @@ function PayrollGroup() {
                     handleDataToForm={handleDataToForm}
                   >
                     <div>{item.description}</div>
-
                   </ListCard>
                 ))}
               </div>
             ) : (
-              <div className="no-data-found">
-                No active payroll groups
-              </div>
+              <div className="no-data-found">No active payroll groups</div>
             )}
 
             <h3 className="group-title inactive">Inactive</h3>
@@ -230,14 +228,11 @@ function PayrollGroup() {
                     handleDataToForm={handleDataToForm}
                   >
                     <div>{item.description}</div>
-
                   </ListCard>
                 ))}
               </div>
             ) : (
-              <div className="no-data-found">
-                No inactive payroll groups
-              </div>
+              <div className="no-data-found">No inactive payroll groups</div>
             )}
           </>
         )}
@@ -267,23 +262,89 @@ function PayrollGroup() {
             ENTITY_FIELD_MAP={PAYROLL_GROUP_FIELD_MAP}
           >
             {({ register, errors, isVarified }) => (
-              <div className="full-content">
-                <div className="form-row">
-                  <label className="group-form-label">Description</label>
-
-                  <textarea
-                    className={`form-control ${errors[PAYROLL_GROUP_FIELD_MAP.desc] ? "error" : ""
+              <div className="main-model-content">
+                {/* CODE */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Code</label>
+                    <input
+                      className={`form-control ${
+                        errors[PAYROLL_GROUP_FIELD_MAP.code] ? "error" : ""
                       } ${isVarified ? "read-only" : ""}`}
-                    placeholder="Enter Description"
-                    disabled={isVarified}
-                    {...register(PAYROLL_GROUP_FIELD_MAP.desc)}
-                  />
+                      disabled={isVarified}
+                      {...register(PAYROLL_GROUP_FIELD_MAP.code, {
+                        required: "Code is required",
+                      })}
+                    />
+                    {errors[PAYROLL_GROUP_FIELD_MAP.code] && (
+                      <span className="error-message">
+                        {errors[PAYROLL_GROUP_FIELD_MAP.code].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                  {errors[PAYROLL_GROUP_FIELD_MAP.desc] && (
-                    <span className="error-message">
-                      {errors[PAYROLL_GROUP_FIELD_MAP.desc].message}
-                    </span>
-                  )}
+                {/* NAME */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Name</label>
+                    <input
+                      className={`form-control ${
+                        errors[PAYROLL_GROUP_FIELD_MAP.name] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      disabled={isVarified}
+                      {...register(PAYROLL_GROUP_FIELD_MAP.name, {
+                        required: "Name is required",
+                      })}
+                    />
+                    {errors[PAYROLL_GROUP_FIELD_MAP.name] && (
+                      <span className="error-message">
+                        {errors[PAYROLL_GROUP_FIELD_MAP.name].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* SHORT NAME */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Short Name</label>
+                    <input
+                      className={`form-control ${
+                        errors[PAYROLL_GROUP_FIELD_MAP.shortName] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      disabled={isVarified}
+                      {...register(PAYROLL_GROUP_FIELD_MAP.shortName, {
+                        required: "Short Name is required",
+                      })}
+                    />
+                    {errors[PAYROLL_GROUP_FIELD_MAP.shortName] && (
+                      <span className="error-message">
+                        {errors[PAYROLL_GROUP_FIELD_MAP.shortName].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Description</label>
+
+                    <textarea
+                      className={`form-control ${
+                        errors[PAYROLL_GROUP_FIELD_MAP.desc] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter Description"
+                      disabled={isVarified}
+                      {...register(PAYROLL_GROUP_FIELD_MAP.desc)}
+                    />
+
+                    {errors[PAYROLL_GROUP_FIELD_MAP.desc] && (
+                      <span className="error-message">
+                        {errors[PAYROLL_GROUP_FIELD_MAP.desc].message}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

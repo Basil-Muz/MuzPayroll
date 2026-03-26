@@ -17,7 +17,7 @@ import {
   saveDesignation,
   searchDesignation,
 } from "../../services/designation.service";
-import { DESIGNATION_FIELD_MAP } from "../../constants/designationMap"; 
+import { DESIGNATION_FIELD_MAP } from "../../constants/designationMap";
 import BackToTop from "../../components/ScrollToTop/ScrollToTopButton";
 import Loading from "../../components/Loaders/Loading";
 import Header from "../../components/Header/Header";
@@ -221,25 +221,89 @@ const Designation = () => {
             ENTITY_FIELD_MAP={DESIGNATION_FIELD_MAP}
           >
             {({ register, errors, isVarified }) => (
-              <div className="full-content">
-                <div className="form-row">
-
-                  <label className="group-form-label">Description</label>
-
-                  <textarea
-                    className={`form-control ${errors[DESIGNATION_FIELD_MAP.desc] ? "error" : ""
+              <div className="main-model-content">
+                {/* CODE */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Code</label>
+                    <input
+                      className={`form-control ${
+                        errors[DESIGNATION_FIELD_MAP.code] ? "error" : ""
                       } ${isVarified ? "read-only" : ""}`}
-                    placeholder="Enter description"
-                    disabled={isVarified}
-                    {...register(DESIGNATION_FIELD_MAP.desc)}
-                  />
+                      disabled={isVarified}
+                      {...register(DESIGNATION_FIELD_MAP.code, {
+                        required: "Code is required",
+                      })}
+                    />
+                    {errors[DESIGNATION_FIELD_MAP.code] && (
+                      <span className="error-message">
+                        {errors[DESIGNATION_FIELD_MAP.code].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                  {errors[DESIGNATION_FIELD_MAP.desc] && (
-                    <span className="error-message">
-                      {errors[DESIGNATION_FIELD_MAP.desc].message}
-                    </span>
-                  )}
+                {/* NAME */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Name</label>
+                    <input
+                      className={`form-control ${
+                        errors[DESIGNATION_FIELD_MAP.name] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      disabled={isVarified}
+                      {...register(DESIGNATION_FIELD_MAP.name, {
+                        required: "Name is required",
+                      })}
+                    />
+                    {errors[DESIGNATION_FIELD_MAP.name] && (
+                      <span className="error-message">
+                        {errors[DESIGNATION_FIELD_MAP.name].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
+                {/* SHORT NAME */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Short Name</label>
+                    <input
+                      className={`form-control ${
+                        errors[DESIGNATION_FIELD_MAP.shortName] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      disabled={isVarified}
+                      {...register(DESIGNATION_FIELD_MAP.shortName, {
+                        required: "Short Name is required",
+                      })}
+                    />
+                    {errors[DESIGNATION_FIELD_MAP.shortName] && (
+                      <span className="error-message">
+                        {errors[DESIGNATION_FIELD_MAP.shortName].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Description</label>
+
+                    <textarea
+                      className={`form-control ${
+                        errors[DESIGNATION_FIELD_MAP.desc] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      placeholder="Enter description"
+                      disabled={isVarified}
+                      {...register(DESIGNATION_FIELD_MAP.desc)}
+                    />
+
+                    {errors[DESIGNATION_FIELD_MAP.desc] && (
+                      <span className="error-message">
+                        {errors[DESIGNATION_FIELD_MAP.desc].message}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

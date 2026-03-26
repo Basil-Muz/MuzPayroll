@@ -13,6 +13,8 @@ import { Controller } from "react-hook-form";
 import TimePicker from "react-time-picker";
 import { GrSun, GrMoon } from "react-icons/gr";
 import { LiaAdjustSolid } from "react-icons/lia";
+import "react-time-picker/dist/TimePicker.css";
+import "react-clock/dist/Clock.css";
 
 import {
   getShiftGroupsList,
@@ -127,14 +129,12 @@ function ShiftGroup() {
       <Header backendError={[]} />
 
       <div className="shift-group-page">
-
         {/* ================= HEADER ================= */}
         <div className="header-section">
           <h2 className="page-title">Shift Group</h2>
 
           <div className="header-actions">
             <div className="view-toggle">
-
               <button
                 className={`icon-btn ${boxView ? "active" : ""}`}
                 onClick={() => {
@@ -190,7 +190,6 @@ function ShiftGroup() {
                   item={item}
                   status="active"
                   handleDataToForm={handleDataToForm}
-
                 >
                   <div>{item.shiftType}</div>
                   <div>{item.timeFrom}</div>
@@ -199,9 +198,7 @@ function ShiftGroup() {
               ))}
             </div>
           ) : (
-            <div className="no-data-found">
-              No shift groups available
-            </div>
+            <div className="no-data-found">No shift groups available</div>
           ))}
 
         {/* ================= GROUPED VIEW ================= */}
@@ -216,7 +213,6 @@ function ShiftGroup() {
                     item={item}
                     status="active"
                     handleDataToForm={handleDataToForm}
-
                   >
                     <div>{item.shiftType}</div>
                     <div>{item.timeFrom}</div>
@@ -225,9 +221,7 @@ function ShiftGroup() {
                 ))}
               </div>
             ) : (
-              <div className="no-data-found">
-                No active shift groups
-              </div>
+              <div className="no-data-found">No active shift groups</div>
             )}
 
             <h3 className="group-title inactive">Inactive</h3>
@@ -239,7 +233,6 @@ function ShiftGroup() {
                     item={item}
                     status="inactive"
                     handleDataToForm={handleDataToForm}
-
                   >
                     <div>{item.shiftType}</div>
                     <div>{item.timeFrom}</div>
@@ -248,9 +241,7 @@ function ShiftGroup() {
                 ))}
               </div>
             ) : (
-              <div className="no-data-found">
-                No inactive shift groups
-              </div>
+              <div className="no-data-found">No inactive shift groups</div>
             )}
           </>
         )}
@@ -278,135 +269,225 @@ function ShiftGroup() {
             fetchEntityById={getShiftGroupById}
             ENTITY_FIELD_MAP={SHIFT_GROUP_FIELD_MAP}
           >
-            {({ register, control, errors, watch, setValue, isVarified }) => (
+            {({ register, control, errors, setValue, watch, isVarified }) => (
               <>
-                {/* TIME FROM */}
-                <div className="form-row">
-                  <label className="group-form-label required">Time From</label>
-
-                  <Controller
-                    name={SHIFT_GROUP_FIELD_MAP.timeFrom}
-                    control={control}
-                    rules={{ required: "Time From is required" }}
-                    render={({ field }) => (
-                      <TimePicker
-                        {...field}
-                        format="HH:mm"
-                        disableClock={true}
-                        clearIcon={null}
-                        clockIcon={null}
-                        className={`custom-time-picker ${errors[SHIFT_GROUP_FIELD_MAP.timeFrom] ? "error" : ""
-                          }`}
+                <div className="main-model-content">
+                  {/* CODE */}
+                  <div className="full-content">
+                    <div className="form-row">
+                      <label className="group-form-label">Code</label>
+                      <input
+                        className={`form-control ${
+                          errors[SHIFT_GROUP_FIELD_MAP.code] ? "error" : ""
+                        } ${isVarified ? "read-only" : ""}`}
                         disabled={isVarified}
+                        {...register(SHIFT_GROUP_FIELD_MAP.code, {
+                          required: "Code is required",
+                        })}
                       />
-                    )}
-                  />
-
-                  {errors[SHIFT_GROUP_FIELD_MAP.timeFrom] && (
-                    <span className="error-message">
-                      {errors[SHIFT_GROUP_FIELD_MAP.timeFrom].message}
-                    </span>
-                  )}
-                </div>
-
-                {/* TIME TO */}
-                <div className="form-row">
-                  <label className="group-form-label required">Time To</label>
-
-                  <Controller
-                    name={SHIFT_GROUP_FIELD_MAP.timeTo}
-                    control={control}
-                    rules={{ required: "Time To is required" }}
-                    render={({ field }) => (
-                      <TimePicker
-                        {...field}
-                        format="HH:mm"
-                        disableClock={true}
-                        clearIcon={null}
-                        clockIcon={null}
-                        className={`custom-time-picker ${errors[SHIFT_GROUP_FIELD_MAP.timeTo] ? "error" : ""
-                          }`}
-                        disabled={isVarified}
-                      />
-                    )}
-                  />
-
-                  {errors[SHIFT_GROUP_FIELD_MAP.timeTo] && (
-                    <span className="error-message">
-                      {errors[SHIFT_GROUP_FIELD_MAP.timeTo].message}
-                    </span>
-                  )}
-                </div>
-
-                {/* SHIFT TYPE ICONS */}
-                <div className="full-content">
-                  <div className="form-row">
-                    <label className="group-form-label required">Shift Type</label>
-
-                    <div className="shift-type-container">
-                      {/* DAY */}
-                      <div
-                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "DAY"
-                            ? "active"
-                            : ""
-                          } ${isVarified ? "disabled" : ""}`}
-                        onClick={() =>
-                          !isVarified &&
-                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "DAY", {
-                            shouldValidate: true,
-                          })
-                        }
-                      >
-                        <GrSun />
-                      </div>
-
-                      {/* NIGHT */}
-                      <div
-                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "NIGHT"
-                            ? "active"
-                            : ""
-                          } ${isVarified ? "disabled" : ""}`}
-                        onClick={() =>
-                          !isVarified &&
-                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "NIGHT", {
-                            shouldValidate: true,
-                          })
-                        }
-                      >
-                        <GrMoon />
-                      </div>
-
-                      {/* GENERAL */}
-                      <div
-                        className={`shift-type ${watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "GENERAL"
-                            ? "active"
-                            : ""
-                          } ${isVarified ? "disabled" : ""}`}
-                        onClick={() =>
-                          !isVarified &&
-                          setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "GENERAL", {
-                            shouldValidate: true,
-                          })
-                        }
-                      >
-                        <LiaAdjustSolid />
-                      </div>
+                      {errors[SHIFT_GROUP_FIELD_MAP.code] && (
+                        <span className="error-message">
+                          {errors[SHIFT_GROUP_FIELD_MAP.code].message}
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Hidden RHF input */}
-                  <input
-                    type="hidden"
-                    {...register(SHIFT_GROUP_FIELD_MAP.shiftType, {
-                      required: "Shift Type is required",
-                    })}
-                  />
+                  {/* NAME */}
+                  <div className="full-content">
+                    <div className="form-row">
+                      <label className="group-form-label">Name</label>
+                      <input
+                        className={`form-control ${
+                          errors[SHIFT_GROUP_FIELD_MAP.name] ? "error" : ""
+                        } ${isVarified ? "read-only" : ""}`}
+                        disabled={isVarified}
+                        {...register(SHIFT_GROUP_FIELD_MAP.name, {
+                          required: "Name is required",
+                        })}
+                      />
+                      {errors[SHIFT_GROUP_FIELD_MAP.name] && (
+                        <span className="error-message">
+                          {errors[SHIFT_GROUP_FIELD_MAP.name].message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                  {errors[SHIFT_GROUP_FIELD_MAP.shiftType] && (
-                    <span className="error-message">
-                      {errors[SHIFT_GROUP_FIELD_MAP.shiftType].message}
-                    </span>
-                  )}
+                  {/* SHORT NAME */}
+                  <div className="full-content">
+                    <div className="form-row">
+                      <label className="group-form-label">Short Name</label>
+                      <input
+                        className={`form-control ${
+                          errors[SHIFT_GROUP_FIELD_MAP.shortName] ? "error" : ""
+                        } ${isVarified ? "read-only" : ""}`}
+                        disabled={isVarified}
+                        {...register(SHIFT_GROUP_FIELD_MAP.shortName, {
+                          required: "Short Name is required",
+                        })}
+                      />
+                      {errors[SHIFT_GROUP_FIELD_MAP.shortName] && (
+                        <span className="error-message">
+                          {errors[SHIFT_GROUP_FIELD_MAP.shortName].message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* TIME FROM */}
+                  <div className="full-content">
+                    <div className="form-row">
+                      <label className="group-form-label required">
+                        Time From
+                      </label>
+
+                      <Controller
+                        name={SHIFT_GROUP_FIELD_MAP.timeFrom}
+                        control={control}
+                        rules={{ required: "Time From is required" }}
+                        render={({ field }) => (
+                          <TimePicker
+                            {...field}
+                            format="HH:mm"
+                            disableClock={true}
+                            clearIcon={null}
+                            clockIcon={null}
+                            className={`custom-time-picker ${
+                              errors[SHIFT_GROUP_FIELD_MAP.timeFrom]
+                                ? "error"
+                                : ""
+                            }`}
+                            disabled={isVarified}
+                          />
+                        )}
+                      />
+
+                      {errors[SHIFT_GROUP_FIELD_MAP.timeFrom] && (
+                        <span className="error-message">
+                          {errors[SHIFT_GROUP_FIELD_MAP.timeFrom].message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* TIME TO */}
+                  <div className="full-content">
+                    <div className="form-row">
+                      <label className="group-form-label required">
+                        Time To
+                      </label>
+
+                      <Controller
+                        name={SHIFT_GROUP_FIELD_MAP.timeTo}
+                        control={control}
+                        rules={{ required: "Time To is required" }}
+                        render={({ field }) => (
+                          <TimePicker
+                            {...field}
+                            format="HH:mm"
+                            disableClock={true}
+                            clearIcon={null}
+                            clockIcon={null}
+                            className={`custom-time-picker ${
+                              errors[SHIFT_GROUP_FIELD_MAP.timeTo]
+                                ? "error"
+                                : ""
+                            }`}
+                            disabled={isVarified}
+                          />
+                        )}
+                      />
+
+                      {errors[SHIFT_GROUP_FIELD_MAP.timeTo] && (
+                        <span className="error-message">
+                          {errors[SHIFT_GROUP_FIELD_MAP.timeTo].message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* SHIFT TYPE ICONS */}
+                  <div className="full-content">
+                  <div className="full-content">
+                    <div className="form-row">
+                      <label className="group-form-label required">
+                        Shift Type
+                      </label>
+
+                      <div className="shift-type-container">
+                        {/* DAY */}
+                        <div
+                          className={`shift-type ${
+                            watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "DAY"
+                              ? "active"
+                              : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                          onClick={() =>
+                            !isVarified &&
+                            setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "DAY", {
+                              shouldValidate: true,
+                            })
+                          }
+                        >
+                          <GrSun />
+                        </div>
+
+                        {/* NIGHT */}
+                        <div
+                          className={`shift-type ${
+                            watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "NIGHT"
+                              ? "active"
+                              : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                          onClick={() =>
+                            !isVarified &&
+                            setValue(SHIFT_GROUP_FIELD_MAP.shiftType, "NIGHT", {
+                              shouldValidate: true,
+                            })
+                          }
+                        >
+                          <GrMoon />
+                        </div>
+
+                        {/* GENERAL */}
+                        <div
+                          className={`shift-type ${
+                            watch(SHIFT_GROUP_FIELD_MAP.shiftType) === "GENERAL"
+                              ? "active"
+                              : ""
+                          } ${isVarified ? "disabled" : ""}`}
+                          onClick={() =>
+                            !isVarified &&
+                            setValue(
+                              SHIFT_GROUP_FIELD_MAP.shiftType,
+                              "GENERAL",
+                              {
+                                shouldValidate: true,
+                              },
+                            )
+                          }
+                        >
+                          <LiaAdjustSolid />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hidden RHF input */}
+                    <input
+                      type="hidden"
+                      {...register(SHIFT_GROUP_FIELD_MAP.shiftType, {
+                        required: "Shift Type is required",
+                      })}
+                    />
+
+                    {errors[SHIFT_GROUP_FIELD_MAP.shiftType] && (
+                      <span className="error-message">
+                        {errors[SHIFT_GROUP_FIELD_MAP.shiftType].message}
+                      </span>
+                    )}
+                    </div>
+                  </div>
                 </div>
               </>
             )}

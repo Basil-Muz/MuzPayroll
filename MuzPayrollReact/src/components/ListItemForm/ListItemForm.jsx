@@ -37,6 +37,7 @@ function ListItemForm({
     reset,
     control,
     setValue,
+    watch,
     clearErrors,
     formState: { errors },
   } = useForm({
@@ -171,7 +172,14 @@ function ListItemForm({
           <div className="main-model-content">
             {/* CHILDREN FIELDS */}
             {children &&
-              children({ register, control, errors, setValue, isVarified })}
+              children({
+                register,
+                control,
+                errors,
+                setValue,
+                watch,
+                isVarified,
+              })}
 
             {/* ACTIVE DATE */}
             <div className="full-content">

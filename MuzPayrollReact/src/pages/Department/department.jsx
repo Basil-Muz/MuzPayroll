@@ -129,16 +129,13 @@ function Department() {
       <Header backendError={[]} />
 
       <div className="department-page">
-
         {/* HEADER */}
 
         <div className="header-section">
           <h2 className="page-title">Department</h2>
 
           <div className="header-actions">
-
             <div className="view-toggle">
-
               <button
                 className={`icon-btn ${boxView ? "active" : ""}`}
                 onClick={() => {
@@ -165,7 +162,6 @@ function Department() {
               >
                 <FaRegObjectGroup size={18} />
               </button>
-
             </div>
 
             <div className="search-box">
@@ -178,7 +174,6 @@ function Department() {
                 onChange={handleSearchChange}
               />
             </div>
-
           </div>
         </div>
 
@@ -205,9 +200,7 @@ function Department() {
               ))}
             </div>
           ) : (
-            <div className="no-data-found">
-              No departments available
-            </div>
+            <div className="no-data-found">No departments available</div>
           ))}
 
         {/* GROUP VIEW */}
@@ -269,12 +262,76 @@ function Department() {
             fetchEntityById={getDepartmentById}
             ENTITY_FIELD_MAP={DEPARTMENT_FIELD_MAP}
           >
-            
-         </ListItemForm>
+            {({ register, errors, isVarified }) => (
+              <div className="main-model-content">
+                {/* CODE */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Code</label>
+                    <input
+                      className={`form-control ${
+                        errors[DEPARTMENT_FIELD_MAP.code] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      disabled={isVarified}
+                      {...register(DEPARTMENT_FIELD_MAP.code, {
+                        required: "Code is required",
+                      })}
+                    />
+                    {errors[DEPARTMENT_FIELD_MAP.code] && (
+                      <span className="error-message">
+                        {errors[DEPARTMENT_FIELD_MAP.code].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* NAME */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Name</label>
+                    <input
+                      className={`form-control ${
+                        errors[DEPARTMENT_FIELD_MAP.name] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      disabled={isVarified}
+                      {...register(DEPARTMENT_FIELD_MAP.name, {
+                        required: "Name is required",
+                      })}
+                    />
+                    {errors[DEPARTMENT_FIELD_MAP.name] && (
+                      <span className="error-message">
+                        {errors[DEPARTMENT_FIELD_MAP.name].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* SHORT NAME */}
+                <div className="full-content">
+                  <div className="form-row">
+                    <label className="group-form-label">Short Name</label>
+                    <input
+                      className={`form-control ${
+                        errors[DEPARTMENT_FIELD_MAP.shortName] ? "error" : ""
+                      } ${isVarified ? "read-only" : ""}`}
+                      disabled={isVarified}
+                      {...register(DEPARTMENT_FIELD_MAP.shortName, {
+                        required: "Short Name is required",
+                      })}
+                    />
+                    {errors[DEPARTMENT_FIELD_MAP.shortName] && (
+                      <span className="error-message">
+                        {errors[DEPARTMENT_FIELD_MAP.shortName].message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </ListItemForm>
         )}
 
         <BackToTop />
-
       </div>
     </>
   );
