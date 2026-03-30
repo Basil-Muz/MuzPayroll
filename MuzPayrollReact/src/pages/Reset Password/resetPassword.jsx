@@ -37,6 +37,9 @@ function ResetPasswordSimple() {
     fetchUsers();
   }, []);
 
+  const handleSearch = () => {};
+ 
+
   // Convert to react-select format
   const userOptions = users.map((u) => ({
     value: u.userCode,
@@ -92,7 +95,7 @@ function ResetPasswordSimple() {
       setError(
         err.response?.data?.errors?.[0] ||
           err.response?.data?.message ||
-          "Failed to reset password"
+          "Failed to reset password",
       );
     }
   };
@@ -101,11 +104,13 @@ function ResetPasswordSimple() {
     <div className="login-container">
       <FloatingActionBar
         actions={{
-          save: { onClick: handleSubmit },
+          // save: { onClick: handleSubmit },
           clear: { onClick: clearForm },
           delete: { disabled: true },
           print: { disabled: true },
-          new: { onClick: clearForm },
+          search: { onClick: handleSearch, disabled: true },
+          // clear: { onClick: handleClear },
+          // new: { onClick: clearForm },
         }}
       />
 
@@ -121,12 +126,8 @@ function ResetPasswordSimple() {
             classNamePrefix="form-control-select"
             options={userOptions}
             isSearchable={false}
-            value={
-              userOptions.find((opt) => opt.value === userCode) || null
-            }
-            onChange={(option) =>
-              setUserCode(option ? option.value : "")
-            }
+            value={userOptions.find((opt) => opt.value === userCode) || null}
+            onChange={(option) => setUserCode(option ? option.value : "")}
             placeholder="-- Select User --"
           />
         </div>

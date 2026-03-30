@@ -53,6 +53,8 @@ function ListItemForm({
   const [mode, setMode] = useState("INSERT");
   const [isVarified, setIsVarified] = useState(false);
 
+  
+
   // Load full entity data if editing
   useEffect(() => {
     if (!data?.id) {
@@ -196,6 +198,7 @@ function ListItemForm({
                       dateFormat="dd/MM/yyyy"
                       className="form-control"
                       minDate={new Date()}
+                      disabled={isVarified}
                     />
                   )}
                 />
@@ -232,7 +235,12 @@ function ListItemForm({
 
           {/* BUTTONS */}
           <div className="form-buttons">
-            <button type="button" className="cancel-btn" onClick={handleClear}>
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={handleClear}
+              disabled={isVarified}
+            >
               <MdOutlineCancel size={18} />
               <span>Cancel</span>
             </button>
