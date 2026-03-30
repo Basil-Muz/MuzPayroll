@@ -9,10 +9,7 @@
   justify-content: center;
   align-items: center;
 
-  background: linear-gradient(135deg,
-      #faf7fd 0%,
-      #f3e8fb 45%,
-      #f6c1fa 100%);
+  background: var(--log-background);
 
   position: relative;
 }
@@ -39,9 +36,7 @@
   padding: 42px 36px;
 
   /* GLASS BACKGROUND (pink tinted) */
-  background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.35),
-      rgba(233, 160, 252, 0.35));
+  background: var(--log-container);
 
   border-radius: 22px;
 
@@ -50,7 +45,7 @@
   -webkit-backdrop-filter: blur(18px);
 
   /* GLASS BORDER */
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border: 1.5px solid var(--primary-light);
 
   /* DEPTH + INNER GLOW */
   box-shadow:
@@ -78,7 +73,7 @@
   /* refined pink */
   letter-spacing: 0.5px;
   margin-bottom: 25px;
-  color: #d946ef;
+  color: var(--brand);
 }
 
 
@@ -90,7 +85,7 @@
 }
 
 .form-group1 label {
-  color: #d946ef;
+  color: var(--brand);
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 6px;
@@ -105,7 +100,7 @@
   border-radius: 34px;
 
   /* box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1); */
-  color: black;
+  color: var(--text);
   font-size: 15px;
 
   outline: none;
@@ -115,7 +110,7 @@
 }
 
 .form-group1 input::placeholder {
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--text);
 
   font-size: 12px;
 
@@ -146,7 +141,7 @@ input:-webkit-autofill:active {
   /* left space for icon */
   border-radius: 34px;
 
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--background);
   backdrop-filter: blur(0px);
 
 
@@ -169,7 +164,7 @@ input:-webkit-autofill:active {
   transform: translateY(-60%);
 
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--text);
 
   pointer-events: none;
   /* important */
@@ -177,7 +172,7 @@ input:-webkit-autofill:active {
 
 /* PLACEHOLDER */
 .input-wrapper input::placeholder {
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--text);
   font-size: 12px;
 }
 
@@ -204,13 +199,13 @@ input:-webkit-autofill:active {
   transform: translateY(-55%);
 
   font-size: 15px;
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--text);
   cursor: pointer;
   transition: 0.2s ease;
 }
 
 .password-eye:hover {
-  color: #d946ef;
+  color: var(--brand);
 }
 
 
@@ -220,7 +215,7 @@ input:-webkit-autofill:active {
    =========================== */
 .error-msg ,
 .common-error-msg{
-  color: #e11d48;
+  color: var(--danger);
   margin-top: 3px;
   margin-bottom: 10px;
   font-size: 13px;

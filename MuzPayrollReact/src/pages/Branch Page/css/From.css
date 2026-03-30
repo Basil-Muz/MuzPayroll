@@ -50,6 +50,11 @@
     #f7e1fa 40%,
     #f8b4fe 100%
   );
+  --log-container: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35),
+    rgba(233, 160, 252, 0.35)
+  );
   /* Shadow Effects */
   --shadow-sm: 0 2px 8px rgba(224, 99, 241, 0.3);
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -126,9 +131,14 @@
   --glass-bg: rgba(36, 17, 38, 0.85);
   --log-background: linear-gradient(
     135deg,
-    #1a1520 0%,
-    #2d1a38 40%,
-    #4a1a52 100%
+    #0f0715 0%,
+    #1a0f2a 45%,
+    #2a0f3a 100%
+  );
+  --log-container: linear-gradient(
+    135deg,
+    rgba(15, 7, 21, 0.6),
+    rgba(168, 85, 247, 0.18)
   );
   /* Shadow Effects */
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.6);

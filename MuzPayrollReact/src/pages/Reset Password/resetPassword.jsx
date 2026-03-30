@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TbPasswordUser } from "react-icons/tb";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import Select from "react-select";
+import { useForm, Controller } from "react-hook-form";
 
 import "../LoginPage/loginpage.css";
 
@@ -15,14 +16,21 @@ import {
 function ResetPasswordSimple() {
   const navigate = useNavigate();
 
-  const [userCode, setUserCode] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  const newPassword = watch("newPassword");
 
   // Fetch users
   useEffect(() => {
@@ -37,39 +45,23 @@ function ResetPasswordSimple() {
     fetchUsers();
   }, []);
 
-  // Convert to react-select format
   const userOptions = users.map((u) => ({
     value: u.userCode,
     label: `${u.userCode} - ${u.username}`,
   }));
 
   const clearForm = () => {
-    setUserCode("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setError("");
+    reset();
+    setServerError("");
     setSuccess("");
   };
 
-  const handleSubmit = async (e) => {
-    if (e) e.preventDefault();
-
-    setError("");
+  const onSubmit = async (data) => {
+    setServerError("");
     setSuccess("");
 
-    if (!userCode || !newPassword || !confirmPassword) {
-      setError("All fields are required");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
     try {
-      const payload = { userCode, newPassword, confirmPassword };
-      const response = await resetPassword(payload);
+      const response = await resetPassword(data);
 
       setSuccess(response.data?.message || "Password reset successfully");
       clearForm();
@@ -89,19 +81,72 @@ function ResetPasswordSimple() {
         }
       }, 2000);
     } catch (err) {
-      setError(
+      setServerError(
         err.response?.data?.errors?.[0] ||
           err.response?.data?.message ||
-          "Failed to reset password"
+          "Failed to reset password",
       );
     }
+  };
+  const customSelectStyles = {
+    control: (base, state) => ({
+      ...base,
+      minHeight: "40px",
+      height: "40px",
+      borderRadius: "9999px", // match your input (pill shape)
+      paddingLeft: "10px", // 🔥 important
+      backgroundColor: "#1a001a",
+      borderColor: state.isFocused ? "#d946ef" : "#d1d5db",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#d946ef",
+      },
+    }),
+
+    valueContainer: (base) => ({
+      ...base,
+      display: "flex",
+      alignItems: "center",
+      padding: "0 8px",
+    }),
+
+    input: (base) => ({
+      ...base,
+      margin: "0px",
+      padding: "0px",
+      opacity: 0,
+    }),
+
+    placeholder: (base) => ({
+      ...base,
+      margin: "0px",
+      padding: "0px",
+
+      color: "#9ca3af",
+    }),
+
+    singleValue: (base) => ({
+      ...base,
+      margin: "0px",
+      color: "#fff",
+    }),
+
+    indicatorsContainer: (base) => ({
+      ...base,
+      height: "40px",
+    }),
+
+    dropdownIndicator: (base) => ({
+      ...base,
+      padding: "8px",
+    }),
   };
 
   return (
     <div className="login-container">
       <FloatingActionBar
         actions={{
-          save: { onClick: handleSubmit },
+          save: { onClick: handleSubmit(onSubmit) },
           clear: { onClick: clearForm },
           delete: { disabled: true },
           print: { disabled: true },
@@ -109,7 +154,7 @@ function ResetPasswordSimple() {
         }}
       />
 
-      <form className="login-box" onSubmit={handleSubmit}>
+      <form className="login-box" onSubmit={handleSubmit(onSubmit)}>
         <div className="logo-section">
           <h2>Reset Password</h2>
         </div>
@@ -117,18 +162,33 @@ function ResetPasswordSimple() {
         {/* User Dropdown */}
         <div className="form-group1">
           <label>User Code</label>
-          <Select
-            classNamePrefix="form-control-select"
-            options={userOptions}
-            isSearchable={false}
-            value={
-              userOptions.find((opt) => opt.value === userCode) || null
-            }
-            onChange={(option) =>
-              setUserCode(option ? option.value : "")
-            }
-            placeholder="-- Select User --"
-          />
+          <div className="pass-user-code">
+            <Controller
+              name="userCode"
+              control={control}
+              rules={{ required: "User is required" }}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  styles={customSelectStyles}
+                  classNamePrefix="form-control-select"
+                  options={userOptions}
+                  isSearchable={true}
+                  placeholder="Select User"
+                  onChange={(option) =>
+                    field.onChange(option ? option.value : "")
+                  }
+                  value={
+                    userOptions.find((opt) => opt.value === field.value) || null
+                  }
+                />
+              )}
+            />
+          </div>
+
+          {errors.userCode && (
+            <p className="error-msg">{errors.userCode.message}</p>
+          )}
         </div>
 
         {/* New Password */}
@@ -136,12 +196,15 @@ function ResetPasswordSimple() {
           <label>New Password</label>
           <div className="input-wrapper">
             <TbPasswordUser className="input-inside-icon" />
+
             <input
               type={showPassword ? "text" : "password"}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter New Password"
+              {...register("newPassword", {
+                required: "New password is required",
+              })}
             />
+
             <span
               className="password-eye"
               onClick={() => setShowPassword(!showPassword)}
@@ -149,6 +212,10 @@ function ResetPasswordSimple() {
               {showPassword ? <IoEye /> : <IoEyeOff />}
             </span>
           </div>
+
+          {errors.newPassword && (
+            <p className="error-msg">{errors.newPassword.message}</p>
+          )}
         </div>
 
         {/* Confirm Password */}
@@ -156,16 +223,24 @@ function ResetPasswordSimple() {
           <label>Confirm Password</label>
           <div className="input-wrapper">
             <TbPasswordUser className="input-inside-icon" />
+
             <input
               type={showPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm Password"
+              {...register("confirmPassword", {
+                required: "Confirm password is required",
+                validate: (value) =>
+                  value === newPassword || "Passwords do not match",
+              })}
             />
           </div>
+
+          {errors.confirmPassword && (
+            <p className="error-msg">{errors.confirmPassword.message}</p>
+          )}
         </div>
 
-        {error && <p className="error-msg">{error}</p>}
+        {serverError && <p className="error-msg">{serverError}</p>}
         {success && <p className="success-msg">{success}</p>}
 
         <button type="submit" className="login-btn">
