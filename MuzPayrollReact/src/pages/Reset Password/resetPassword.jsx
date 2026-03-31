@@ -12,14 +12,25 @@ import {
   resetPassword,
   getUsersDropdown,
 } from "../../services/resetpassword.service";
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
+// import { handleApiError } from "../../utils/errorToastResolver";
+import { toast } from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
+import { getFloatingActions } from "../../utils/setActionButtons";
+import { useSidebarPermissions } from "../../hooks/useSidebarPermissions";
+import { useAuth } from "../../context/AuthProvider";
+import { handleApiError } from "../../utils/errorToastResolver";
+
 
 function ResetPasswordSimple() {
   const navigate = useNavigate();
 
   const [users, setUsers] = useState([]);
-  const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // const [serverError, setServerError] = useState("");
+  // const [success, setSuccess] = useState("");
 
   const {
     register,
@@ -29,19 +40,45 @@ function ResetPasswordSimple() {
     watch,
     formState: { errors },
   } = useForm();
+  const { user } = useAuth();
+
+  const [backendPermissions, setBackendPermissions] = useState();
+
+  const [searchParams] = useSearchParams();
+  const optionid = searchParams.get("opid");
+
+  const { setSidebar } = useSidebarPermissions();
+  const { showRailLoader, hideLoader } = useLoader();
 
   const newPassword = watch("newPassword");
 
+  useEffect(() => {
+    setSidebar(
+      "OPTION_RIGHTS",
+      "",
+      user.userMstId,
+      user.solutionId,
+      optionid,
+      user.userEntityHierarchyId,
+      setBackendPermissions,
+    );
+  }, [optionid]);
+  const fetchUsers = async () => {
+    const startTime = Date.now();
+    showRailLoader("Fetching Users details…");
+    try {
+      const res = await getUsersDropdown();
+      setUsers(res.data || []);
+    } catch (err) {
+      handleApiError(err, { entity: "Users" });
+      console.error("Failed to fetch users", err);
+    } finally {
+      await ensureMinDuration(startTime, 1200);
+      hideLoader();
+    }
+  };
   // Fetch users
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await getUsersDropdown();
-        setUsers(res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch users", err);
-      }
-    };
     fetchUsers();
   }, []);
 
@@ -52,26 +89,33 @@ function ResetPasswordSimple() {
 
   const clearForm = () => {
     reset();
-    setServerError("");
-    setSuccess("");
+  };
+  const handleRefresh = () => {
+    fetchUsers();
+    toast.success("Form refreshed");
   };
 
   const onSubmit = async (data) => {
-    setServerError("");
-    setSuccess("");
+    const startTime = Date.now();
+
+    showRailLoader("Resetting password...");
 
     try {
       const response = await resetPassword(data);
 
-      setSuccess(response.data?.message || "Password reset successfully");
+      await ensureMinDuration(startTime, 700);
+      hideLoader();
+
+      toast.success(response.data?.message || "Password reset successfully");
       clearForm();
 
       const loginData = JSON.parse(localStorage.getItem("loginData"));
       const solutionId = loginData?.solutionId;
 
-      localStorage.clear();
+      showRailLoader("Redirecting to login...");
 
       setTimeout(() => {
+        localStorage.clear();
         if (solutionId === 1) {
           navigate("/payroll", { replace: true });
         } else if (solutionId === 2) {
@@ -79,13 +123,16 @@ function ResetPasswordSimple() {
         } else {
           navigate("/payroll", { replace: true });
         }
+        hideLoader();
       }, 2000);
     } catch (err) {
-      setServerError(
+      hideLoader();
+      const message =
         err.response?.data?.errors?.[0] ||
-          err.response?.data?.message ||
-          "Failed to reset password",
-      );
+        err.response?.data?.message ||
+        "Something went wrong";
+
+      toast.error(message);
     }
   };
   const customSelectStyles = {
@@ -94,7 +141,7 @@ function ResetPasswordSimple() {
       minHeight: "40px",
       height: "40px",
       borderRadius: "9999px", // match your input (pill shape)
-      paddingLeft: "10px", // 🔥 important
+      paddingLeft: "10px", //important
       backgroundColor: "#1a001a",
       borderColor: state.isFocused ? "#d946ef" : "#d1d5db",
       boxShadow: "none",
@@ -145,13 +192,25 @@ function ResetPasswordSimple() {
   return (
     <div className="login-container">
       <FloatingActionBar
-        actions={{
-          save: { onClick: handleSubmit(onSubmit) },
-          clear: { onClick: clearForm },
-          delete: { disabled: true },
-          print: { disabled: true },
-          new: { onClick: clearForm },
-        }}
+        actions={getFloatingActions(
+          backendPermissions,
+          {
+            // handleSave,
+            handleClear: clearForm,
+            handleRefresh,
+            // handleSearch,
+            // handleNew: handleClear,
+            // handleDelete,
+            // handlePrint,
+          },
+          {
+            // because disabled: canSave
+            canSearch: true, // true → disabled
+            canClear: false, // false → enabled
+            canRefresh: false, // false → enabled
+          },
+          ["clear", "search", "refresh","delete","print"],
+        )}
       />
 
       <form className="login-box" onSubmit={handleSubmit(onSubmit)}>
@@ -198,18 +257,49 @@ function ResetPasswordSimple() {
             <TbPasswordUser className="input-inside-icon" />
 
             <input
-              type={showPassword ? "text" : "password"}
+              type={showNewPassword ? "text" : "password"}
               placeholder="Enter New Password"
               {...register("newPassword", {
                 required: "New password is required",
+
+                minLength: {
+                  value: 6,
+                  message: "Minimum 6 characters required",
+                },
+
+                maxLength: {
+                  value: 20,
+                  message: "Maximum 20 characters allowed",
+                },
+
+                validate: {
+                  noSpaces: (value) =>
+                    !value.includes(" ") || "Password must not contain spaces",
+
+                  hasUpperCase: (value) =>
+                    /[A-Z]/.test(value) ||
+                    "At least one uppercase letter required",
+
+                  hasLowerCase: (value) =>
+                    /[a-z]/.test(value) ||
+                    "At least one lowercase letter required",
+
+                  hasNumber: (value) =>
+                    /[0-9]/.test(value) || "At least one number required",
+
+                  // optional (if needed)
+                  hasSpecialChar: (value) =>
+                    /[!@#$%^&*]/.test(value) ||
+                    "At least one special character required",
+                },
               })}
             />
 
             <span
               className="password-eye"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={() => setShowNewPassword(!showNewPassword)}
             >
-              {showPassword ? <IoEye /> : <IoEyeOff />}
+              {showNewPassword ? <IoEye /> : <IoEyeOff />}
             </span>
           </div>
 
@@ -225,7 +315,7 @@ function ResetPasswordSimple() {
             <TbPasswordUser className="input-inside-icon" />
 
             <input
-              type={showPassword ? "text" : "password"}
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm Password"
               {...register("confirmPassword", {
                 required: "Confirm password is required",
@@ -233,15 +323,19 @@ function ResetPasswordSimple() {
                   value === newPassword || "Passwords do not match",
               })}
             />
+
+            <span
+              className="password-eye"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <IoEye /> : <IoEyeOff />}
+            </span>
           </div>
 
           {errors.confirmPassword && (
             <p className="error-msg">{errors.confirmPassword.message}</p>
           )}
         </div>
-
-        {serverError && <p className="error-msg">{serverError}</p>}
-        {success && <p className="success-msg">{success}</p>}
 
         <button type="submit" className="login-btn">
           RESET

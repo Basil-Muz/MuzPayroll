@@ -279,77 +279,42 @@ input:-webkit-autofill:active {
 }
 
 /* ===========================
-   RESPONSIVE STYLES
+   RESPONSIVE
    =========================== */
 
-/* ----- Tablets (max-width: 900px) ----- */
+/* TABLET */
 @media (max-width: 900px) {
   .login-box {
     width: 300px;
     padding: 35px 30px;
   }
 
-  .login-logo {
-    width: 65px;
-  }
-
-  .logo-section h2 {
-    font-size: 22px;
-  }
-
-  .form-group1 input {
+  .input-wrapper input {
+    padding: 11px 36px 11px 40px;
     font-size: 14px;
-    padding: 11px;
   }
 }
 
-/* ----- Large Mobile (max-width: 600px) ----- */
+/* MOBILE */
 @media (max-width: 600px) {
-  .login-container {
-    padding: 20px;
-  }
-
   .login-box {
     width: 100%;
     max-width: 330px;
     padding: 30px 25px;
   }
-
-  .logo-section h2 {
-    font-size: 20px;
-  }
-
-  .login-btn {
-    font-size: 15px;
-  }
 }
 
-/* ----- Small Mobile (max-width: 400px) ----- */
+/* SMALL MOBILE */
 @media (max-width: 400px) {
   .login-box {
     max-width: 300px;
     padding: 25px 20px;
   }
 
-  .login-logo {
-    width: 55px;
-  }
-
-  .logo-section h2 {
-    font-size: 18px;
-  }
-
-  .form-group1 input {
-    padding: 10px;
-    font-size: 13px;
-  }
-
-  .login-btn {
-    padding: 12px;
-    font-size: 14px;
-  }
-
-  .forgot-link {
+  .input-wrapper input {
+    padding: 10px 34px 10px 38px;
     font-size: 13px;
   }
 }
+
+

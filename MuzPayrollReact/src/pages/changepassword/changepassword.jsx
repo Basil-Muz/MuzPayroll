@@ -4,7 +4,15 @@ import "../LoginPage/loginpage.css";
 import { TbPasswordUser } from "react-icons/tb";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useAuth } from "../../context/AuthProvider";
-import { changePassword, changePasswordForgot } from "../../services/changepassword.service";
+import {
+  changePassword,
+  changePasswordForgot,
+} from "../../services/changepassword.service";
+
+import { useLoader } from "../../context/LoaderContext";
+import { ensureMinDuration } from "../../utils/loaderDelay";
+import { handleApiError } from "../../utils/errorToastResolver";
+import { toast } from "react-hot-toast";
 
 function ChangePassword() {
   const navigate = useNavigate();
@@ -19,17 +27,21 @@ function ChangePassword() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+
   const [loading, setLoading] = useState(false);
+
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { showRailLoader, hideLoader } = useLoader();
 
   // Password rules
   const validatePasswordRules = (password) => {
     if (password.length < 2)
       return "Password must be at least 2 characters long";
-    if (password.includes(" "))
-      return "Password must not contain spaces";
+    if (password.includes(" ")) return "Password must not contain spaces";
 
     return null;
   };
@@ -37,7 +49,6 @@ function ChangePassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
 
     // Required validation
     if (!newPassword || !confirmPassword) {
@@ -49,6 +60,10 @@ function ChangePassword() {
     const ruleError = validatePasswordRules(newPassword);
     if (ruleError) {
       setError(ruleError);
+      return;
+    }
+    if (!isForgotFlow && currentPassword === newPassword) {
+      setError("New password cannot be same as current password");
       return;
     }
 
@@ -71,6 +86,9 @@ function ChangePassword() {
       setLoading(false);
       return;
     }
+    const startTime = Date.now();
+
+    showRailLoader("Changing password...");
 
     try {
       let payload = {};
@@ -102,7 +120,15 @@ function ChangePassword() {
         response = await changePassword(payload);
       }
 
-      setSuccess(response.data?.message || "Password changed successfully");
+      await ensureMinDuration(startTime, 700);
+      hideLoader();
+
+      toast.success(response.data?.message || "Password changed successfully", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+
+      showRailLoader("Redirecting to login...");
 
       // const solutionId = user?.solutionId;
       localStorage.clear();
@@ -115,13 +141,15 @@ function ChangePassword() {
         } else {
           navigate("/payroll", { replace: true });
         }
+        hideLoader();
       }, 2000);
-
     } catch (err) {
+      hideLoader();
+      handleApiError(err);
       setError(
         err.response?.data?.errors?.[0] ||
-        err.response?.data?.message ||
-        "Failed to change password"
+          err.response?.data?.message ||
+          "Failed to change password",
       );
     } finally {
       setLoading(false);
@@ -142,16 +170,17 @@ function ChangePassword() {
             <div className="input-wrapper">
               <TbPasswordUser className="input-inside-icon" />
               <input
-                type={showPassword ? "text" : "password"}
+                type={showCurrentPassword ? "text" : "password"}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Current Password"
                 autoFocus
               />
               <span
                 className="password-eye"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
               >
-                {showPassword ? <IoEye /> : <IoEyeOff />}
+                {showCurrentPassword ? <IoEye /> : <IoEyeOff />}
               </span>
             </div>
           </div>
@@ -163,16 +192,17 @@ function ChangePassword() {
           <div className="input-wrapper">
             <TbPasswordUser className="input-inside-icon" />
             <input
-              type={showPassword ? "text" : "password"}
+              type={showNewPassword ? "text" : "password"}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New Password"
               autoFocus={isForgotFlow}
             />
             <span
               className="password-eye"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={() => setShowNewPassword(!showNewPassword)}
             >
-              {showPassword ? <IoEye /> : <IoEyeOff />}
+              {showNewPassword ? <IoEye /> : <IoEyeOff />}
             </span>
           </div>
         </div>
@@ -183,21 +213,22 @@ function ChangePassword() {
           <div className="input-wrapper">
             <TbPasswordUser className="input-inside-icon" />
             <input
-              type={showPassword ? "text" : "password"}
+              type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm Password"
             />
             <span
               className="password-eye"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
-              {showPassword ? <IoEye /> : <IoEyeOff />}
+              {showConfirmPassword ? <IoEye /> : <IoEyeOff />}
             </span>
           </div>
         </div>
 
         {error && <p className="error-msg">{error}</p>}
-        {success && <p className="success-msg">{success}</p>}
+       
 
         <button type="submit" className="login-btn" disabled={loading}>
           {loading ? "SUBMITTING..." : "SUBMIT"}
@@ -205,8 +236,7 @@ function ChangePassword() {
         <p
           className="forgot-link"
           onClick={() => {
-            const redirectPath =
-              solutionId === 1 ? "/payroll" : "/payrollemp";
+            const redirectPath = solutionId === 1 ? "/payroll" : "/payrollemp";
 
             logout(); // clears auth + storage
             navigate(redirectPath, { replace: true });
