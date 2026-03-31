@@ -196,9 +196,14 @@ function ListItemForm({
                       selected={field.value ? new Date(field.value) : null}
                       onChange={(date) => field.onChange(date)}
                       dateFormat="dd/MM/yyyy"
-                      className="form-control"
+                      className="form-control datepicker-input"
                       minDate={new Date()}
+
                       disabled={isVarified}
+
+                      calendarClassName="custom-datepicker"
+                      popperClassName="custom-datepicker-popper"
+
                     />
                   )}
                 />

@@ -53,6 +53,9 @@ public class ChangePasswordService
         if (req.getNewPassword() == null || req.getNewPassword().isBlank())
             return Response.error("New password is required");
 
+        if (req.getConfirmPassword() == null || req.getConfirmPassword().isBlank())
+            return Response.error("Confirm password is required");
+
         return Response.success(true);
     }
 
@@ -88,6 +91,20 @@ public class ChangePasswordService
 
         if (!user.getPassword().equals(req.getCurrentPassword())) {
             return Response.error("Current password is incorrect");
+        }
+        if (req.getNewPassword().length() < 2) {
+            return Response.error("Password must be at least 2 characters");
+        }
+
+        if (req.getNewPassword().contains(" ")) {
+            return Response.error("Password must not contain spaces");
+        }
+
+        if (req.getNewPassword().equals(req.getCurrentPassword())) {
+            return Response.error("New password cannot be same as current password");
+        }
+        if (!req.getNewPassword().equals(req.getConfirmPassword())) {
+            return Response.error("Passwords do not match");
         }
 
         return Response.success(true);
@@ -153,36 +170,41 @@ public class ChangePasswordService
         return dto;
     }
 
-   public Response<Boolean> resetPassword(ChangePasswordRequest request) {
+    // reset password
 
-    try {
-        UserMst user = userRepo.findByUserCode(request.getUserCode());
+    public Response<Boolean> resetPassword(ChangePasswordRequest request) {
 
-        if (user == null) {
-            return Response.error("User not found");
+        try {
+            UserMst user = userRepo.findByUserCode(request.getUserCode());
+
+            if (user == null) {
+                return Response.error("User not found");
+            }
+
+            if (request.getNewPassword() == null || request.getNewPassword().isBlank()) {
+                return Response.error("New password is required");
+            }
+
+            if (request.getConfirmPassword() == null || request.getConfirmPassword().isBlank()) {
+                return Response.error("Confirm password is required");
+            }
+
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                return Response.error("Passwords do not match");
+            }
+            if (user.getPassword().equals(request.getNewPassword())) {
+                return Response.error("New password cannot be same as old password");
+            }
+
+            user.setPassword(request.getNewPassword());
+            user.setUsmChangePasswordOnNextLogin(false);
+
+            userRepo.save(user);
+
+            return Response.success(true);
+
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
         }
-
-        if (request.getNewPassword() == null || request.getNewPassword().isBlank()) {
-            return Response.error("New password is required");
-        }
-
-        if (request.getConfirmPassword() == null || request.getConfirmPassword().isBlank()) {
-            return Response.error("Confirm password is required");
-        }
-
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            return Response.error("Passwords do not match");
-        }
-
-        user.setPassword(request.getNewPassword());
-        user.setUsmChangePasswordOnNextLogin(false);
-
-        userRepo.save(user);
-
-        return Response.success(true);
-
-    } catch (Exception e) {
-        return Response.error(e.getMessage());
     }
-}
 }
