@@ -12,6 +12,7 @@ export const useSidebarPermissions = () => {
     setBackendPermissions,
   ) => {
     try {
+      if (optionid === null) return;
       const res = await fetchSideBar(
         transtype,
         transsubtype,

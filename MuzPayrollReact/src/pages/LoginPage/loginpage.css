@@ -27,7 +27,6 @@
   z-index: 1;
 }
 
-
 /* ===========================
    GLASS LOGIN CARD
    =========================== */
@@ -56,7 +55,6 @@
   z-index: 2;
 }
 
-
 /* ==false=========================
    LOGO
    =========================== */
@@ -75,7 +73,6 @@
   margin-bottom: 25px;
   color: var(--brand);
 }
-
 
 /* ===========================
    FORM FIELDS
@@ -105,12 +102,10 @@
 
   outline: none;
   transition: 0.25s ease;
-
-
 }
 
 .form-group1 input::placeholder {
-  color: var(--text);
+  color: var(--text-light);
 
   font-size: 12px;
 
@@ -128,7 +123,6 @@ input:-webkit-autofill:active {
   transition: background-color 9999s ease-in-out 0s;
 }
 
-
 .input-wrapper {
   position: relative;
   width: 100%;
@@ -139,11 +133,10 @@ input:-webkit-autofill:active {
   width: 100%;
   padding: 12px 16px 12px 42px;
   /* left space for icon */
-  border-radius: 34px;
+  border-radius: var(--radius);
 
   background: var(--background);
   backdrop-filter: blur(0px);
-
 
   border: 1px solid var(--brand-border);
 
@@ -153,7 +146,6 @@ input:-webkit-autofill:active {
   outline: none;
   transition: 0.25s ease;
 }
-
 
 /* ICON INSIDE INPUT */
 .input-inside-icon {
@@ -172,7 +164,7 @@ input:-webkit-autofill:active {
 
 /* PLACEHOLDER */
 .input-wrapper input::placeholder {
-  color: var(--text);
+  color: var(--text-light);
   font-size: 12px;
 }
 
@@ -185,10 +177,9 @@ input:-webkit-autofill:active {
   box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1);
 }
 
-
 /* OPTIONAL: fade icon when typing */
-.input-wrapper input:focus+.input-inside-icon,
-.input-wrapper input:not(:placeholder-shown)+.input-inside-icon {
+.input-wrapper input:focus + .input-inside-icon,
+.input-wrapper input:not(:placeholder-shown) + .input-inside-icon {
   opacity: 0.5;
 }
 
@@ -208,19 +199,16 @@ input:-webkit-autofill:active {
   color: var(--brand);
 }
 
-
-
 /* ===========================
    ERROR MESSAGE
    =========================== */
-.error-msg ,
-.common-error-msg{
+.error-msg,
+.common-error-msg {
   color: var(--danger);
   margin-top: 3px;
   margin-bottom: 10px;
   font-size: 13px;
   text-align: left;
-
 }
 .success-msg {
   color: var(--success);
@@ -232,10 +220,17 @@ input:-webkit-autofill:active {
 
 .input-wrapper input.input-error {
   border-color: var(--danger);
-
 }
 
+.login-container .form-control-select__control {
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--brand-border) !important;
+}
 
+.login-container .form-control-select__control:focus {
+  border-color: var(--brand)!important;
+  box-shadow: 0 0 0 3px rgba(208, 99, 241, 0.1)!important;
+}
 /* ===========================
    LOGIN BUTTON
    =========================== */
@@ -244,9 +239,7 @@ input:-webkit-autofill:active {
   padding: 12px;
   margin-top: 12px;
 
-  background: linear-gradient(90deg,
-      #d946ef,
-      #b832d9);
+  background: linear-gradient(90deg, #db46ef, #cb32d9);
 
   border: none;
   border-radius: 26px;
@@ -270,7 +263,6 @@ input:-webkit-autofill:active {
   margin-bottom: 10px;
   font-size: 14px;
   text-align: center;
-
 }
 
 .forgot-link {
@@ -285,7 +277,6 @@ input:-webkit-autofill:active {
   color: #e661be;
   text-decoration: underline;
 }
-
 
 /* ===========================
    RESPONSIVE STYLES
@@ -361,5 +352,4 @@ input:-webkit-autofill:active {
   .forgot-link {
     font-size: 13px;
   }
-
 }

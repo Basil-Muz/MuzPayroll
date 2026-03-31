@@ -103,13 +103,13 @@
 .logged-btn {
   padding: 9px 26px;
   border-radius: var(--radius-lg);
-  background: var(--brand);
+  background: var(--button-primary-hover);
   color: white;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
 
 .logged-btn:hover {
-  background: #e766f5;
+  background: var(--button-primary);
 }
 
 /* ---------- SIDEBAR OVERLAY ---------- */

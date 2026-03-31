@@ -12,7 +12,6 @@ import "./FloatingActionBar.css";
 import { IoMenu } from "react-icons/io5";
 const FloatingActionBar = ({ actions = {} }) => {
   const [fabOpen, setFabOpen] = useState(false);
-  console.log("Actions",actions)
   return (
     <div className={`floating-action-bar ${fabOpen ? "open" : ""}`}>
       {/* Mobile toggle */}

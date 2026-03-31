@@ -11,7 +11,6 @@ import { normalizeUserCode } from "../../utils/userCodeUtils.js";
 import { loginUser } from "../../services/login.service.js";
 import { useLocation } from "react-router-dom";
 
-
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,7 +59,6 @@ function LoginPage() {
       const data = await loginUser({
         userCode: value,
         password,
-
       });
       console.log("LOGIN RESPONSE FROM BACKEND:", data);
 
@@ -87,7 +85,6 @@ function LoginPage() {
 
         return;
       }
-
 
       // STORE ALL DROPDOWN LISTS + DEFAULT VALUES
       const payload = data.data;
@@ -128,8 +125,6 @@ function LoginPage() {
 
       setCommonError("Something went wrong.");
     }
-
-
   };
 
   // Handle typing: Allow only letters + numbers
@@ -138,7 +133,7 @@ function LoginPage() {
     const usercode = normalizeUserCode(input);
 
     if (/^[A-Za-z0-9]*$/.test(usercode.cleaned)) {
-      setUserCode(usercode.cleaned);          // internal clean value
+      setUserCode(usercode.cleaned); // internal clean value
       setDisplayUserCode(usercode.cleaned);
       setUserCodeError("");
     } else {
@@ -155,7 +150,6 @@ function LoginPage() {
   const handleUserCodeFocus = () => {
     setDisplayUserCode(userCode);
   };
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -181,7 +175,7 @@ function LoginPage() {
                 onChange={handleUserCodeChange}
                 onBlur={handleUserCodeBlur}
                 onFocus={handleUserCodeFocus}
-                placeholder="e.g. abc, not abc@muziris"
+                placeholder="Enter user code (e.g. abc, no @ or domain)"
                 className={userCodeError ? "input-error" : ""}
                 autoFocus
                 autoComplete="username"
@@ -198,7 +192,7 @@ function LoginPage() {
 
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder="Enter password"
                 value={password}
                 className={passwordError ? "input-error" : ""}
                 onChange={(e) => {
@@ -236,10 +230,13 @@ function LoginPage() {
             )} */}
 
             {/* Login Button */}
-            <button type="submit" className="login-btn" disabled={accountLocked}>
+            <button
+              type="submit"
+              className="login-btn"
+              disabled={accountLocked}
+            >
               Submit
             </button>
-
 
             {/* Forgot Password */}
             <p
